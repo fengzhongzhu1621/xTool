@@ -5,6 +5,10 @@ include CONTRIBUTING.rst
 include HISTORY.rst
 include LICENSE
 include README.rst
+include NOTICE
+include DISCLAIMER
+include CHANGELOG.txt
+include README.md
 
 recursive-include tests *
 recursive-exclude * __pycache__

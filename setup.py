@@ -1,12 +1,11 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-    Command: py.test tests/test_example.py -v
 
-"""
-
-import codecs
+import imp
+import logging
 import os
+import pip
+import sys
+import codecs
 import sys
 from io import open
 
@@ -15,13 +14,91 @@ try:
 except ImportError:
     from distutils.core import setup  # noqa
 from setuptools.command.test import test as TestCommand  # noqa
+from setuptools import find_packages, Command
 
 try:
     import twisted  # noqa
 except ImportError:
-    #raise SystemExit("twisted not found.  Make sure you "
+    # raise SystemExit("twisted not found.  Make sure you "
     #                 "have installed the Twisted core package.")
     pass
+
+logger = logging.getLogger(__name__)
+
+# Kept manually in sync with airflow.__version__
+version = imp.load_source(
+    'xTools.version', os.path.join('xTools', 'version.py')).version
+
+PY3 = sys.version_info[0] == 3
+
+
+class Tox(TestCommand):
+    user_options = [('tox-args=', None, "Arguments to pass to tox")]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.tox_args = ''
+
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        # import here, cause outside the eggs aren't loaded
+        import tox
+        errno = tox.cmdline(args=self.tox_args.split())
+        sys.exit(errno)
+
+
+class CleanCommand(Command):
+    """Custom clean command to tidy up the project root."""
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        os.system('rm -vrf ./build ./dist ./*.pyc ./*.tgz ./*.egg-info')
+
+
+def git_version(version):
+    """
+    Return a version to identify the state of the underlying git repo. The version will
+    indicate whether the head of the current git-backed working directory is tied to a
+    release tag or not : it will indicate the former with a 'release:{version}' prefix
+    and the latter with a 'dev0' prefix. Following the prefix will be a sha of the current
+    branch head. Finally, a "dirty" suffix is appended to indicate that uncommitted changes
+    are present.
+    """
+    repo = None
+    try:
+        import git
+        repo = git.Repo('.git')
+    except ImportError:
+        logger.warning('gitpython not found: Cannot compute the git version.')
+        return ''
+    except Exception as e:
+        logger.warning('Cannot compute the git version. {}'.format(e))
+        return ''
+    if repo:
+        sha = repo.head.commit.hexsha
+        if repo.is_dirty():
+            return '.dev0+{sha}.dirty'.format(sha=sha)
+        # commit is clean
+        return '.release:{version}+{sha}'.format(version=version, sha=sha)
+    else:
+        return 'no_git_version'
+
+
+def write_version(filename=os.path.join(*['airflow',
+                                          'git_version'])):
+    text = "{}".format(git_version(version))
+    with open(filename, 'w') as a:
+        a.write(text)
 
 
 def read(filename):
@@ -33,10 +110,8 @@ def read(filename):
 with open('README.rst', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
-
 with open('HISTORY.rst', encoding='utf-8') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
-
 
 test_requirements = [
     'pytest',
@@ -77,7 +152,7 @@ def refresh_plugin_cache():
 
 
 from setuptools import setup, find_packages
-#from distutils.core import setup
+# from distutils.core import setup
 version = '0.1.0'
 
 README = os.path.join(os.path.dirname(__file__), 'README')
@@ -93,44 +168,76 @@ if os.path.exists("requirements.txt"):
             except ValueError as e:
                 pass
 
-setup(
-    name = 'xTools',
-    version = version,
-    description = 'A python script tools',
-    long_description=long_description,
-    author = 'jinyinqiao',
-    author_email = 'jinyinqiao@gmail.com',
-    license = 'MIT',
-    packages = find_packages(),
-    #packages = ['xTools',
-    #            #"twisted.plugins",
-    #],
-    include_package_data=True,
-    install_requires=install_requires,
-    zip_safe=False,
-    keywords='xTools',
-    classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-    ],
-    setup_requires=[
-        "flake8"
-    ],
-    extras_require={
-        'docs': ['Sphinx', ],
-    },
-    test_suite='tests',
-    tests_require=test_requirements,
-    cmdclass={'test': PyTest},
-)
+doc = [
+    'sphinx>=1.2.3',
+    'sphinx-argparse>=0.1.13',
+    'sphinx-rtd-theme>=0.1.6',
+    'Sphinx-PyPI-upload>=0.2.1'
+]
+
+
+def do_setup():
+    write_version()
+
+    setup(
+        name='xTools',
+        version=version,
+        description='A python script tools',
+        long_description=long_description,
+        author='jinyinqiao',
+        author_email='jinyinqiao@gmail.com',
+        license='Apache License 2.0',
+        packages=find_packages(exclude=['tests*']),
+        # packages = ['xTools',
+        #            #"twisted.plugins",
+        # ],
+        include_package_data=True,
+        install_requires=install_requires,
+        zip_safe=False,
+        scripts=['airflow/bin/airflow'],
+        keywords='xTools',
+        classifiers=[
+            'Development Status :: 2 - Pre-Alpha',
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: MIT License',
+            'Natural Language :: English',
+            "Programming Language :: Python :: 2",
+            'Programming Language :: Python :: 2.6',
+            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.3',
+            'Programming Language :: Python :: 3.4',
+            'Programming Language :: Python :: 3.5',
+        ],
+        setup_requires=[
+            "flake8",
+            'docutils>=0.14, <1.0',
+        ],
+        extras_require={
+            'doc': doc,
+        },
+        test_suite='tests',
+        tests_require=test_requirements,
+        # cmdclass={'test': PyTest},
+        cmdclass={
+            'test': Tox,
+            'extra_clean': CleanCommand,
+        },
+        classifiers=[
+            'Development Status :: 5 - Production/Stable',
+            'Environment :: Console',
+            'Environment :: Web Environment',
+            'Intended Audience :: Developers',
+            'Intended Audience :: System Administrators',
+            'License :: OSI Approved :: Apache Software License',
+            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3.4',
+            'Topic :: System :: Monitoring',
+        ],
+    )
+
 
 refresh_plugin_cache()
+
+if __name__ == "__main__":
+    do_setup()
