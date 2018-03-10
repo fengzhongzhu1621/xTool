@@ -15,6 +15,7 @@ import subprocess
 import warnings
 import shlex
 import sys
+from tempfile import mkstemp
 
 from future import standard_library
 
@@ -268,10 +269,10 @@ class XToolConfigParser(ConfigParser):
         if display_source:
             for section in cfg:
                 for k, v in cfg[section].items():
-                    cfg[section][k] = (v, 'airflow config')
+                    cfg[section][k] = (v, 'xTool config')
 
         # add env vars and overwrite because they have priority
-        for ev in [ev for ev in os.environ if ev.startswith('AIRFLOW__')]:
+        for ev in [ev for ev in os.environ if ev.startswith('XTOOL__')]:
             try:
                 _, section, key = ev.split('__')
                 opt = self._get_env_var_option(section, key)
@@ -280,7 +281,7 @@ class XToolConfigParser(ConfigParser):
             if opt:
                 if (
                         not display_sensitive
-                        and ev != 'AIRFLOW__CORE__UNIT_TEST_MODE'):
+                        and ev != 'XTOOL__CORE__UNIT_TEST_MODE'):
                     opt = '< hidden >'
                 if display_source:
                     opt = (opt, 'env var')
@@ -418,3 +419,23 @@ as_dict.__doc__ = conf.as_dict.__doc__
 
 def set(section, option, value):  # noqa
     return conf.set(section, option, value)
+
+
+def tmp_configuration_copy(copy_sections):
+    """拷贝配置文件到临时文件中
+    Returns a path for a temporary file including a full copy of the configuration
+    settings.
+    :param copy_sections: 需要备份的section
+    :return: a path to a temporary file
+    """
+    cfg_dict = conf.as_dict(display_sensitive=True)
+    temp_fd, cfg_path = mkstemp()
+
+    cfg_subset = dict()
+    for section in copy_sections:
+        cfg_subset[section] = cfg_dict.get(section, {})
+
+    with os.fdopen(temp_fd, 'w') as temp_file:
+        json.dump(cfg_subset, temp_file)
+
+    return cfg_path
