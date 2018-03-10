@@ -7,3 +7,6 @@ class XToolException(Exception):
 
 class XToolConfigException(XToolException):
     pass
+
+class XToolTaskTimeout(XToolException):
+    pass
