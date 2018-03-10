@@ -158,7 +158,7 @@ version = '0.1.0'
 README = os.path.join(os.path.dirname(__file__), 'README')
 long_description = open(README, encoding='utf-8').read() + '\n\n'
 
-install_requires = None
+install_requires = []
 if os.path.exists("requirements.txt"):
     install_requires = read("requirements.txt").split()
     if "win" in sys.platform:
@@ -167,6 +167,11 @@ if os.path.exists("requirements.txt"):
                 install_requires.remove(item)
             except ValueError as e:
                 pass
+
+install_requires.extend([
+    'python-daemon>=2.1.1, <2.2',  # 用于构建守护进程
+    'pendulum==1.4.0',  # 日期库
+])
 
 doc = [
     'sphinx>=1.2.3',
