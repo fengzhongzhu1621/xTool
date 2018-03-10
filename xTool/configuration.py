@@ -20,7 +20,7 @@ from future import standard_library
 
 from six import iteritems
 
-from xTools.utils.log.logging_mixin import LoggingMixin
+from xTool.utils.log.logging_mixin import LoggingMixin
 
 standard_library.install_aliases()
 
@@ -28,15 +28,15 @@ from builtins import str
 from collections import OrderedDict
 from six.moves import configparser
 
-from airflow.exceptions import XToolConfigException
+from xTool.exceptions import XToolConfigException
 
 log = LoggingMixin().log
 
 # show Airflow's deprecation warnings
 warnings.filterwarnings(
-    action='default', category=DeprecationWarning, module='xTools')
+    action='default', category=DeprecationWarning, module='xTool')
 warnings.filterwarnings(
-    action='default', category=PendingDeprecationWarning, module='xTools')
+    action='default', category=PendingDeprecationWarning, module='xTool')
 
 if six.PY3:
     ConfigParser = configparser.ConfigParser
@@ -98,7 +98,7 @@ def run_command(command):
 
 # 读取默认配置
 _templates_dir = os.path.join(os.path.dirname(__file__), 'config_templates')
-with open(os.path.join(_templates_dir, 'default_xTools.cfg')) as f:
+with open(os.path.join(_templates_dir, 'default_xTool.cfg')) as f:
     DEFAULT_CONFIG = f.read()
 with open(os.path.join(_templates_dir, 'default_test.cfg')) as f:
     TEST_CONFIG = f.read()
@@ -328,17 +328,17 @@ def mkdir_p(path):
 
 
 if 'XTOOL_HOME' not in os.environ:
-    XTOOL_HOME = expand_env_var('~/xTools')
+    XTOOL_HOME = expand_env_var('~/xTool')
 else:
     XTOOL_HOME = expand_env_var(os.environ['XTOOL_HOME'])
 
 mkdir_p(XTOOL_HOME)
 
 if 'XTOOL_CONFIG' not in os.environ:
-    if os.path.isfile(expand_env_var('~/xTools.cfg')):
-        XTOOL_CONFIG = expand_env_var('~/xTools.cfg')
+    if os.path.isfile(expand_env_var('~/xTool.cfg')):
+        XTOOL_CONFIG = expand_env_var('~/xTool.cfg')
     else:
-        XTOOL_CONFIG = XTOOL_HOME + '/xTools.cfg'
+        XTOOL_CONFIG = XTOOL_HOME + '/xTool.cfg'
 else:
     XTOOL_CONFIG = expand_env_var(os.environ['XTOOL_CONFIG'])
 

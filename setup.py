@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # Kept manually in sync with airflow.__version__
 version = imp.load_source(
-    'xTools.version', os.path.join('xTools', 'version.py')).version
+    'xTool.version', os.path.join('xTool', 'version.py')).version
 
 PY3 = sys.version_info[0] == 3
 
@@ -185,7 +185,7 @@ def do_setup():
     write_version()
 
     setup(
-        name='xTools',
+        name='xTool',
         version=version,
         description='A python script tools',
         long_description=long_description,
@@ -193,14 +193,14 @@ def do_setup():
         author_email='jinyinqiao@gmail.com',
         license='Apache License 2.0',
         packages=find_packages(exclude=['tests*']),
-        # packages = ['xTools',
+        # packages = ['xTool',
         #            #"twisted.plugins",
         # ],
         include_package_data=True,
         install_requires=install_requires,
         zip_safe=False,
         scripts=['airflow/bin/airflow'],
-        keywords='xTools',
+        keywords='xTool',
         classifiers=[
             'Development Status :: 2 - Pre-Alpha',
             'Intended Audience :: Developers',

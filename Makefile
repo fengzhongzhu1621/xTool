@@ -35,7 +35,7 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	flake8 xTools tests
+	flake8 xTool tests
 
 test:
 	python setup.py test
@@ -44,15 +44,15 @@ test-all:
 	tox
 
 coverage:
-	coverage run --source xTools setup.py test
+	coverage run --source xTool setup.py test
 	coverage report -m
 	coverage html
 	open htmlcov/index.html
 
 docs:
-	rm -f docs/xTools.rst
+	rm -f docs/xTool.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ xTools
+	sphinx-apidoc -o docs/ xTool
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html

@@ -1,17 +1,17 @@
-# xTools configuration
-xTools.cfg
+# xTool configuration
+xTool.cfg
 unittests.cfg
 dbinit.py
 initdb.py
 secrets.py
 
-# xTools sqlite databases
-xTools.db
+# xTool sqlite databases
+xTool.db
 unittests.db
 
-# xTools temporary artifacts
-xTools/git_version
-xTools/www/static/coverage/
+# xTool temporary artifacts
+xTool/git_version
+xTool/www/static/coverage/
 logs/
 
 # Byte-compiled / optimized / DLL files
