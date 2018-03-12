@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -71,3 +71,119 @@ def set_context(logger, value):
             _logger = _logger.parent
         else:
             _logger = None
+
+
+class StreamLogWriter(object):
+    encoding = False
+
+    """
+    Allows to redirect stdout and stderr to logger
+    """
+    def __init__(self, logger, level):
+        """
+        :param log: The log level method to write to, ie. log.debug, log.warning
+        :return:
+        """
+        self.logger = logger
+        self.level = level
+        self._buffer = str()
+
+    def write(self, message):
+        """
+        Do whatever it takes to actually log the specified logging record
+        :param message: message to log
+        """
+        if not message.endswith("\n"):
+            self._buffer += message
+        else:
+            # 只有遇到换行符才真正的输入日志，否则缓存到_buffer
+            self._buffer += message
+            self.logger.log(self.level, self._buffer)
+            self._buffer = str()
+
+    def flush(self):
+        """
+        Ensure all logging output has been flushed
+        """
+        if len(self._buffer) > 0:
+            self.logger.log(self.level, self._buffer)
+            self._buffer = str()
+
+    def isatty(self):
+        """
+        Returns False to indicate the fd is not connected to a tty(-like) device.
+        For compatibility reasons.
+        """
+        return False
+
+
+@contextmanager
+def redirect_stdout(logger, level):
+    """
+    重定向stdout
+
+    .. code:: python
+
+        if args.interactive:
+            _run(args, dag, ti)
+        else:
+            with redirect_stdout(ti.log, logging.INFO),\
+                    redirect_stderr(ti.log, logging.WARN):
+                _run(args, dag, ti)
+            logging.shutdown()
+    """
+    writer = StreamLogWriter(logger, level)
+    try:
+        sys.stdout = writer
+        yield
+    finally:
+        sys.stdout = sys.__stdout__
+
+
+@contextmanager
+def redirect_stderr(logger, level):
+    """
+    重定向stderr
+
+    .. code:: python
+
+        if args.interactive:
+            _run(args, dag, ti)
+        else:
+            with redirect_stdout(ti.log, logging.INFO),\
+                    redirect_stderr(ti.log, logging.WARN):
+                _run(args, dag, ti)
+            logging.shutdown()
+    """
+    writer = StreamLogWriter(logger, level)
+    try:
+        sys.stderr = writer
+        yield
+    finally:
+        sys.stderr = sys.__stderr__
+
+
+class RedirectStdHandler(StreamHandler):
+    """
+    This class is like a StreamHandler using sys.stderr/stdout, but always uses
+    whatever sys.stderr/stderr is currently set to rather than the value of
+    sys.stderr/stdout at handler construction time.
+    """
+    def __init__(self, stream):
+        if not isinstance(stream, six.string_types):
+            raise Exception("Cannot use file like objects. Use 'stdout' or 'stderr'"
+                            " as a str and without 'ext://'.")
+
+        self._use_stderr = True
+        if 'stdout' in stream:
+            self._use_stderr = False
+
+        # StreamHandler tries to set self.stream
+        Handler.__init__(self)
+
+    @property
+    def stream(self):
+        if self._use_stderr:
+            return sys.stderr
+
+        return sys.stdout
