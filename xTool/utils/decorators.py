@@ -89,7 +89,7 @@ def apply_defaults(func):
     return wrapper
 
 
-if 'BUILDING_AIRFLOW_DOCS' in os.environ:
+if 'BUILDING_XTOOL_DOCS' in os.environ:
     # Monkey patch hook to get good function headers while building docs
     def apply_defaults(x): return x
 
