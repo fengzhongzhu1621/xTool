@@ -27,17 +27,32 @@ def apply_defaults(func):
     inheritance and argument defaults, this decorator also alerts with
     specific information about the missing arguments.
     """
+    # 获得函数签名
+    # Cache inspect.signature for the wrapper closure to avoid calling it
+    # at every decorated invocation. This is separate sig_cache created
+    # per decoration, i.e. each function decorated using apply_defaults will
+    # have a different sig_cache.
+    sig_cache = signature(func)
+
+
+    # 获得默认值为空的参数名，且此参数不为self, 且此参数不为可变参数
+    non_optional_args = {
+        name for (name, param) in sig_cache.parameters.items()
+        if param.default == param.empty and
+        param.name != 'self' and
+        param.kind not in (param.VAR_POSITIONAL, param.VAR_KEYWORD)}
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         # 列表参数最多一个
         if len(args) > 1:
             raise XToolException(
-                "Use keyword arguments when initializing object")
+                "Use keyword arguments when initializing operators")
         # 获得参数中的model对象
         model_args = {}
         model_params = {}
-        if kwargs.get('model', None):
-            model = kwargs.get('model', None)
+        model = kwargs.get('model', None)
+        if model:
             model_args = copy(model.default_args) or {}
             model_params = copy(model.params) or {}
 
@@ -60,23 +75,17 @@ def apply_defaults(func):
         model_args.update(default_args)
         default_args = model_args
 
-        # 获得函数签名
-        sig = signature(func)
-
-        # 获得默认值为空的参数名，且此参数不为self, 且此参数不为可变参数
-        non_optional_args = [
-            name for (name, param) in sig.parameters.items()
-            if param.default == param.empty and
-            param.name != 'self' and
-            param.kind not in (param.VAR_POSITIONAL, param.VAR_KEYWORD)]
 
         # 将kwargs['default_args']中的参数合并到函数的kwargs中
-        for arg in sig.parameters:
-            if arg in default_args and arg not in kwargs:
+        for arg in sig_cache.parameters:
+            if arg not in kwargs and arg in default_args:
                 kwargs[arg] = default_args[arg]
 
         # 获得没有设置默认值的参数，抛出异常
-        missing_args = list(set(non_optional_args) - set(kwargs))
+        print(non_optional_args)
+        print(type(non_optional_args))
+        print(set(kwargs))
+        missing_args = list(non_optional_args - set(kwargs))
         if missing_args:
             msg = "Argument {0} is required".format(missing_args)
             raise XToolException(msg)
@@ -91,7 +100,7 @@ def apply_defaults(func):
 
 if 'BUILDING_XTOOL_DOCS' in os.environ:
     # Monkey patch hook to get good function headers while building docs
-    def apply_defaults(x): return x
+    apply_defaults = lambda x: x
 
 
 if __name__ == '__main__':
@@ -115,3 +124,5 @@ if __name__ == '__main__':
             self.output_encoding = output_encoding
 
     BashOperator(bash_command="ls")
+    BashOperator()
+

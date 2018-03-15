@@ -12,6 +12,10 @@ class BaseRule(object):
 
     @classmethod
     def all_rules(cls):
-        return [getattr(cls, attr)
+        if not cls._ALL_TRIGGER_RULES:
+            cls._ALL_TRIGGER_RULES = {
+                getattr(cls, attr)
                 for attr in dir(cls)
-                if not attr.startswith("__") and not callable(getattr(cls, attr))]
+                if not attr.startswith("_") and not callable(getattr(cls, attr))
+            }
+        return cls._ALL_TRIGGER_RULES
