@@ -189,9 +189,10 @@ class XToolConfigParser(ConfigParser):
 
         else:
             log.warning(
-                "section/key [{section}/{key}] not found in config".format(**locals())
+                "section/key [{section}/{key}] not found in config".format(
+                    **locals())
             )
-
+            # 配置不存在，抛出异常
             raise XToolConfigException(
                 "section/key [{section}/{key}] not found "
                 "in config".format(**locals()))
