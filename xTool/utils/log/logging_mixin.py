@@ -11,7 +11,7 @@ import warnings
 
 import six
 
-from builtins import object
+from builtins import object, str
 from contextlib import contextmanager
 from logging import Handler, StreamHandler
 
@@ -76,7 +76,7 @@ def set_context(logger, value):
 class StreamLogWriter(object):
     encoding = False
 
-    """
+    """添加带有缓冲的日志流
     Allows to redirect stdout and stderr to logger
     """
     def __init__(self, logger, level):
@@ -105,7 +105,7 @@ class StreamLogWriter(object):
         """
         Ensure all logging output has been flushed
         """
-        if len(self._buffer) > 0:
+        if self._buffer:
             self.logger.log(self.level, self._buffer)
             self._buffer = str()
 

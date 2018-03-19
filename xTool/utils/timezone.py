@@ -11,7 +11,7 @@ utc = pendulum.timezone('UTC')
 
 
 def is_localized(value):
-    """ 存在时区信息
+    """存在时区信息
 
     Determine if a given datetime.datetime is aware.
     The concept is defined in Python's docs:
@@ -23,7 +23,7 @@ def is_localized(value):
 
 
 def is_naive(value):
-    """ 不存在时区信息
+    """不存在时区信息
 
     Determine if a given datetime.datetime is naive.
     The concept is defined in Python's docs:
@@ -35,7 +35,7 @@ def is_naive(value):
 
 
 def utcnow():
-    """ 获得当前的utc时间
+    """获得当前的utc时间
 
     Get the current date and time in UTC
     :return:
