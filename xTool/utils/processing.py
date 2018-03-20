@@ -14,6 +14,82 @@ from xTool.utils import timezone
 from xTool.utils.log.logging_mixin import LoggingMixin
 
 
+class AbstractFileProcessor(object):
+    """
+    Processes a DAG file. See SchedulerJob.process_file() for more details.
+    """
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def start(self):
+        """
+        Launch the process to process the file
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def terminate(self, sigkill=False):
+        """
+        Terminate (and then kill) the process launched to process the file
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def pid(self):
+        """
+        :return: the PID of the process launched to process the given file
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def exit_code(self):
+        """
+        After the process is finished, this can be called to get the return code
+        :return: the exit code of the process
+        :rtype: int
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def done(self):
+        """
+        Check if the process launched to process this file is done.
+        :return: whether the process is finished running
+        :rtype: bool
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def result(self):
+        """
+        :return: result of running SchedulerJob.process_file()
+        :rtype: list[SimpleDag]
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def start_time(self):
+        """
+        :return: When this started to process the file
+        :rtype: datetime
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def file_path(self):
+        """
+        :return: the path to the file that this is processing
+        :rtype: unicode
+        """
+        raise NotImplementedError()
+
+
 class FileProcessorManager(LoggingMixin):
     """
     Given a list of DAG definition files, this kicks off several processors
