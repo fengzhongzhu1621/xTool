@@ -23,6 +23,7 @@ from xTool.utils.log.logging_mixin import LoggingMixin
 
 @contextmanager
 def TemporaryDirectory(suffix='', prefix=None, dir=None):
+    # 创建临时目录
     name = mkdtemp(suffix=suffix, prefix=prefix, dir=dir)
     try:
         yield name

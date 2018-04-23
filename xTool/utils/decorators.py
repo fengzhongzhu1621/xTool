@@ -82,9 +82,6 @@ def apply_defaults(func):
                 kwargs[arg] = default_args[arg]
 
         # 获得没有设置默认值的参数，抛出异常
-        print(non_optional_args)
-        print(type(non_optional_args))
-        print(set(kwargs))
         missing_args = list(non_optional_args - set(kwargs))
         if missing_args:
             msg = "Argument {0} is required".format(missing_args)

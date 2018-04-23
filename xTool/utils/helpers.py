@@ -93,7 +93,6 @@ def is_container(obj):
     return hasattr(obj, '__iter__') and not isinstance(obj, basestring)
 
 
-
 def as_tuple(obj):
     """ 将对象转化为元组
     If obj is a container, returns obj as a tuple.
