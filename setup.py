@@ -94,7 +94,7 @@ def git_version(version):
         return 'no_git_version'
 
 
-def write_version(filename=os.path.join(*['airflow',
+def write_version(filename=os.path.join(*['xTool',
                                           'git_version'])):
     text = "{}".format(git_version(version))
     with open(filename, 'w') as a:
@@ -153,7 +153,6 @@ def refresh_plugin_cache():
 
 from setuptools import setup, find_packages
 # from distutils.core import setup
-version = '0.1.0'
 
 README = os.path.join(os.path.dirname(__file__), 'README')
 long_description = open(README, encoding='utf-8').read() + '\n\n'
@@ -169,8 +168,8 @@ if os.path.exists("requirements.txt"):
                 pass
 
 install_requires.extend([
-    'python-daemon>=2.1.1, <2.2',  # 用于构建守护进程
-    'pendulum==1.4.0',  # 日期库
+    # 'python-daemon>=2.1.1, <2.2',  # 用于构建守护进程
+    'pendulum==1.4.2',  # 日期库
     'tabulate>=0.7.5, <0.8.0',
     'python-dateutil>=2.3, <3',
     'croniter>=0.3.17, <0.4',
@@ -202,13 +201,14 @@ def do_setup():
         include_package_data=True,
         install_requires=install_requires,
         zip_safe=False,
-        scripts=['airflow/bin/airflow'],
+        scripts=None,
         keywords='xTool',
         classifiers=[
             'Development Status :: 2 - Pre-Alpha',
             'Intended Audience :: Developers',
-            'License :: OSI Approved :: MIT License',
+            'License :: OSI Approved :: Apache Software License',
             'Natural Language :: English',
+            'Environment :: Console',
             "Programming Language :: Python :: 2",
             'Programming Language :: Python :: 2.6',
             'Programming Language :: Python :: 2.7',
@@ -226,22 +226,11 @@ def do_setup():
         },
         test_suite='tests',
         tests_require=test_requirements,
-        # cmdclass={'test': PyTest},
-        cmdclass={
-            'test': Tox,
-            'extra_clean': CleanCommand,
-        },
-        classifiers=[
-            'Development Status :: 5 - Production/Stable',
-            'Environment :: Console',
-            'Environment :: Web Environment',
-            'Intended Audience :: Developers',
-            'Intended Audience :: System Administrators',
-            'License :: OSI Approved :: Apache Software License',
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3.4',
-            'Topic :: System :: Monitoring',
-        ],
+        cmdclass={'test': PyTest},
+        #cmdclass={
+        #    'test': Tox,
+        #    'extra_clean': CleanCommand,
+        #},
     )
 
 

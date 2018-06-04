@@ -27,7 +27,13 @@ def make_module(name, objects):
 
 
 def load_backend_module_from_conf(backend, section, key):
-    """从配置文件中加载模块 ."""
+    """从配置文件中加载模块 .
+    
+    Args:
+        backend: 默认后端模块配置
+        section: 配置文件中的section
+        key: section中的key
+    """
     module = None
     # 从配置文件中获取配置的后端模块
     try:
