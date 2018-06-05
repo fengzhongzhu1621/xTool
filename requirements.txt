@@ -9,7 +9,7 @@ torndb
 #pexpect
 pyDes
 #pycrypto
-httpsig
+#httpsig
 mccabe
 pyflakes
 six

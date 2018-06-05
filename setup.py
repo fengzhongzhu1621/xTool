@@ -16,12 +16,12 @@ except ImportError:
 from setuptools.command.test import test as TestCommand  # noqa
 from setuptools import find_packages, Command
 
-try:
-    import twisted  # noqa
-except ImportError:
-    # raise SystemExit("twisted not found.  Make sure you "
-    #                 "have installed the Twisted core package.")
-    pass
+# try:
+#     import twisted  # noqa
+# except ImportError:
+#     # raise SystemExit("twisted not found.  Make sure you "
+#     #                 "have installed the Twisted core package.")
+#     pass
 
 logger = logging.getLogger(__name__)
 
@@ -234,7 +234,7 @@ def do_setup():
     )
 
 
-refresh_plugin_cache()
+# refresh_plugin_cache()
 
 if __name__ == "__main__":
     do_setup()
