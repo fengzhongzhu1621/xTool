@@ -17,5 +17,4 @@ hacking
 flake8-print
 colorama
 pytest
-cov-core
 pytest-cov

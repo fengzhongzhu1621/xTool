@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# coding: utf-8
 '''
 Task Coach - Your friendly task manager
 Copyright (C) 2004-2010 Task Coach developers <developers@taskcoach.org>
@@ -19,41 +19,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 class Singleton(type):
-    ''' Singleton metaclass. Use by defining the metaclass of a class Singleton,
-        e.g.: class ThereCanBeOnlyOne:
+    """Singleton metaclass. Use by defining the metaclass of a class Singleton,
+       e.g.: class ThereCanBeOnlyOne:
                   __metaclass__ = Singleton
-        ÔÚPython 2Àï£¬Äã¿ÉÒÔÍ¨¹ıÔÚÀàµÄÉùÃ÷ÖĞ¶¨Òåmetaclass
-        ²ÎÊı£¬»òÕß¶¨ÒåÒ»¸öÌØÊâµÄÀà¼¶±ğµÄ(class-level)__metaclass__ÊôĞÔ£¬À´´´½¨ÔªÀà¡£ÔÚ
-        Python 3Àï£¬__metaclass__ÊôĞÔÒÑ¾­±»È¡ÏûÁË¡£
+       åœ¨Python 2é‡Œï¼Œä½ å¯ä»¥é€šè¿‡åœ¨ç±»çš„å£°æ˜ä¸­å®šä¹‰metaclass
+       å‚æ•°ï¼Œæˆ–è€…å®šä¹‰ä¸€ä¸ªç‰¹æ®Šçš„ç±»çº§åˆ«çš„(class-level)__metaclass__å±æ€§ï¼Œæ¥åˆ›å»ºå…ƒç±»ã€‚åœ¨
+       Python 3é‡Œï¼Œ__metaclass__å±æ€§å·²ç»è¢«å–æ¶ˆäº†ã€‚
 
-        µ¥¼şÔªÀà
+       å•ä»¶å…ƒç±»
 
-        instance = Singleton(class_name): ´´½¨Ààclass_nameµÄÒ»¸öÊµÀı
-    '''              
-
+       instance = Singleton(class_name): åˆ›å»ºç±»class_nameçš„ä¸€ä¸ªå®ä¾‹
+    """
     def __call__(class_, *args, **kwargs):
-        # ÔÚ¶ÔÏó´´½¨Ê±Ö±½Ó·µ»Ø__call__µÄÄÚÈİ£¬Ê¹ÓÃ¸Ã·½·¨¿ÉÒÔÄ£Äâ¾²Ì¬·½·¨¡£
-        # Èç¹ûÊµÀı²»´æÔÚ£¬Ôò´´½¨ÊµÀı
-        # Èç¹ûÊµÀı´æÔÚ£¬ÔòÖ±½Ó·µ»ØÒÔÇ°´´½¨µÄÊµÀı
-        if not class_.hasInstance(): # ÅĞ¶ÏÀàclass_ÊÇ·ñ´æÔÚÊµÀı
+        # åœ¨å¯¹è±¡åˆ›å»ºæ—¶ç›´æ¥è¿”å›__call__çš„å†…å®¹ï¼Œä½¿ç”¨è¯¥æ–¹æ³•å¯ä»¥æ¨¡æ‹Ÿé™æ€æ–¹æ³•ã€‚
+        # å¦‚æœå®ä¾‹ä¸å­˜åœ¨ï¼Œåˆ™åˆ›å»ºå®ä¾‹
+        # å¦‚æœå®ä¾‹å­˜åœ¨ï¼Œåˆ™ç›´æ¥è¿”å›ä»¥å‰åˆ›å»ºçš„å®ä¾‹
+        if not class_.hasInstance(): # åˆ¤æ–­ç±»class_æ˜¯å¦å­˜åœ¨å®ä¾‹
             # pylint: disable-msg=W0201
-            # ´´½¨Ò»¸öÀàÃûÎªclass_µÄÀàµÄÊµÀı
-            # Èç¹ûÀàclass_Ã»ÓĞÊµÀı£¬Ôò´´½¨Ò»¸öÊµÀı
-            class_.instance = super(Singleton, class_).__call__(*args, **kwargs) # ´´½¨Ààclass_µÄÒ»¸öÊµÀı
-        # ·µ»Ø´´½¨µÄÀàµÄÊµÀı
+            # åˆ›å»ºä¸€ä¸ªç±»åä¸ºclass_çš„ç±»çš„å®ä¾‹
+            # å¦‚æœç±»class_æ²¡æœ‰å®ä¾‹ï¼Œåˆ™åˆ›å»ºä¸€ä¸ªå®ä¾‹
+            class_.instance = super(Singleton, class_).__call__(*args, **kwargs)
+        # è¿”å›åˆ›å»ºçš„ç±»çš„å®ä¾‹
         return class_.instance
 
     def deleteInstance(class_):
         ''' Delete the (only) instance. This method is mainly for unittests so
             they can start with a clean slate. 
-            É¾³ıÊµÀı£¬Èç¹ûÊµÀı´æÔÚ
+            åˆ é™¤å®ä¾‹ï¼Œå¦‚æœå®ä¾‹å­˜åœ¨
         '''
         if class_.hasInstance():
             del class_.instance
 
     def hasInstance(class_):
         ''' Has the (only) instance been created already? 
-            ÅĞ¶ÏÊµÀıÊÇ·ñ´æÔÚ
+            åˆ¤æ–­å®ä¾‹æ˜¯å¦å­˜åœ¨
         '''
         return hasattr(class_, 'instance')
-        
