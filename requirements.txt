@@ -16,5 +16,5 @@ six
 hacking
 flake8-print
 colorama
-pytest
-pytest-cov
+#pytest
+#pytest-cov
