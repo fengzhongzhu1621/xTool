@@ -101,17 +101,17 @@ def as_tuple(obj):
 
 
 def chunks(items, chunk_size):
-    """
+    """将数组按指定大小分割
     Yield successive chunks of a given size from a list of items
     """
-    if (chunk_size <= 0):
+    if chunk_size <= 0:
         raise ValueError('Chunk size must be a positive integer')
     for i in range(0, len(items), chunk_size):
         yield items[i:i + chunk_size]
 
 
 def reduce_in_chunks(fn, iterable, initializer, chunk_size=0):
-    """
+    """将数组分组后，并对分片进行fn计算
     Reduce the given list of items by splitting it into chunks
     of the given size and passing each chunk through the reducer
     """
@@ -128,6 +128,9 @@ def as_flattened_list(iterable):
 
     >>> as_flattened_list((('blue', 'red'), ('green', 'yellow', 'pink')))
     ['blue', 'red', 'green', 'yellow', 'pink']
+
+    等价于
+    list(itertools.chain.from_iterable((('blue', 'red'), ('green', 'yellow', 'pink'))))
     """
     return [e for i in iterable for e in i]
 
