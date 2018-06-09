@@ -19,3 +19,4 @@ colorama
 #pytest
 #pytest-cov
 future
+jinja2

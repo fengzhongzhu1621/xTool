@@ -86,7 +86,6 @@ def apply_defaults(func):
             raise XToolException(msg)
 
         kwargs['params'] = model_params
-        print(kwargs)
         result = func(*args, **kwargs)
         return result
 
