@@ -4,9 +4,8 @@ import errno
 import logging
 import os
 
-from jinja2 import Template
-
 from xTool import configuration as conf
+from xTool.utils.helpers import parse_template_string
 from datetime import datetime
 
 
@@ -29,25 +28,21 @@ class FileProcessorHandler(logging.Handler):
         # 资源目录
         self.resouce_folder = resouce_folder
         # 日志文件名的格式
-        self.filename_template = filename_template
-        self.filename_jinja_template = None
-
-        if "{{" in self.filename_template: #jinja mode
-            self.filename_jinja_template = Template(self.filename_template)
+        self.filename_template, self.filename_jinja_template = \
+            parse_template_string(filename_template)
 
         self._cur_date = datetime.today()
 
         # 创建日志日期目录
-        log_date_directory = self._get_log_directory()
-        if not os.path.exists(log_date_directory):
+        if not os.path.exists(self._get_log_directory()):
             try:
-                os.makedirs(log_date_directory)
+                os.makedirs(self._get_log_directory())
             except OSError as e:
                 # only ignore case where the directory already exist
                 if e.errno != errno.EEXIST:
                     raise
 
-                logging.warning("%s already exists", log_date_directory)
+                logging.warning("%s already exists", self._get_log_directory())
         
         # 在日志目录中创建 latest 链接
         self._symlink_latest_log_directory()

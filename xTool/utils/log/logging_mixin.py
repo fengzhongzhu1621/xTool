@@ -11,17 +11,18 @@ import warnings
 
 import six
 
-from builtins import object, str
+from builtins import object
 from contextlib import contextmanager
 from logging import Handler, StreamHandler
 
 
 class LoggingMixin(object):
-    """
+    """用于给派生的类添加日志属性.log
     Convenience super-class to have a logger configured with the class name
     """
 
     def __init__(self, context=None):
+        """给处理器增加上下文 ."""
         self._set_context(context)
 
     # We want to deprecate the logger property in Airflow 2.0
@@ -30,7 +31,7 @@ class LoggingMixin(object):
     def logger(self):
         warnings.warn(
             'Initializing logger for {} using logger(), which will '
-            'be replaced by .log in Airflow 2.0'.format(
+            'be replaced by .log'.format(
                 self.__class__.__module__ + '.' + self.__class__.__name__
             ),
             DeprecationWarning
@@ -48,37 +49,17 @@ class LoggingMixin(object):
             return self._log
 
     def _set_context(self, context):
+        """给处理器增加上下文 ."""
         if context is not None:
             set_context(self.log, context)
 
 
-def set_context(logger, value):
-    """
-    Walks the tree of loggers and tries to set the context for each handler
-    :param logger: logger
-    :param value: value to set
-    """
-    _logger = logger
-    while _logger:
-        for handler in _logger.handlers:
-            try:
-                handler.set_context(value)
-            except AttributeError:
-                # Not all handlers need to have context passed in so we ignore
-                # the error when handlers do not have set_context defined.
-                pass
-        if _logger.propagate is True:
-            _logger = _logger.parent
-        else:
-            _logger = None
-
-
 class StreamLogWriter(object):
-    encoding = False
-
-    """添加带有缓冲的日志流
+    """添加带有缓冲的日志流，用于重定向标准输入和输出
     Allows to redirect stdout and stderr to logger
     """
+    encoding = False
+
     def __init__(self, logger, level):
         """
         :param log: The log level method to write to, ie. log.debug, log.warning
@@ -115,6 +96,32 @@ class StreamLogWriter(object):
         For compatibility reasons.
         """
         return False
+
+
+class RedirectStdHandler(StreamHandler):
+    """
+    This class is like a StreamHandler using sys.stderr/stdout, but always uses
+    whatever sys.stderr/stderr is currently set to rather than the value of
+    sys.stderr/stdout at handler construction time.
+    """
+    def __init__(self, stream):
+        if not isinstance(stream, six.string_types):
+            raise Exception("Cannot use file like objects. Use 'stdout' or 'stderr'"
+                            " as a str and without 'ext://'.")
+
+        self._use_stderr = True
+        if 'stdout' in stream:
+            self._use_stderr = False
+
+        # StreamHandler tries to set self.stream
+        Handler.__init__(self)
+
+    @property
+    def stream(self):
+        if self._use_stderr:
+            return sys.stderr
+
+        return sys.stdout
 
 
 @contextmanager
@@ -163,27 +170,22 @@ def redirect_stderr(logger, level):
         sys.stderr = sys.__stderr__
 
 
-class RedirectStdHandler(StreamHandler):
+def set_context(logger, value):
+    """给日志处理器添加上下文
+    Walks the tree of loggers and tries to set the context for each handler
+    :param logger: logger
+    :param value: value to set
     """
-    This class is like a StreamHandler using sys.stderr/stdout, but always uses
-    whatever sys.stderr/stderr is currently set to rather than the value of
-    sys.stderr/stdout at handler construction time.
-    """
-    def __init__(self, stream):
-        if not isinstance(stream, six.string_types):
-            raise Exception("Cannot use file like objects. Use 'stdout' or 'stderr'"
-                            " as a str and without 'ext://'.")
-
-        self._use_stderr = True
-        if 'stdout' in stream:
-            self._use_stderr = False
-
-        # StreamHandler tries to set self.stream
-        Handler.__init__(self)
-
-    @property
-    def stream(self):
-        if self._use_stderr:
-            return sys.stderr
-
-        return sys.stdout
+    _logger = logger
+    while _logger:
+        for handler in _logger.handlers:
+            try:
+                handler.set_context(value)
+            except AttributeError:
+                # Not all handlers need to have context passed in so we ignore
+                # the error when handlers do not have set_context defined.
+                pass
+        if _logger.propagate is True:
+            _logger = _logger.parent
+        else:
+            _logger = None

@@ -18,3 +18,4 @@ flake8-print
 colorama
 #pytest
 #pytest-cov
+future
