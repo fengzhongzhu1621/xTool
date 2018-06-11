@@ -2,22 +2,10 @@
 
 import importlib
 import socket
-from xTool.configuration import (conf, XToolConfigException)
 
 
-def get_hostname():
-    """
-    Fetch the hostname using the callable from the config or using
-    `socket.getfqdn` as a fallback.
-    """
-    # First we attempt to fetch the callable path from the config.
-    try:
-        callable_path = conf.get('core', 'hostname_callable')
-    except XToolConfigException:
-        callable_path = None
-
-    # Then we handle the case when the config is missing or empty. This is the
-    # default behavior.
+def get_hostname(callable_path=None):
+    """获得主机名 ."""
     if not callable_path:
         return socket.getfqdn()
 
@@ -27,4 +15,5 @@ def get_hostname():
     module_path, attr_name = callable_path.split(':')
     module = importlib.import_module(module_path)
     callable = getattr(module, attr_name)
+	# 执行属性方法返回结果
     return callable()
