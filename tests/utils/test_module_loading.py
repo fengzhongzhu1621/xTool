@@ -1,11 +1,20 @@
 #coding: utf-8
 
+import os
+import sys
 from inspect import isfunction
 
 from xTool.utils import module_loading
 from xTool.exceptions import XToolException
 
 import pytest
+
+
+def test_prepare_classpath():
+    dir_path = "."
+    module_loading.prepare_classpath(dir_path)
+    dir_path = os.path.abspath(os.path.expanduser(dir_path))
+    assert dir_path in sys.path
 
 
 def test_make_module():

@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+import os
 import sys
 from importlib import import_module
 import imp
@@ -14,6 +15,14 @@ from xTool.utils.log.logging_mixin import LoggingMixin
 
 
 log = LoggingMixin().log
+
+
+def prepare_classpath(dir_path):
+    """将路径加入python系统路径 ."""
+    dir_path = os.path.abspath(os.path.expanduser(dir_path))
+    print("dir_path = ", dir_path)
+    if dir_path not in sys.path:
+        sys.path.append(dir_path)
 
 
 def make_module(name, objects):
