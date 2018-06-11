@@ -136,7 +136,7 @@ def as_flattened_list(iterable):
 
 
 def chain(*tasks):
-    """
+    """将任务连成线
     Given a number of tasks, builds a dependency chain.
 
     chain(task_1, task_2, task_3, task_4)
@@ -152,7 +152,8 @@ def chain(*tasks):
 
 
 def pprinttable(rows):
-    """Returns a pretty ascii table from tuples
+    """打印一个漂亮的ascii表格
+	Returns a pretty ascii table from tuples
 
     If namedtuple are used, the table will have headers
     """
@@ -165,13 +166,16 @@ def pprinttable(rows):
     else:
         headers = ["col{}".format(i) for i in range(len(rows[0]))]
 
+    # 获得表头每一列的长度
     lens = [len(s) for s in headers]
-
+    # 计算所有行中每一列的最大长度
     for row in rows:
         for i in range(len(rows[0])):
             slenght = len("{}".format(row[i]))
             if slenght > lens[i]:
                 lens[i] = slenght
+
+    # 获得行列格式
     formats = []
     hformats = []
     for i in range(len(rows[0])):
@@ -182,6 +186,7 @@ def pprinttable(rows):
         hformats.append("%%-%ds" % lens[i])
     pattern = " | ".join(formats)
     hpattern = " | ".join(hformats)
+    # 获得每一行的分隔符
     separator = "-+-".join(['-' * n for n in lens])
     s = ""
     s += separator + '\n'
@@ -206,30 +211,39 @@ def reap_process_group(pid, log, sig=signal.SIGTERM,
 
     :param log: log handler
     :param pid: pid to kill
-    :param sig: signal type
+    :param sig: signal type 软件终止信号
     :param timeout: how much time a process has to terminate 杀死进程后的等待超时时间
     """
     def on_terminate(p):
+        """进程被关闭时的回调，打印进程ID和返回码 ."""
         log.info("Process %s (%s) terminated with exit code %s", p, p.pid, p.returncode)
 
+    # 不允许杀死自己
     if pid == os.getpid():
         raise RuntimeError("I refuse to kill myself")
 
+    # 创建进程对象
     parent = psutil.Process(pid)
 
-    # 根据进程ID，获得所有子进程和当前进程
+    # 根据进程ID，递归获得所有子进程和当前进程
     children = parent.children(recursive=True)
     children.append(parent)
 
     # 杀掉进程组
+    # 程序结束(terminate)信号, 与SIGKILL不同的是该信号可以被阻塞和处理。
+    # 通常用来要求程序自己正常退出，shell命令kill缺省产生这个信号。
+    # 如果进程终止不了，我们才会尝试SIGKILL。
     log.info("Sending %s to GPID %s", sig, os.getpgid(pid))
+    # getpgid 返回pid进程的group id.
+    # 如果pid为0,返回当前进程的group id。在unix中有效
     os.killpg(os.getpgid(pid), sig)
 
-    # 等待子进程结束
+    # 等待正在被杀死的进程结束
     gone, alive = psutil.wait_procs(children, timeout=timeout, callback=on_terminate)
 
-    # 判断子进程是否存活
+    # 如果仍然有进程存活
     if alive:
+        # 打印存活的进程
         for p in alive:
             log.warn("process %s (%s) did not respond to SIGTERM. Trying SIGKILL", p, pid)
 
@@ -251,123 +265,3 @@ def parse_template_string(template_string):
         return None, Template(template_string)
     else:
         return template_string, None
-
-
-class XToolImporter(object):
-    """
-    Importer that dynamically loads a class and module from its parent. This
-    allows Airflow to support ``from airflow.operators import BashOperator``
-    even though BashOperator is actually in
-    ``airflow.operators.bash_operator``.
-
-    The importer also takes over for the parent_module by wrapping it. This is
-    required to support attribute-based usage:
-
-    .. code:: python
-
-        from xTool import operators
-        operators.BashOperator(...)
-
-        airflow_importer = AirflowImporter(sys.modules[__name__], _operators)
-    """
-
-    def __init__(self, parent_module, module_attributes):
-        """
-        :param parent_module: The string package name of the parent module. For
-            example, 'airflow.operators'
-        :type parent_module: string
-        :param module_attributes: The file to class mappings for all importable
-            classes.
-        :type module_attributes: string
-        """
-        self._parent_module = parent_module
-        self._attribute_modules = self._build_attribute_modules(module_attributes)
-        self._loaded_modules = {}
-
-        # Wrap the module so we can take over __getattr__.
-        sys.modules[parent_module.__name__] = self
-
-    @staticmethod
-    def _build_attribute_modules(module_attributes):
-        """
-        Flips and flattens the module_attributes dictionary from:
-
-            module => [Attribute, ...]
-
-        To:
-
-            Attribute => module
-
-        This is useful so that we can find the module to use, given an
-        attribute.
-        """
-        attribute_modules = {}
-
-        for module, attributes in list(module_attributes.items()):
-            for attribute in attributes:
-                attribute_modules[attribute] = module
-
-        return attribute_modules
-
-    def _load_attribute(self, attribute):
-        """
-        Load the class attribute if it hasn't been loaded yet, and return it.
-        """
-        module = self._attribute_modules.get(attribute, False)
-
-        if not module:
-            # This shouldn't happen. The check happens in find_modules, too.
-            raise ImportError(attribute)
-        elif module not in self._loaded_modules:
-            # Note that it's very important to only load a given modules once.
-            # If they are loaded more than once, the memory reference to the
-            # class objects changes, and Python thinks that an object of type
-            # Foo that was declared before Foo's module was reloaded is no
-            # longer the same type as Foo after it's reloaded.
-            path = os.path.realpath(self._parent_module.__file__)
-            folder = os.path.dirname(path)
-            # 从模块下的所有文件中查找指定的module
-            f, filename, description = imp.find_module(module, [folder])
-            self._loaded_modules[module] = imp.load_module(module, f, filename, description)
-
-            # This functionality is deprecated, and AirflowImporter should be
-            # removed in 2.0.
-            warnings.warn(
-                "Importing '{i}' directly from '{m}' has been "
-                "deprecated. Please import from "
-                "'{m}.[operator_module]' instead. Support for direct "
-                "imports will be dropped entirely in Airflow 2.0.".format(
-                    i=attribute, m=self._parent_module.__name__),
-                DeprecationWarning)
-
-        loaded_module = self._loaded_modules[module]
-        
-        # 从动态加载后的模块中获取属性
-        return getattr(loaded_module, attribute)
-
-    def __getattr__(self, attribute):
-        """
-        Get an attribute from the wrapped module. If the attribute doesn't
-        exist, try and import it as a class from a submodule.
-
-        This is a Python trick that allows the class to pretend it's a module,
-        so that attribute-based usage works:
-
-            from airflow import operators
-            operators.BashOperator(...)
-
-        It also allows normal from imports to work:
-
-            from airflow.operators.bash_operator import BashOperator
-        """
-        if hasattr(self._parent_module, attribute):
-            # Always default to the parent module if the attribute exists.
-            return getattr(self._parent_module, attribute)
-        elif attribute in self._attribute_modules:
-            # 动态加载模块，并获取属性
-            # Try and import the attribute if it's got a module defined.
-            loaded_attribute = self._load_attribute(attribute)
-            setattr(self, attribute, loaded_attribute)
-            return loaded_attribute
-
-        raise AttributeError
