@@ -50,6 +50,21 @@ def utcnow():
     return d
 
 
+def utc_epoch():
+    """
+    Gets the epoch in the users timezone
+    :return:
+    """
+
+    # pendulum utcnow() is not used as that sets a TimezoneInfo object
+    # instead of a Timezone. This is not pickable and also creates issues
+    # when using replace()
+    d = dt.datetime(1970, 1, 1)
+    d = d.replace(tzinfo=utc)
+
+    return d
+
+
 def convert_to_utc(value):
     """
     1. 给无时区的datetime对象添加默认时区信息，并转化为UTC时区
@@ -72,7 +87,7 @@ def convert_to_utc(value):
 
 
 def make_aware(value, timezone=None):
-    """ 将无时区的datetime对象从UTC转为指定时区
+    """将无时区的datetime对象，添加时区信息 
 
     Make a naive datetime.datetime in a given time zone aware.
 
@@ -102,7 +117,7 @@ def make_aware(value, timezone=None):
 
 
 def make_naive(value, timezone=None):
-    """将有时区的datetime对象从UTC转为指定时区，并去掉时区信息
+    """将有时区的datetime对象转为指定时区timezone，并去掉时区信息
     Make an aware datetime.datetime naive in a given time zone.
 
     :param value: datetime
@@ -116,8 +131,10 @@ def make_naive(value, timezone=None):
     if is_naive(value):
         raise ValueError("make_naive() cannot be applied to a naive datetime")
 
+    # 转换为指定时区
     o = value.astimezone(timezone)
 
+    # 去掉时区信息
     # cross library compatibility
     naive = dt.datetime(o.year,
                         o.month,
@@ -143,7 +160,7 @@ def datetime(*args, **kwargs):
 
 
 def parse(string):
-    """将日期字符串转化为datetime对象
+    """将日期字符串转化为datetime对象（带有时区信息）
     Parse a time string and return an aware datetime
     :param string: time string
     """
