@@ -23,7 +23,11 @@ from xTool.utils.log.logging_mixin import LoggingMixin
 
 @contextmanager
 def TemporaryDirectory(suffix='', prefix=None, dir=None):
-    # 创建临时目录
+    """创建临时目录 .
+    
+    with TemporaryDirectory(prefix='xtool_tmp') as tmp_dir:
+        pass
+    """
     name = mkdtemp(suffix=suffix, prefix=prefix, dir=dir)
     try:
         yield name
@@ -37,7 +41,7 @@ def TemporaryDirectory(suffix='', prefix=None, dir=None):
 
 
 def mkdirs(path, mode):
-    """
+    """创建目录
     Creates the directory specified by path, creating intermediate directories
     as necessary. If directory already exists, this is a no-op.
 
@@ -56,8 +60,8 @@ def mkdirs(path, mode):
         os.umask(o_umask)
 
 
-def list_py_file_paths(directory, ignore_filename='.ignore', safe_mode=False, safe_filters=(b'xTool', b'XTool')):
-    """
+def list_py_file_paths(directory, followlinks=True, ignore_filename='.ignore', file_ext='.py', safe_mode=False, safe_filters=(b'xTool', b'XTool')):
+    """递归遍历目录，返回匹配规则的文件列表
     Traverse a directory and look for Python files.
 
     :param directory: the directory to traverse
@@ -74,7 +78,8 @@ def list_py_file_paths(directory, ignore_filename='.ignore', safe_mode=False, sa
         return [directory]
     elif os.path.isdir(directory):
         patterns = []
-        for root, dirs, files in os.walk(directory, followlinks=True):
+        # 递归遍历目录，包含链接文件
+        for root, dirs, files in os.walk(directory, followlinks=followlinks):
             # 获得需要忽略的文件
             ignore_file = [f for f in files if f == ignore_filename]
             if ignore_file:
@@ -88,9 +93,9 @@ def list_py_file_paths(directory, ignore_filename='.ignore', safe_mode=False, sa
                     if not os.path.isfile(file_path):
                         continue
                     # 验证文件后缀
-                    mod_name, file_ext = os.path.splitext(
+                    mod_name, file_extension = os.path.splitext(
                         os.path.split(file_path)[-1])
-                    if file_ext != '.py' and not zipfile.is_zipfile(file_path):
+                    if file_extension != file_ext and not zipfile.is_zipfile(file_path):
                         continue
                     # 验证忽略规则
                     if any([re.findall(p, file_path) for p in patterns]):
