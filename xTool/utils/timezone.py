@@ -3,11 +3,23 @@
 import datetime as dt
 import pendulum
 
-# 从配置文件中获取时区设置
-from xTool.settings import TIMEZONE
 
 # UTC time zone as a tzinfo instance.
-utc = pendulum.timezone('UTC')
+TIMEZONE_UTC = pendulum.timezone('UTC')
+TIMEZONE_SYSTEM = pendulum.local_timezone()
+
+
+def get_default_timezone(conf=None):
+    """获得默认时区 ."""
+    if conf:
+        tz = conf.get_default_timezone()
+    else:
+        tz = 'system'
+    if tz == "system":
+        timezone = TIMEZONE_SYSTEM
+    else:
+        timezone = pendulum.timezone(tz)
+    return timezone
 
 
 def is_localized(value):
@@ -45,7 +57,7 @@ def utcnow():
     # instead of a Timezone. This is not pickable and also creates issues
     # when using replace()
     d = dt.datetime.utcnow()
-    d = d.replace(tzinfo=utc)
+    d = d.replace(tzinfo=TIMEZONE_UTC)
 
     return d
 
@@ -60,12 +72,12 @@ def utc_epoch():
     # instead of a Timezone. This is not pickable and also creates issues
     # when using replace()
     d = dt.datetime(1970, 1, 1)
-    d = d.replace(tzinfo=utc)
+    d = d.replace(tzinfo=TIMEZONE_UTC)
 
     return d
 
 
-def convert_to_utc(value):
+def convert_to_utc(value, timezone=None):
     """
     1. 给无时区的datetime对象添加默认时区信息，并转化为UTC时区
     2. 将有时区的datetime对象转化为UTC时区
@@ -80,10 +92,12 @@ def convert_to_utc(value):
 
     # 添加默认时区
     if not is_localized(value):
-        value = pendulum.instance(value, TIMEZONE)
+        if timezone is None:
+            timezone = TIMEZONE_UTC
+        value = pendulum.instance(value, timezone)
 
     # 将当前时区转化为UTC
-    return value.astimezone(utc)
+    return value.astimezone(TIMEZONE_UTC)
 
 
 def make_aware(value, timezone=None):
@@ -97,7 +111,7 @@ def make_aware(value, timezone=None):
 
     """
     if timezone is None:
-        timezone = TIMEZONE
+        timezone = TIMEZONE_SYSTEM
 
     # Check that we won't overwrite the timezone of an aware datetime.
     # 如果value已经存在时区信息，则不需要添加了，抛出一个异常
@@ -125,7 +139,7 @@ def make_naive(value, timezone=None):
     :return: naive datetime
     """
     if timezone is None:
-        timezone = TIMEZONE
+        timezone = TIMEZONE_SYSTEM
 
     # Emulate the behavior of astimezone() on Python < 3.6.
     if is_naive(value):
@@ -147,21 +161,11 @@ def make_naive(value, timezone=None):
     return naive
 
 
-def datetime(*args, **kwargs):
-    """在使用datetime创建日期时，自动加上配置文件中的时区
-    Wrapper around datetime.datetime that adds settings.TIMEZONE if tzinfo not specified
-
-    :return: datetime.datetime
-    """
-    if 'tzinfo' not in kwargs:
-        kwargs['tzinfo'] = TIMEZONE
-
-    return dt.datetime(*args, **kwargs)
-
-
-def parse(string):
+def parse(string, timezone=None):
     """将日期字符串转化为datetime对象（带有时区信息）
     Parse a time string and return an aware datetime
     :param string: time string
     """
-    return pendulum.parse(string, tz=TIMEZONE)
+    if timezone is None:
+        timezone = TIMEZONE_SYSTEM
+    return pendulum.parse(string, tz=timezone)
