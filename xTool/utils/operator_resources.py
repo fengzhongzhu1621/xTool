@@ -2,8 +2,8 @@
 
 from builtins import str
 
-from xTool import configuration
 from xTool.exceptions import XToolException
+
 
 # Constants for resources (megabytes are the base unit)
 MB = 1
@@ -90,10 +90,10 @@ class Resources(object):
     :type gpus: long
     """
     def __init__(self,
-                 cpus=configuration.getint('operators', 'default_cpus'),
-                 ram=configuration.getint('operators', 'default_ram'),
-                 disk=configuration.getint('operators', 'default_disk'),
-                 gpus=configuration.getint('operators', 'default_gpus')
+                 cpus=0,
+                 ram=0,
+                 disk=0,
+                 gpus=0
                  ):
         self.cpus = CpuResource(cpus)
         self.ram = RamResource(ram)
