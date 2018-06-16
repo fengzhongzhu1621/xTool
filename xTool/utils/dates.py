@@ -56,14 +56,15 @@ def date_range(
         raise Exception("Wait. Either specify end_date OR num")
     # 结束时间默认为当前UTC时间
     if not end_date and not num:
-        end_date = timezone.utcnow()
+        end_date = timezone.system_now()
 
     delta_iscron = False
     tz = start_date.tzinfo
     if isinstance(delta, six.string_types):
         delta_iscron = True
         # 去掉开始时间的时区
-        start_date = timezone.make_naive(start_date, tz)
+        if tz is not None:
+            start_date = timezone.make_naive(start_date, tz)
         cron = croniter(delta, start_date)
     elif isinstance(delta, timedelta):
         delta = abs(delta)
@@ -83,6 +84,8 @@ def date_range(
     else:
         for _ in range(abs(num)):
             if timezone.is_naive(start_date):
+                # 如果开始时间不存在时区信息，加上指定的时区信息
+                # 如果没有指定时区信息，默认系统时区
                 l.append(timezone.make_aware(start_date, tz))
             else:
                 l.append(start_date)

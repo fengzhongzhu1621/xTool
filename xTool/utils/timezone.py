@@ -35,7 +35,7 @@ def is_localized(value):
 
 
 def is_naive(value):
-    """不存在时区信息
+    """判断不存在时区信息
 
     Determine if a given datetime.datetime is naive.
     The concept is defined in Python's docs:
@@ -58,6 +58,22 @@ def utcnow():
     # when using replace()
     d = dt.datetime.utcnow()
     d = d.replace(tzinfo=TIMEZONE_UTC)
+
+    return d
+
+
+def system_now():
+    """获得当前的系统时间
+
+    Get the current date and time in UTC
+    :return:
+    """
+
+    # pendulum utcnow() is not used as that sets a TimezoneInfo object
+    # instead of a Timezone. This is not pickable and also creates issues
+    # when using replace()
+    d = dt.datetime.now()
+    d = d.replace(tzinfo=TIMEZONE_SYSTEM)
 
     return d
 
@@ -142,10 +158,12 @@ def make_naive(value, timezone=None):
         timezone = TIMEZONE_SYSTEM
 
     # Emulate the behavior of astimezone() on Python < 3.6.
+    # Since version 3.6, astimezone works with naive (timezone unawared) datetime.
+    # If you still working on lower version (<=3.5), timezone unawared datetime has to be awared by calling pytz.localize()
+    # 转换为指定时区
     if is_naive(value):
         raise ValueError("make_naive() cannot be applied to a naive datetime")
 
-    # 转换为指定时区
     o = value.astimezone(timezone)
 
     # 去掉时区信息
@@ -159,6 +177,30 @@ def make_naive(value, timezone=None):
                         o.microsecond)
 
     return naive
+
+
+def system_datetime(*args, **kwargs):
+    """在使用datetime创建日期时，自动加上配置文件中的时区
+    Wrapper around datetime.datetime that adds settings.TIMEZONE if tzinfo not specified
+
+    :return: datetime.datetime
+    """
+    if 'tzinfo' not in kwargs:
+        kwargs['tzinfo'] = TIMEZONE_SYSTEM
+
+    return dt.datetime(*args, **kwargs)
+
+
+def utc_datetime(*args, **kwargs):
+    """在使用datetime创建日期时，自动加上配置文件中的时区
+    Wrapper around datetime.datetime that adds settings.TIMEZONE if tzinfo not specified
+
+    :return: datetime.datetime
+    """
+    if 'tzinfo' not in kwargs:
+        kwargs['tzinfo'] = TIMEZONE_UTC
+
+    return dt.datetime(*args, **kwargs)
 
 
 def parse(string, timezone=None):

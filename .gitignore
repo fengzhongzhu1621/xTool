@@ -131,4 +131,5 @@ rat-results.txt
 # eclipse pydev
 .project
 .pydevproject
+.pytest_cache/
 .settings/
