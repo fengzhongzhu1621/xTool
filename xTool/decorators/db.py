@@ -15,11 +15,6 @@ from functools import wraps
 import os
 import contextlib
 
-from xTool import settings
-from xTool.utils.log.logging_mixin import LoggingMixin
-
-log = LoggingMixin().log
-
 
 @contextlib.contextmanager
 def create_session():
@@ -68,59 +63,3 @@ def provide_session(func):
                 return func(*args, **kwargs)
 
     return wrapper
-
-
-@provide_session
-def merge_conn(conn, session=None):
-    """添加连接记录 ."""
-    from xTool import models
-    C = models.Connection
-    # 如果连接记录conn不存在连接表中，则将此连接记录新增到表中
-    if not session.query(C).filter(C.conn_id == conn.conn_id).first():
-        session.add(conn)
-        session.commit()
-
-
-def initdb():
-    session = settings.Session()
-
-    from models import models
-    upgradedb()
-
-
-def upgradedb():
-    # alembic adds significant import time, so we import it lazily
-    from alembic import command
-    from alembic.config import Config
-
-    log.info("Creating tables")
-
-    # 获得migrations目录路径
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    package_dir = os.path.normpath(os.path.join(current_dir, '..'))
-    directory = os.path.join(package_dir, 'migrations')
-
-    # 读取配置并设置
-    config = Config(os.path.join(package_dir, 'alembic.ini'))
-    config.set_main_option('script_location', directory)
-    config.set_main_option('sqlalchemy.url', settings.SQL_ALCHEMY_CONN)
-
-    # 更新DB
-    command.upgrade(config, 'heads')
-
-
-def resetdb():
-    '''
-    Clear out the database
-    '''
-    from airflow import models
-    # alembic adds significant import time, so we import it lazily
-    from alembic.migration import MigrationContext
-
-    log.info("Dropping tables that exist")
-
-    models.Base.metadata.drop_all(settings.engine)
-    mc = MigrationContext.configure(settings.engine)
-    if mc._version.exists(settings.engine):
-        mc._version.drop(settings.engine)
-    initdb()
