@@ -1,21 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -34,14 +17,15 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from email.utils import formatdate
 
-from xTool import configuration
-from xTool.exceptions import AirflowConfigException
+from xTool.exceptions import XToolConfigException
 from xTool.utils.log.logging_mixin import LoggingMixin
 
 
-def send_email(to, subject, html_content,
+def send_email(e_from, to, subject, html_content,
                files=None, dryrun=False, cc=None, bcc=None,
-               mime_subtype='mixed', mime_charset='us-ascii', **kwargs):
+               mime_subtype='mixed', mime_charset='us-ascii',
+               conf=None,
+               **kwargs):
     """
     Send email using backend specified in EMAIL_BACKEND.
 
@@ -49,16 +33,23 @@ def send_email(to, subject, html_content,
     """
     # 动态加载模块发送函数
     # 可以通过插件的方式自定义邮件发送函数
-    # e.g. email_backend = airflow.utils.email.send_email_smtp
-    path, attr = configuration.conf.get('email', 'EMAIL_BACKEND').rsplit('.', 1)
-    module = importlib.import_module(path)
-    backend = getattr(module, attr)
-    return backend(to, subject, html_content, files=files,
+    # e.g. email_backend = xTool.utils.send_email.send_email_smtp
+    if conf:
+        path, attr = conf.get_email_backend().rsplit('.', 1)
+        module = importlib.import_module(path)
+        backend = getattr(module, attr)
+    else:
+        backend = send_email_smtp
+    return backend(e_from, to, subject, html_content, files=files,
                    dryrun=dryrun, cc=cc, bcc=bcc,
                    mime_subtype=mime_subtype, mime_charset=mime_charset, **kwargs)
 
 
-def send_email_smtp(to, subject, html_content, files=None,
+def send_email_smtp(e_from, to, subject, html_content,
+                    files=None,
+                    host=None, port=None,
+                    ssl=None, starttls=None,
+                    user=None, password=None,
                     dryrun=False, cc=None, bcc=None,
                     mime_subtype='mixed', mime_charset='us-ascii',
                     **kwargs):
@@ -67,16 +58,13 @@ def send_email_smtp(to, subject, html_content, files=None,
 
     >>> send_email('test@example.com', 'foo', '<b>Foo</b> bar', ['/dev/null'], dryrun=True)
     """
-    # 发件人
-    SMTP_MAIL_FROM = configuration.conf.get('smtp', 'SMTP_MAIL_FROM')
-    
     # 收件人格式化
     to = get_email_address_list(to)
 
     # 构建混合邮件体
     msg = MIMEMultipart(mime_subtype)
     msg['Subject'] = subject
-    msg['From'] = SMTP_MAIL_FROM
+    msg['From'] = e_from
     msg['To'] = ", ".join(to)
     recipients = to
     if cc:
@@ -108,32 +96,29 @@ def send_email_smtp(to, subject, html_content, files=None,
             msg.attach(part)
 
     # 发送邮件
-    send_MIME_email(SMTP_MAIL_FROM, recipients, msg, dryrun)
+    send_MIME_email(e_from, recipients, msg,
+                    host, port,
+                    ssl, starttls,
+                    user, password,
+                    dryrun)
 
 
-def send_MIME_email(e_from, e_to, mime_msg, dryrun=False):
+def send_MIME_email(e_from, e_to, mime_msg,
+                    host, port,
+                    ssl=False, starttls=False,
+                    user=None, password=None,
+                    dryrun=False):
     """发送邮件 ."""
     log = LoggingMixin().log
 
-    SMTP_HOST = configuration.conf.get('smtp', 'SMTP_HOST')
-    SMTP_PORT = configuration.conf.getint('smtp', 'SMTP_PORT')
-    SMTP_STARTTLS = configuration.conf.getboolean('smtp', 'SMTP_STARTTLS')
-    SMTP_SSL = configuration.conf.getboolean('smtp', 'SMTP_SSL')
-    SMTP_USER = None
-    SMTP_PASSWORD = None
-
-    try:
-        SMTP_USER = configuration.conf.get('smtp', 'SMTP_USER')
-        SMTP_PASSWORD = configuration.conf.get('smtp', 'SMTP_PASSWORD')
-    except XToolConfigException:
+    if not user or not password:
         log.debug("No user/password found for SMTP, so logging in with no authentication.")
 
     if not dryrun:
-        s = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) if SMTP_SSL else smtplib.SMTP(SMTP_HOST, SMTP_PORT)
-        if SMTP_STARTTLS:
+        s = smtplib.SMTP_SSL(host, port) if ssl else smtplib.SMTP(host, port)
+        if starttls:
             s.starttls()
-        if SMTP_USER and SMTP_PASSWORD:
-            s.login(SMTP_USER, SMTP_PASSWORD)
+        s.login(user, password)
         log.info("Sent an alert email to %s", e_to)
         s.sendmail(e_from, e_to, mime_msg.as_string())
         s.quit()
