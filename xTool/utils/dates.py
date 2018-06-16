@@ -110,10 +110,14 @@ def round_time(dt, delta, start_date=timezone.make_aware(datetime.min)):
 
     Note that delta may be a datetime.timedelta or a dateutil.relativedelta
 
+    datetime.min 按天四舍五入
+    relativedelta(months=1) 按月四舍五入
+
     >>> round_time(datetime(2015, 1, 1, 6), timedelta(days=1))
     datetime.datetime(2015, 1, 1, 0, 0)
     >>> round_time(datetime(2015, 1, 2), relativedelta(months=1))
     datetime.datetime(2015, 1, 1, 0, 0)
+
     >>> round_time(datetime(2015, 9, 16, 0, 0), timedelta(1), datetime(2015, 9, 14, 0, 0))
     datetime.datetime(2015, 9, 16, 0, 0)
     >>> round_time(datetime(2015, 9, 15, 0, 0), timedelta(1), datetime(2015, 9, 14, 0, 0))
@@ -124,9 +128,11 @@ def round_time(dt, delta, start_date=timezone.make_aware(datetime.min)):
     datetime.datetime(2015, 9, 14, 0, 0)
     """
     if isinstance(delta, six.string_types):
+        # 获得上一个周期的时间
         # It's cron based, so it's easy
         tz = start_date.tzinfo
-        start_date = timezone.make_naive(start_date, tz)
+        if tz is not None:
+            start_date = timezone.make_naive(start_date, tz)
         cron = croniter(delta, start_date)
         prev = cron.get_prev(datetime)
         if prev == start_date:
