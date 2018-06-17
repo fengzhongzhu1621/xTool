@@ -1,11 +1,26 @@
 # -*- coding: utf-8 -*-
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
 
 import logging
 import os
 import requests
 
-from xTool import configuration as conf
-from xTool.configuration import XToolConfigException
 from xTool.utils.file import mkdirs
 from xTool.utils.helpers import parse_template_string
 
@@ -29,17 +44,20 @@ class FileTaskHandler(logging.Handler):
         """
         super(FileTaskHandler, self).__init__()
         self.handler = None
+        # 日志目录
         self.local_base = base_log_folder
+        # 解析日志文件模板
         self.filename_template, self.filename_jinja_template = \
             parse_template_string(filename_template)
 
     def set_context(self, ti):
         """
-        Provide task_instance context to airflow task handler.
+        Provide task_instance context to task handler.
         :param ti: task instance object
         """
-        # 创建日志文件
+        # 根据任务实例，创建日志文件，返回文件的路径
         local_loc = self._init_file(ti)
+        # 创建文件处理器
         self.handler = logging.FileHandler(local_loc)
         self.handler.setFormatter(self.formatter)
         self.handler.setLevel(self.level)
@@ -58,14 +76,13 @@ class FileTaskHandler(logging.Handler):
 
     def _render_filename(self, ti, try_number):
         if self.filename_jinja_template:
+            # 获得任务实例的模板上下文
             jinja_context = ti.get_template_context()
             jinja_context['try_number'] = try_number
             return self.filename_jinja_template.render(**jinja_context)
 
-        return self.filename_template.format(dag_id=ti.dag_id,
-                                             task_id=ti.task_id,
-                                             execution_date=ti.execution_date.isoformat(),
-                                             try_number=try_number)
+        # 使用字符串渲染
+        return self.filename_template.format(ti.__dict__)
 
     def _read(self, ti, try_number, metadata=None):
         """
@@ -80,6 +97,7 @@ class FileTaskHandler(logging.Handler):
         # Task instance here might be different from task instance when
         # initializing the handler. Thus explicitly getting log location
         # is needed to get correct log path.
+        # 获得文件路径
         log_relative_path = self._render_filename(ti, try_number)
         location = os.path.join(self.local_base, log_relative_path)
 
@@ -96,26 +114,13 @@ class FileTaskHandler(logging.Handler):
                 log += "*** {}\n".format(str(e))
         else:
             # 如果本地日志不存在，则从日志服务器获取
-            url = os.path.join(
-                "http://{ti.hostname}:{worker_log_server_port}/log", log_relative_path
-            ).format(
-                ti=ti,
-                worker_log_server_port=conf.get('celery', 'WORKER_LOG_SERVER_PORT')
-            )
+            url = ti.get_log_url()
             log += "*** Log file does not exist: {}\n".format(location)
             log += "*** Fetching from: {}\n".format(url)
             try:
-                timeout = None  # No timeout
-                try:
-                    timeout = conf.getint('webserver', 'log_fetch_timeout_sec')
-                except (AirflowConfigException, ValueError):
-                    pass
-
-                response = requests.get(url, timeout=timeout)
-
+                response = requests.get(url)
                 # Check if the resource was properly fetched
                 response.raise_for_status()
-
                 log += '\n' + response.text
             except Exception as e:
                 log += "*** Failed to fetch log file from worker. {}\n".format(str(e))
@@ -176,6 +181,7 @@ class FileTaskHandler(logging.Handler):
         # writable by both users, then it's possible that re-running a task
         # via the UI (or vice versa) results in a permission error as the task
         # tries to write to a log file created by the other user.
+        # 根据重试次数，渲染模板文件
         relative_path = self._render_filename(ti, ti.try_number)
         full_path = os.path.join(self.local_base, relative_path)
         directory = os.path.dirname(full_path)
