@@ -194,27 +194,32 @@ def round_time(dt, delta, start_date=timezone.make_aware(datetime.min)):
 
 
 def infer_time_unit(time_seconds_arr):
-    """
+    """时间的表示方式
     Determine the most appropriate time unit for an array of time durations
     specified in seconds.
 
     e.g. 5400 seconds => 'minutes', 36000 seconds => 'hours'
     """
+    # 默认时间的单位是小时
     if len(time_seconds_arr) == 0:
         return 'hours'
     max_time_seconds = max(time_seconds_arr)
+    # 如果小于2分钟，则用秒表示
     if max_time_seconds <= 60*2:
         return 'seconds'
+    # 如果小于2小时，用分钟表示
     elif max_time_seconds <= 60*60*2:
         return 'minutes'
+    # 如果小于2天，用小时表示
     elif max_time_seconds <= 24*60*60*2:
         return 'hours'
+    # 否则用天表示
     else:
         return 'days'
 
 
 def scale_time_units(time_seconds_arr, unit):
-    """
+    """将时间转换为指定的单位表示
     Convert an array of time durations in seconds to the specified time unit.
     """
     if unit == 'minutes':
