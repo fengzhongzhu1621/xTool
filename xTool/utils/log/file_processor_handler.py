@@ -4,17 +4,12 @@ import errno
 import logging
 import os
 
-from xTool import configuration as conf
 from xTool.utils.helpers import parse_template_string
 from datetime import datetime
 
 
 class FileProcessorHandler(logging.Handler):
-    """根据日期分日期文件夹写入日志文件，并增加lastest链接
-    FileProcessorHandler is a python log handler that handles
-    dag processor logs. It creates and delegates log handling
-    to `logging.FileHandler` after receiving dag processor context.
-    """
+    """根据日期分日期文件夹写入日志文件，并增加lastest链接 ."""
 
     def __init__(self, base_log_folder, filename_template, resouce_folder):
         """
@@ -25,7 +20,7 @@ class FileProcessorHandler(logging.Handler):
         self.handler = None
         # 日志目录
         self.base_log_folder = base_log_folder
-        # 资源目录
+        # 资源目录，在日志目录下先创建资源文件，在资源文件下创建时间文件夹
         self.resouce_folder = resouce_folder
         # 日志文件名的格式
         self.filename_template, self.filename_jinja_template = \
