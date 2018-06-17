@@ -71,7 +71,7 @@ class FileProcessorManager(LoggingMixin):
     """文件处理器进程管理类
 
     :type _file_path_queue: list[unicode]
-    :type _processors: dict[unicode, AbstractDagFileProcessor]
+    :type _processors: dict[unicode, AbstractFileProcessor]
     :type _last_runtime: dict[unicode, float]
     :type _last_finish_time: dict[unicode, datetime]
     """
@@ -84,8 +84,7 @@ class FileProcessorManager(LoggingMixin):
                  max_runs,
                  processor_factory):
         """
-        :param processor_factory: function that creates processors for file
-        definition files. Arguments are (dag_definition_path)
+        :param processor_factory: function that creates processors for file definition files.
         :type processor_factory: (unicode, unicode) -> (AbstractFileProcessor)
         """
         # 文件的目录
@@ -192,10 +191,10 @@ class FileProcessorManager(LoggingMixin):
         - 执行队列中的进程
         """
         # 已完成的文件处理器
-        # :type : dict[unicode, AbstractDagFileProcessor]
+        # :type : dict[unicode, AbstractFileProcessor]
         finished_processors = {}
         # 正在运行的文件处理器
-        # :type : dict[unicode, AbstractDagFileProcessor]
+        # :type : dict[unicode, AbstractFileProcessor]
         running_processors = {}
 
         # 遍历所有的文件处理器
@@ -322,9 +321,7 @@ class FileProcessorManager(LoggingMixin):
         return result
 
     def max_runs_reached(self):
-        """
-        :return: whether all file paths have been processed max_runs times
-        """
+        """判断文件处理器是否触发最大阈值 ."""
         if self._max_runs == -1:  # Unlimited runs.
             return False
         # 如果有任意一个文件都没有达到执行次数，也认为没有到达最大阈值
