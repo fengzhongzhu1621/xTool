@@ -5,15 +5,22 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import logging
 import os
 import re
+import sys
 import time
 import zipfile
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
+import multiprocessing
+
 
 from xTool.utils import timezone
 from xTool.utils.log.logging_mixin import LoggingMixin
+from xTool.utils.log.logging_mixin import set_context
+from xTool.utils.log.logging_mixin import StreamLogWriter
+from xTool.exceptions import XToolException
 
 
 class AbstractFileProcessor(object):
@@ -67,6 +74,174 @@ class AbstractFileProcessor(object):
         raise NotImplementedError()
 
 
+class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
+    """文件处理器基类 ."""
+
+    # 记录这个类实例的创建数量
+    class_creation_counter = 0
+
+    def __init__(self, file_path, *args, **kwargs):
+        # 文件的路径
+        self._file_path = file_path
+        # 创建一个多进程队列
+        self._result_queue = multiprocessing.Queue()
+        # 文件处理进程对象
+        self._process = None
+        # 文件处理进程返回的结果
+        self._result = None
+        # 文件处理进程是否完成的标识
+        self._done = False
+        # 文件处理进程的开始时间
+        self._start_time = None
+        # 使用实例的次数作为实例ID
+        self._instance_id = BaseMultiprocessFileProcessor.class_creation_counter
+        # 实例创建次数自增
+        BaseMultiprocessFileProcessor.class_creation_counter += 1
+        self.args = args
+        self.kwargs = kwargs
+
+    @property
+    def file_path(self):
+        """返回文件的路径 ."""
+        return self._file_path
+    
+    def process_file(self, file_path):
+        """子进程文件处理函数 .
+        
+        Returns:
+            返回结果数组
+        """
+        raise NotImplementedError()
+
+    def helper(self, result_queue, file_path, *args, **kwargs):
+        log = logging.getLogger("xTool.processor")
+
+        # 重定向输入输出
+        stdout = StreamLogWriter(log, logging.INFO)
+        stderr = StreamLogWriter(log, logging.WARN)
+
+        # 设置日志处理器上下文，例如日志handler初始化时创建日志目录
+        set_context(log, file_path)
+
+        try:
+            # redirect stdout/stderr to log
+            sys.stdout = stdout
+            sys.stderr = stderr
+
+            # 设置进程名
+            start_time = time.time()
+
+            log.info("Started process (PID=%s) to work on %s", os.getpid(), file_path)
+            # 执行文件处理
+            result = self.process_file(file_path)
+            # 将执行结果保存到结果队列
+            result_queue.put(result)
+            end_time = time.time()
+            log.info(
+                "Processing %s took %.3f seconds", file_path, end_time - start_time
+            )
+        except:
+            log.exception("Got an exception! Propagating...")
+            raise
+        finally:
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
+
+    def start(self):
+        """创建一个文件处理子进程，
+        并将结果保存到self._result_queue结果队列
+        """
+        thread_name = "{}_{}-Process".format(self.__class__.__name__, self._instance_id)
+        self._process = multiprocessing.Process(
+            target=self.helper,
+            args=(self._result_queue,
+                  self.file_path,
+                  self.args,
+                  self.kwargs),
+            name=thread_name)
+        self._process.start()
+        # 记录子进程启动时间
+        self._start_time = timezone.system_now()
+        return self._process
+
+    def terminate(self, sigkill=False):
+        """终止文件处理子进程 ."""
+        if self._process is None:
+            raise XToolException("Tried to call stop before starting!")
+        # 删除结果队列
+        self._result_queue = None
+        # 终止进程
+        self._process.terminate()
+        # 等待进程被杀死
+        self._process.join(5)
+        # 是否需要强制再次杀死存活的文件处理进程
+        if sigkill and self._process.is_alive():
+            # 如果进程被终止后依然存活，发送SIGKILL信号杀死进程
+            self.log.warning("Killing PID %s", self._process.pid)
+            os.kill(self._process.pid, signal.SIGKILL)
+
+    @property
+    def pid(self):
+        """获得文件处理子进程的PID ."""
+        if self._process is None:
+            raise XToolException("Tried to get PID before starting!")
+        return self._process.pid
+
+    @property
+    def exit_code(self):
+        """获得文件处理子进程的错误码 ."""
+        if not self._done:
+            raise XToolException("Tried to call retcode before process was finished!")
+        return self._process.exitcode
+
+    @property
+    def done(self):
+        """判断文件处理子进程是否已经执行完成 ."""
+        if self._process is None:
+            raise XToolException("Tried to see if it's done before starting!")
+
+        if self._done:
+            return True
+
+        # 如果子进程有结果返回
+        if not self._result_queue.empty():
+            # 获得执行结果
+            self._result = self._result_queue.get_nowait()
+            self._done = True
+            self.log.debug("Waiting for %s", self._process)
+            # 等待子进程释放资源并结束
+            self._process.join()
+            return True
+
+        # 如果子进程已经执行完成
+        if not self._process.is_alive():
+            # 设置完成标记
+            self._done = True
+            # 获得子进程执行结果
+            if not self._result_queue.empty():
+                self._result = self._result_queue.get_nowait()
+            # 等待子进程资源释放
+            self.log.debug("Waiting for %s", self._process)
+            self._process.join()
+            return True
+
+        return False
+
+    @property
+    def result(self):
+        """获得文件处理子进程的执行结果 ."""
+        if not self.done:
+            raise XToolException("Tried to get the result before it's done!")
+        return self._result
+
+    @property
+    def start_time(self):
+        """获得文件处理子进程的启动时间 ."""
+        if self._start_time is None:
+            raise XToolException("Tried to get start time before it started!")
+        return self._start_time
+
+
 class FileProcessorManager(LoggingMixin):
     """文件处理器进程管理类
 
@@ -75,12 +250,12 @@ class FileProcessorManager(LoggingMixin):
     :type _last_runtime: dict[unicode, float]
     :type _last_finish_time: dict[unicode, datetime]
     """
-
     def __init__(self,
                  file_directory,
                  file_paths,
                  parallelism,
                  process_file_interval,
+                 min_file_parsing_loop_time,
                  max_runs,
                  processor_factory):
         """
@@ -103,7 +278,7 @@ class FileProcessorManager(LoggingMixin):
         self._process_file_interval = process_file_interval
         # 每次心跳的休眠时间
         self._min_file_parsing_loop_time = min_file_parsing_loop_time
-        # 文件处理进程
+        # 文件处理进程工厂函数，接受一个文件路径参数，返回 AbstractFileProcessor 对象
         self._processor_factory = processor_factory
         # 记录正在运行的处理器
         self._processors = {}

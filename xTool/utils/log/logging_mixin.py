@@ -74,6 +74,9 @@ class StreamLogWriter(object):
         Do whatever it takes to actually log the specified logging record
         :param message: message to log
         """
+        self.logger.log(self.level, message)
+        return
+
         if not message.endswith("\n"):
             self._buffer += message
         else:
