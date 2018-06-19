@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
+#coding: utf-8
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
+import atexit
 import os
 import time
 import random
 
 from sqlalchemy import event, exc, select
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from xTool.utils.log.logging_mixin import LoggingMixin
-
 log = LoggingMixin().log
 
 
@@ -105,3 +103,75 @@ def setup_event_handlers(
                 "Connection record belongs to pid {}, "
                 "attempting to check out in pid {}".format(connection_record.info['pid'], pid)
             )
+
+
+def configure_orm(sql_alchemy_conn,
+                  pool_enabled=True,
+                  pool_size=5,
+                  pool_recycle=1800,
+                  reconnect_timeout=300,
+                  autocommit=False,
+                  disable_connection_pool=False):
+    log.debug("Setting up DB connection pool (PID %s)" % os.getpid())
+    global engine
+    global Session
+    engine_args = {}
+
+    # 不使用DB连接池
+    if disable_connection_pool or not pool_enabled:
+        engine_args['poolclass'] = NullPool
+        log.debug("settings.configure_orm(): Using NullPool")
+    elif 'sqlite' not in sql_alchemy_conn:
+        # The DB server already has a value for wait_timeout (number of seconds after
+        # which an idle sleeping connection should be killed). Since other DBs may
+        # co-exist on the same server, SQLAlchemy should set its
+        # pool_recycle to an equal or smaller value.
+        log.info("setting.configure_orm(): Using pool settings. pool_size={}, "
+                 "pool_recycle={}".format(pool_size, pool_recycle))
+        engine_args['pool_size'] = pool_size
+        engine_args['pool_recycle'] = pool_recycle
+
+    # 连接数据库
+    engine = create_engine(sql_alchemy_conn, **engine_args)
+    # 设置数据库事件处理函数
+    reconnect_timeout = conf.getint('core', 'SQL_ALCHEMY_RECONNECT_TIMEOUT')
+    setup_event_handlers(engine, reconnect_timeout)
+
+    Session = scoped_session(
+        sessionmaker(autocommit=autocommit,
+                     autoflush=False,
+                     bind=engine))
+
+
+def dispose_orm():
+    """ Properly close pooled database connections """
+    log.debug("Disposing DB connection pool (PID %s)", os.getpid())
+    global engine
+    global Session
+
+    if Session:
+        Session.remove()
+        Session = None
+    if engine:
+        engine.dispose()
+        engine = None
+
+
+def configure_adapters():
+    from pendulum import Pendulum
+    try:
+        from sqlite3 import register_adapter
+        register_adapter(Pendulum, lambda val: val.isoformat(' '))
+    except ImportError:
+        pass
+    try:
+        import MySQLdb.converters
+        MySQLdb.converters.conversions[Pendulum] = MySQLdb.converters.DateTime2literal
+    except ImportError:
+        pass
+
+
+configure_adapters()
+
+# Ensure we close DB connections at scheduler and gunicon worker terminations
+atexit.register(dispose_orm)
