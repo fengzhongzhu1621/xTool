@@ -113,21 +113,12 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
         """
         raise NotImplementedError()
 
-    def helper(self, result_queue, file_path, *args, **kwargs):
+    def _handler(self, result_queue, file_path, *args, **kwargs):
         log = logging.getLogger("xTool.processor")
-
-        # 重定向输入输出
-        stdout = StreamLogWriter(log, logging.INFO)
-        stderr = StreamLogWriter(log, logging.WARN)
-
         # 设置日志处理器上下文，例如日志handler初始化时创建日志目录
         set_context(log, file_path)
 
         try:
-            # redirect stdout/stderr to log
-            sys.stdout = stdout
-            sys.stderr = stderr
-
             # 设置进程名
             start_time = time.time()
 
@@ -143,9 +134,6 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
         except:
             log.exception("Got an exception! Propagating...")
             raise
-        finally:
-            sys.stdout = sys.__stdout__
-            sys.stderr = sys.__stderr__
 
     def start(self):
         """创建一个文件处理子进程，
@@ -153,7 +141,7 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
         """
         thread_name = "{}_{}-Process".format(self.__class__.__name__, self._instance_id)
         self._process = multiprocessing.Process(
-            target=self.helper,
+            target=self._handler,
             args=(self._result_queue,
                   self.file_path,
                   self.args,
@@ -244,6 +232,13 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
 
 class FileProcessorManager(LoggingMixin):
     """文件处理器进程管理类
+
+    与multiprocess.Pool相比的特点如下
+    - 基于文件的并发调度
+    - 支持并发控制
+    - 支持同一个文件在多次调度之间的间隔设置
+    - 支持对进程池输入参数的动态改变
+    - 支持以心跳的形式返还进程的部分处理结果
 
     :type _file_path_queue: list[unicode]
     :type _processors: dict[unicode, AbstractFileProcessor]
