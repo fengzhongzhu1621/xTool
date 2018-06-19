@@ -20,7 +20,6 @@ log = LoggingMixin().log
 def prepare_classpath(dir_path):
     """将路径加入python系统路径 ."""
     dir_path = os.path.abspath(os.path.expanduser(dir_path))
-    print("dir_path = ", dir_path)
     if dir_path not in sys.path:
         sys.path.append(dir_path)
 
@@ -31,11 +30,16 @@ def make_module(name, objects):
     - name: 模块名称
     - objects: 模块中需要包含的对象列表
     """
-    name = name.lower()
+    log.debug('Creating module %s', name)
+    # 创建模块
     module = imp.new_module(name)
+    # 给模块设置_name属性 （插件名）
     module._name = name.split('.')[-1]
+    # 给模块设置_object属性（插件中所有的类名）
     module._objects = objects
+    # 给模块设置属性 （类名 => 类）
     module.__dict__.update((o.__name__, o) for o in objects)
+    # 返回新创建的模块
     return module
 
 
