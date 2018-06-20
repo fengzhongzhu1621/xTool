@@ -110,3 +110,10 @@ def test_expand_env_var():
     actual = expand_env_var("$var 123")
     expected = "I'm 123"
     assert actual == expected
+
+
+def test_run_command():
+    actual = run_command("echo 1")
+    assert actual == '1' + os.linesep
+    with pytest.raises(FileNotFoundError):
+        actual = run_command("runerr example")

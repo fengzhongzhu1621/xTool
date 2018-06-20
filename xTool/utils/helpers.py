@@ -15,9 +15,12 @@ import imp
 import os
 import re
 import signal
+import shlex
 import subprocess
 import sys
 import warnings
+import platform
+
 
 from xTool.exceptions import XToolException
 
@@ -297,3 +300,28 @@ def expand_env_var(env_var):
             return interpolated
         else:
             env_var = interpolated
+
+
+def run_command(command):
+    """
+    Runs command and returns stdout
+    """
+    if platform.system() == 'Windows':
+        close_fds = False
+    else:
+        close_fds = True
+    process = subprocess.Popen(
+        shlex.split(command),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        close_fds=close_fds)
+    output, stderr = [stream.decode(sys.getdefaultencoding(), 'ignore')
+                      for stream in process.communicate()]
+
+    if process.returncode != 0:
+        raise XToolException(
+            "Cannot execute {}. Error code is: {}. Output: {}, Stderr: {}"
+            .format(command, process.returncode, output, stderr)
+        )
+
+    return output
