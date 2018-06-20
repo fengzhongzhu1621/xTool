@@ -22,6 +22,11 @@ import warnings
 from xTool.exceptions import XToolException
 
 
+PY3 = sys.version_info[0] == 3
+if PY3:
+    unicode = str
+
+
 def validate_key(k, max_length=250):
     """验证key的格式 ."""
     if not isinstance(k, basestring):
@@ -265,3 +270,14 @@ def parse_template_string(template_string):
         return None, Template(template_string)
     else:
         return template_string, None
+
+
+def tob(s, enc='utf-8'):
+    """字符串编码 ."""
+    return s.encode(enc) if isinstance(s, unicode) else bytes(s)
+
+def tou(s, enc='utf-8'):
+    """字符串解码 ."""
+    return s.decode(enc) if isinstance(s, bytes) else unicode(s)
+
+tos = tou if PY3 else tob

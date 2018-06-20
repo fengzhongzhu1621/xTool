@@ -82,3 +82,21 @@ def test_parse_template_string():
     (template_string, template) = parse_template_string("1+2")
     assert template is None
     assert template_string == "1+2"
+
+
+def test_tob():
+    actual = tob('123')
+    expected = b'123'
+    assert actual == expected
+    actual = tob('你好')
+    expected = '你好'.encode('utf8')
+    assert actual == expected
+
+
+def test_tou():
+    actual = tou(b'123')
+    expected = '123'
+    assert actual == expected
+    actual = tou('你好'.encode('utf8'))
+    expected = '你好'
+    assert actual == expected
