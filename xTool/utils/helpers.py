@@ -281,3 +281,19 @@ def tou(s, enc='utf-8'):
     return s.decode(enc) if isinstance(s, bytes) else unicode(s)
 
 tos = tou if PY3 else tob
+
+
+def expand_env_var(env_var):
+    """使用环境变量替换env_var
+
+    - 根据环境变量替换env_var
+    - 把env_var中包含的”~”和”~user”转换成用户目录
+    """
+    if not env_var:
+        return env_var
+    while True:
+        interpolated = os.path.expanduser(os.path.expandvars(str(env_var)))
+        if interpolated == env_var:
+            return interpolated
+        else:
+            env_var = interpolated

@@ -100,3 +100,13 @@ def test_tou():
     actual = tou('你好'.encode('utf8'))
     expected = '你好'
     assert actual == expected
+
+
+def test_expand_env_var():
+    actual = expand_env_var("$var 123")
+    expected = "$var 123"
+    assert actual == expected
+    os.environ['var'] =  "I'm"
+    actual = expand_env_var("$var 123")
+    expected = "I'm 123"
+    assert actual == expected
