@@ -60,6 +60,16 @@ def mkdirs(path, mode):
         os.umask(o_umask)
 
 
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
+
 def list_py_file_paths(directory, followlinks=True, ignore_filename='.ignore', file_ext='.py', safe_mode=False, safe_filters=(b'xTool', b'XTool')):
     """递归遍历目录，返回匹配规则的文件列表
     Traverse a directory and look for Python files.
