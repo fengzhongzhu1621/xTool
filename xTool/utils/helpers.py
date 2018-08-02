@@ -119,7 +119,7 @@ def chunks(items, chunk_size):
 
 
 def reduce_in_chunks(fn, iterable, initializer, chunk_size=0):
-    """将数组分组后，并对分片进行fn计算
+    """将数组 iterable 分组后，并对分片进行fn计算
     Reduce the given list of items by splitting it into chunks
     of the given size and passing each chunk through the reducer
     """
