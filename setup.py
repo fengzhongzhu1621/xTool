@@ -172,7 +172,7 @@ install_requires.extend([
     'pendulum==1.4.2',  # 日期库
     'tabulate>=0.7.5, <0.8.0',
     'python-dateutil>=2.3, <3',
-    'croniter>=0.3.17, <0.4',
+    'croniter>=0.3.17, <0.4'
 ])
 
 doc = [

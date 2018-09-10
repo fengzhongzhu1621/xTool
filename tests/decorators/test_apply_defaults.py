@@ -70,5 +70,29 @@ def test_apply_defaults():
     kwargs = bash_operator.kwargs
     assert kwargs['params'] == {'b': 22, 'c': 4, 'g': 7}
     assert kwargs['default_args'] == {'env': 8, 'e': 5}
+
+    # env从model中的default_args中取值
     assert bash_operator.env == 8
     assert bash_operator.bash_command == 'ls'
+
+    kwargs = {
+        'model': model,
+        'default_args': {
+            'params': {
+                'b': 22,
+                'c': 4
+            },
+            'e': 5,
+            'env': 8
+        },
+        'params': {
+            'g': 7,
+            'c': 5,
+        }
+    }
+    # 如果BashOperator设置了默认值，则model中的相同的值对其没有影响
+    bash_operator = BashOperator(
+        bash_command="ls",
+        env=7,
+        *args, **kwargs)
+    assert bash_operator.env == 7

@@ -3,21 +3,13 @@ repoze.lru>=0.6
 psutil>=2.2.1
 pika>=0.9.14
 zope.interface>=4.1.2
-#twisted>=15.1.0
 torndb
-#MySQL-python==1.2.5
-#pexpect
 pyDes
-#pycrypto
-#httpsig
 mccabe
 pyflakes
 six
-hacking
 flake8-print
 colorama
-#pytest
-#pytest-cov
-future>=0.16.0, <0.17
-jinja2>=2.7.3, <2.9.0
-configparser>=3.5.0, <3.6.0
+future
+jinja2
+configparser
