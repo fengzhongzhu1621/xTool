@@ -17,7 +17,6 @@ from collections import OrderedDict
 
 from future import standard_library
 import six
-from six.moves import configparser
 from six import iteritems
 
 from backports.configparser import ConfigParser
