@@ -19,10 +19,8 @@ from future import standard_library
 import six
 from six.moves import configparser
 from six import iteritems
-if six.PY3:
-    ConfigParser = configparser.ConfigParser
-else:
-    ConfigParser = configparser.SafeConfigParser
+
+from backports.configparser import ConfigParser
 
 from xTool.utils.helpers import expand_env_var
 from xTool.utils.helpers import run_command
