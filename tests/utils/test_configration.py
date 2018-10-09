@@ -6,8 +6,11 @@ import unittest
 from xTool.utils.configuration import *
 
 
+# 获得配置文件路径
 config_file_path = os.path.join(os.path.dirname(__file__), 'data', 'default_config.cfg')
 product_config_file_path = os.path.join(os.path.dirname(__file__), 'data', 'product_config.cfg')
+
+# 读取默认配置文件
 DEFAULT_CONFIG = read_config_file(config_file_path)
 
 def test_read_config_file():
@@ -17,18 +20,23 @@ def test_read_config_file():
 
 class TestXToolConfigParser(unittest.TestCase):
     def setUp(self):
+        # 使用全局变量和局部变量渲染模版字符串
         default_config = parameterized_config(DEFAULT_CONFIG)
+        # 创建配置对象
         self.conf = XToolConfigParser(default_config=default_config)
         assert self.conf.is_validated is False
         assert self.conf.get('smtp', 'smtp_host') == 'localhost'
+        # 读取生产环境配置文件，覆盖默认配置文件
         self.conf.read(product_config_file_path)
         assert self.conf.is_validated is True
         assert self.conf.get('smtp', 'smtp_host') == 'localhost'
         assert self.conf.get('webserver', 'base_url') == 'http://localhost:8080'
 
     def test__get_env_var_option(self):
+        # 把环境变量的值中包含的”~”和”~user”转换成用户目录，并获得配置结果值
         actual = self.conf._get_env_var_option('smtp', 'smtp_host')
         assert actual is None
+        # 设置环境变量进行测试
         os.environ['XTOOL__SMTP__SMTP_HOST'] = '0.0.0.0'
         actual = self.conf._get_env_var_option('smtp', 'smtp_host')
         assert actual == '0.0.0.0'
@@ -72,6 +80,7 @@ class XToolCmdOptionConfigParser(XToolConfigParser):
         ('smtp', 'smtp_host'),
     }
 
+
 class TestXToolConfigParser(unittest.TestCase):
     def setUp(self):
         default_config = parameterized_config(DEFAULT_CONFIG)
@@ -80,6 +89,6 @@ class TestXToolConfigParser(unittest.TestCase):
         assert self.conf.get('smtp', 'smtp_host_cmd') == 'echo 1'
 
     def test__get_cmd_option(self):
-        assert self.conf.get('smtp', 'smtp_host') == '1' + os.linesep
-        actual = self.conf._get_cmd_option('smtp', 'smtp_host')
-        assert actual == '1' + os.linesep
+        assert self.conf.get('smtp', 'smtp_host').strip() == '1'
+        actual = self.conf._get_cmd_option('smtp', 'smtp_host').strip()
+        assert actual == '1'

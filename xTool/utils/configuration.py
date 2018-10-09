@@ -1,14 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 from __future__ import absolute_import
+# 开启除法浮点运算
+from __future__ import division
+from __future__ import print_function
+# 把你当前模块所有的字符串（string literals）转为unicode
+from __future__ import unicode_literals
 
+from base64 import b64encode
+from builtins import str
 import os
 import json
 from tempfile import mkstemp
 import copy
 from collections import OrderedDict
 
+from future import standard_library
 import six
 from six.moves import configparser
 from six import iteritems
@@ -22,6 +29,7 @@ from xTool.utils.helpers import run_command
 from xTool.utils.log.logging_mixin import LoggingMixin
 from xTool.exceptions import XToolConfigException
 
+standard_library.install_aliases()
 
 log = LoggingMixin().log
 
@@ -52,7 +60,7 @@ def read_config_file(file_path):
 
 
 def parameterized_config(template):
-    """
+    """使用全局变量和局部变量渲染模版字符串
     Generates a configuration from the provided template + variables defined in
     current scope
     :param template: a config content templated with {{variables}}
@@ -67,8 +75,12 @@ class XToolConfigParser(ConfigParser):
     # following the "{section}__{name}__cmd" pattern, the idea behind this
     # is to not store password on boxes in text files.
     as_command_stdout = {
-
+        ('core', 'sql_alchemy_conn'),
+        ('core', 'fernet_key'),
+        ('celery', 'broker_url'),
+        ('celery', 'result_backend'),
     }
+
 
     def __init__(self, default_config=None, *args, **kwargs):
         super(XToolConfigParser, self).__init__(*args, **kwargs)
@@ -79,26 +91,12 @@ class XToolConfigParser(ConfigParser):
 
         self.is_validated = False
 
-    def read_string(self, string, source='<string>'):
-        """
-        Read configuration from a string.
-
-        A backwards-compatible version of the ConfigParser.read_string()
-        method that was introduced in Python 3.
-        """
-        # Python 3 added read_string() method
-        if six.PY3:
-            ConfigParser.read_string(self, string, source=source)
-        # Python 2 requires StringIO buffer
-        else:
-            import StringIO
-            self.readfp(StringIO.StringIO(string))
-
     def _validate(self):
         self.is_validated = True
 
     def _get_env_var_option(self, section, key):
-        # must have format AIRFLOW__{SECTION}__{KEY} (note double underscore)
+        """把环境变量的值中包含的”~”和”~user”转换成用户目录，并获取配置结果值 ."""
+        # must have format XTOOL__{SECTION}__{KEY} (note double underscore)
         env_var = 'XTOOL__{S}__{K}'.format(S=section.upper(), K=key.upper())
         if env_var in os.environ:
             return expand_env_var(os.environ[env_var])
@@ -174,7 +172,7 @@ class XToolConfigParser(ConfigParser):
         
         @note: 执行此函数，获取的配置项会覆盖掉构造函数中的默认配置 default_config
         """
-        super(XToolConfigParser, self).read(filenames)
+        super(XToolConfigParser, self).read(filenames, encoding="utf-8")
         self._validate()
 
     def has_option(self, section, option):
@@ -280,3 +278,6 @@ class XToolConfigParser(ConfigParser):
                 cfg.setdefault(section, OrderedDict()).update({key: opt})
 
         return cfg
+
+
+SECRET_KEY = b64encode(os.urandom(16)).decode('utf-8')
