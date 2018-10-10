@@ -18,6 +18,10 @@ def test_read_config_file():
     assert 'smtp_host' in default_config
 
 
+def test_generate_secret_key():
+    assert len(SECRET_KEY) == 24
+
+
 class TestXToolConfigParser(unittest.TestCase):
     def setUp(self):
         # 使用全局变量和局部变量渲染模版字符串

@@ -279,4 +279,5 @@ class XToolConfigParser(ConfigParser):
         return cfg
 
 
+# 生成16个字节的加密key，并转化为base64编码的unicode格式
 SECRET_KEY = b64encode(os.urandom(16)).decode('utf-8')
