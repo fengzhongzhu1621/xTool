@@ -49,11 +49,13 @@ def tmp_configuration_copy(conf):
 
 def read_config_file(file_path):
     """读取默认配置 ."""
-    with open(file_path) as f:
-        config = f.read()
-        if six.PY2:
-            config = config.decode('utf-8')
-    return config
+    if six.PY2:
+        with open(file_path) as f:
+            config = f.read()
+            return config.decode('utf-8')
+    else:
+        with open(file_path, encoding='utf-8') as f:
+            return f.read()
 
 
 def parameterized_config(template):
