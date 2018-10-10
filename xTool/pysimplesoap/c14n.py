@@ -32,8 +32,6 @@ determine if the node is in the XPath result list, but little else.
 Authors:
     "Joseph M. Reagle Jr." <reagle@w3.org>
     "Rich Salz" <rsalz@zolera.com>
-
-$Date: 2006-03-30 23:47:16 +0000 (Thu, 30 Mar 2006) $ by $Author: luciferliu $
 '''
 
 _copyright = '''Copyright 2001, Zolera Systems Inc.  All Rights Reserved.
