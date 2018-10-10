@@ -20,9 +20,10 @@ import subprocess
 import sys
 import warnings
 import platform
+import errno
 
 
-from xTool.exceptions import XToolException
+from xTool.exceptions import XToolException, XToolConfigException
 
 
 PY3 = sys.version_info[0] == 3
@@ -328,3 +329,14 @@ def run_command(command):
         )
 
     return output
+
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise XToolConfigException(
+                'Error creating {}: {}'.format(path, exc.strerror))
