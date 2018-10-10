@@ -83,8 +83,8 @@ class XToolConfigParser(ConfigParser):
 
     def __init__(self, default_config=None, *args, **kwargs):
         super(XToolConfigParser, self).__init__(*args, **kwargs)
-        # 读取格式化后的文件
         self.defaults = ConfigParser(*args, **kwargs)
+        # 读取配置字符串
         if default_config is not None:
             self.defaults.read_string(default_config)
 
@@ -229,7 +229,7 @@ class XToolConfigParser(ConfigParser):
         Returns the current configuration as an OrderedDict of OrderedDicts.
         :param display_source: If False, the option value is returned. If True,
             a tuple of (option_value, source) is returned. Source is either
-            'airflow.cfg' or 'default'.
+            'xTool.cfg' or 'default'.
         :type display_source: bool
         :param display_sensitive: If True, the values of options set by env
             vars and bash commands will be displayed. If False, those options
