@@ -113,7 +113,7 @@ def test_expand_env_var():
 
 
 def test_run_command():
-    actual = run_command("echo 1")
-    assert actual == '1' + os.linesep
+    actual = run_command("echo 1").strip()
+    assert actual == '1'
     with pytest.raises(FileNotFoundError):
         actual = run_command("runerr example")

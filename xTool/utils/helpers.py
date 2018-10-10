@@ -295,10 +295,13 @@ def expand_env_var(env_var):
     if not env_var:
         return env_var
     while True:
+        # 把env_var中包含的”~”和”~user”转换成用户目录
         interpolated = os.path.expanduser(os.path.expandvars(str(env_var)))
+        # 如果相等则说明已经全部替换成功
         if interpolated == env_var:
             return interpolated
         else:
+            # 如果不相等需要继续替换
             env_var = interpolated
 
 
