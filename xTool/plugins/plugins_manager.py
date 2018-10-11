@@ -28,12 +28,12 @@ class XToolPluginException(Exception):
 
 
 class XToolBasePlugin(object):
-    Name = None
+    name = None
 
     @classmethod
     def validate(cls):
         """验证插件必须定义name静态变量 ."""
-        if not cls.Name:
+        if not cls.name:
             raise XToolPluginException("Your plugin needs a name.")
 
 
@@ -88,17 +88,19 @@ def load_plugin(plugin):
     modules_list = [
         (attr, getattr(plugin, attr))
         for attr in dir(plugin)
-            if attr.endswith("_MODULES") and isinstance(getattr(plugin, attr), (tuple, list))
+        if attr.endswith("_MODULES") and isinstance(getattr(plugin, attr), (tuple, list))
     ]
-
     modules = []
     for attr, objects in modules_list:
         prefix = "xTool.%s" % attr.split('_MODULES')[0].lower()
-        module_name = "%s.%s" % (prefix, plugin.Name)
+        module_name = "%s.%s" % (prefix, plugin.name)
+        # 动态创建模块
         module = make_module(module_name, objects)
+        # 将动态创建的模块加入到sys.modules
         sys.modules[module.__name__] = module
         modules.append(module)
     return modules
+
 
 def load_plugins(plugins_folder, followlinks=True):
     prepare_classpath(plugins_folder)

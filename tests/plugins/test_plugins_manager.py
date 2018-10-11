@@ -14,11 +14,11 @@ class OperatorA(object):
 
 
 class XToolTestPlugin(XToolBasePlugin):
-    Name = 'my_module'
-    OPERATOR_MODULES = [OperatorA]
+    name = 'my_module'
+    OPERATORS_MODULES = [OperatorA]
 
 
 def test_load_plugins():
     operators_modules = load_plugins(plugins_folder, followlinks=True)
-    from xTool.operator.my_module import OperatorA
+    from xTool.operators.my_module import OperatorA
     a = OperatorA()
