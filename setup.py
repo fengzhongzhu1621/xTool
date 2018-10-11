@@ -174,7 +174,6 @@ install_requires.extend([
     # 'python-daemon>=2.1.1, <2.2',  # 用于构建守护进程
     'pendulum>=1.4.2',  # 日期库
     'tabulate>=0.7.5',
-    'python-dateutil>=2.3',
     'croniter>=0.3.17'
 ])
 
@@ -222,7 +221,7 @@ def do_setup():
         ],
         setup_requires=[
             "flake8",
-            'docutils>=0.14, <1.0',
+            'docutils>=0.14',
         ],
         extras_require={
             'doc': doc,
