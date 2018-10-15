@@ -7,5 +7,5 @@ from xTool.crypto.fernet import *
 
 def test_generate_fernet_key():
     key = generate_fernet_key()
-    assert type(key) == type(u'')
-    assert len(base64.b64decode(key.encode('utf8'))) == 32
+    assert type(key) is type(u'')
+    assert len(key) == 44
