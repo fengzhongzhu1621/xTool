@@ -5,6 +5,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import re
+
 from xTool.utils import timezone
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta  # for doctest
@@ -249,3 +251,91 @@ def parse_execution_date(execution_date_str):
     Parse execution date string to datetime object.
     """
     return timezone.parse(execution_date_str)
+
+
+def rfc3339_datetime_re( anchor=True ):
+    """
+    Returns a regular expression for syntactic validation of ISO date-times, RFC-3339 date-times
+    to be precise.
+
+
+    >>> bool( rfc3339_datetime_re().match('2013-11-06T15:56:39Z') )
+    True
+
+    >>> bool( rfc3339_datetime_re().match('2013-11-06T15:56:39.123Z') )
+    True
+
+    >>> bool( rfc3339_datetime_re().match('2013-11-06T15:56:39-08:00') )
+    True
+
+    >>> bool( rfc3339_datetime_re().match('2013-11-06T15:56:39.123+11:00') )
+    True
+
+    It anchors the matching to the beginning and end of a string by default ...
+
+    >>> bool( rfc3339_datetime_re().search('bla 2013-11-06T15:56:39Z bla') )
+    False
+
+    ... but that can be changed:
+
+    >>> bool( rfc3339_datetime_re( anchor=False ).search('bla 2013-11-06T15:56:39Z bla') )
+    True
+
+    >>> bool( rfc3339_datetime_re( anchor=False ).match('2013-11-06T15:56:39Z bla') )
+    True
+
+    Keep in mind that re.match() always anchors at the beginning:
+
+    >>> bool( rfc3339_datetime_re( anchor=False ).match('bla 2013-11-06T15:56:39Z') )
+    False
+
+    It does not check whether the actual value is a semantically valid datetime:
+
+    >>> bool( rfc3339_datetime_re().match('9999-99-99T99:99:99.9-99:99') )
+    True
+
+    If the regular expression matches, each component of the matching value will be exposed as a
+    captured group in the match object.
+
+    >>> rfc3339_datetime_re().match('2013-11-06T15:56:39Z').groups()
+    ('2013', '11', '06', '15', '56', '39', None, 'Z')
+    >>> rfc3339_datetime_re().match('2013-11-06T15:56:39.123Z').groups()
+    ('2013', '11', '06', '15', '56', '39', '123', 'Z')
+    >>> rfc3339_datetime_re().match('2013-11-06T15:56:39.123-08:30').groups()
+    ('2013', '11', '06', '15', '56', '39', '123', '-08:30')
+    """
+    return re.compile(
+        ('^' if anchor else '') +
+        '(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:\d{2})' +
+        ('$' if anchor else '') )
+
+
+_rfc3339_datetime_re = rfc3339_datetime_re( )
+
+
+def parse_iso_utc( s ):
+    """
+    Parses an ISO time with a hard-coded Z for zulu-time (UTC) at the end. Other timezones are
+    not supported.
+
+    :param str s: the ISO-formatted time
+
+    :rtype: datetime.datetime
+
+    :return: an timezone-naive datetime object
+
+    >>> parse_iso_utc('2016-04-27T00:28:04.000Z')
+    datetime(2016, 4, 27, 0, 28, 4)
+    >>> parse_iso_utc('2016-04-27T00:28:04Z')
+    datetime(2016, 4, 27, 0, 28, 4)
+    >>> parse_iso_utc('2016-04-27T00:28:04X')
+    Traceback (most recent call last):
+    ...
+    ValueError: Not a valid ISO datetime in UTC: 2016-04-27T00:28:04X
+    """
+    m = _rfc3339_datetime_re.match( s )
+    if not m:
+        raise ValueError( 'Not a valid ISO datetime in UTC: ' + s )
+    else:
+        fmt = '%Y-%m-%dT%H:%M:%S' + ('.%f' if m.group( 7 ) else '') + 'Z'
+        return datetime.strptime( s, fmt )

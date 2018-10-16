@@ -5,6 +5,8 @@ from __future__ import unicode_literals
 from datetime import timedelta
 import subprocess
 
+import pytest
+
 from xTool import misc
 
 
@@ -94,3 +96,36 @@ def test_format_time():
     actual = misc.format_time(seconds)
     expect = "0:10:00"
     assert actual == expect
+
+
+def test_strict_bool():
+    with pytest.raises(ValueError):
+        misc.strict_bool(True)
+    with pytest.raises(ValueError):
+        misc.strict_bool(False)
+    with pytest.raises(ValueError):
+        misc.strict_bool(None)
+    with pytest.raises(ValueError):
+        misc.strict_bool("None")
+    assert misc.strict_bool("True") is True
+    assert misc.strict_bool("False") is False
+    with pytest.raises(ValueError):
+        misc.strict_bool("true") is True
+    with pytest.raises(ValueError):
+        misc.strict_bool("false") is True
+
+
+def test_less_strict_bool():
+    with pytest.raises(ValueError):
+        misc.less_strict_bool('abc')
+    with pytest.raises(ValueError):
+        misc.less_strict_bool("true") is True
+    with pytest.raises(ValueError):
+        misc.less_strict_bool("false") is True
+    with pytest.raises(ValueError):
+        misc.less_strict_bool("None")
+    assert misc.less_strict_bool("True") is True
+    assert misc.less_strict_bool("False") is False
+    assert misc.less_strict_bool(True) is True
+    assert misc.less_strict_bool(False) is False
+    assert misc.less_strict_bool(None) is False

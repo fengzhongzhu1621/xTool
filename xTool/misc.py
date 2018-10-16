@@ -29,6 +29,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import json
 import decimal
+from functools import wraps
 
 
 PY2 = sys.version_info[0] == 2
@@ -914,3 +915,107 @@ def tob(s, enc='utf-8'):
 def tou(s, enc='utf-8'):
     """将字符串转换为unicode编码 ."""
     return s.decode(enc) if isinstance(s, bytes) else s
+
+
+def strict_bool(s):
+    """
+    Variant of bool() that only accepts two possible string values.
+    """
+    if s == 'True':
+        return True
+    elif s == 'False':
+        return False
+    else:
+        raise ValueError( s )
+
+
+def less_strict_bool( x ):
+    """
+    Idempotent and None-safe version of strict_bool.
+    """
+    if x is None:
+        return False
+    elif x is True or x is False:
+        return x
+    else:
+        return strict_bool( x )
+
+
+def properties( obj ):
+    """
+    Returns a dictionary with one entry per attribute of the given object. The key being the
+    attribute name and the value being the attribute value. Attributes starting in two
+    underscores will be ignored. This function is an alternative to vars() which only returns
+    instance variables, not properties. Note that methods are returned as well but the value in
+    the dictionary is the method, not the return value of the method.
+
+    >>> class Foo():
+    ...     def __init__(self):
+    ...         self.var = 1
+    ...     @property
+    ...     def prop(self):
+    ...         return self.var + 1
+    ...     def meth(self):
+    ...         return self.var + 2
+    >>> foo = Foo()
+    >>> properties( foo ) == { 'var':1, 'prop':2, 'meth':foo.meth }
+    True
+
+    Note how the entry for prop is not a bound method (i.e. the getter) but a the return value of
+    that getter.
+    """
+    return dict( (attr, getattr( obj, attr ))
+                     for attr in dir( obj )
+                     if not attr.startswith( '__' ) )
+
+
+def memoize( f ):
+    """
+    A decorator that memoizes a function result based on its parameters. For example, this can be
+    used in place of lazy initialization. If the decorating function is invoked by multiple
+    threads, the decorated function may be called more than once with the same arguments.
+    """
+
+    # TODO: Recommend that f's arguments be immutable
+
+    memory = { }
+
+    @wraps( f )
+    def new_f( *args ):
+        try:
+            return memory[ args ]
+        except KeyError:
+            r = f( *args )
+            memory[ args ] = r
+            return r
+
+    return new_f
+
+
+def sync_memoize( f ):
+    """
+    Like memoize, but guarantees that decorated function is only called once, even when multiple
+    threads are calling the decorating function with multiple parameters.
+    """
+
+    # TODO: Think about an f that is recursive
+
+    memory = { }
+    from threading import Lock
+    lock = Lock( )
+
+    @wraps( f )
+    def new_f( *args ):
+        try:
+            return memory[ args ]
+        except KeyError:
+            # on cache misses, retry with lock held
+            with lock:
+                try:
+                    return memory[ args ]
+                except KeyError:
+                    r = f( *args )
+                    memory[ args ] = r
+                    return r
+
+    return new_f
