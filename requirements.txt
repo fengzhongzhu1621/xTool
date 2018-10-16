@@ -12,3 +12,5 @@ colorama
 future
 jinja2
 cryptography
+configparser
+numpy

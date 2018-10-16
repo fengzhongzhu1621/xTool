@@ -46,20 +46,7 @@ def test_runCommand():
 
 def test_getRunCommandResult():
     actual = misc.getRunCommandResult("echo 1")
-    expect = (0, '1\r\n', '')
-    assert actual == expect
-
-
-def test_collect_process_output():
-    command = "echo 1"
-    process = subprocess.Popen(command,
-            shell=True,
-            close_fds=False if misc.USE_WINDOWS else False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-    actual = misc.collect_process_output(process)
-    expect = {'stderr': '', 'stdout': '1\r\n'}
+    expect = (0, b'1\r\n', b'')
     assert actual == expect
 
 

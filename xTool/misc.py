@@ -35,6 +35,11 @@ from functools import wraps
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 
+if sys.version > '3':
+    unicode = str
+    unichr = chr
+
+
 # Determine platform being used.
 system = platform.system()
 USE_MAC = USE_WINDOWS = USE_X11 = False
@@ -67,6 +72,16 @@ def exceptionToString():
     return "".join(traceback.format_exception(*exc))
 
 
+def tob(s, enc='utf-8'):
+    """将字符串转换为utf8/bytes编码 ."""
+    return s.encode(enc) if not isinstance(s, bytes) else s
+
+
+def tou(s, enc='utf-8'):
+    """将字符串转换为unicode编码 ."""
+    return s.decode(enc) if isinstance(s, bytes) else s
+
+
 def ustr(value):
     """
     @value : the value to convert
@@ -77,14 +92,14 @@ def ustr(value):
         return value
 
     try:
-        return unicode(value)
-    except:
+        return tou(value)
+    except Exception as e:
         pass
 
     for ln in get_encodings():
         try:
-            return unicode(value, ln)
-        except:
+            return tou(value, ln)
+        except Exception as e:
             pass
     raise UnicodeError('unable de to convert %r' % (orig,))
 
@@ -132,24 +147,6 @@ def getRunCommandResult(command):
     )
     (stdoutdata, stderrdata) = proc.communicate()
     return (proc.returncode, stdoutdata, stderrdata)
-
-
-def collect_process_output(process):
-    """获得subprocess的输出结果 ."""
-    output = {}
-    if process.stderr is not None:
-        output["stderr"] = ""
-        for line in process.stderr.readlines():
-            output["stderr"] += str(line)
-    if process.stdin is not None:
-        output["stdin"] = ""
-        for line in process.stdin.readlines():
-            output["stdin"] += str(line)
-    if process.stdout is not None:
-        output["stdout"] = ""
-        for line in process.stdout.readlines():
-            output["stdout"] += str(line)
-    return output
 
 
 class ExpectTimeoutException(Exception):
