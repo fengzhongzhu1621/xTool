@@ -1,7 +1,7 @@
 #coding: utf-8
 
 """
-first
+first 获得第一个非空数据
 =====
 
 first is the function you always missed in Python.

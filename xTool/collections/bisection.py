@@ -1,5 +1,9 @@
 #coding: utf-8
 
+"""
+二分法
+"""
+
 from bisect import bisect_left, bisect_right
 
 
