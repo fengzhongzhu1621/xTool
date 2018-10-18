@@ -33,12 +33,16 @@ from functools import wraps
 
 
 PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] == 3
+PY3 = sys.version_info[0] >= 3
 
 if sys.version > '3':
+    import builtins
+    xrange = builtins.range
     unicode = str
     unichr = chr
-
+else:
+    import __builtin__
+    xrange = __builtin__.xrange
 
 # Determine platform being used.
 system = platform.system()
@@ -742,10 +746,6 @@ def grouper(n, iterable, padvalue=None):
     return zip_longest(*[iter(iterable)] * n, fillvalue=padvalue)
 
 
-def chunksWithPad(input, size):
-    return map(None, *([iter(input)] * size))
-
-
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
     return (l[i:i + n] for i in xrange(0, len(l), n))
@@ -940,6 +940,8 @@ def less_strict_bool( x ):
 
 def properties( obj ):
     """
+    获得一个对象的所有属性值
+
     Returns a dictionary with one entry per attribute of the given object. The key being the
     attribute name and the value being the attribute value. Attributes starting in two
     underscores will be ignored. This function is an alternative to vars() which only returns

@@ -134,6 +134,31 @@ def test_getFileRow():
     assert row == 2
 
 
+def test_grouper():
+    n = 3
+    iterable = 'abcdefg'
+    actual = misc.grouper(n, iterable, padvalue=None)
+    expect = [('a', 'b', 'c'), ('d', 'e', 'f'), ('g', None, None)]
+    assert list(actual) == expect
+    actual = misc.grouper(n, iterable, padvalue='x')
+    expect = [('a', 'b', 'c'), ('d', 'e', 'f'), ('g', 'x', 'x')]
+    assert list(actual) == expect
+
+
+def test_chunks():
+    n = 3
+    iterable = 'abcdefg'
+    actual = misc.chunks(iterable, n)
+    assert list(actual) == [u'abc', u'def', u'g']
+
+
+def test_get_random_string():
+    actual = misc.get_random_string(length=12)
+    assert len(actual) == 12
+    actual = misc.get_random_string(length=0)
+    assert actual == ''
+
+
 def test_strict_bool():
     with pytest.raises(ValueError):
         misc.strict_bool(True)
@@ -165,3 +190,18 @@ def test_less_strict_bool():
     assert misc.less_strict_bool(True) is True
     assert misc.less_strict_bool(False) is False
     assert misc.less_strict_bool(None) is False
+
+
+def test_properties():
+    class Foo():
+         def __init__(self):
+             self.var = 1
+         @property
+         def prop(self):
+             return self.var + 1
+         def meth(self):
+             return self.var + 2
+    foo = Foo()
+    actual = misc.properties( foo )
+    expect = { 'var':1, 'prop':2, 'meth':foo.meth }
+    assert expect == expect
