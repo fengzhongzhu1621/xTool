@@ -718,6 +718,7 @@ def getFileRowColCount(filePath):
             line = line.strip()
             if line:
                 row += 1
+                # 根据第一行识别列数
                 if row == 1:
                     col = getColCount(line)
     return (row, col)
@@ -726,7 +727,7 @@ def getFileRowColCount(filePath):
 def getFileRow(filePath):
     """获得文件行数 ."""
     with open(filePath, 'r') as rFb:
-        return sum(1 for row in rFb if row)
+        return sum(1 for row in rFb if row.strip())
 
 
 if PY2:

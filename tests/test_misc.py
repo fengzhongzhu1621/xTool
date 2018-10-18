@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import os
 from datetime import timedelta
 import subprocess
 
@@ -116,6 +117,21 @@ def test_getColCount():
     row = ""
     actual = misc.getColCount(row)
     assert actual == 0
+
+
+def test_getFileRowColCount():
+    dirname = os.path.dirname(__name__)
+    filePath = os.path.abspath(os.path.join(dirname, "tests/data/a.txt"))
+    (row, col) = misc.getFileRowColCount(filePath)
+    assert row == 2
+    assert col == 3
+
+
+def test_getFileRow():
+    dirname = os.path.dirname(__name__)
+    filePath = os.path.abspath(os.path.join(dirname, "tests/data/a.txt"))
+    row = misc.getFileRow(filePath)
+    assert row == 2
 
 
 def test_strict_bool():
