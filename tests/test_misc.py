@@ -85,6 +85,39 @@ def test_format_time():
     assert actual == expect
 
 
+def test_isMemoryAvailable():
+    actual = misc.isMemoryAvailable(limit=1)
+    assert actual is False
+    actual = misc.isMemoryAvailable(limit=100)
+    assert actual is True
+
+
+def test_isDiskAvailable():
+    actual = misc.isDiskAvailable(".", limit=1)
+    assert actual is False
+    actual = misc.isDiskAvailable(".", limit=100)
+    assert actual is True
+
+
+def test_formatRow():
+    row = " a  b \t c "
+    actual = misc.formatRow(row)
+    expect = ['a', 'b', 'c']
+    assert actual == expect
+    row = ""
+    actual = misc.formatRow(row)
+    assert actual == []
+
+
+def test_getColCount():
+    row = " a  b \t c "
+    actual = misc.getColCount(row)
+    assert actual == 3
+    row = ""
+    actual = misc.getColCount(row)
+    assert actual == 0
+
+
 def test_strict_bool():
     with pytest.raises(ValueError):
         misc.strict_bool(True)

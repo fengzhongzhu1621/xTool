@@ -695,16 +695,15 @@ def isDiskAvailable(dirname, limit=80):
     return True
 
 
-def getColCount(row):
-    """ 获得文本列数 """
-    lines = re.split("\s", row)
-    return len([i for i in lines if i])
-
-
 def formatRow(row):
     """ 日志行按空白字符分隔 """
     lines = re.split("\s", row.strip())
     return [i for i in lines if i]
+
+
+def getColCount(row):
+    """ 获得文本列数 """
+    return len(formatRow(row))
 
 
 def getFileRowColCount(filePath):
