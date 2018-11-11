@@ -1,3 +1,5 @@
+#coding: utf-8
+
 """
 Responses.
 
@@ -41,9 +43,12 @@ UNSPECIFIED = object()
 
 
 class Response(ABC):
-    """Base class of all responses."""
+    """相应基类
+    Base class of all responses.
+    """
 
     def __init__(self, http_status: Optional[int] = None) -> None:
+        # 响应状态码
         self.http_status = http_status
 
     @property
@@ -61,7 +66,7 @@ class Response(ABC):
 
 
 class NotificationResponse(Response):
-    """
+    """通知响应，请求id is NOID，状态码是204
     Notification response.
 
     Returned from processing a successful
@@ -74,6 +79,7 @@ class NotificationResponse(Response):
 
     @property
     def wanted(self) -> bool:
+        """不需要返回内容，即说明是一个通知请求 ."""
         return False
 
     def __str__(self) -> str:
@@ -81,7 +87,7 @@ class NotificationResponse(Response):
 
 
 def sort_dict_response(response: Dict[str, Any]) -> OrderedDict:
-    """
+    """格式化响应输出
     Sort the keys of a dict, returning an OrderedDict.
 
     This has no effect other than making it nicer to read. It's also only useful with
@@ -129,7 +135,9 @@ class DictResponse(Response):
         """Gets the response as a dictionary. Used by __str__."""
 
     def __str__(self) -> str:
-        """Use str() to get the JSON-RPC response string."""
+        """
+        返回响应字符串
+        Use str() to get the JSON-RPC response string."""
         return json.dumps(sort_dict_response(self.deserialized()))
 
 
@@ -197,12 +205,14 @@ class ErrorResponse(DictResponse):
             "error": {"code": self.code, "message": self.message},
             "id": self.id,
         }  # type: Dict[str, Any]
+        # 只有调试模式，才会返回data
         if self.data is not UNSPECIFIED and self.debug:
             dct["error"]["data"] = self.data
         return dct
 
 
 class InvalidJSONResponse(ErrorResponse):
+    """Invalid JSON was received by the server. An error occurred on the server while parsing the JSON text. """
     def __init__(
         self, *args: Any, http_status: int = status.HTTP_BAD_REQUEST, **kwargs: Any
     ) -> None:
@@ -215,10 +225,12 @@ class InvalidJSONResponse(ErrorResponse):
             *args,
             **kwargs,
         )
+        # 无效的json的id必须返回None
         assert self.id is None
 
 
 class InvalidJSONRPCResponse(ErrorResponse):
+    """The JSON sent is not a valid Request object. """
     def __init__(
         self, *args: Any, http_status: int = status.HTTP_BAD_REQUEST, **kwargs: Any
     ) -> None:
@@ -231,10 +243,12 @@ class InvalidJSONRPCResponse(ErrorResponse):
             *args,
             **kwargs,
         )
+        # 无效的json的id必须返回None
         assert self.id is None
 
 
 class MethodNotFoundResponse(ErrorResponse):
+    """The method does not exist / is not available. ."""
     def __init__(
         self, *args: Any, http_status: int = status.HTTP_NOT_FOUND, **kwargs: Any
     ) -> None:
@@ -248,6 +262,7 @@ class MethodNotFoundResponse(ErrorResponse):
 
 
 class InvalidParamsResponse(ErrorResponse):
+    """Invalid method parameter(s). """
     def __init__(
         self, *args: Any, http_status: int = status.HTTP_BAD_REQUEST, **kwargs: Any
     ) -> None:
@@ -261,6 +276,7 @@ class InvalidParamsResponse(ErrorResponse):
 
 
 class ExceptionResponse(ErrorResponse):
+    """服务器异常 ."""
     def __init__(
         self,
         exc: BaseException,
@@ -290,6 +306,7 @@ class BatchResponse(Response):
     ) -> None:
         super().__init__(http_status=http_status)
         # Remove notifications; these are not allowed in batch responses
+        # 只获得非通知响应
         self.responses = cast(
             Iterable[DictResponse], {r for r in responses if r.wanted}
         )
@@ -303,7 +320,7 @@ class BatchResponse(Response):
 
     def __str__(self) -> str:
         """JSON-RPC response string."""
-        dicts = self.deserialized()
+        lists = self.deserialized()
         # For an all-notifications response, an empty string should be returned, as per
         # spec
-        return json.dumps(dicts) if len(dicts) else ""
+        return json.dumps(lists) if lists else ""
