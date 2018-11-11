@@ -1,3 +1,5 @@
+#coding: utf-8
+
 """Asynchronous dispatch"""
 import asyncio
 import collections
@@ -18,10 +20,12 @@ from .response import (BatchResponse, InvalidJSONResponse,
 
 
 async def call(method: Method, *args: Any, **kwargs: Any) -> Any:
+    """验证参数args, kwargs是否和func的签名一致，如果签名一致则执行此方法 ."""
     return await validate_args(method, *args, **kwargs)(*args, **kwargs)
 
 
 async def safe_call(request: Request, methods: Methods, *, debug: bool) -> Response:
+    """单次请求调用 ."""
     with handle_exceptions(request, debug) as handler:
         result = await call(
             methods.items[request.method], *request.args, **request.kwargs
@@ -33,6 +37,7 @@ async def safe_call(request: Request, methods: Methods, *, debug: bool) -> Respo
 async def call_requests(
     requests: Union[Request, Iterable[Request]], methods: Methods, debug: bool
 ) -> Response:
+    """批量请求调用 ."""
     if isinstance(requests, collections.Iterable):
         responses = (safe_call(r, methods, debug=debug) for r in requests)
         return BatchResponse(await asyncio.gather(*responses))
