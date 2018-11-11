@@ -1,3 +1,5 @@
+#coding: utf-8
+
 """
 Request class.
 
@@ -14,15 +16,29 @@ NOPARAMS = object()
 # can't use None which is a valid ID.
 NOID = object()
 
+RE_CAMEL_CASE_1 = re.compile("(.)([A-Z][a-z]+)")
+RE_CAMEL_CASE_2 = re.compile("([a-z0-9])([A-Z])")
+
 
 def convert_camel_case_string(name: str) -> str:
-    """Convert camel case string to snake case"""
-    string = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
-    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", string).lower()
+    """Convert camel case string to snake case
+    
+    fooBar => foo_bar
+    """
+    string = RE_CAMEL_CASE_1.sub(r"\1_\2", name)
+    return RE_CAMEL_CASE_2.sub(r"\1_\2", string).lower()
 
 
 def convert_camel_case_keys(original_dict: Dict[str, Any]) -> Dict[str, Any]:
-    """Converts all keys of a dict from camel case to snake case, recursively"""
+    """Converts all keys of a dict from camel case to snake case, recursively
+    
+    {"fooKey": 1, "aDict": {"fooKey": 1, "barKey": 2}}
+    =>
+    {
+        "foo_key": 1,
+        "a_dict": {"foo_key": 1, "bar_key": 2},
+    }
+    """
     new_dict = dict()
     for key, val in original_dict.items():
         if isinstance(val, dict):
@@ -37,12 +53,20 @@ def get_arguments(
     params: Union[List, Dict, object] = NOPARAMS, context: Any = NOCONTEXT
 ) -> Tuple[List, Dict]:
     """
+    将参数组合成函数需要的标准签名
+
     Get the positional and keyword arguments from a request.
 
     Takes the 'params' part of a JSON-RPC request and converts it to either positional
     or named arguments usable in a Python function call. Note that a JSON-RPC request
     can only have positional _or_ named arguments, but not both. See
     http://www.jsonrpc.org/specification#parameter_structures
+
+    Examples:
+        [2, 3] ->  ([2, 3], {})
+        {"foo": "bar"} -> ([], {"foo": "bar"})
+        ["foo"], context="bar" -> (["bar", "foo"], {})
+        {"foo": "bar"}, context="baz" -> (["baz"], {"foo": "bar"})
 
     Args:
         params: The 'params' part of the JSON-RPC request (should be a list or dict).
@@ -71,7 +95,7 @@ def get_arguments(
 
 
 class Request:
-    """
+    """请求类
     Represents a JSON-RPC Request object.
 
     Encapsulates a JSON-RPC request, providing details such as the method name,
@@ -100,15 +124,20 @@ class Request:
             convert_camel_case: Will convert the method name and any keyword parameter
                 names to snake_case.
         """
+        # 版本号
         self.jsonrpc = jsonrpc
+        # 请求方法
         self.method = method
+        # 格式化参数，支持数组、字典格式
         self.args, self.kwargs = (
             get_arguments(params, context=context)
             if isinstance(params, (list, dict))
             else ([], {})
         )
+        # 请求ID
         self.id = id
 
+        # 将参数名改为下划线的形式
         if convert_camel_case:
             self.method = convert_camel_case_string(self.method)
             if self.kwargs:
@@ -116,7 +145,8 @@ class Request:
 
     @property
     def is_notification(self) -> bool:
-        """
+        """判断请求是否是通知类型
+
         Returns:
             True if the request is a JSON-RPC Notification (ie. No id attribute is
             included). False if it doesn't, meaning it's a JSON-RPC "Request".
