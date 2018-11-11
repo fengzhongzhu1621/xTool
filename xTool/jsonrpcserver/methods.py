@@ -19,7 +19,7 @@ Method = Callable[..., Any]
 
 def validate_args(func: Method, *args: Any, **kwargs: Any) -> Method:
     """
-    验证参数args, kwargs是否和func的签名一致
+    验证参数args, kwargs是否和func的签名一致，如果签名一致，则返回func
     Check if the request's arguments match a function's signature.
 
     Raises TypeError exception if arguments cannot be passed to a function.

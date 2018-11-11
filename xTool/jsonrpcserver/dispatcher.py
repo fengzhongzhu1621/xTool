@@ -30,14 +30,17 @@ from .response import (BatchResponse, ExceptionResponse, InvalidJSONResponse,
                        MethodNotFoundResponse, NotificationResponse, Response,
                        SuccessResponse)
 
+# 初始化日志
 request_logger = logging.getLogger(__name__ + ".request")
 response_logger = logging.getLogger(__name__ + ".response")
 
+# 读取json schema配置文件
 schema = deserialize(resource_string(__name__, "request-schema.json"))
 
 DEFAULT_REQUEST_LOG_FORMAT = "--> %(message)s"
 DEFAULT_RESPONSE_LOG_FORMAT = "<-- %(message)s"
 
+# 读取jsonrpcserver配置文件
 config = ConfigParser(default_section="dispatch")
 config.read([".jsonrpcserverrc", os.path.expanduser("~/.jsonrpcserverrc")])
 
@@ -78,7 +81,7 @@ def log_response(response: str, trim_log_values: bool = False, **kwargs: Any) ->
 
 
 def validate(request: Union[Dict, List], schema: dict) -> Union[Dict, List]:
-    """
+    """使用jsonschema验证请求json格式
     Wraps jsonschema.validate, returning the same object passed in.
 
     Args:
@@ -93,7 +96,7 @@ def validate(request: Union[Dict, List], schema: dict) -> Union[Dict, List]:
 
 
 def call(method: Method, *args: Any, **kwargs: Any) -> Any:
-    """
+    """验证参数args, kwargs是否和func的签名一致，如果签名一致则执行此方法
     Validates arguments and then calls the method.
 
     Args:
@@ -111,6 +114,8 @@ def call(method: Method, *args: Any, **kwargs: Any) -> Any:
 
 @contextmanager
 def handle_exceptions(request: Request, debug: bool) -> Generator:
+    """异常处理上下文管理器 ."""
+    # 创建一个标准类
     handler = SimpleNamespace(response=None)
     try:
         yield handler
@@ -132,7 +137,7 @@ def handle_exceptions(request: Request, debug: bool) -> Generator:
 
 
 def safe_call(request: Request, methods: Methods, *, debug: bool) -> Response:
-    """
+    """单次请求调用
     Call a Request, catching exceptions to ensure we always return a Response.
 
     Args:
@@ -144,6 +149,7 @@ def safe_call(request: Request, methods: Methods, *, debug: bool) -> Response:
         A Response object.
     """
     with handle_exceptions(request, debug) as handler:
+        # 验证函数签名，并执行此函数，返回函数执行结果
         result = call(methods.items[request.method], *request.args, **request.kwargs)
         handler.response = SuccessResponse(result=result, id=request.id)
     return handler.response
@@ -152,7 +158,7 @@ def safe_call(request: Request, methods: Methods, *, debug: bool) -> Response:
 def call_requests(
     requests: Union[Request, Iterable[Request]], methods: Methods, debug: bool
 ) -> Response:
-    """
+    """批量请求调用
     Takes a request or list of Requests and calls them.
 
     Args:
@@ -160,19 +166,21 @@ def call_requests(
         methods: The list of methods that can be called.
         debug: Include more information in error responses.
     """
+    # 批量请求调用
     if isinstance(requests, collections.Iterable):
         return BatchResponse(safe_call(r, methods, debug=debug) for r in requests)
+    # 单次请求调用
     return safe_call(requests, methods, debug=debug)
 
 
 def create_requests(
     requests: Union[Dict, List], *, context: Any = NOCONTEXT, convert_camel_case: bool
 ) -> Union[Request, Set[Request]]:
-    """
+    """创建批量或单次请求对象
     Create a Request object from a dictionary (or list of them).
 
     Args:
-        requests: Request object, or a collection of them.
+        requests: Request object, or a collection of them. 客户端传递的POST json格式
         methods: The list of methods that can be called.
         context: If specified, will be the first positional argument in all requests.
         convert_camel_case: Will convert the method name/any named params to snake case.
@@ -196,7 +204,7 @@ def dispatch_pure(
     convert_camel_case: bool,
     debug: bool,
 ) -> Response:
-    """
+    """调用请求调用指定的方法
     Pure version of dispatch - no logging, no optional parameters.
 
     Does two things:
@@ -213,11 +221,13 @@ def dispatch_pure(
         A Response.
     """
     try:
+        # 使用jsonschema验证请求json格式的请求
         deserialized = validate(deserialize(request), schema)
     except JSONDecodeError as exc:
         return InvalidJSONResponse(data=str(exc), debug=debug)
     except ValidationError as exc:
         return InvalidJSONRPCResponse(data=None, debug=debug)
+    # 根据请求的method方法调用
     return call_requests(
         create_requests(
             deserialized, context=context, convert_camel_case=convert_camel_case
@@ -239,7 +249,7 @@ def dispatch(
     trim_log_values: bool = False,
     **kwargs: Any,
 ) -> Response:
-    """
+    """调用请求调用指定的方法，参数的默认值从配置文件中获取
     Dispatch a request (or requests) to methods.
 
     This is the main public method, it's the only one with optional params, and the only
@@ -262,10 +272,13 @@ def dispatch(
         >>> dispatch('{"jsonrpc": "2.0", "method": "ping", "id": 1}', methods)
     """
     # Use the global methods object if no methods object was passed.
+    # 确认是否使用全局方法收集器
     methods = global_methods if methods is None else methods
+
     # Add temporary stream handlers for this request, and remove them later
     if basic_logging:
         request_handler, response_handler = add_handlers()
+
     log_request(request, trim_log_values=trim_log_values)
     response = dispatch_pure(
         request,
@@ -275,6 +288,7 @@ def dispatch(
         convert_camel_case=convert_camel_case,
     )
     log_response(str(response), trim_log_values=trim_log_values)
+
     # Remove the temporary stream handlers
     if basic_logging:
         remove_handlers(request_handler, response_handler)

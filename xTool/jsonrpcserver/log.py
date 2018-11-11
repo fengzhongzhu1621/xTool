@@ -1,3 +1,5 @@
+#coding: utf-8
+
 """Logging"""
 import json
 import logging
@@ -5,6 +7,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 
 
 def _trim_string(message: str) -> str:
+    """如果字符串过长，隐藏中间信息 ."""
     longest_string = 30
 
     if len(message) > longest_string:

@@ -295,7 +295,7 @@ class ExceptionResponse(ErrorResponse):
 
 
 class BatchResponse(Response):
-    """
+    """批量请求的响应
     Returned from batch requests.
 
     A collection of Responses, either success or error.
