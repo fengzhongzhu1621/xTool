@@ -67,8 +67,12 @@ HTTP_METHOD_NOT_ALLOWED = 405
 HTTP_INTERNAL_ERROR = 500
 
 # JSONRPC status codes from http://www.jsonrpc.org/specification#error_object
+# Invalid JSON was received by the server. An error occurred on the server while parsing the JSON text.
 JSONRPC_PARSE_ERROR_CODE = -32700
+# The JSON sent is not a valid Request object.
 JSONRPC_INVALID_REQUEST_CODE = -32600
+# The method does not exist / is not available.
 JSONRPC_METHOD_NOT_FOUND_CODE = -32601
+# Invalid method parameter(s).
 JSONRPC_INVALID_PARAMS_CODE = -32602
 JSONRPC_SERVER_ERROR_CODE = -32000

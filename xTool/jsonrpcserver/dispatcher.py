@@ -1,5 +1,7 @@
+#coding: utf-8
+
 """
-Dispatcher.
+Dispatcher. 同步调度
 
 The dispatch() function takes a JSON-RPC request, logs it, calls the appropriate method,
 then logs and returns the response.

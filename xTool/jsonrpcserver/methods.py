@@ -1,3 +1,6 @@
+#coding: utf-8
+
+
 """
 The "methods" object holds the list of functions that can be called by remote calls.
 
@@ -10,11 +13,13 @@ from typing import Any, Callable, Optional
 
 from funcsigs import signature  # type: ignore
 
+# 可以通过对类型提示中的参数列表替换一个文本省略号来声明一个可调用的返回类型，而不指定调用参数
 Method = Callable[..., Any]
 
 
 def validate_args(func: Method, *args: Any, **kwargs: Any) -> Method:
     """
+    验证参数args, kwargs是否和func的签名一致
     Check if the request's arguments match a function's signature.
 
     Raises TypeError exception if arguments cannot be passed to a function.
@@ -32,6 +37,7 @@ def validate_args(func: Method, *args: Any, **kwargs: Any) -> Method:
 
 
 def validate(method: Callable) -> Callable:
+    """验证method是否可调用，如果可调用则返回此方法，否则抛出AssertionError ."""
     assert callable(method)
     return method
 
@@ -73,9 +79,11 @@ class Methods:
         return None
 
 
+# 全局方法容器
 # A default Methods object which can be used, or user can create their own.
 global_methods = Methods()
 
 
 def add(*args: Any, **kwargs: Any) -> Optional[Callable]:
+    """将方法添加到全局容器中 ."""
     return global_methods.add(*args, **kwargs)
