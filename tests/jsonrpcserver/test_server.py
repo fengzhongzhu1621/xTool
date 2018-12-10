@@ -1,8 +1,8 @@
 from unittest.mock import patch
 
-from jsonrpcserver.server import serve
+from xTool.jsonrpcserver.server import serve
 
 
-@patch("jsonrpcserver.server.HTTPServer")
+@patch("xTool.jsonrpcserver.server.HTTPServer")
 def test_serve(*_):
     serve()

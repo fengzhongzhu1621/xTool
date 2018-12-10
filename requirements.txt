@@ -14,3 +14,6 @@ jinja2
 cryptography
 configparser
 numpy
+apply_defaults
+jsonschema
+funcsigs

@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from jsonrpcserver.request import (
+from xTool.jsonrpcserver.request import (
     NOID,
     Request,
     convert_camel_case_keys,

@@ -1,6 +1,6 @@
 import logging
 
-from jsonrpcserver.log import _trim_message, _trim_string, _trim_values, log_
+from xTool.jsonrpcserver.log import _trim_message, _trim_string, _trim_values, log_
 
 
 def test_trim_string():

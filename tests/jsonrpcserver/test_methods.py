@@ -2,7 +2,7 @@ from functools import partial
 
 import pytest
 
-from jsonrpcserver.methods import Methods, add, validate_args
+from xTool.jsonrpcserver.methods import Methods, add, validate_args
 
 
 def test_validate_no_arguments():

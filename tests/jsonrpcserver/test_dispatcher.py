@@ -2,7 +2,7 @@ import logging
 from json import dumps as serialize
 from unittest.mock import sentinel
 
-from jsonrpcserver.dispatcher import (
+from xTool.jsonrpcserver.dispatcher import (
     add_handlers,
     call_requests,
     create_requests,
@@ -13,9 +13,9 @@ from jsonrpcserver.dispatcher import (
     remove_handlers,
     safe_call,
 )
-from jsonrpcserver.methods import Methods, global_methods
-from jsonrpcserver.request import NOCONTEXT, Request
-from jsonrpcserver.response import (
+from xTool.jsonrpcserver.methods import Methods, global_methods
+from xTool.jsonrpcserver.request import NOCONTEXT, Request
+from xTool.jsonrpcserver.response import (
     BatchResponse,
     ErrorResponse,
     InvalidJSONResponse,

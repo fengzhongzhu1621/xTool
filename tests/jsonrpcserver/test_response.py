@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from jsonrpcserver import status
-from jsonrpcserver.response import (
+from xTool.jsonrpcserver import status
+from xTool.jsonrpcserver.response import (
     BatchResponse,
     ErrorResponse,
     ExceptionResponse,
