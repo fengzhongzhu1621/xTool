@@ -950,3 +950,8 @@ def many_to_one(input_dict):
                 for keys, val in input_dict.items()
                 for key in keys)
 
+
+def open_url(url):
+    """根据URL打开浏览器 ."""
+    from webbrowser import open as wbopen
+    wbopen(url)
