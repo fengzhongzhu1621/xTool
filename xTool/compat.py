@@ -3,6 +3,8 @@
 import sys
 
 PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] >= 3
+
 _identity = lambda x: x
 
 
@@ -83,3 +85,20 @@ def with_metaclass(meta, *bases):
                 return type.__new__(cls, name, (), d)
             return meta(name, bases, d)
     return metaclass('temporary_class', None, {})
+
+
+if PY3:
+    import builtins
+    import functools
+    reduce = functools.reduce
+    zip = builtins.zip
+    xrange = builtins.range
+    map = builtins.map
+else:
+    import __builtin__
+    import itertools
+    builtins = __builtin__
+    reduce = __builtin__.reduce
+    zip = itertools.izip
+    xrange = __builtin__.xrange
+    map = itertools.imap
