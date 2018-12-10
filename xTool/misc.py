@@ -924,3 +924,29 @@ def properties( obj ):
     return dict( (attr, getattr( obj, attr ))
                      for attr in dir( obj )
                      if not attr.startswith( '__' ) )
+
+
+def get_first_duplicate(items):
+    """获得列表中第一个重复值 ."""
+    seen = set()
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+        else:
+            return item
+    return None
+
+
+def many_to_one(input_dict):
+    """拆分词典中的key
+    Convert a many-to-one mapping to a one-to-one mapping
+    
+    Examples:
+
+        {'ab': 1, ('c', 'd'): 2} -> {'a': 1, 'b': 1, 'c': 2, 'd': 2}
+    
+    """
+    return dict((key, val)
+                for keys, val in input_dict.items()
+                for key in keys)
+
