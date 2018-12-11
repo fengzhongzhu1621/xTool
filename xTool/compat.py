@@ -16,6 +16,12 @@ except NameError:
         return hasattr(object, '__call__')
 
 
+try:
+    text = (str, unicode)
+except NameError:
+    text = str
+
+
 # Python 3.x (and backports) use a modified iterator syntax
 # This will allow 2.x to behave with 3.x iterators
 if not hasattr(__builtins__, 'next'):

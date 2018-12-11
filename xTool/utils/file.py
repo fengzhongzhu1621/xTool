@@ -78,6 +78,19 @@ def mkdir_p(path):
             raise
 
 
+def rm_f(path):
+    """
+    Remove the file at the given path with os.remove(), ignoring errors caused by the file's absence.
+    """
+    try:
+        os.remove( path )
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            pass
+        else:
+            raise
+
+
 def list_py_file_paths(directory, followlinks=True, ignore_filename='.ignore', file_ext='.py', safe_mode=False, safe_filters=(b'xTool', b'XTool')):
     """递归遍历目录，返回匹配规则的文件列表
     Traverse a directory and look for Python files.
