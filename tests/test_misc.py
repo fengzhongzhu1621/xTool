@@ -205,3 +205,15 @@ def test_properties():
     actual = misc.properties( foo )
     expect = { 'var':1, 'prop':2, 'meth':foo.meth }
     assert expect == expect
+
+
+def test_get_first_duplicate():
+    expectValue = 2
+    actualValue = misc.get_first_duplicate([1,2,2,3])
+    assert expectValue == actualValue
+
+
+def test_many_to_one():
+    expectValue = {'a': 1, 'b': 1, 'c': 2, 'd': 2}
+    actualValue = misc.many_to_one({'ab': 1, ('c', 'd'): 2})
+    assert expectValue == actualValue
