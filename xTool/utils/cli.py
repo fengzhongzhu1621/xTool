@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 
+import logging
 import sys
 from datetime import datetime
 from collections import namedtuple
@@ -88,7 +89,8 @@ def action_logging(f):
             "but {}".format(args[0])
         # 创建命令行参数的上下文
         metrics = _build_metrics(f.__name__, args[0])
-        cli_action_loggers.on_pre_execution(**metrics)
+        # 执行命令行之前的预处理操作，可以通过register_pre_exec_callback注册
+        on_pre_execution(**metrics)
         # 执行命令行
         try:
             return f(*args, **kwargs)
@@ -99,7 +101,8 @@ def action_logging(f):
         finally:
             # 记录命令行结束时间
             metrics['end_datetime'] = datetime.now()
-            cli_action_loggers.on_post_execution(**metrics)
+            # 执行命令行之后的操作，可以通过register_post_exec_callback注册
+            on_post_execution(**metrics)
 
     return wrapper
 
@@ -107,9 +110,6 @@ def action_logging(f):
 def _build_metrics(func_name, namespace):
     """
     Builds metrics dict from function args
-    It assumes that function arguments is from airflow.bin.cli module's function
-    and has Namespace instance where it optionally contains "dag_id", "task_id",
-    and "execution_date".
 
     :param func_name: name of function
     :param namespace: Namespace instance from argparse
@@ -120,21 +120,72 @@ def _build_metrics(func_name, namespace):
                'full_command': '{}'.format(list(sys.argv)), 'user': getpass.getuser()}
 
     assert isinstance(namespace, Namespace)
-    tmp_dic = vars(namespace)
-    metrics = dict(metrics)
+    metrics = vars(namespace)
     metrics['host_name'] = socket.gethostname()
 
     extra = json.dumps(dict((k, metrics[k]) for k in ('host_name', 'full_command')))
+    metrics['extra'] = extra
 
-    # 构造需要记录在DB中的日志
-    log = airflow.models.Log(
-        event='cli_{}'.format(func_name),
-        task_instance=None,
-        owner=metrics['user'],
-        extra=extra,
-        task_id=metrics.get('task_id'),
-        dag_id=metrics.get('dag_id'),
-        execution_date=metrics.get('execution_date'))
-    metrics['log'] = log
     return metrics
 
+
+def register_pre_exec_callback(handler):
+    """
+    Registers more handler function callback for pre-execution.
+    This function callback is expected to be called with keyword args.
+    For more about the arguments that is being passed to the callback
+    
+    :param handler
+    :return: None
+    """
+    logging.debug("Adding {} to pre execution callback".format(handler))
+    __pre_exec_callbacks.append(handler)
+
+
+def register_post_exec_callback(handler):
+    """
+    Registers more handler function callback for post-execution.
+    This function callback is expected to be called with keyword args.
+    For more about the arguments that is being passed to the callback
+    
+    :param handler
+    :return: None
+    """
+    logging.debug("Adding {} to post execution callback".format(handler))
+    __post_exec_callbacks.append(handler)
+
+
+def on_pre_execution(**kwargs):
+    """
+    Calls callbacks before execution.
+    Note that any exception from callback will be logged but won't be propagated.
+    :param kwargs:
+    :return: None
+    """
+    logging.debug("Calling callbacks: {}".format(__pre_exec_callbacks))
+    for cb in __pre_exec_callbacks:
+        try:
+            cb(**kwargs)
+        except Exception:
+            logging.exception('Failed on pre-execution callback using {}'.format(cb))
+
+
+def on_post_execution(**kwargs):
+    """
+    Calls callbacks after execution.
+    As it's being called after execution, it can capture status of execution,
+    duration, etc. Note that any exception from callback will be logged but
+    won't be propagated.
+    :param kwargs:
+    :return: None
+    """
+    logging.debug("Calling callbacks: {}".format(__post_exec_callbacks))
+    for cb in __post_exec_callbacks:
+        try:
+            cb(**kwargs)
+        except Exception:
+            logging.exception('Failed on post-execution callback using {}'.format(cb))
+
+
+__pre_exec_callbacks = []
+__post_exec_callbacks = []
