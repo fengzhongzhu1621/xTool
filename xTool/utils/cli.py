@@ -27,7 +27,7 @@ class BaseCLIFactory(object):
 
         # 获得需要添加到子解析器的命令名
         subparser_name_list = cls.subparsers_dict.keys()
-        # 遍历自解析器命令的名称
+        # 遍历子解析器命令的名称
         for subparser_name in subparser_name_list:
             # 获得子解析器配置
             subparser_conf = cls.subparsers_dict[subparser_name]
@@ -45,5 +45,10 @@ class BaseCLIFactory(object):
                 # 子解析器添加参数
                 # flags：参数的短写和长写
                 sp.add_argument(*arg_namedtuple.flags, **kwargs)
+            # 设置参数的动作
             sp.set_defaults(func=subparser_conf['func'])
         return parser
+
+
+def get_parser():
+    return CLIFactory.get_parser()
