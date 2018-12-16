@@ -955,3 +955,16 @@ def open_url(url):
     """根据URL打开浏览器 ."""
     from webbrowser import open as wbopen
     wbopen(url)
+
+
+# Dates and JSON encoding/decoding
+
+def json_ser(obj):
+    """json serializer that deals with dates.
+
+    usage: json.dumps(object, default=utils.json.json_ser)
+    """
+    if isinstance(obj, (datetime, date)):
+        # Return a string representing the date and time in ISO 8601 format,
+        # YYYY-MM-DDTHH:MM:SS.mmmmmm or, if microsecond is 0, YYYY-MM-DDTHH:MM:SS
+        return obj.isoformat()
