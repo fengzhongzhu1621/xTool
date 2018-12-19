@@ -26,8 +26,10 @@ def create_session():
         yield session
         # 清除session实例
         session.expunge_all()
+        # 提交事务
         session.commit()
     except:
+        # 异常则回滚事务
         session.rollback()
         raise
     finally:
