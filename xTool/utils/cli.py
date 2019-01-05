@@ -15,15 +15,41 @@ import json
 from argparse import Namespace
 
 
+# 自定义命令行配置参数元组
 Arg = namedtuple(
     'Arg', ['flags', 'help', 'action', 'default', 'nargs', 'type', 'choices', 'metavar'])
 Arg.__new__.__defaults__ = (None, None, None, None, None, None, None)
 
 
 class BaseCLIFactory(object):
+    """支持子命令的命令行工厂函数
+
+    Examples:
+        subparsers = (
+            {
+                'func': backfill,
+                'help': "Run subsections of a DAG for a specified date range. "
+                        "If reset_dag_run option is used,"
+                        " backfill will first prompt users whether airflow "
+                        "should clear all the previous dag_run and task_instances "
+                        "within the backfill date range. "
+                        "If rerun_failed_tasks is used, backfill "
+                        "will auto re-run the previous failed task instances"
+                        " within the backfill date range.",
+                'args': (
+                    'dag_id', 'task_regex', 'start_date', 'end_date',
+                    'mark_success', 'local', 'donot_pickle',
+                    'bf_ignore_dependencies', 'bf_ignore_first_depends_on_past',
+                    'subdir', 'pool', 'delay_on_limit', 'dry_run', 'verbose', 'conf',
+                    'reset_dag_run', 'rerun_failed_tasks',
+                )
+            })
+    """
     args = {}
+    # 子查询器配置
     subparsers = tuple()
 
+    # 获得子查询器的函数名
     subparsers_dict = {sp['func'].__name__: sp for sp in subparsers}
 
     @classmethod
@@ -35,7 +61,7 @@ class BaseCLIFactory(object):
             help='sub-command help', dest='subcommand')
         subparsers.required = True
 
-        # 获得需要添加到子解析器的命令名
+        # 获得需要添加到子解析器的函数命令名
         subparser_name_list = cls.subparsers_dict.keys()
         # 遍历子解析器命令的名称
         for subparser_name in subparser_name_list:

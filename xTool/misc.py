@@ -573,7 +573,7 @@ def getIp(ifname):
     )[20:24])
 
 
-def get_local_host_ip(ifname='eth1'):
+def get_local_host_ip(ifname=b'eth1'):
     """获得本机的IP地址 ."""
     import platform
     import socket
