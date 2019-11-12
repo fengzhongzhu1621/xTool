@@ -1,4 +1,3 @@
-graft twisted
 graft xTool
 include AUTHORS.rst
 include CONTRIBUTING.rst

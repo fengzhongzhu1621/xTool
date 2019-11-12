@@ -1,4 +1,22 @@
 # -*- coding: utf-8 -*-
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
 
 from __future__ import unicode_literals
 
@@ -177,13 +195,6 @@ install_requires.extend([
     'croniter>=0.3.17'
 ])
 
-doc = [
-    'sphinx>=1.2.3',
-    'sphinx-argparse>=0.1.13',
-    'sphinx-rtd-theme>=0.1.6',
-    'Sphinx-PyPI-upload>=0.2.1'
-]
-
 
 def do_setup():
     write_version()
@@ -212,20 +223,14 @@ def do_setup():
             'Natural Language :: English',
             'Environment :: Console',
             "Programming Language :: Python :: 2",
-            'Programming Language :: Python :: 2.6',
             'Programming Language :: Python :: 2.7',
             'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.3',
-            'Programming Language :: Python :: 3.4',
-            'Programming Language :: Python :: 3.5',
+            'Programming Language :: Python :: 3.6',
         ],
         setup_requires=[
             "flake8",
             'docutils>=0.14',
         ],
-        extras_require={
-            'doc': doc,
-        },
         test_suite='tests',
         tests_require=test_requirements,
         cmdclass={'test': PyTest},
@@ -235,8 +240,6 @@ def do_setup():
         #},
     )
 
-
-# refresh_plugin_cache()
 
 if __name__ == "__main__":
     do_setup()
