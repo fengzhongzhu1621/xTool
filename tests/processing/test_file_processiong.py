@@ -4,8 +4,8 @@ import os
 import logging
 
 from xTool.utils.file import list_py_file_paths
-from xTool.processing.file_processing import FileProcessorManager
-from xTool.processing.file_processing import BaseMultiprocessFileProcessor
+from xTool.utils.file_processing import FileProcessorManager
+from xTool.utils.file_processing import BaseMultiprocessFileProcessor
 
 
 #logging.basicConfig(level=logging.INFO)
