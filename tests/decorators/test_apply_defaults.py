@@ -1,9 +1,11 @@
 #coding: utf-8
 
-from xTool.decorators.apply_defaults import apply_defaults
+from xTool.decorators.decorators import apply_defaults
+
 
 class Model(object):
     pass
+
 
 class BashOperator(object):
     template_fields = ('bash_command', 'env')
@@ -25,6 +27,7 @@ class BashOperator(object):
         self.output_encoding = output_encoding
         self.args = args
         self.kwargs = kwargs
+
 
 def test_apply_defaults():
     bash_operator = BashOperator(bash_command="ls")
