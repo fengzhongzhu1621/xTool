@@ -25,16 +25,6 @@ def test_exceptionToString():
         assert "ZeroDivisionError" in value
 
 
-def test_ustr():
-    value = "你好"
-    value2 = misc.ustr(value)
-    assert value == value2
-    value3 = misc.ustr(value.encode('utf8'))
-    assert value == value3
-    value4 = misc.ustr('abc')
-    assert 'abc' == value4
-
-
 def test_get_cur_info():
     actual = misc.get_cur_info()
     value = ('test_get_cur_info', 35)
@@ -51,10 +41,6 @@ def test_getRunCommandResult():
     assert actual == expect
 
 
-def test_dumpGarbage():
-    misc.dumpGarbage()
-
-
 def test_listData():
     rows = [{
         'key': 'abc',
@@ -65,25 +51,6 @@ def test_listData():
     actual = misc.listData(rows, key, value)
     expect = {u'abc': u'def'}
     assert expect == actual
-
-
-def test_ustr2unicode():
-    value = "%u67E5%u8BE2%u5DE5%u4F1A%u4FE1%u606F%u63A5%u53E3"
-    actual = misc.ustr2unicode(value, sep='%')
-    expect = "查询工会信息接口"
-    assert actual == expect
-    value = "\\u67E5\\u8BE2\\u5DE5\\u4F1A\\u4FE1\\u606F\\u63A5\\u53E3"
-    actual = misc.ustr2unicode(value, sep='\\')
-    expect = "查询工会信息接口"
-    assert actual == expect
-
-
-def test_format_time():
-    a = timedelta(minutes=10)
-    seconds = a.total_seconds()
-    actual = misc.format_time(seconds)
-    expect = "0:10:00"
-    assert actual == expect
 
 
 def test_isMemoryAvailable():
@@ -100,37 +67,37 @@ def test_isDiskAvailable():
     assert actual is True
 
 
-def test_formatRow():
+def test_format_row():
     row = " a  b \t c "
-    actual = misc.formatRow(row)
+    actual = misc.format_row(row)
     expect = ['a', 'b', 'c']
     assert actual == expect
     row = ""
-    actual = misc.formatRow(row)
+    actual = misc.format_row(row)
     assert actual == []
 
 
-def test_getColCount():
+def test_get_col_count():
     row = " a  b \t c "
-    actual = misc.getColCount(row)
+    actual = misc.get_col_count(row)
     assert actual == 3
     row = ""
-    actual = misc.getColCount(row)
+    actual = misc.get_col_count(row)
     assert actual == 0
 
 
-def test_getFileRowColCount():
+def test_get_file_rowcol_count():
     dirname = os.path.dirname(__name__)
     filePath = os.path.abspath(os.path.join(dirname, "tests/data/a.txt"))
-    (row, col) = misc.getFileRowColCount(filePath)
+    (row, col) = misc.get_file_rowcol_count(filePath)
     assert row == 2
     assert col == 3
 
 
-def test_getFileRow():
+def test_get_file_row():
     dirname = os.path.dirname(__name__)
     filePath = os.path.abspath(os.path.join(dirname, "tests/data/a.txt"))
-    row = misc.getFileRow(filePath)
+    row = misc.get_file_row(filePath)
     assert row == 2
 
 
@@ -153,8 +120,8 @@ def test_chunks():
 
 
 def test_get_random_string():
-    actual = misc.get_random_string(length=12)
-    assert len(actual) == 12
+    actual = misc.get_random_string(length=13)
+    assert len(actual) == 13
     actual = misc.get_random_string(length=0)
     assert actual == ''
 

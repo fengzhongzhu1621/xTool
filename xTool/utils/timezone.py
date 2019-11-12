@@ -1,28 +1,13 @@
 # -*- coding: utf-8 -*-
-#
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
+
 import datetime as dt
 import pendulum
 
+
 # 设置默认时区
 TIMEZONE = pendulum.timezone('UTC')
-
+TIMEZONE_UTC = TIMEZONE
+TIMEZONE_SYSTEM = pendulum.local_timezone()
 
 # UTC time zone as a tzinfo instance.
 utc = pendulum.timezone('UTC')
@@ -188,3 +173,33 @@ def parse(string, timezone=None):
     :param string: time string
     """
     return pendulum.parse(string, tz=timezone or TIMEZONE)
+
+
+def system_now():
+    """获得当前的系统时间
+
+    Get the current date and time in UTC
+    :return:
+    """
+
+    # pendulum utcnow() is not used as that sets a TimezoneInfo object
+    # instead of a Timezone. This is not pickable and also creates issues
+    # when using replace()
+    d = dt.datetime.now()
+    d = d.replace(tzinfo=TIMEZONE_SYSTEM)
+
+    return d
+
+
+def system_datetime(*args, **kwargs):
+    if 'tzinfo' not in kwargs:
+        kwargs['tzinfo'] = TIMEZONE_SYSTEM
+
+    return dt.datetime(*args, **kwargs)
+
+
+def utc_datetime(*args, **kwargs):
+    if 'tzinfo' not in kwargs:
+        kwargs['tzinfo'] = TIMEZONE_UTC
+
+    return dt.datetime(*args, **kwargs)

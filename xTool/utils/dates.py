@@ -22,11 +22,11 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from xTool.utils import timezone
 from datetime import datetime, timedelta
 import datetime as dt
-import six
 
+import six
+from xTool.utils import timezone
 from croniter import croniter
 
 
@@ -133,6 +133,9 @@ def round_time(dt, delta, start_date=datetime.min):
         else:
             return prev
 
+    print()
+    print("dt = ", dt, type(dt))
+
     # Ignore the microseconds of dt
     dt -= timedelta(microseconds=dt.microsecond)
 
@@ -146,6 +149,8 @@ def round_time(dt, delta, start_date=datetime.min):
     # We first search an upper limit for i for which start_date + upper * delta
     # exceeds dt.
     upper = 1
+    print("start_date = ", start_date, type(start_date))
+    print("dt = ", dt, type(dt))
     while start_date + upper * delta < dt:
         # To speed up finding an upper limit we grow this exponentially by a
         # factor of 2

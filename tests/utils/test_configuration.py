@@ -18,10 +18,6 @@ def test_read_config_file():
     assert 'smtp_host' in default_config
 
 
-def test_generate_secret_key():
-    assert len(SECRET_KEY) == 24
-
-
 class TestXToolConfigParser(unittest.TestCase):
     def setUp(self):
         # 使用全局变量和局部变量渲染模版字符串
@@ -91,8 +87,3 @@ class TestXToolConfigParser(unittest.TestCase):
         default_config += os.linesep + "smtp_host_cmd = echo 1"
         self.conf = XToolCmdOptionConfigParser(default_config=default_config)
         assert self.conf.get('smtp', 'smtp_host_cmd') == 'echo 1'
-
-    def test__get_cmd_option(self):
-        assert self.conf.get('smtp', 'smtp_host').strip() == '1'
-        actual = self.conf._get_cmd_option('smtp', 'smtp_host').strip()
-        assert actual == '1'

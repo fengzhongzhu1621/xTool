@@ -18,6 +18,12 @@
 # under the License.
 
 
+"""
+python -W ignore -m pytest -v -s -x tests
+
+
+"""
+
 from __future__ import unicode_literals
 
 
