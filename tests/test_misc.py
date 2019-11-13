@@ -37,7 +37,7 @@ def test_runCommand():
 
 def test_getRunCommandResult():
     actual = misc.getRunCommandResult("echo 1")
-    expect = (0, b'1\r\n', b'')
+    expect = (0, b'1' + misc.tob(os.linesep), b'')
     assert actual == expect
 
 
