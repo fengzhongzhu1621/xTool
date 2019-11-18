@@ -4,3 +4,4 @@ future
 jinja2
 pendulum
 croniter
+tabulate

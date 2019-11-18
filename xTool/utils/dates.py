@@ -70,14 +70,12 @@ def date_range(
         raise Exception("Wait. start_date needs to be before end_date")
     if end_date and num:
         raise Exception("Wait. Either specify end_date OR num")
-    # 结束时间默认为当前UTC时间
     if not end_date and not num:
         end_date = datetime.now()
 
     delta_iscron = False
     if isinstance(delta, six.string_types):
         delta_iscron = True
-        # 去掉开始时间的时区
         cron = croniter(delta, start_date)
     elif isinstance(delta, timedelta):
         delta = abs(delta)
@@ -133,9 +131,6 @@ def round_time(dt, delta, start_date=datetime.min):
         else:
             return prev
 
-    print()
-    print("dt = ", dt, type(dt))
-
     # Ignore the microseconds of dt
     dt -= timedelta(microseconds=dt.microsecond)
 
@@ -149,8 +144,6 @@ def round_time(dt, delta, start_date=datetime.min):
     # We first search an upper limit for i for which start_date + upper * delta
     # exceeds dt.
     upper = 1
-    print("start_date = ", start_date, type(start_date))
-    print("dt = ", dt, type(dt))
     while start_date + upper * delta < dt:
         # To speed up finding an upper limit we grow this exponentially by a
         # factor of 2

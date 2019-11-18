@@ -1,25 +1,21 @@
 # coding: utf-8
 
-import subprocess
 import logging
-import sys
 
 import pytest
 
 from xTool.utils.helpers import *
 from xTool.exceptions import XToolException
+from xTool.misc import tob, tou
 
 
 def test_validate_key():
-    with pytest.raises(XToolException) as excinfo:
+    with pytest.raises(XToolException) as e:
         validate_key('*')
 
-    with pytest.raises(TypeError) as excinfo:
+    with pytest.raises(TypeError) as e:
         validate_key({})
-        
-def test_alchemy_to_dict():
-    pass
-        
+
         
 def test_is_in():
     class A(object):
@@ -47,8 +43,8 @@ def test_as_tuple():
 def test_chunks():
     items = chunks([1,2,3], 2)
     assert list(items) == [[1, 2], [3]]
-    with pytest.raises(ValueError) as excinfo:
-        a = chunks([1,2,3], 0)
+    with pytest.raises(ValueError) as e:
+        a = chunks([1, 2, 3], 0)
         list(a)
     
     
@@ -56,6 +52,7 @@ def test_reduce_in_chunks():
     initializer = [0]
     iterable = [1, 2, 3]
     chunk_size = 2
+
     def fn(x, y):
         return x + y
     res = reduce_in_chunks(fn, iterable, initializer, chunk_size)
@@ -106,7 +103,7 @@ def test_expand_env_var():
     actual = expand_env_var("$var 123")
     expected = "$var 123"
     assert actual == expected
-    os.environ['var'] =  "I'm"
+    os.environ['var'] = "I'm"
     actual = expand_env_var("$var 123")
     expected = "I'm 123"
     assert actual == expected
@@ -116,4 +113,4 @@ def test_run_command():
     actual = run_command("echo 1").strip()
     assert actual == '1'
     with pytest.raises(FileNotFoundError):
-        actual = run_command("runerr example")
+        run_command("runerr example")

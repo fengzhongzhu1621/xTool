@@ -1,6 +1,6 @@
-#coding: utf-8
+# coding: utf-8
 
-from datetime import datetime
+import datetime as dt
 from datetime import timedelta
 
 from xTool.utils.dates import *
@@ -8,48 +8,44 @@ from xTool.utils.timezone import *
 
 
 def test_date_range():
-    actual = date_range(datetime(2016, 1, 1), datetime(2016, 1, 3), delta=timedelta(1))
-    expected = [system_datetime(2016, 1, 1, 0, 0),
-                system_datetime(2016, 1, 2, 0, 0),
-                system_datetime(2016, 1, 3, 0, 0)]
+    actual = date_range(dt.datetime(2016, 1, 1), dt.datetime(2016, 1, 3), delta=timedelta(1))
+    expected = [dt.datetime(2016, 1, 1, 0, 0),
+                dt.datetime(2016, 1, 2, 0, 0),
+                dt.datetime(2016, 1, 3, 0, 0)]
     assert expected == actual
 
-    actual = date_range(datetime(2016, 1, 1), datetime(2016, 1, 3), delta=timedelta(2))
-    expected = [system_datetime(2016, 1, 1, 0, 0),
-                system_datetime(2016, 1, 3, 0, 0)]
+    actual = date_range(dt.datetime(2016, 1, 1), dt.datetime(2016, 1, 3), delta=timedelta(2))
+    expected = [dt.datetime(2016, 1, 1, 0, 0),
+                dt.datetime(2016, 1, 3, 0, 0)]
     assert expected == actual
 
-    actual = date_range(datetime(2016, 1, 1), datetime(2016, 1, 3), delta=timedelta(3))
-    expected = [system_datetime(2016, 1, 1, 0, 0)]
+    actual = date_range(dt.datetime(2016, 1, 1), dt.datetime(2016, 1, 3), delta=timedelta(3))
+    expected = [dt.datetime(2016, 1, 1, 0, 0)]
     assert expected == actual
 
-    actual = date_range(datetime(2016, 1, 1),
-                        datetime(2016, 1, 3),
+    actual = date_range(dt.datetime(2016, 1, 1),
+                        dt.datetime(2016, 1, 3),
                         delta='0 0 * * *')
-    expected = [system_datetime(2016, 1, 1, 0, 0),
-                system_datetime(2016, 1, 2, 0, 0),
-                system_datetime(2016, 1, 3, 0, 0)]
+    expected = [dt.datetime(2016, 1, 1, 0, 0),
+                dt.datetime(2016, 1, 2, 0, 0),
+                dt.datetime(2016, 1, 3, 0, 0)]
     assert expected == actual
 
-    actual = date_range(datetime(2016, 1, 1), datetime(2016, 3, 3), delta="0 0 0 * *")
-    expected = [system_datetime(2016, 1, 1, 0, 0),
-                system_datetime(2016, 2, 1, 0, 0),
-                system_datetime(2016, 3, 1, 0, 0)]
+    actual = date_range(dt.datetime(2016, 1, 1), dt.datetime(2016, 3, 3), delta="0 0 0 * *")
+    expected = [dt.datetime(2016, 1, 1, 0, 0),
+                dt.datetime(2016, 2, 1, 0, 0),
+                dt.datetime(2016, 3, 1, 0, 0)]
     assert expected == actual
 
 
 def test_round_time():
-    print()
-    a = datetime(2015, 1, 1, 6)
-    print("a = ", a, type(a))
-
-    actual = round_time(datetime(2015, 1, 1, 6), timedelta(days=1))
-    expected = datetime(2015, 1, 1, 0, 0)
+    actual = round_time(dt.datetime(2015, 1, 1, 6), timedelta(days=1))
+    expected = dt.datetime(2015, 1, 1, 0, 0)
     assert expected == actual
 
-    #actual = round_time(None, "0 0 0 * *", start_date=datetime(2015, 1, 1, 6))
-    #expected = datetime(2015, 1, 1, 0, 0)
-    #assert expected == actual
+    actual = round_time(None, "0 0 0 * *", start_date=dt.datetime(2015, 1, 1, 6))
+    expected = dt.datetime(2015, 1, 1, 0, 0)
+    assert expected == actual
 
 
 def test_infer_time_unit():
@@ -95,4 +91,4 @@ def test_parse_execution_date():
     actual_1 = parse_execution_date('2018-01-01')
     actual_2 = parse_execution_date('2018-01-01 00:00:00')
     actual_3 = parse_execution_date('2018-01-01T00:00:00')
-    assert actual_1== actual_2 == actual_3
+    assert actual_1 == actual_2 == actual_3

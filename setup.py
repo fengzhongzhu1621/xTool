@@ -27,34 +27,24 @@ python -W ignore -m pytest -v -s -x tests
 from __future__ import unicode_literals
 
 
-import imp
 import logging
 import os
-import pip
-import sys
 import codecs
 import sys
 from io import open
 
 try:
-    from setuptools import setup  # noqa
+    from setuptools import setup
 except ImportError:
-    from distutils.core import setup  # noqa
-from setuptools.command.test import test as TestCommand  # noqa
-from setuptools import find_packages, Command
+    from distutils.core import setup
+from setuptools.command.test import test as TestCommand
+from setuptools import Command
+from importlib import import_module
 
-# try:
-#     import twisted  # noqa
-# except ImportError:
-#     # raise SystemExit("twisted not found.  Make sure you "
-#     #                 "have installed the Twisted core package.")
-#     pass
 
 logger = logging.getLogger(__name__)
 
-# Kept manually in sync with airflow.__version__
-version = imp.load_source(
-    'xTool.version', os.path.join('xTool', 'version.py')).version
+version = import_module('xTool.version').version
 
 PY3 = sys.version_info[0] == 3
 
@@ -101,7 +91,6 @@ def git_version(version):
     branch head. Finally, a "dirty" suffix is appended to indicate that uncommitted changes
     are present.
     """
-    repo = None
     try:
         import git
         repo = git.Repo('.git')
@@ -137,8 +126,10 @@ def read(filename):
 with open('README.rst', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
+
 with open('HISTORY.rst', encoding='utf-8') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
+
 
 test_requirements = [
     'pytest',
@@ -146,21 +137,16 @@ test_requirements = [
 
 
 class PyTest(TestCommand):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
+    user_options = [("pytest-args=", "a", "Arguments to pass to pytest")]
 
     def initialize_options(self):
         TestCommand.initialize_options(self)
-        self.pytest_args = []
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
+        self.pytest_args = ""
 
     def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
+        import shlex
         import pytest
-        errno = pytest.main(self.pytest_args)
+        errno = pytest.main(shlex.split(self.pytest_args))
         sys.exit(errno)
 
 
@@ -194,11 +180,9 @@ if os.path.exists("requirements.txt"):
             except ValueError as e:
                 pass
 
+
 install_requires.extend([
-    # 'python-daemon>=2.1.1, <2.2',  # 用于构建守护进程
-    'pendulum>=1.4.2',  # 日期库
-    'tabulate>=0.7.5',
-    'croniter>=0.3.17'
+
 ])
 
 
@@ -214,9 +198,6 @@ def do_setup():
         author_email='jinyinqiao@gmail.com',
         license='Apache License 2.0',
         packages=find_packages(exclude=['tests*']),
-        # packages = ['xTool',
-        #            #"twisted.plugins",
-        # ],
         include_package_data=True,
         install_requires=install_requires,
         zip_safe=False,
@@ -234,6 +215,7 @@ def do_setup():
             'Programming Language :: Python :: 3.6',
         ],
         setup_requires=[
+            "gitpython",
             "flake8",
             'docutils>=0.14',
         ],
