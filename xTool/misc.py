@@ -1,10 +1,11 @@
-#coding: utf-8
+# -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import io
 import re
 import sys
 from datetime import datetime, date
@@ -404,3 +405,27 @@ def open_url(url):
     """根据URL打开浏览器 ."""
     from webbrowser import open as wbopen
     wbopen(url)
+
+
+def format_exception(exc):
+    """
+    Format and return the specified exception information as a string.
+
+    This default implementation just uses
+    traceback.print_exception()
+    """
+    ei = (type(exc), exc, exc.__traceback__)
+    sio = io.StringIO()
+    tb = ei[2]
+    traceback.print_exception(ei[0], ei[1], tb, None, sio)
+    s = sio.getvalue()
+    sio.close()
+    if s[-1:] == "\n":
+        s = s[:-1]
+    return s
+
+
+def format_exception_without_line_break(exc):
+    """将异常对象转换为没有换行的字符串 ."""
+    s = format_exception(exc)
+    return s.replace("\n", "\\n")

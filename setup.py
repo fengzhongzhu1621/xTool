@@ -204,7 +204,6 @@ def do_setup():
         scripts=None,
         keywords='xTool',
         classifiers=[
-            'Development Status :: 2 - Pre-Alpha',
             'Intended Audience :: Developers',
             'License :: OSI Approved :: Apache Software License',
             'Natural Language :: English',
