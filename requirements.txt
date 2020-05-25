@@ -5,3 +5,5 @@ jinja2
 pendulum
 croniter
 tabulate
+Cython
+cryptography
