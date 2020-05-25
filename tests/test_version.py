@@ -1,7 +1,7 @@
-#coding: utf-8
+# -*- coding: utf-8
 
 from xTool import version
 
 
 def test_version():
-    assert version.version == '1.0.0dev'
+    assert version.version == '1.1.0dev'
