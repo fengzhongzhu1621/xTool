@@ -14,7 +14,7 @@ except AttributeError:
 from copy import copy
 from functools import wraps
 
-from xTool.exceptions import AirflowException
+from xTool.exceptions import XToolException
 
 
 def apply_defaults(func):
@@ -34,7 +34,6 @@ def apply_defaults(func):
     # per decoration, i.e. each function decorated using apply_defaults will
     # have a different sig_cache.
     sig_cache = signature(func)
-
 
     # 获得默认值为空的参数名，且此参数不为self, 且此参数不为可变参数
     non_optional_args = {
@@ -76,7 +75,6 @@ def apply_defaults(func):
         dag_args.update(default_args)
         default_args = dag_args
 
-
         # 将kwargs['default_args']中的参数合并到函数的kwargs中
         for arg in sig_cache.parameters:
             if arg not in kwargs and arg in default_args:
@@ -99,4 +97,4 @@ def apply_defaults(func):
 if 'BUILDING_AIRFLOW_DOCS' in os.environ:
     # flake8: noqa: F811
     # Monkey patch hook to get good function headers while building docs
-    apply_defaults = lambda x: x
+    def apply_defaults(x): return x
