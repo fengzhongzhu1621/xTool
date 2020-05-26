@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 import os
 import sys
 from importlib import import_module
+from inspect import ismodule
 import imp
 import warnings
 
@@ -59,7 +60,7 @@ def integrate_plugins(modules):
 
 def create_object_from_plugin_module(name, *args, **kwargs):
     """从插件模块中获取类实例 .
-    
+
     Args:
         name: plugin_module.class_name
     """
@@ -74,14 +75,15 @@ def create_object_from_plugin_module(name, *args, **kwargs):
     class_name = items[1]
     if plugin_module_name in globals():
         # 根据插件中的类名创建对象
-        return globals()[plugin_module_name].__dict__[class_name](*args, **kwargs)
+        return globals()[plugin_module_name].__dict__[
+            class_name](*args, **kwargs)
     else:
         raise XToolException("Executor {0} not supported.".format(name))
 
 
 def load_backend_module_from_conf(section, key, default_backend, conf=None):
     """从配置文件中加载模块 .
-    
+
     Args:
         section: 配置文件中的section
         key: section中的key
@@ -128,7 +130,8 @@ def import_string(dotted_path):
     try:
         module_path, class_name = dotted_path.rsplit('.', 1)
     except ValueError:
-        raise ImportError("{} doesn't look like a module path".format(dotted_path))
+        raise ImportError(
+            "{} doesn't look like a module path".format(dotted_path))
 
     module = import_module(module_path)
 
@@ -139,6 +142,24 @@ def import_string(dotted_path):
         raise ImportError('Module "{}" does not define a "{}" attribute/class'.format(
             module_path, class_name)
         )
+
+
+def import_string_from_package(module_name, package=None):
+    """
+    import a module or class by string path.
+
+    :module_name: str with path of module or path to import and
+    instanciate a class
+    :returns: a module object or one instance from class if
+    module_name is a valid path to class
+
+    """
+    module, klass = module_name.rsplit(".", 1)
+    module = import_module(module, package=package)
+    obj = getattr(module, klass)
+    if ismodule(obj):
+        return obj
+    return obj()
 
 
 class XToolImporter(object):
@@ -171,7 +192,8 @@ class XToolImporter(object):
         :type module_attributes: string
         """
         self._parent_module = parent_module
-        self._attribute_modules = self._build_attribute_modules(module_attributes)
+        self._attribute_modules = self._build_attribute_modules(
+            module_attributes)
         self._loaded_modules = {}
 
         # Wrap the module so we can take over __getattr__.
@@ -222,7 +244,8 @@ class XToolImporter(object):
             folder = os.path.dirname(path)
             # 在父模块的目录下所有的文件中查找指定的module
             f, filename, description = imp.find_module(module, [folder])
-            self._loaded_modules[module] = imp.load_module(module, f, filename, description)
+            self._loaded_modules[module] = imp.load_module(
+                module, f, filename, description)
 
             # This functionality is deprecated
             warnings.warn(
@@ -234,7 +257,7 @@ class XToolImporter(object):
                 DeprecationWarning)
 
         loaded_module = self._loaded_modules[module]
-        
+
         # 从动态加载后的模块中获取属性
         return getattr(loaded_module, attribute)
 
