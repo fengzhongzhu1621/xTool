@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
+
 import os
 import platform
 import sys
 import warnings
+import codecs
+import re
 from distutils.command.build_ext import build_ext
 from distutils.errors import CCompilerError
 from distutils.errors import DistutilsExecError
 from distutils.errors import DistutilsPlatformError
+from setuptools.command.test import test as TestCommand
 
 from setuptools import setup
 from setuptools.extension import Extension
@@ -109,3 +113,46 @@ class _PeeweeBuildExt(build_ext):
             build_ext.build_extension(self, ext)
         except (CCompilerError, DistutilsExecError, DistutilsPlatformError):
             raise BuildFailure()
+
+
+class PyTest(TestCommand):
+    """
+    Provide a Test runner to be used from setup.py to run unit tests
+    """
+
+    user_options = [("pytest-args=", "a", "Arguments to pass to pytest")]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = ""
+
+    def run_tests(self):
+        import shlex
+        import pytest
+
+        errno = pytest.main(shlex.split(self.pytest_args))
+        sys.exit(errno)
+
+
+def open_local(paths, mode="r", encoding="utf8"):
+    """打开本地文件 ."""
+    path = os.path.join(*paths)
+
+    return codecs.open(path, mode, encoding)
+
+
+def read_version_file(package):
+    with open_local([package, "__version__.py"], encoding="latin1") as fp:
+        try:
+            version = re.findall(
+                r"^__version__ = \"([^']+)\"\r?$", fp.read(), re.M
+            )[0]
+        except IndexError:
+            raise RuntimeError("Unable to determine version.")
+    return version
+
+
+def read_readme_rst():
+    with open_local(["README.rst"]) as rm:
+        long_description = rm.read()
+    return long_description
