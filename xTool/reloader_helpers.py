@@ -58,6 +58,7 @@ def restart_with_reloader():
     cwd = os.getcwd()
     args = _get_args_for_reloading()
     new_environ = os.environ.copy()
+    new_environ["RELOADER_SERVER_RUNNING"] = "true"
     cmd = " ".join(args)
     worker_process = Process(
         target=subprocess.call,
