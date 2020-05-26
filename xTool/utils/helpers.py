@@ -59,7 +59,7 @@ def alchemy_to_dict(obj):
     for c in obj.__table__.columns:
         value = getattr(obj, c.name)
         # 格式化时间
-        if type(value) == datetime:
+        if isinstance(value, datetime):
             value = value.isoformat()
         d[c.name] = value
     return d
@@ -164,7 +164,7 @@ def chain(*tasks):
 
 def pprinttable(rows):
     """打印一个漂亮的ascii表格
-	Returns a pretty ascii table from tuples
+        Returns a pretty ascii table from tuples
 
     If namedtuple are used, the table will have headers
     """
@@ -230,7 +230,11 @@ def reap_process_group(pid, log, sig=signal.SIGTERM,
 
     def on_terminate(p):
         """进程被关闭时的回调，打印进程ID和返回码 ."""
-        log.info("Process %s (%s) terminated with exit code %s", p, p.pid, p.returncode)
+        log.info(
+            "Process %s (%s) terminated with exit code %s",
+            p,
+            p.pid,
+            p.returncode)
 
     # 不允许杀死自己，pid必须是子进程
     if pid == os.getpid():
@@ -253,24 +257,30 @@ def reap_process_group(pid, log, sig=signal.SIGTERM,
     os.killpg(os.getpgid(pid), sig)
 
     # 等待正在被杀死的进程结束
-    gone, alive = psutil.wait_procs(children, timeout=timeout, callback=on_terminate)
+    gone, alive = psutil.wait_procs(
+        children, timeout=timeout, callback=on_terminate)
 
     # 如果仍然有进程存活
     if alive:
         # 打印存活的进程
         for p in alive:
-            log.warn("process %s (%s) did not respond to SIGTERM. Trying SIGKILL", p, pid)
+            log.warn(
+                "process %s (%s) did not respond to SIGTERM. Trying SIGKILL",
+                p,
+                pid)
 
         # 如果子进程仍然存活，则调用SIGKILL信号重新杀死
         os.killpg(os.getpgid(pid), signal.SIGKILL)
 
         # 等待子进程结束
-        gone, alive = psutil.wait_procs(alive, timeout=timeout, callback=on_terminate)
+        gone, alive = psutil.wait_procs(
+            alive, timeout=timeout, callback=on_terminate)
 
         # 如果子进程仍然存活，则记录错误日志
         if alive:
             for p in alive:
-                log.error("Process %s (%s) could not be killed. Giving up.", p, p.pid)
+                log.error(
+                    "Process %s (%s) could not be killed. Giving up.", p, p.pid)
 
 
 def parse_template_string(template_string):
@@ -278,6 +288,7 @@ def parse_template_string(template_string):
         return None, Template(template_string)
     else:
         return template_string, None
+
 
 def expand_env_var(env_var):
     """使用环境变量替换env_var
@@ -310,6 +321,7 @@ def run_command(command):
         shlex.split(command),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        shell=True,
         close_fds=close_fds)
     # 将结果转换为unicode编码
     output, stderr = [stream.decode(sys.getdefaultencoding(), 'ignore')

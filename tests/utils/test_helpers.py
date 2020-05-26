@@ -112,5 +112,5 @@ def test_expand_env_var():
 def test_run_command():
     actual = run_command("echo 1").strip()
     assert actual == '1'
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(XToolException):
         run_command("runerr example")
