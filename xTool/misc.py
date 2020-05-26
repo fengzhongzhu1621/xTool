@@ -14,9 +14,12 @@ import platform
 import traceback
 import subprocess
 import random
+import warnings
+import itertools
 
 import numpy as np
 import psutil
+from functools import reduce
 
 
 # Determine platform being used.
@@ -35,6 +38,10 @@ PY3 = sys.version_info[0] >= 3
 
 if PY3:
     xrange = range
+    izip_longest = itertools.zip_longest
+else:
+    izip_longest = itertools.izip_longest
+zip_longest = izip_longest
 
 
 def get_encodings():
@@ -79,11 +86,11 @@ def get_cur_info(number=1):
 def runCommand(command):
     print(command)
     proc = subprocess.Popen(command,
-        shell=True,
-        close_fds=False if USE_WINDOWS else False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
+                            shell=True,
+                            close_fds=False if USE_WINDOWS else False,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE
+                            )
     (stdoutdata, stderrdata) = proc.communicate()
     if stdoutdata:
         print(stdoutdata)
@@ -94,11 +101,11 @@ def runCommand(command):
 
 def getRunCommandResult(command):
     proc = subprocess.Popen(command,
-        shell=True,
-        close_fds=False if USE_WINDOWS else False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
+                            shell=True,
+                            close_fds=False if USE_WINDOWS else False,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE
+                            )
     (stdoutdata, stderrdata) = proc.communicate()
     return (proc.returncode, stdoutdata, stderrdata)
 
@@ -128,7 +135,8 @@ def json_ser(obj):
     """
     if isinstance(obj, (datetime, date)):
         # Return a string representing the date and time in ISO 8601 format,
-        # YYYY-MM-DDTHH:MM:SS.mmmmmm or, if microsecond is 0, YYYY-MM-DDTHH:MM:SS
+        # YYYY-MM-DDTHH:MM:SS.mmmmmm or, if microsecond is 0,
+        # YYYY-MM-DDTHH:MM:SS
         return obj.isoformat()
 
 
@@ -208,7 +216,7 @@ def isDiskAvailable(dirname, limit=80):
 
 def format_row(row):
     """日志行按空白字符分隔 """
-    lines = re.split("\s", row.strip())
+    lines = re.split(r"\s", row.strip())
     return [i for i in lines if i]
 
 
@@ -224,7 +232,7 @@ def get_file_rowcol_count(filePath):
     """
     row = 0
     col = 0
-    with open(filePath , 'r') as fb:
+    with open(filePath, 'r') as fb:
         for line in fb:
             line = line.strip()
             if line:
@@ -241,24 +249,26 @@ def get_file_row(filePath):
         return sum(1 for row in rFb if row.strip())
 
 
-if PY2:
-    from itertools import izip_longest as zip_longest  # for Python 2.x
-else:
-    from itertools import zip_longest # for Python 3.x
-# from six.moves import zip_longest # for both (uses the six compat library)
-
-
 def grouper(n, iterable, padvalue=None):
     """grouper(3, 'abcdefg', 'x') --> ('a','b','c'), ('d','e','f'), ('g','x','x')"""
     return zip_longest(*[iter(iterable)] * n, fillvalue=padvalue)
 
 
-def chunks(l, n):
+def chunks(items, chunk_len):
     """Yield successive n-sized chunks from l."""
-    return (l[i:i + n] for i in xrange(0, len(l), n))
+    return (items[i:i + chunk_len] for i in xrange(0, len(items), chunk_len))
 
 
-def get_random_string(length=12,
+def chunked(it, chunk_len):
+    marker = object()
+    for group in (list(g) for g in izip_longest(*[iter(it)] * chunk_len,
+                                                fillvalue=marker)):
+        if group[-1] is marker:
+            del group[group.index(marker):]
+        yield group
+
+
+def get_random_string(length=32,
                       allowed_chars='abcdefghijklmnopqrstuvwxyz'
                                     'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
     """
@@ -319,7 +329,7 @@ def print_bin(data):
 def ipv4_into_int(ip):
     # 先把 192.168.1.13 变成16进制的 c0.a8.01.0d ，再去了“.”后转成10进制的 3232235789 即可。
     # (((((192 * 256) + 168) * 256) + 1) * 256) + 13
-    return reduce(lambda x,y:(x<<8)+y,map(int,ip.split('.')))
+    return reduce(lambda x, y: (x << 8) + y, map(int, ip.split('.')))
 
 
 def strict_bool(s):
@@ -331,10 +341,10 @@ def strict_bool(s):
     elif s == 'False':
         return False
     else:
-        raise ValueError( s )
+        raise ValueError(s)
 
 
-def less_strict_bool( x ):
+def less_strict_bool(x):
     """
     Idempotent and None-safe version of strict_bool.
     """
@@ -343,10 +353,10 @@ def less_strict_bool( x ):
     elif x is True or x is False:
         return x
     else:
-        return strict_bool( x )
+        return strict_bool(x)
 
 
-def properties( obj ):
+def properties(obj):
     """
     获得一个对象的所有属性值
 
@@ -371,9 +381,9 @@ def properties( obj ):
     Note how the entry for prop is not a bound method (i.e. the getter) but a the return value of
     that getter.
     """
-    return dict( (attr, getattr( obj, attr ))
-                     for attr in dir( obj )
-                     if not attr.startswith( '__' ) )
+    return dict((attr, getattr(obj, attr))
+                for attr in dir(obj)
+                if not attr.startswith('__'))
 
 
 def get_first_duplicate(items):
@@ -390,11 +400,11 @@ def get_first_duplicate(items):
 def many_to_one(input_dict):
     """拆分词典中的key
     Convert a many-to-one mapping to a one-to-one mapping
-    
+
     Examples:
 
         {'ab': 1, ('c', 'd'): 2} -> {'a': 1, 'b': 1, 'c': 2, 'd': 2}
-    
+
     """
     return dict((key, val)
                 for keys, val in input_dict.items()
@@ -436,3 +446,48 @@ def make_int(value):
     if value is not None and not isinstance(value, (int, float)):
         return int(value)
     return value
+
+
+def __deprecated__(s):
+    warnings.warn(s, DeprecationWarning)
+
+
+# Helper functions that are used in various parts of the codebase.
+MODEL_BASE = '_metaclass_helper_'
+
+
+def with_metaclass(meta, base=object):
+    return meta(MODEL_BASE, (base,), {})
+
+
+def merge_dict(source, overrides):
+    """字典合并，返回新的字典 ."""
+    merged = source.copy()
+    if overrides:
+        merged.update(overrides)
+    return merged
+
+
+def quote(path, quote_chars):
+    if len(path) == 1:
+        return path[0].join(quote_chars)
+    return '.'.join([part.join(quote_chars) for part in path])
+
+
+def ensure_tuple(value):
+    if value is not None:
+        return value if isinstance(value, (list, tuple)) else (value,)
+
+
+# Regular expressions used to convert class names to snake-case table names.
+# First regex handles acronym followed by word or initial lower-word followed
+# by a capitalized word. e.g. APIResponse -> API_Response / fooBar -> foo_Bar.
+# Second regex handles the normal case of two title-cased words.
+SNAKE_CASE_STEP1 = re.compile('(.)_*([A-Z][a-z]+)')
+SNAKE_CASE_STEP2 = re.compile('([a-z0-9])_*([A-Z])')
+
+
+def make_snake_case(s):
+    first = SNAKE_CASE_STEP1.sub(r'\1_\2', s)
+    print("first = ", first)
+    return SNAKE_CASE_STEP2.sub(r'\1_\2', first).lower()

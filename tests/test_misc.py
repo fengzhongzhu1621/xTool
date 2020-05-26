@@ -19,7 +19,7 @@ def test_get_encodings():
 
 def test_exceptionToString():
     try:
-        1/0
+        1 / 0
     except Exception:
         value = misc.exceptionToString()
         assert "ZeroDivisionError" in value
@@ -119,6 +119,13 @@ def test_chunks():
     assert list(actual) == [u'abc', u'def', u'g']
 
 
+def test_chunked():
+    n = 3
+    iterable = 'abcdefg'
+    actual = misc.chunked(iterable, n)
+    assert list(actual) == [['a', 'b', 'c'], ['d', 'e', 'f'], ['g']]
+
+
 def test_get_random_string():
     actual = misc.get_random_string(length=13)
     assert len(actual) == 13
@@ -161,26 +168,44 @@ def test_less_strict_bool():
 
 def test_properties():
     class Foo():
-         def __init__(self):
-             self.var = 1
-         @property
-         def prop(self):
-             return self.var + 1
-         def meth(self):
-             return self.var + 2
+        def __init__(self):
+            self.var = 1
+
+        @property
+        def prop(self):
+            return self.var + 1
+
+        def meth(self):
+            return self.var + 2
     foo = Foo()
-    actual = misc.properties( foo )
-    expect = { 'var':1, 'prop':2, 'meth':foo.meth }
-    assert expect == expect
+    actual = misc.properties(foo)
+    expect = {'var': 1, 'prop': 2, 'meth': foo.meth}
+    assert actual == expect
 
 
 def test_get_first_duplicate():
-    expectValue = 2
-    actualValue = misc.get_first_duplicate([1,2,2,3])
-    assert expectValue == actualValue
+    expect = 2
+    actual = misc.get_first_duplicate([1, 2, 2, 3])
+    assert actual == expect
 
 
 def test_many_to_one():
-    expectValue = {'a': 1, 'b': 1, 'c': 2, 'd': 2}
-    actualValue = misc.many_to_one({'ab': 1, ('c', 'd'): 2})
-    assert expectValue == actualValue
+    expect = {'a': 1, 'b': 1, 'c': 2, 'd': 2}
+    actual = misc.many_to_one({'ab': 1, ('c', 'd'): 2})
+    assert actual == expect
+
+
+def test_quote():
+    actual = misc.quote(",", ["a", "b"])
+    assert actual == "a,b"
+    actual = misc.quote([",", ";"], ["a", "b"])
+    assert actual == "a,b.a;b"
+
+
+def test_make_snake_case():
+    actual = misc.make_snake_case("API_Response")
+    assert actual == "api_response"
+    actual = misc.make_snake_case("APIResponse")
+    assert actual == "api_response"
+    actual = misc.make_snake_case("APIResponseFactory")
+    assert actual == "api_response_factory"
