@@ -457,6 +457,7 @@ MODEL_BASE = '_metaclass_helper_'
 
 
 def with_metaclass(meta, base=object):
+    """根据元类创建一个类 ."""
     return meta(MODEL_BASE, (base,), {})
 
 
