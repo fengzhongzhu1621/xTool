@@ -231,3 +231,20 @@ def with_metaclass(meta, *bases):
                 return type.__new__(cls, name, (), d)
             return meta(name, bases, d)
     return metaclass('temporary_class', None, {})
+
+
+try:
+    from trio import open_file as open_async, Path  # type: ignore
+
+    def stat_async(path):
+        return Path(path).stat()
+except ImportError:
+
+    try:
+        from aiofiles import open as aio_open  # type: ignore
+        from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
+
+        async def open_async(file, mode="r", **kwargs):
+            return aio_open(file, mode, **kwargs)
+    except ImportError:
+        pass
