@@ -7,3 +7,4 @@ croniter
 tabulate
 Cython
 cryptography
+multidict
