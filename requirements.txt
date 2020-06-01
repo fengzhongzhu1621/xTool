@@ -10,3 +10,4 @@ cryptography
 multidict
 six
 future
+httptools
