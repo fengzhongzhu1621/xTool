@@ -1,4 +1,4 @@
-#coding: utf-8
+# -*- coding: utf-8 -*-
 
 import os
 try:
@@ -7,30 +7,32 @@ try:
 except ImportError:
     pass
 import psutil
+import asyncio
+import signal
 
 
 # the prefix to append to gunicorn worker processes after init
 GUNICORN_WORKER_READY_PREFIX = "[ready] "
 
 
-def uid_to_name( uid ):
+def uid_to_name(uid):
     """用户ID转换为用户名称 ."""
     return pwd.getpwuid(uid).pw_name
 
 
 def gid_to_name(gid):
     """组ID转换为组名 。"""
-    return grp.getgrgid( gid ).gr_name
+    return grp.getgrgid(gid).gr_name
 
 
-def name_to_uid( name ):
+def name_to_uid(name):
     """用户名转换为用户ID ."""
-    return pwd.getpwnam( name ).pw_uid
+    return pwd.getpwnam(name).pw_uid
 
 
-def name_to_gid( name ):
+def name_to_gid(name):
     """组名转换为组ID ."""
-    return grp.getgrnam( name ).gr_gid
+    return grp.getgrnam(name).gr_gid
 
 
 def which(name, path=None):
@@ -134,3 +136,32 @@ def kill_children_processes(pids_to_kill, timeout=5, log=None):
                 log.info("Killing child PID: %s", child.pid)
                 child.kill()
                 child.wait()
+
+
+def ctrlc_workaround_for_windows(app):
+    async def stay_active(app):
+        """Asyncio wakeups to allow receiving SIGINT in Python"""
+        while not die:
+            # If someone else stopped the app, just exit
+            if app.is_stopping:
+                return
+            # Windows Python blocks signal handlers while the event loop is
+            # waiting for I/O. Frequent wakeups keep interrupts flowing.
+            await asyncio.sleep(0.1)
+        # Can't be called from signal handler, so call it from here
+        # 收到SIGINIT信号，则停止APP，实现了graceful stop
+        app.stop()
+
+    def ctrlc_handler(sig, frame):
+        """SIGINT信号处理函数 ."""
+        nonlocal die
+        if die:
+            # 如果收到重复的SIGINT信号，则抛出异常
+            raise KeyboardInterrupt("Non-graceful Ctrl+C")
+        die = True
+
+    die = False
+    # 程序终止(interrupt)信号, 在用户键入INTR字符(通常是Ctrl-C)时发出，用于通知前台进程组终止进程
+    signal.signal(signal.SIGINT, ctrlc_handler)
+    # 注册一个监控协程，每0.1秒检测一次APP的状态
+    app.add_task(stay_active)
