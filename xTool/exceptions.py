@@ -28,7 +28,7 @@ _http_status_exceptions = {}
 
 def add_status_code(code, quiet=None):
     """类装饰器，用于给类添加状态码
-    Decorator used for adding exceptions to :class:`SanicException`.
+    Decorator used for adding exceptions to :class:`HttpStatusException`.
     """
 
     def class_decorator(cls):
@@ -192,7 +192,7 @@ class Unauthorized(HttpStatusException):
 
 def abort(status_code, message=None):
     """
-    Raise an exception based on SanicException. Returns the HTTP response
+    Raise an exception based on HttpStatusException. Returns the HTTP response
     message appropriate for the given status code, unless provided.
 
     :param status_code: The HTTP status code to return.

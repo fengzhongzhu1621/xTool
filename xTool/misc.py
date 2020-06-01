@@ -5,6 +5,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import os
 import io
 import re
 import sys
@@ -31,7 +32,7 @@ elif system == 'Windows' or system == 'Microsoft':
     USE_WINDOWS = True
 else:  # Default to X11
     USE_X11 = True
-
+OS_IS_WINDOWS = os.name == "nt"
 
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] >= 3
