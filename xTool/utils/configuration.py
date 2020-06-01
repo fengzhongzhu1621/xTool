@@ -14,6 +14,8 @@ from base64 import b64encode
 from builtins import str
 import copy
 from collections import OrderedDict
+import warnings
+import types
 
 from future import standard_library
 import six
@@ -27,8 +29,10 @@ else:
 
 from xTool.utils.helpers import expand_env_var
 from xTool.utils.helpers import run_command
+from xTool.utils.helpers import strtobool
 from xTool.utils.log.logging_mixin import LoggingMixin
-from xTool.exceptions import XToolConfigException
+from xTool.utils.module_loading import import_string_from_package
+from xTool.exceptions import (XToolConfigException, PyFileError)
 from xTool.misc import USE_WINDOWS
 
 
@@ -75,7 +79,7 @@ def tmp_configuration_copy(cfg_dict, chmod=0o600):
 
 class XToolConfigParser(ConfigParser):
     """通用配置文件解析器 .
-    
+
     Args:
         default_config: 默认.ini格式配置文件的内容
 
@@ -86,7 +90,7 @@ class XToolConfigParser(ConfigParser):
         conf.read(AIRFLOW_CONFIG)
     """
     env_prefix = "XTOOL"
-	
+
     # These configuration elements can be fetched as the stdout of commands
     # following the "{section}__{name}__cmd" pattern, the idea behind this
     # is to not store password on boxes in text files.
@@ -118,7 +122,8 @@ class XToolConfigParser(ConfigParser):
         """从环境变量中获取配置的值，
         把环境变量的值中包含的”~”和”~user”转换成用户目录，并获取配置结果值 ."""
         # must have format XTOOL__{SECTION}__{KEY} (note double underscore)
-        env_var = '{E}__{S}__{K}'.format(E=self.env_prefix, S=section.upper(), K=key.upper())
+        env_var = '{E}__{S}__{K}'.format(
+            E=self.env_prefix, S=section.upper(), K=key.upper())
         if env_var in os.environ:
             return expand_env_var(os.environ[env_var])
 
@@ -161,7 +166,11 @@ class XToolConfigParser(ConfigParser):
             return expand_env_var(
                 super(XToolConfigParser, self).get(section, key, **kwargs))
         if deprecated_name:
-            if super(XToolConfigParser, self).has_option(section, deprecated_name):
+            if super(
+                    XToolConfigParser,
+                    self).has_option(
+                    section,
+                    deprecated_name):
                 self._warn_deprecate(section, key, deprecated_name)
                 return expand_env_var(super(XToolConfigParser, self).get(
                     section,
@@ -251,7 +260,7 @@ class XToolConfigParser(ConfigParser):
         # 使用用户自定义配置端更新默认配置端
         if section in self._sections:
             _section.update(copy.deepcopy(self._sections[section]))
-        
+
         # 遍历section下所有的key，对value进行格式化处理
         for key, val in iteritems(_section):
             try:
@@ -288,14 +297,18 @@ class XToolConfigParser(ConfigParser):
                     sect[k] = val
 
         # 用户环境变量的配置覆盖配置文件的配置，环境变量有较高的优先级
-        for ev in [ev for ev in os.environ if ev.startswith('%s__' % self.env_prefix)]:
+        for ev in [
+            ev for ev in os.environ if ev.startswith(
+                '%s__' %
+                self.env_prefix)]:
             try:
                 _, section, key = ev.split('__')
                 # 从环境变量中获取配置的值
                 opt = self._get_env_var_option(section, key)
             except ValueError:
                 continue
-            if (not display_sensitive and ev != '%s__CORE__UNIT_TEST_MODE' % self.env_prefix):
+            if (not display_sensitive and ev !=
+                    '%s__CORE__UNIT_TEST_MODE' % self.env_prefix):
                 opt = '< hidden >'
             elif raw:
                 opt = opt.replace('%', '%%')
@@ -316,7 +329,7 @@ class XToolConfigParser(ConfigParser):
                 del cfg[section][key + '_cmd']
 
         return cfg
-        
+
     def _warn_deprecate(self, section, key, deprecated_name):
         """输出过期配置警告信息 ."""
         warnings.warn(
@@ -328,3 +341,135 @@ class XToolConfigParser(ConfigParser):
             DeprecationWarning,
             stacklevel=3,
         )
+
+
+DEFAULT_CONFIG = {
+    "REQUEST_MAX_SIZE": 100000000,  # 100 megabytes
+    "REQUEST_BUFFER_QUEUE_SIZE": 100,
+    "REQUEST_TIMEOUT": 60,  # 60 seconds
+    "RESPONSE_TIMEOUT": 60,  # 60 seconds
+    "KEEP_ALIVE": True,
+    "KEEP_ALIVE_TIMEOUT": 5,  # 5 seconds
+    "WEBSOCKET_MAX_SIZE": 2 ** 20,  # 1 megabyte
+    "WEBSOCKET_MAX_QUEUE": 32,
+    "WEBSOCKET_READ_LIMIT": 2 ** 16,
+    "WEBSOCKET_WRITE_LIMIT": 2 ** 16,
+    "GRACEFUL_SHUTDOWN_TIMEOUT": 15.0,  # 15 sec
+    "ACCESS_LOG": True,
+    "FORWARDED_SECRET": None,
+    "REAL_IP_HEADER": None,
+    "PROXIES_COUNT": None,
+    "FORWARDED_FOR_HEADER": "X-Forwarded-For",
+}
+
+
+class Config(dict):
+    def __init__(self, defaults=None, load_env=True, keep_alive=None, base_logo=None, prefix="XTOOL_"):
+        defaults = defaults or {}
+        super().__init__({**DEFAULT_CONFIG, **defaults})
+
+        self.LOGO = base_logo
+        self.prefix = prefix
+
+        if keep_alive is not None:
+            self.KEEP_ALIVE = keep_alive
+
+        if load_env:
+            prefix = self.prefix if load_env is True else load_env
+            self.load_environment_vars(prefix=prefix)
+
+    def __getattr__(self, attr):
+        try:
+            return self[attr]
+        except KeyError as ke:
+            raise AttributeError(f"Config has no '{ke.args[0]}'")
+
+    def __setattr__(self, attr, value):
+        self[attr] = value
+
+    def from_envvar(self, variable_name):
+        """Load a configuration from an environment variable pointing to
+        a configuration file.
+
+        :param variable_name: name of the environment variable
+        :return: bool. ``True`` if able to load config, ``False`` otherwise.
+        """
+        # 从环境变量中获取配置文件的路径
+        config_file = os.environ.get(variable_name)
+        if not config_file:
+            raise RuntimeError(
+                "The environment variable %r is not set and "
+                "thus configuration could not be loaded." % variable_name
+            )
+        return self.from_pyfile(config_file)
+
+    def from_pyfile(self, filename):
+        """Update the values in the config from a Python file.
+        Only the uppercase variables in that module are stored in the config.
+
+        :param filename: an absolute path to the config file
+        """
+        module = types.ModuleType("config")
+        module.__file__ = filename
+        try:
+            with open(filename) as config_file:
+                exec(  # nosec
+                    compile(config_file.read(), filename, "exec"),
+                    module.__dict__,
+                )
+        except IOError as e:
+            e.strerror = "Unable to load configuration file (%s)" % e.strerror
+            raise
+        except Exception as e:
+            raise PyFileError(filename) from e
+
+        # 从创建的对象中加载配置
+        self.from_object(module)
+        return True
+
+    def from_object(self, obj):
+        """Update the values from the given object.
+        Objects are usually either modules or classes.
+
+        Just the uppercase variables in that object are stored in the config.
+        Example usage::
+
+            from yourapplication import default_config
+            app.config.from_object(default_config)
+
+            or also:
+            app.config.from_object('myproject.config.MyConfigClass')
+
+        You should not use this function to load the actual configuration but
+        rather configuration defaults. The actual config should be loaded
+        with :meth:`from_pyfile` and ideally from a location not within the
+        package because the package might be installed system wide.
+
+        :param obj: an object holding the configuration
+        """
+        if isinstance(obj, str):
+            obj = import_string_from_package(obj)
+        for key in dir(obj):
+            if key.isupper():
+                self[key] = getattr(obj, key)
+
+    def load_environment_vars(self, prefix=None):
+        """
+        Looks for prefixed environment variables and applies
+        them to the configuration if present.
+        """
+        if not prefix:
+            prefix = self.prefix
+        for k, v in os.environ.items():
+            if k.startswith(prefix):
+                _, config_key = k.split(prefix, 1)
+                try:
+                    self[config_key] = int(v)
+                except ValueError:
+                    try:
+                        self[config_key] = float(v)
+                    except ValueError:
+                        try:
+                            self[config_key] = strtobool(v)
+                        except ValueError:
+                            self[config_key] = v

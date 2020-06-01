@@ -5,32 +5,21 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import psutil
 
 from builtins import input
 from past.builtins import basestring
 from datetime import datetime
 from functools import reduce
-import imp
 import os
 import re
-import signal
 import shlex
 import subprocess
 import sys
-import warnings
 import platform
-import errno
 
 from jinja2 import Template
 
-from xTool.exceptions import XToolException, XToolConfigException
-from xTool.misc import USE_WINDOWS
-
-
-PY3 = sys.version_info[0] == 3
-if PY3:
-    unicode = str
+from xTool.exceptions import XToolException
 
 
 def validate_key(k, max_length=250):
@@ -79,6 +68,23 @@ def ask_yesno(question):
             return False
         else:
             print("Please respond by yes or no.")
+
+
+def strtobool(val):
+    """
+    This function was borrowed from distutils.utils. While distutils
+    is part of stdlib, it feels odd to use distutils in main application code.
+
+    The function was modified to walk its talk and actually return bool
+    and not int.
+    """
+    val = val.lower()
+    if val in ("y", "yes", "t", "true", "on", "1"):
+        return True
+    elif val in ("n", "no", "f", "false", "off", "0"):
+        return False
+    else:
+        raise ValueError("invalid truth value %r" % (val,))
 
 
 def is_in(obj, l):
@@ -211,76 +217,6 @@ def pprinttable(rows):
         s += pattern % tuple(f(t) for t in line) + '\n'
     s += separator + '\n'
     return s
-
-
-def reap_process_group(pid, log, sig=signal.SIGTERM,
-                       timeout=60):
-    """终止进程id为pid的子进程（包括进程id的所有子进程）
-    Tries really hard to terminate all children (including grandchildren). Will send
-    sig (SIGTERM) to the process group of pid. If any process is alive after timeout
-    a SIGKILL will be send.
-
-    :param log: log handler
-    :param pid: pid to kill
-    :param sig: signal type 软件终止信号
-    :param timeout: how much time a process has to terminate 杀死进程后的等待超时时间
-    """
-    if USE_WINDOWS:
-        return True
-
-    def on_terminate(p):
-        """进程被关闭时的回调，打印进程ID和返回码 ."""
-        log.info(
-            "Process %s (%s) terminated with exit code %s",
-            p,
-            p.pid,
-            p.returncode)
-
-    # 不允许杀死自己，pid必须是子进程
-    if pid == os.getpid():
-        raise RuntimeError("I refuse to kill myself")
-
-    # 创建进程对象
-    parent = psutil.Process(pid)
-
-    # 根据进程ID，递归获得所有子进程和当前进程
-    children = parent.children(recursive=True)
-    children.append(parent)
-
-    # 杀掉进程组
-    # 程序结束(terminate)信号, 与SIGKILL不同的是该信号可以被阻塞和处理。
-    # 通常用来要求程序自己正常退出，shell命令kill缺省产生这个信号。
-    # 如果进程终止不了，我们才会尝试SIGKILL。
-    log.info("Sending %s to GPID %s", sig, os.getpgid(pid))
-    # getpgid 返回pid进程的group id.
-    # 如果pid为0,返回当前进程的group id。在unix中有效
-    os.killpg(os.getpgid(pid), sig)
-
-    # 等待正在被杀死的进程结束
-    gone, alive = psutil.wait_procs(
-        children, timeout=timeout, callback=on_terminate)
-
-    # 如果仍然有进程存活
-    if alive:
-        # 打印存活的进程
-        for p in alive:
-            log.warn(
-                "process %s (%s) did not respond to SIGTERM. Trying SIGKILL",
-                p,
-                pid)
-
-        # 如果子进程仍然存活，则调用SIGKILL信号重新杀死
-        os.killpg(os.getpgid(pid), signal.SIGKILL)
-
-        # 等待子进程结束
-        gone, alive = psutil.wait_procs(
-            alive, timeout=timeout, callback=on_terminate)
-
-        # 如果子进程仍然存活，则记录错误日志
-        if alive:
-            for p in alive:
-                log.error(
-                    "Process %s (%s) could not be killed. Giving up.", p, p.pid)
 
 
 def parse_template_string(template_string):

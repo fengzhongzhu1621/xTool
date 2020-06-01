@@ -1,4 +1,4 @@
-#coding: utf-8
+# -*- coding: utf-8 -*-
 
 import os
 import unittest
@@ -7,11 +7,16 @@ from xTool.utils.configuration import *
 
 
 # 获得配置文件路径
-config_file_path = os.path.join(os.path.dirname(__file__), 'data', 'default_config.cfg')
-product_config_file_path = os.path.join(os.path.dirname(__file__), 'data', 'product_config.cfg')
+config_file_path = os.path.join(
+    os.path.dirname(__file__),
+    'data',
+    'default_config.cfg')
+product_config_file_path = os.path.join(
+    os.path.dirname(__file__), 'data', 'product_config.cfg')
 
 # 读取默认配置文件
 DEFAULT_CONFIG = read_config_file(config_file_path)
+
 
 def test_read_config_file():
     default_config = parameterized_config(DEFAULT_CONFIG)
@@ -30,7 +35,8 @@ class TestXToolConfigParser(unittest.TestCase):
         self.conf.read(product_config_file_path)
         assert self.conf.is_validated is True
         assert self.conf.get('smtp', 'smtp_host') == 'localhost'
-        assert self.conf.get('webserver', 'base_url') == 'http://localhost:8080'
+        assert self.conf.get('webserver',
+                             'base_url') == 'http://localhost:8080'
 
     def test__get_env_var_option(self):
         # 把环境变量的值中包含的”~”和”~user”转换成用户目录，并获得配置结果值
@@ -45,7 +51,8 @@ class TestXToolConfigParser(unittest.TestCase):
 
     def test_get(self):
         assert self.conf.get('smtp', 'smtp_host') == 'localhost'
-        assert self.conf.get('webserver', 'base_url') == 'http://localhost:8080'
+        assert self.conf.get('webserver',
+                             'base_url') == 'http://localhost:8080'
 
     def test_getboolean(self):
         assert self.conf.getboolean('smtp', 'smtp_ssl') is False
@@ -62,7 +69,7 @@ class TestXToolConfigParser(unittest.TestCase):
 
     def test_getsection(self):
         actual = self.conf.getsection('smtp')
-        expected =  OrderedDict([
+        expected = OrderedDict([
             ('smtp_host', 'localhost'),
             ('smtp_starttls', True),
             ('smtp_ssl', False),
@@ -71,7 +78,18 @@ class TestXToolConfigParser(unittest.TestCase):
 
     def test_as_dict(self):
         actual = self.conf.as_dict()
-        expected = OrderedDict([('smtp', OrderedDict([('smtp_host', 'localhost'), ('smtp_starttls', 'True'),('smtp_ssl', 'False'), ('smtp_port', '25')])), ('webserver', OrderedDict([('base_url', 'http://localhost:8080')]))])
+        expected = OrderedDict([('smtp',
+                                 OrderedDict([('smtp_host',
+                                               'localhost'),
+                                              ('smtp_starttls',
+                                               'True'),
+                                              ('smtp_ssl',
+                                               'False'),
+                                              ('smtp_port',
+                                               '25')])),
+                                ('webserver',
+                                 OrderedDict([('base_url',
+                                               'http://localhost:8080')]))])
         assert actual == expected
 
 
@@ -87,3 +105,15 @@ class TestXToolConfigParser(unittest.TestCase):
         default_config += os.linesep + "smtp_host_cmd = echo 1"
         self.conf = XToolCmdOptionConfigParser(default_config=default_config)
         assert self.conf.get('smtp', 'smtp_host_cmd') == 'echo 1'
+
+
+class TestConfig:
+    def test_from_envvar(self):
+        config = Config()
+        variable_name = "TEST_ENVVAR_VARIABLE_NAME"
+        config_file_path = os.path.join(
+            os.path.dirname(__file__), "config_data.py")
+        os.environ[variable_name] = config_file_path
+        config.from_envvar(variable_name)
+        assert config["KEEP_ALIVE"] is True
+        assert config["A"] == 1

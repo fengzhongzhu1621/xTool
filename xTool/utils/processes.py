@@ -10,6 +10,8 @@ import psutil
 import asyncio
 import signal
 
+from xTool.misc import USE_WINDOWS
+
 
 # the prefix to append to gunicorn worker processes after init
 GUNICORN_WORKER_READY_PREFIX = "[ready] "
@@ -136,6 +138,76 @@ def kill_children_processes(pids_to_kill, timeout=5, log=None):
                 log.info("Killing child PID: %s", child.pid)
                 child.kill()
                 child.wait()
+
+
+def reap_process_group(pid, log, sig=signal.SIGTERM,
+                       timeout=60):
+    """终止进程id为pid的子进程（包括进程id的所有子进程）
+    Tries really hard to terminate all children (including grandchildren). Will send
+    sig (SIGTERM) to the process group of pid. If any process is alive after timeout
+    a SIGKILL will be send.
+
+    :param log: log handler
+    :param pid: pid to kill
+    :param sig: signal type 软件终止信号
+    :param timeout: how much time a process has to terminate 杀死进程后的等待超时时间
+    """
+    if USE_WINDOWS:
+        return True
+
+    def on_terminate(p):
+        """进程被关闭时的回调，打印进程ID和返回码 ."""
+        log.info(
+            "Process %s (%s) terminated with exit code %s",
+            p,
+            p.pid,
+            p.returncode)
+
+    # 不允许杀死自己，pid必须是子进程
+    if pid == os.getpid():
+        raise RuntimeError("I refuse to kill myself")
+
+    # 创建进程对象
+    parent = psutil.Process(pid)
+
+    # 根据进程ID，递归获得所有子进程和当前进程
+    children = parent.children(recursive=True)
+    children.append(parent)
+
+    # 杀掉进程组
+    # 程序结束(terminate)信号, 与SIGKILL不同的是该信号可以被阻塞和处理。
+    # 通常用来要求程序自己正常退出，shell命令kill缺省产生这个信号。
+    # 如果进程终止不了，我们才会尝试SIGKILL。
+    log.info("Sending %s to GPID %s", sig, os.getpgid(pid))
+    # getpgid 返回pid进程的group id.
+    # 如果pid为0,返回当前进程的group id。在unix中有效
+    os.killpg(os.getpgid(pid), sig)
+
+    # 等待正在被杀死的进程结束
+    gone, alive = psutil.wait_procs(
+        children, timeout=timeout, callback=on_terminate)
+
+    # 如果仍然有进程存活
+    if alive:
+        # 打印存活的进程
+        for p in alive:
+            log.warn(
+                "process %s (%s) did not respond to SIGTERM. Trying SIGKILL",
+                p,
+                pid)
+
+        # 如果子进程仍然存活，则调用SIGKILL信号重新杀死
+        os.killpg(os.getpgid(pid), signal.SIGKILL)
+
+        # 等待子进程结束
+        gone, alive = psutil.wait_procs(
+            alive, timeout=timeout, callback=on_terminate)
+
+        # 如果子进程仍然存活，则记录错误日志
+        if alive:
+            for p in alive:
+                log.error(
+                    "Process %s (%s) could not be killed. Giving up.", p, p.pid)
 
 
 def ctrlc_workaround_for_windows(app):

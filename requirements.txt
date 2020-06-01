@@ -8,3 +8,5 @@ tabulate
 Cython
 cryptography
 multidict
+six
+future
