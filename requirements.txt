@@ -11,3 +11,5 @@ multidict
 six
 future
 httptools
+gunicorn
+websockets
