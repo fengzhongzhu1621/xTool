@@ -658,6 +658,7 @@ def trigger_events(events, loop):
     for event in events:
         result = event(loop)
         if isawaitable(result):
+            # 一直运行直到future运行完成
             loop.run_until_complete(result)
 
 
@@ -721,6 +722,7 @@ class AsyncioServer:
         if self.server:
             self.server.close()
             coro = self.wait_closed()
+            # 创建一个task
             task = asyncio.ensure_future(coro, loop=self.loop)
             return task
 
@@ -747,8 +749,10 @@ class AsyncioServer:
     def __await__(self):
         """Starts the asyncio server, returns AsyncServerCoro"""
         task = asyncio.ensure_future(self.serve_coro)
+        # 等待task执行完成
         while not task.done():
             yield
+        # 获得task的执行结果
         self.server = task.result()
         return self
 
@@ -821,6 +825,7 @@ def serve(
     asyncio_server_kwargs = (
         asyncio_server_kwargs if asyncio_server_kwargs else {}
     )
+    # 创建一个http server coroutine
     server_coroutine = loop.create_server(
         server,
         host,
@@ -844,26 +849,34 @@ def serve(
 
     trigger_events(before_start, loop)
 
+    # 创建http server
     try:
         http_server = loop.run_until_complete(server_coroutine)
     except BaseException:
         logger.exception("Unable to start server")
         return
 
+    # 服务启动后的初始化
     trigger_events(after_start, loop)
 
     # Ignore SIGINT when run_multiple
     if run_multiple:
         signal_func(SIGINT, SIG_IGN)
 
+    # 注册信号处理函数
     # Register signals for graceful termination
     if register_sys_signals:
         if OS_IS_WINDOWS:
+            # 注册SIGINT
             ctrlc_workaround_for_windows(app)
         else:
             for _signal in [SIGTERM] if run_multiple else [SIGINT, SIGTERM]:
                 loop.add_signal_handler(_signal, app.stop)
+
+    # 获得主进程
     pid = os.getpid()
+
+    # 运行http server
     try:
         logger.info("Starting worker [%s]", pid)
         loop.run_forever()
@@ -942,6 +955,7 @@ def serve_multiple(server_settings, workers):
     signal_func(SIGTERM, lambda s, f: sig_handler(s, f))
     mp = multiprocessing.get_context("fork")
 
+    # 启动多进程
     for _ in range(workers):
         process = mp.Process(target=serve, kwargs=server_settings)
         process.daemon = True
