@@ -363,12 +363,19 @@ DEFAULT_CONFIG = {
 }
 
 
+BASE_LOGO = """
+
+                 XTool
+
+"""
+
+
 class Config(dict):
     def __init__(self, defaults=None, load_env=True, keep_alive=None, base_logo=None, prefix="XTOOL_"):
         defaults = defaults or {}
         super().__init__({**DEFAULT_CONFIG, **defaults})
 
-        self.LOGO = base_logo
+        self.LOGO = base_logo if base_logo else BASE_LOGO
         self.prefix = prefix
 
         if keep_alive is not None:
