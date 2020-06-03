@@ -8,9 +8,9 @@ from textwrap import dedent
 
 import pytest
 
-from sanic import Sanic
-from sanic.config import DEFAULT_CONFIG, Config
-from sanic.exceptions import PyFileError
+from xTool.apps.sanic import Sanic
+from xTool.utils.configuration import DEFAULT_CONFIG, Config
+from xTool.exceptions import PyFileError
 
 
 @contextmanager
@@ -45,24 +45,24 @@ def test_load_from_object_string_exception(app):
 
 
 def test_auto_load_env():
-    environ["SANIC_TEST_ANSWER"] = "42"
+    environ["XTOOL_TEST_ANSWER"] = "42"
     app = Sanic(name=__name__)
     assert app.config.TEST_ANSWER == 42
-    del environ["SANIC_TEST_ANSWER"]
+    del environ["XTOOL_TEST_ANSWER"]
 
 
 def test_auto_load_bool_env():
-    environ["SANIC_TEST_ANSWER"] = "True"
+    environ["XTOOL_TEST_ANSWER"] = "True"
     app = Sanic(name=__name__)
-    assert app.config.TEST_ANSWER == True
-    del environ["SANIC_TEST_ANSWER"]
+    assert app.config.TEST_ANSWER is True
+    del environ["XTOOL_TEST_ANSWER"]
 
 
 def test_dont_load_env():
-    environ["SANIC_TEST_ANSWER"] = "42"
+    environ["XTOOL_TEST_ANSWER"] = "42"
     app = Sanic(name=__name__, load_env=False)
     assert getattr(app.config, "TEST_ANSWER", None) is None
-    del environ["SANIC_TEST_ANSWER"]
+    del environ["XTOOL_TEST_ANSWER"]
 
 
 def test_load_env_prefix():
@@ -96,7 +96,9 @@ def test_load_from_file(app):
     """
     )
     with temp_path() as config_path:
+        # 向临时文件写入内容
         config_path.write_text(config)
+        # 从临时文件读取配置
         app.config.from_pyfile(str(config_path))
         assert "VALUE" in app.config
         assert app.config.VALUE == "some value"
@@ -228,22 +230,22 @@ def test_config_custom_defaults_with_env():
 
 
 def test_config_access_log_passing_in_run(app):
-    assert app.config.ACCESS_LOG == True
+    assert app.config.ACCESS_LOG is True
 
     @app.listener("after_server_start")
     async def _request(sanic, loop):
         app.stop()
 
     app.run(port=1340, access_log=False)
-    assert app.config.ACCESS_LOG == False
+    assert app.config.ACCESS_LOG is False
 
     app.run(port=1340, access_log=True)
-    assert app.config.ACCESS_LOG == True
+    assert app.config.ACCESS_LOG is True
 
 
 @pytest.mark.asyncio
 async def test_config_access_log_passing_in_create_server(app):
-    assert app.config.ACCESS_LOG == True
+    assert app.config.ACCESS_LOG
 
     @app.listener("after_server_start")
     async def _request(sanic, loop):
@@ -252,24 +254,24 @@ async def test_config_access_log_passing_in_create_server(app):
     await app.create_server(
         port=1341, access_log=False, return_asyncio_server=True
     )
-    assert app.config.ACCESS_LOG == False
+    assert app.config.ACCESS_LOG is False
 
     await app.create_server(
         port=1342, access_log=True, return_asyncio_server=True
     )
-    assert app.config.ACCESS_LOG == True
+    assert app.config.ACCESS_LOG is True
 
 
 def test_config_rewrite_keep_alive():
     config = Config()
     assert config.KEEP_ALIVE == DEFAULT_CONFIG["KEEP_ALIVE"]
     config = Config(keep_alive=True)
-    assert config.KEEP_ALIVE == True
+    assert config.KEEP_ALIVE is True
     config = Config(keep_alive=False)
-    assert config.KEEP_ALIVE == False
+    assert config.KEEP_ALIVE is False
 
     # use defaults
     config = Config(defaults={"KEEP_ALIVE": False})
-    assert config.KEEP_ALIVE == False
+    assert config.KEEP_ALIVE is False
     config = Config(defaults={"KEEP_ALIVE": True})
-    assert config.KEEP_ALIVE == True
+    assert config.KEEP_ALIVE is True

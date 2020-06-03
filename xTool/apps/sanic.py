@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import logging
 import logging.config
 import os
@@ -71,6 +73,7 @@ class Sanic:
         self.router = router or Router()
         self.request_class = request_class
         self.error_handler = error_handler or ErrorHandler()
+        # 配置对象
         self.config = Config(load_env=load_env)
         self.request_middleware = deque()
         self.response_middleware = deque()
