@@ -13,3 +13,5 @@ future
 httptools
 gunicorn
 websockets
+httpx
+websockets

@@ -34,7 +34,7 @@ from xTool.servers.server import (
     serve_multiple,
 )
 from sanic.static import register as static_register
-from sanic.testing import SanicASGITestClient, SanicTestClient
+from xTool.tests.testing import SanicASGITestClient, SanicTestClient
 from xTool.views import CompositionView
 from xTool.servers.websocket import ConnectionClosed, WebSocketProtocol
 
@@ -606,7 +606,7 @@ class Sanic:
         :param exceptions: exceptions
         :return: decorated function
         """
-
+        # handler表示异常处理器，将指定的异常和异常处理器绑定
         def response(handler):
             for exception in exceptions:
                 if isinstance(exception, (tuple, list)):
@@ -985,7 +985,7 @@ class Sanic:
             # -------------------------------------------- #
             # Response Generation Failed
             # -------------------------------------------- #
-
+            # 请求异常处理
             try:
                 response = self.error_handler.response(request, e)
                 if isawaitable(response):
@@ -1295,6 +1295,7 @@ class Sanic:
                 await result
 
     async def _run_request_middleware(self, request, request_name=None):
+        """运行请求中间件 ."""
         # The if improves speed.  I don't know why
         named_middleware = self.named_request_middleware.get(
             request_name, deque()
@@ -1392,6 +1393,7 @@ class Sanic:
             ("before_server_stop", "before_stop", True),
             ("after_server_stop", "after_stop", True),
         ):
+            # 获得指定类型的监听器
             listeners = self.listeners[event_name].copy()
             if reverse:
                 listeners.reverse()

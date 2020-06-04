@@ -46,6 +46,7 @@ def exception_response(request, exception, debug):
         )
 
     # Keeping it minimal with trailing newline for pretty curl/console output
+    # 默认的错误处理器返回的结果
     return html(
         f"<!DOCTYPE html><meta charset=UTF-8><title>{title}</title>"
         "<style>html { font-family: sans-serif }</style>\n"

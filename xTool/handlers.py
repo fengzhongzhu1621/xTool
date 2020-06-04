@@ -30,12 +30,13 @@ class ErrorHandler:
     _missing = object()
 
     def __init__(self):
+        # 存放注册的异常和错误处理器的映射关系
         self.handlers = []
         self.cached_handlers = {}
         self.debug = False
 
     def add(self, exception, handler):
-        """
+        """添加错误处理器
         Add a new exception handler to an already existing handler object.
 
         :param exception: Type of exception that need to be handled
@@ -63,13 +64,16 @@ class ErrorHandler:
 
         :return: Registered function if found ``None`` otherwise
         """
-        handler = self.cached_handlers.get(type(exception), self._missing)
+        # 从缓存中获得已注册错误处理器
+        exception_type = type(exception)
+        handler = self.cached_handlers.get(exception_type, self._missing)
+        # 如果缓存中没有找到对应的处理器，则加入缓存
         if handler is self._missing:
             for exception_class, handler in self.handlers:
                 if isinstance(exception, exception_class):
-                    self.cached_handlers[type(exception)] = handler
+                    self.cached_handlers[exception_type] = handler
                     return handler
-            self.cached_handlers[type(exception)] = None
+            self.cached_handlers[exception_type] = None
             handler = None
         return handler
 
@@ -87,15 +91,20 @@ class ErrorHandler:
         :return: Wrap the return value obtained from :func:`default`
             or registered handler for that type of exception.
         """
+        # 查找已注册的处理器
         handler = self.lookup(exception)
         response = None
         try:
+            # 执行错误处理器
             if handler:
                 response = handler(request, exception)
+            # 如果错误处理器不返回内容，则继续执行默认错误处理器
             if response is None:
                 response = self.default(request, exception)
         except Exception:
+            # 错误处理器执行异常返回500响应
             self.log(format_exc())
+            # 获得请求地址
             try:
                 url = repr(request.url)
             except AttributeError:
@@ -117,7 +126,7 @@ class ErrorHandler:
         """
 
     def default(self, request, exception):
-        """
+        """默认错误处理
         Provide a default behavior for the objects of :class:`ErrorHandler`.
         If a developer chooses to extent the :class:`ErrorHandler` they can
         provide a custom implementation for this method to behave in a way
@@ -141,6 +150,7 @@ class ErrorHandler:
             self.log(format_exc())
             logger.exception("Exception occurred while handling uri: %s", url)
 
+        # 返回默认错误响应
         return exception_response(request, exception, self.debug)
 
 
