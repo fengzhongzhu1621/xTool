@@ -408,6 +408,7 @@ class HttpProtocol(asyncio.Protocol):
                 )
             return
         self.request.body_finish()
+        # 执行请求处理器
         self.execute_request_handler()
 
     def execute_request_handler(self):
@@ -421,6 +422,7 @@ class HttpProtocol(asyncio.Protocol):
             self.response_timeout, self.response_timeout_callback
         )
         self._last_request_time = time()
+        # 创建执行请求处理器任务
         self._request_handler_task = self.loop.create_task(
             self.request_handler(
                 self.request, self.write_response, self.stream_response
@@ -711,6 +713,7 @@ class AsyncioServer:
         trigger_events(self._after_stop, self.loop)
 
     def is_serving(self):
+        """判断服务器是否已经启动 ."""
         if self.server:
             return self.server.is_serving()
         return False
@@ -720,14 +723,17 @@ class AsyncioServer:
             return self.server.wait_closed()
 
     def close(self):
+        """关闭服务器 ."""
         if self.server:
+            # 关闭服务器
             self.server.close()
+            # 创建一个等待服务器关闭任务
             coro = self.wait_closed()
-            # 创建一个task
             task = asyncio.ensure_future(coro, loop=self.loop)
             return task
 
     def start_serving(self):
+        """启动服务器 ."""
         if self.server:
             try:
                 return self.server.start_serving()
@@ -755,6 +761,7 @@ class AsyncioServer:
             yield
         # 获得task的执行结果
         self.server = task.result()
+        # 返回AsyncioServer
         return self
 
 
@@ -874,7 +881,7 @@ def serve(
             for _signal in [SIGTERM] if run_multiple else [SIGINT, SIGTERM]:
                 loop.add_signal_handler(_signal, app.stop)
 
-    # 获得主进程
+    # 获得主进程ID
     pid = os.getpid()
 
     # 运行http server

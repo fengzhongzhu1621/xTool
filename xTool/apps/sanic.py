@@ -64,7 +64,7 @@ class Sanic:
             frame_records = stack()[1]
             name = getmodulename(frame_records[1])
 
-        # logging
+        # logging，默认开启日志
         if configure_logging:
             logging.config.dictConfig(log_config or LOGGING_CONFIG_DEFAULTS)
 
@@ -937,6 +937,7 @@ class Sanic:
         name = None
         try:
             # Fetch handler from router
+            # 根据路由获取请求处理器及参数
             handler, args, kwargs, uri, name = self.router.get(request)
 
             # -------------------------------------------- #
@@ -971,6 +972,7 @@ class Sanic:
                         )
 
                 # Run response handler
+                # 执行请求处理器
                 response = handler(request, *args, **kwargs)
                 if isawaitable(response):
                     response = await response
@@ -1150,6 +1152,7 @@ class Sanic:
         )
 
         try:
+            # app是否已经运行
             self.is_running = True
             self.is_stopping = False
             if workers > 1 and os.name != "posix":
@@ -1262,6 +1265,7 @@ class Sanic:
         if access_log is not None:
             self.config.ACCESS_LOG = access_log
 
+        # 生成服务器配置
         server_settings = self._helper(
             host=host,
             port=port,
@@ -1274,12 +1278,14 @@ class Sanic:
             run_async=return_asyncio_server,
         )
 
+        # 执行before_start事件
         # Trigger before_start events
         await self.trigger_events(
             server_settings.get("before_start", []),
             server_settings.get("loop"),
         )
 
+        # 创建httpserver
         return await serve(
             asyncio_server_kwargs=asyncio_server_kwargs, **server_settings
         )

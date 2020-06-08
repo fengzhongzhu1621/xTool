@@ -493,3 +493,12 @@ def make_snake_case(s):
     first = SNAKE_CASE_STEP1.sub(r'\1_\2', s)
     print("first = ", first)
     return SNAKE_CASE_STEP2.sub(r'\1_\2', first).lower()
+
+
+def uvloop_installed():
+    try:
+        import uvloop  # noqa
+
+        return True
+    except ImportError:
+        return False

@@ -173,6 +173,7 @@ class SanicASGITestClient(httpx.AsyncClient):
         app.asgi = True
 
         self.app = app
+        self.gather_request = True
 
         dispatch = SanicASGIDispatch(app=app, client=(ASGI_HOST, PORT or 0))
         super().__init__(dispatch=dispatch, base_url=base_url, trust_env=False)
@@ -185,7 +186,6 @@ class SanicASGITestClient(httpx.AsyncClient):
         app.request_middleware.appendleft(_collect_request)
 
     async def request(self, method, url, gather_request=True, *args, **kwargs):
-
         self.gather_request = gather_request
         response = await super().request(method, url, *args, **kwargs)
         response.status = response.status_code
