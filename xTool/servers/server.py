@@ -259,6 +259,7 @@ class HttpProtocol(asyncio.Protocol):
     # -------------------------------------------- #
 
     def data_received(self, data):
+        """接受到HTTP请求时调用 ."""
         # Check for the request itself getting too large and exceeding
         # memory limits
         self._total_request_size += len(data)
@@ -276,8 +277,10 @@ class HttpProtocol(asyncio.Protocol):
 
         # Parse request chunk or close connection
         try:
+            # 解析HTTP协议
             self.parser.feed_data(data)
         except HttpParserError:
+            # 如果不是合法的HTTP协议，返回400错误
             message = "Bad Request"
             if self.app.debug:
                 message += "\n" + traceback.format_exc()
@@ -857,7 +860,7 @@ def serve(
 
     trigger_events(before_start, loop)
 
-    # 创建http server
+    # 创建http server future
     try:
         http_server = loop.run_until_complete(server_coroutine)
     except BaseException:
