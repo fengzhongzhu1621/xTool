@@ -209,3 +209,7 @@ def test_make_snake_case():
     assert actual == "api_response"
     actual = misc.make_snake_case("APIResponseFactory")
     assert actual == "api_response_factory"
+
+
+def test_md5():
+    assert misc.md5("1") == "c4ca4238a0b923820dcc509a6f75849b"

@@ -17,10 +17,11 @@ import subprocess
 import random
 import warnings
 import itertools
+import hashlib
+from functools import reduce
 
 import numpy as np
 import psutil
-from functools import reduce
 
 
 # Determine platform being used.
@@ -502,3 +503,9 @@ def uvloop_installed():
         return True
     except ImportError:
         return False
+
+
+def md5(src):
+    m = hashlib.md5()
+    m.update(tob(src))
+    return m.hexdigest()
