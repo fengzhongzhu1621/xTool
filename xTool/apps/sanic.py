@@ -120,6 +120,7 @@ class Sanic:
         :param task: future, couroutine or awaitable
         """
         try:
+            # 创建异步任务
             if callable(task):
                 try:
                     self.loop.create_task(task(self))
