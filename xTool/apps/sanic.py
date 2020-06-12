@@ -25,7 +25,7 @@ from xTool.exceptions import HttpStatusException, ServerError, URLBuildError
 from xTool.handlers import ErrorHandler
 from xTool.log.log import LOGGING_CONFIG_DEFAULTS, error_logger, logger
 from xTool.response import HTTPResponse, StreamingHTTPResponse
-from sanic.router import Router
+from xTool.router import Router
 from xTool.servers.server import (
     AsyncioServer,
     HttpProtocol,
@@ -33,7 +33,7 @@ from xTool.servers.server import (
     serve,
     serve_multiple,
 )
-from sanic.static import register as static_register
+from xTool.static import register as static_register
 from xTool.tests.testing import SanicASGITestClient, SanicTestClient
 from xTool.views import CompositionView
 from xTool.servers.websocket import ConnectionClosed, WebSocketProtocol
