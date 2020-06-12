@@ -467,7 +467,7 @@ class HttpProtocol(asyncio.Protocol):
             access_logger.info("", extra=extra)
 
     def write_response(self, response):
-        """
+        """处理HTTP响应
         Writes response content synchronously to the transport.
         """
         if self._response_timeout_handler:
