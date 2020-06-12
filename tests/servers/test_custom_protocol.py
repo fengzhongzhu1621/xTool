@@ -1,5 +1,7 @@
-from sanic.response import text
-from sanic.server import HttpProtocol
+# -*- coding: utf-8 -*-
+
+from xTool.response import text
+from xTool.servers.server import HttpProtocol
 
 
 class CustomHttpProtocol(HttpProtocol):

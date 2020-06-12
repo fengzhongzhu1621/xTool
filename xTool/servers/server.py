@@ -312,6 +312,7 @@ class HttpProtocol(asyncio.Protocol):
             self._header_fragment = b""
 
     def on_headers_complete(self):
+        """在服务器接收到头部后，创建一个请求对象 ."""
         self.request = self.request_class(
             url_bytes=self.url,
             headers=Header(self.headers),
@@ -353,6 +354,7 @@ class HttpProtocol(asyncio.Protocol):
                 )
 
     def on_body(self, body):
+        """服务器接收到body后，将其存放到请求对象中 ."""
         if self.is_request_stream and self._is_stream_handler:
             # body chunks can be put into asyncio.Queue out of order if
             # multiple tasks put concurrently and the queue is full in python
@@ -395,6 +397,7 @@ class HttpProtocol(asyncio.Protocol):
                 await self.request.stream.put(body)
 
     def on_message_complete(self):
+        """服务器收到全部消息 ."""
         # Entire request (headers and whole body) is received.
         # We can cancel and remove the request timeout handler now.
         if self._request_timeout_handler:
@@ -410,6 +413,7 @@ class HttpProtocol(asyncio.Protocol):
                     self.stream_append()
                 )
             return
+        # 服务器收到全部请求后，将完整的body放到请求对象中
         self.request.body_finish()
         # 执行请求处理器
         self.execute_request_handler()
