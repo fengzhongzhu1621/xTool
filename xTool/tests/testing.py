@@ -1,19 +1,27 @@
 # -*- coding: utf-8 -*-
 
 from socket import socket
+from json import JSONDecodeError
+import asyncio
 
 import httpx
+import websockets
 
 from xTool.exceptions import MethodNotSupported
 from xTool.response import text
 from xTool.log.log import logger
 from xTool.servers.asgi import ASGIApp
 from xTool.clients.http_client import async_httpx_request
+from xTool.servers import server
 
 
 ASGI_HOST = "mockserver"
 HOST = "127.0.0.1"
 PORT = None
+
+old_conn = None
+CONFIG_FOR_TESTS = {"KEEP_ALIVE_TIMEOUT": 2, "KEEP_ALIVE": True}
+KEEP_ALIVE_TIMEOUT_REUSE_PORT = 42101  # test_keep_alive_timeout_reuse doesn't work with random port
 
 
 class SanicTestClient:
@@ -22,6 +30,46 @@ class SanicTestClient:
         self.app = app
         self.port = port
         self.host = host
+
+    def get_new_session(self):
+        return httpx.AsyncClient(verify=False, trust_env=False)
+
+    async def _local_request(self, method, url, *args, **kwargs):
+        logger.info(url)
+        raw_cookies = kwargs.pop("raw_cookies", None)
+
+        if method == "websocket":
+            async with websockets.connect(url, *args, **kwargs) as websocket:
+                websocket.opened = websocket.open
+                return websocket
+        else:
+            async with self.get_new_session() as session:
+
+                try:
+                    response = await getattr(session, method.lower())(
+                        url, *args, **kwargs
+                    )
+                except NameError:
+                    raise Exception(response.status_code)
+
+                response.body = await response.aread()
+                response.status = response.status_code
+                response.content_type = response.headers.get("content-type")
+
+                # response can be decoded as json after response._content
+                # is set by response.aread()
+                try:
+                    response.json = response.json()
+                except (JSONDecodeError, UnicodeDecodeError):
+                    response.json = None
+
+                if raw_cookies:
+                    response.raw_cookies = {}
+
+                    for cookie in response.cookies.jar:
+                        response.raw_cookies[cookie.name] = cookie
+
+                return response
 
     def _endpoint(
         self,
@@ -88,7 +136,7 @@ class SanicTestClient:
         async def _collect_response(sanic, loop):
             try:
                 # 模拟客户端请求
-                response = await async_httpx_request(
+                response = await self._local_request(
                     method, url, *request_args, **request_kwargs
                 )
                 # 记录上一次请求的响应
@@ -228,3 +276,209 @@ class SanicASGITestClient(httpx.AsyncClient):
         await self.app(scope, receive, send)
 
         return None, {}
+
+
+class ReusableSanicConnectionPool(
+    httpx.dispatch.connection_pool.ConnectionPool
+):
+    @property
+    def cert(self):
+        return self.ssl.cert
+
+    @property
+    def verify(self):
+        return self.ssl.verify
+
+    @property
+    def trust_env(self):
+        return self.ssl.trust_env
+
+    @property
+    def http2(self):
+        return self.ssl.http2
+
+    async def acquire_connection(self, origin, timeout):
+        global old_conn
+        connection = self.pop_connection(origin)
+
+        if connection is None:
+            pool_timeout = None if timeout is None else timeout.pool_timeout
+
+            await self.max_connections.acquire(timeout=pool_timeout)
+            ssl_config = httpx.config.SSLConfig(
+                cert=self.cert,
+                verify=self.verify,
+                trust_env=self.trust_env,
+                http2=self.http2
+            )
+            connection = httpx.dispatch.connection.HTTPConnection(
+                origin,
+                ssl=ssl_config,
+                backend=self.backend,
+                release_func=self.release_connection,
+                uds=self.uds,
+            )
+
+        self.active_connections.add(connection)
+
+        # 判断HTTP连接是否复用
+        if old_conn is not None:
+            if old_conn != connection:
+                raise RuntimeError(
+                    "We got a new connection, wanted the same one!"
+                )
+        old_conn = connection
+
+        return connection
+
+
+class ResusableSanicSession(httpx.AsyncClient):
+    def __init__(self, *args, **kwargs) -> None:
+        dispatch = ReusableSanicConnectionPool()
+        super().__init__(dispatch=dispatch, trust_env=False, *args, **kwargs)
+
+
+class ReuseableSanicTestClient(SanicTestClient):
+    def __init__(self, app, loop=None):
+        super().__init__(app)
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        self._loop = loop
+        self._server = None
+        self._tcp_connector = None
+        self._session = None
+
+    def get_new_session(self):
+        return ResusableSanicSession()
+
+    # Copied from SanicTestClient, but with some changes to reuse the
+    # same loop for the same app.
+    def _endpoint(
+        self,
+        method="get",
+        uri="/",
+        gather_request=True,
+        debug=False,
+        server_kwargs=None,
+        *request_args,
+        **request_kwargs,
+    ):
+        loop = self._loop
+        results = [None, None]
+        exceptions = []
+        server_kwargs = server_kwargs or {"return_asyncio_server": True}
+        if gather_request:
+
+            def _collect_request(request):
+                if results[0] is None:
+                    results[0] = request
+
+            self.app.request_middleware.appendleft(_collect_request)
+
+        if uri.startswith(
+            ("http:", "https:", "ftp:", "ftps://", "//", "ws:", "wss:")
+        ):
+            url = uri
+        else:
+            uri = uri if uri.startswith("/") else f"/{uri}"
+            scheme = "http"
+            url = f"{scheme}://{HOST}:{KEEP_ALIVE_TIMEOUT_REUSE_PORT}{uri}"
+
+        @self.app.listener("after_server_start")
+        async def _collect_response(loop):
+            try:
+                # 给自己发送请求
+                response = await self._local_request(
+                    method, url, *request_args, **request_kwargs
+                )
+                results[-1] = response
+            except Exception as e2:
+                exceptions.append(e2)
+
+        if self._server is not None:
+            _server = self._server
+        else:
+            _server_co = self.app.create_server(
+                host=HOST, debug=debug, port=KEEP_ALIVE_TIMEOUT_REUSE_PORT, **server_kwargs
+            )
+
+            server.trigger_events(
+                self.app.listeners["before_server_start"], loop
+            )
+
+            try:
+                loop._stopping = False
+                _server = loop.run_until_complete(_server_co)
+            except Exception as e1:
+                raise e1
+            self._server = _server
+        server.trigger_events(self.app.listeners["after_server_start"], loop)
+        self.app.listeners["after_server_start"].pop()
+
+        if exceptions:
+            raise ValueError(f"Exception during request: {exceptions}")
+
+        if gather_request:
+            self.app.request_middleware.pop()
+            try:
+                request, response = results
+                return request, response
+            except Exception:
+                raise ValueError(
+                    f"Request and response object expected, got ({results})"
+                )
+        else:
+            try:
+                return results[-1]
+            except Exception:
+                raise ValueError(
+                    f"Request object expected, got ({results})"
+                )
+
+    def kill_server(self):
+        try:
+            if self._server:
+                self._server.close()
+                self._loop.run_until_complete(self._server.wait_closed())
+                self._server = None
+
+            if self._session:
+                self._loop.run_until_complete(self._session.aclose())
+                self._session = None
+
+        except Exception as e3:
+            raise e3
+
+    # Copied from SanicTestClient, but with some changes to reuse the
+    # same TCPConnection and the sane ClientSession more than once.
+    # Note, you cannot use the same session if you are in a _different_
+    # loop, so the changes above are required too.
+    async def _local_request(self, method, url, *args, **kwargs):
+        raw_cookies = kwargs.pop("raw_cookies", None)
+        request_keepalive = kwargs.pop(
+            "request_keepalive", CONFIG_FOR_TESTS["KEEP_ALIVE_TIMEOUT"]
+        )
+        if not self._session:
+            self._session = self.get_new_session()
+        try:
+            response = await getattr(self._session, method.lower())(
+                url, timeout=request_keepalive, *args, **kwargs
+            )
+        except NameError:
+            raise Exception(response.status_code)
+
+        try:
+            response.json = response.json()
+        except (JSONDecodeError, UnicodeDecodeError):
+            response.json = None
+
+        response.body = await response.aread()
+        response.status = response.status_code
+        response.content_type = response.headers.get("content-type")
+
+        if raw_cookies:
+            response.raw_cookies = {}
+            for cookie in response.cookies:
+                response.raw_cookies[cookie.name] = cookie
+
+        return response
