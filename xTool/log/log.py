@@ -2,6 +2,7 @@
 
 import logging
 import sys
+from importlib import reload
 
 
 LOGGING_CONFIG_DEFAULTS = dict(
@@ -61,3 +62,8 @@ LOGGING_CONFIG_DEFAULTS = dict(
 logger = logging.getLogger("xTool.root")
 error_logger = logging.getLogger("xTool.error")
 access_logger = logging.getLogger("xTool.access")
+
+
+def reset_logging():
+    logging.shutdown()
+    reload(logging)
