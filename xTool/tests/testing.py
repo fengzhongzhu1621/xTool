@@ -11,7 +11,6 @@ from xTool.exceptions import MethodNotSupported
 from xTool.response import text
 from xTool.log.log import logger
 from xTool.servers.asgi import ASGIApp
-from xTool.clients.http_client import async_httpx_request
 from xTool.servers import server
 
 
@@ -482,3 +481,67 @@ class ReuseableSanicTestClient(SanicTestClient):
                 response.raw_cookies[cookie.name] = cookie
 
         return response
+
+
+class DelayableHTTPConnection(httpx.dispatch.connection.HTTPConnection):
+    def __init__(self, *args, **kwargs):
+        self._request_delay = None
+        if "request_delay" in kwargs:
+            self._request_delay = kwargs.pop("request_delay")
+        super().__init__(*args, **kwargs)
+
+    async def send(self, request, timeout=None):
+
+        if self.connection is None:
+            self.connection = (await self.connect(timeout=timeout))
+
+        if self._request_delay:
+            await asyncio.sleep(self._request_delay)
+
+        response = await self.connection.send(request, timeout=timeout)
+
+        return response
+
+
+class DelayableSanicConnectionPool(
+    httpx.dispatch.connection_pool.ConnectionPool
+):
+    def __init__(self, request_delay=None, *args, **kwargs):
+        self._request_delay = request_delay
+        super().__init__(*args, **kwargs)
+
+    async def acquire_connection(self, origin, timeout=None):
+        connection = self.pop_connection(origin)
+
+        if connection is None:
+            pool_timeout = None if timeout is None else timeout.pool_timeout
+
+            await self.max_connections.acquire(timeout=pool_timeout)
+            connection = DelayableHTTPConnection(
+                origin,
+                ssl=self.ssl,
+                backend=self.backend,
+                release_func=self.release_connection,
+                uds=self.uds,
+                request_delay=self._request_delay,
+            )
+
+        self.active_connections.add(connection)
+
+        return connection
+
+
+class DelayableSanicSession(httpx.AsyncClient):
+    def __init__(self, request_delay=None, *args, **kwargs) -> None:
+        dispatch = DelayableSanicConnectionPool(request_delay=request_delay)
+        super().__init__(dispatch=dispatch, trust_env=False, *args, **kwargs)
+
+
+class DelayableSanicTestClient(SanicTestClient):
+    def __init__(self, app, request_delay=None):
+        super().__init__(app)
+        self._request_delay = request_delay
+        self._loop = None
+
+    def get_new_session(self):
+        return DelayableSanicSession(request_delay=self._request_delay)
