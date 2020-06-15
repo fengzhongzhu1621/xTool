@@ -971,13 +971,14 @@ def serve_multiple(server_settings, workers):
     signal_func(SIGTERM, lambda s, f: sig_handler(s, f))
     mp = multiprocessing.get_context("fork")
 
-    # 启动多进程
+    # 启动多个子进程
     for _ in range(workers):
         process = mp.Process(target=serve, kwargs=server_settings)
         process.daemon = True
         process.start()
         processes.append(process)
 
+    # 等待所有子进程结束
     for process in processes:
         process.join()
 

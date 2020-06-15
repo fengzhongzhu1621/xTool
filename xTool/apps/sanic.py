@@ -1176,6 +1176,7 @@ class Sanic:
                 else:
                     serve(**server_settings)
             else:
+                # 启动多个进程
                 serve_multiple(server_settings, workers)
         except BaseException:
             error_logger.exception(
