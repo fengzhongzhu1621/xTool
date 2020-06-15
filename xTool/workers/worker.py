@@ -7,7 +7,12 @@ import signal
 import sys
 import traceback
 
-import gunicorn.workers.base as base  # type: ignore
+try:
+    import gunicorn.workers.base as base  # type: ignore
+except ModuleNotFoundError:
+    class base:
+        class Worker:
+            pass
 
 from xTool.servers.server import HttpProtocol, Signal, serve, trigger_events
 from xTool.servers.websocket import WebSocketProtocol

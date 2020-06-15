@@ -3,6 +3,9 @@
 import random
 import string
 import uuid
+import time
+import subprocess
+import shlex
 
 import pytest
 
@@ -23,3 +26,45 @@ TYPE_TO_GENERATOR_MAP = {
 @pytest.fixture(scope="function")
 def url_param_generator():
     return TYPE_TO_GENERATOR_MAP
+
+
+@pytest.fixture(scope="module")
+def gunicorn_worker():
+    command = (
+        "gunicorn "
+        "--bind 127.0.0.1:1337 "
+        "--worker-class xTool.workers.worker.GunicornWorker "
+        "examples.simple_server:app"
+    )
+    worker = subprocess.Popen(shlex.split(command))
+    time.sleep(3)
+    yield
+    worker.kill()
+
+
+@pytest.fixture(scope="module")
+def gunicorn_worker_with_access_logs():
+    command = (
+        "gunicorn "
+        "--bind 127.0.0.1:1338 "
+        "--worker-class xTool.workers.worker.GunicornWorker "
+        "examples.simple_server:app"
+    )
+    worker = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
+    time.sleep(2)
+    return worker
+
+
+@pytest.fixture(scope="module")
+def gunicorn_worker_with_env_var():
+    command = (
+        'env XTOOL_ACCESS_LOG="False" '
+        "gunicorn "
+        "--bind 127.0.0.1:1339 "
+        "--worker-class xTool.workers.worker.GunicornWorker "
+        "--log-level info "
+        "examples.simple_server:app"
+    )
+    worker = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
+    time.sleep(2)
+    return worker
