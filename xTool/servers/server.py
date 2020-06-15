@@ -263,6 +263,7 @@ class HttpProtocol(asyncio.Protocol):
         # Check for the request itself getting too large and exceeding
         # memory limits
         self._total_request_size += len(data)
+        # 限制请求内容的长度
         if self._total_request_size > self.request_max_size:
             self.write_error(PayloadTooLarge("Payload Too Large"))
 
