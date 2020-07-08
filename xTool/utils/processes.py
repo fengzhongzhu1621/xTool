@@ -13,7 +13,7 @@ import signal
 from xTool.misc import USE_WINDOWS
 
 
-# the prefix to append to gunicorn worker processes after init
+# the prefix to append to gunicorn worker processes after ini
 GUNICORN_WORKER_READY_PREFIX = "[ready] "
 
 

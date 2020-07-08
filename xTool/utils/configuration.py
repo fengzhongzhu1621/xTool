@@ -10,7 +10,6 @@ from __future__ import unicode_literals
 import os
 import json
 from tempfile import mkstemp
-from base64 import b64encode
 from builtins import str
 import copy
 from collections import OrderedDict
@@ -371,7 +370,14 @@ BASE_LOGO = """
 
 
 class Config(dict):
-    def __init__(self, defaults=None, load_env=True, keep_alive=None, base_logo=None, prefix="XTOOL_"):
+    """基于字典的配置类 ."""
+    def __init__(
+            self,
+            defaults=None,
+            load_env=True,
+            keep_alive=None,
+            base_logo=None,
+            prefix="XTOOL_"):
         defaults = defaults or {}
         super().__init__({**DEFAULT_CONFIG, **defaults})
 
