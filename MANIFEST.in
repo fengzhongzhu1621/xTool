@@ -10,8 +10,11 @@ include CHANGELOG.txt
 include README.md
 
 recursive-include tests *
+recursive-include docs *.rst conf.py Makefile make.bat
+
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 recursive-exclude dist *
 
-recursive-include docs *.rst conf.py Makefile make.bat
+global-include *.pyx
+global-include *.pxd
