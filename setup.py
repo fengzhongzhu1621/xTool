@@ -98,6 +98,7 @@ def read(filename):
 
 test_requirements = [
     'pytest',
+    'pytest-asyncio',
 ]
 
 
