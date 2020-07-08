@@ -90,13 +90,6 @@ def git_version(version):
         return 'no_git_version'
 
 
-def write_version(filename=os.path.join(*['xTool',
-                                          'git_version'])):
-    text = "{}".format(git_version(version))
-    with open(filename, 'w') as a:
-        a.write(text)
-
-
 def read(filename):
     """Read and return `filename` in root dir of project and return string ."""
     here = os.path.abspath(os.path.dirname(__file__))
@@ -156,8 +149,6 @@ install_requires.extend([
 
 
 def do_setup():
-    write_version()
-
     setup(
         name='xTool',
         version=version,
