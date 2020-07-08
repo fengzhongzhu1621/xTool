@@ -17,7 +17,7 @@ from typing import (
 )
 from urllib.parse import quote
 
-import sanic.app  # noqa
+import xTool.apps.sanic  # noqa
 
 from xTool.collections.header import Header
 from xTool.exceptions import InvalidUsage, ServerError
@@ -189,7 +189,7 @@ class Lifespan:
 
 
 class ASGIApp:
-    sanic_app: "sanic.app.Sanic"
+    sanic_app: "xTool.apps.sanic.Sanic"
     request: Request
     transport: MockTransport
     do_stream: bool
