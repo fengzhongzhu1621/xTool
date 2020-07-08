@@ -6,7 +6,6 @@ python -W ignore -m pytest -v -s -x tests
 from __future__ import unicode_literals
 from setuptools import setup, find_packages
 
-
 import logging
 import os
 import codecs
@@ -19,8 +18,10 @@ except ImportError:
     from distutils.core import setup
 from setuptools.command.test import test as TestCommand
 from setuptools import Command
+from setuptools import Extension
 from importlib import import_module
 
+from Cython.Build import cythonize
 
 logger = logging.getLogger(__name__)
 
@@ -149,6 +150,9 @@ install_requires.extend([
 ])
 
 
+ext_modules = []
+
+
 def do_setup():
     setup(
         name='xTool',
@@ -180,6 +184,11 @@ def do_setup():
             "flake8",
             'docutils>=0.14',
         ],
+        extras_require={
+            'dev': ['pytest', 'pyyaml'],
+            'fast': ['uvloop']
+        },
+        ext_modules=cythonize(ext_modules),
         test_suite='tests',
         tests_require=test_requirements,
         cmdclass={'test': PyTest},
