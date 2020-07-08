@@ -152,6 +152,17 @@ def read_version_file(package):
     return version
 
 
+def read_version_file2(package):
+    regexp = re.compile(r"^__version__\W*=\W*'([\d.abrc]+)'")
+    init_py = os.path.join(os.path.dirname(__file__), package, "__init__.py")
+    with open(init_py) as f:
+        for line in f:
+            match = regexp.match(line)
+            if match is not None:
+                return match.group(1)
+        raise RuntimeError("Cannot find version in {}".format(init_py))
+
+
 def read_readme_rst():
     with open_local(["README.rst"]) as rm:
         long_description = rm.read()
