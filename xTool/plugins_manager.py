@@ -62,7 +62,8 @@ def import_plugins(plugins_folder):
                 # e.g.:
                 # __data__home__user00__application__airflow__plugins_rest_api_plugin
                 # mod_name 为文件名（去掉后缀）
-                namespace = '_'.join([re.sub(norm_pattern, '__', root), mod_name])
+                namespace = '_'.join(
+                    [re.sub(norm_pattern, '__', root), mod_name])
 
                 # 根据文件名加载模块
                 m = imp.load_source(namespace, filepath)
