@@ -1,30 +1,10 @@
 # -*- coding: utf-8 -*-
-#
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
-
 """
 python -W ignore -m pytest -v -s -x tests
-
-
 """
 
 from __future__ import unicode_literals
+from setuptools import setup, find_packages
 
 
 import logging
@@ -123,14 +103,6 @@ def read(filename):
     return codecs.open(os.path.join(here, filename), 'r').read()
 
 
-with open('README.rst', encoding='utf-8') as readme_file:
-    readme = readme_file.read()
-
-
-with open('HISTORY.rst', encoding='utf-8') as history_file:
-    history = history_file.read().replace('.. :changelog:', '')
-
-
 test_requirements = [
     'pytest',
 ]
@@ -164,10 +136,7 @@ def refresh_plugin_cache():
         # log.warn(str(e))
 
 
-from setuptools import setup, find_packages
-# from distutils.core import setup
-
-README = os.path.join(os.path.dirname(__file__), 'README')
+README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README, encoding='utf-8').read() + '\n\n'
 
 install_requires = []
@@ -194,6 +163,7 @@ def do_setup():
         version=version,
         description='A python script tools',
         long_description=long_description,
+        long_description_content_type='text/markdown',
         author='jinyinqiao',
         author_email='jinyinqiao@gmail.com',
         license='Apache License 2.0',
@@ -221,10 +191,10 @@ def do_setup():
         test_suite='tests',
         tests_require=test_requirements,
         cmdclass={'test': PyTest},
-        #cmdclass={
+        # cmdclass={
         #    'test': Tox,
         #    'extra_clean': CleanCommand,
-        #},
+        # },
     )
 
 
