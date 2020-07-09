@@ -15,7 +15,6 @@ class Plugin:
 
 
 def test_register_plugin():
-
     plugin_instance = get_plugin_instance(PluginType.UNITTEST, "unittest")
     assert plugin_instance.a == 1
     assert plugin_instance.b == 2

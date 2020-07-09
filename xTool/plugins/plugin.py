@@ -8,6 +8,9 @@ from abc import ABCMeta, abstractmethod
 class PluginType(IntEnum):
     UNITTEST = 1
 
+    # 配置：范围 [2 - 20]
+    CONFIG_DATA_SOURCE = 2
+
 
 class BasePlugin(metaclass=ABCMeta):
     pass
@@ -46,9 +49,12 @@ class PluginManager:
 DefaultPluginManager = PluginManager()
 
 
-def register_plugin(plugin_type, plugin_name):
+def register_plugin(plugin_type, plugin_name=None):
     """将类注册为一个插件 ."""
     def decorator(cls):
+        nonlocal plugin_name
+        if not plugin_name:
+            plugin_name = cls.__name__
         plugin = Plugin(cls, plugin_type, plugin_name)
         DefaultPluginManager.add_plugin(plugin_type, plugin_name, plugin)
         return cls
