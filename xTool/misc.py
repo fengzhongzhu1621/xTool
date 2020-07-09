@@ -5,6 +5,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import asyncio
 import os
 import io
 import re
@@ -19,10 +20,11 @@ import warnings
 import itertools
 import hashlib
 from functools import reduce
-import inspect
 
 import numpy as np
 import psutil
+
+from xTool.compat import basestring
 
 
 # Determine platform being used.
@@ -295,24 +297,24 @@ def print_bin(data):
     assert isinstance(data, basestring)
 
     dump_list = []
-    slice = ""
+    slice_str = ""
     addr = 0
 
     for byte in data:
         if addr % 16 == 0:
             dump_list.append(" ")
 
-            for char in slice:
-                if ord(char) >= 32 and ord(char) <= 126:
+            for char in slice_str:
+                if 32 <= ord(char) <= 126:
                     dump_list.append(char)
                 else:
                     dump_list.append(".")
 
             dump_list.append("\n%04x: " % addr)
-            slice = ""
+            slice_str = ""
 
         dump_list.append("%02x " % ord(byte))
-        slice += byte
+        slice_str += byte
         addr += 1
 
     remainder = addr % 16
@@ -320,8 +322,8 @@ def print_bin(data):
     if remainder != 0:
         dump_list.append("   " * (16 - remainder) + " ")
 
-    for char in slice:
-        if ord(char) >= 32 and ord(char) <= 126:
+    for char in slice_str:
+        if 32 <= ord(char) <= 126:
             dump_list.append(char)
         else:
             dump_list.append(".")
@@ -510,3 +512,13 @@ def md5(src):
     m = hashlib.md5()
     m.update(tob(src))
     return m.hexdigest()
+
+
+def load_uvlopo():
+    try:
+        import uvloop  # type: ignore
+
+        if not isinstance(asyncio.get_event_loop_policy(), uvloop.EventLoopPolicy):
+            asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+    except ImportError:
+        pass
