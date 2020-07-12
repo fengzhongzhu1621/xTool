@@ -920,11 +920,10 @@ def serve(
         for conn in connections:
             if hasattr(conn, "websocket") and conn.websocket:
                 coros.append(conn.websocket.close_connection())
+                _shutdown = asyncio.gather(*coros)
+                loop.run_until_complete(_shutdown)
             else:
                 conn.close()
-
-        _shutdown = asyncio.gather(*coros)
-        loop.run_until_complete(_shutdown)
 
         trigger_events(after_stop, loop)
 

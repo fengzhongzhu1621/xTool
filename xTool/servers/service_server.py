@@ -138,7 +138,12 @@ class ServiceServer:
         try:
             # 注册信号处理函数
             self.register_signal()
+            # 获得主进程ID
+            pid = os.getpid()
             # 启动server
+            logging.info("Starting worker [%s]", pid)
             self.loop.run_forever()
         except (SystemExit, KeyboardInterrupt):
             self.loop.stop()
+        finally:
+            logging.info("Stopping worker [%s]", pid)
