@@ -10,6 +10,7 @@ class PluginType(IntEnum):
 
     # 配置：范围 [2 - 20]
     CONFIG_DATA_SOURCE = 2
+    CONFIG_DECODER = 3
 
 
 class BasePlugin(metaclass=ABCMeta):

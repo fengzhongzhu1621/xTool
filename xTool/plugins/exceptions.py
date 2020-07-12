@@ -8,3 +8,6 @@ class PluginException(Exception):
 class PluginDataSourceException(PluginException):
     pass
 
+
+class PluginDecoderException(PluginException):
+    pass

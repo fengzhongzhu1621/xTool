@@ -15,3 +15,5 @@ gunicorn
 websockets
 httpx
 websockets
+ujson
+PyYAML>=5.1

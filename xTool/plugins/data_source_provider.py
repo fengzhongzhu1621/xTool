@@ -28,3 +28,4 @@ class FileDataProvider(BaseDataProvider):
 
     def set_options(self, options: dict):
         self.options = options
+
