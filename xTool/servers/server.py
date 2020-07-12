@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import sys
 import traceback
-
+from abc import ABCMeta, abstractmethod
 from collections import deque
 from functools import partial
 from inspect import isawaitable
@@ -30,20 +30,21 @@ from xTool.exceptions import (
 from xTool.log.log import access_logger, logger
 from xTool.request import EXPECT_HEADER, Request, StreamBuffer
 from xTool.response import HTTPResponse
-from xTool.misc import OS_IS_WINDOWS
+from xTool.misc import OS_IS_WINDOWS, load_uvlopo
 
 
-try:
-    import uvloop  # type: ignore
-
-    if not isinstance(asyncio.get_event_loop_policy(), uvloop.EventLoopPolicy):
-        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-except ImportError:
-    pass
+load_uvlopo()
 
 
 class Signal:
     stopped = False
+
+
+class AbstractServer(metaclass=ABCMeta):
+
+    @abstractmethod
+    def serve_forever(self):
+        raise NotImplementedError
 
 
 class HttpProtocol(asyncio.Protocol):
@@ -673,7 +674,7 @@ def trigger_events(events, loop):
             loop.run_until_complete(result)
 
 
-class AsyncioServer:
+class AsyncioServer(AbstractServer):
     """
     Wraps an asyncio server with functionality that might be useful to
     a user who needs to manage the server lifecycle manually.
