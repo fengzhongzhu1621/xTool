@@ -40,13 +40,6 @@ class Signal:
     stopped = False
 
 
-class AbstractServer(metaclass=ABCMeta):
-
-    @abstractmethod
-    def serve_forever(self):
-        raise NotImplementedError
-
-
 class HttpProtocol(asyncio.Protocol):
     """
     This class provides a basic HTTP implementation of the web framework.
@@ -674,7 +667,7 @@ def trigger_events(events, loop):
             loop.run_until_complete(result)
 
 
-class AsyncioServer(AbstractServer):
+class AsyncioServer:
     """
     Wraps an asyncio server with functionality that might be useful to
     a user who needs to manage the server lifecycle manually.

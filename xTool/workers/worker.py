@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 
+"""
+Gunicorn ‘Green Unicorn’ 是一个 UNIX 下的 WSGI HTTP 服务器。这是一个从 Ruby 的 Unicorn 项目移植过来的预分叉工作者模型。
+
+为了用 Gunicorn 运行 Sanic 应用程序，你需要为 Gunicorn worler-class 参数使用特定的 sanic.worker.GunicornWorker：
+
+gunicorn myapp:app --bind 0.0.0.0:1337 --worker-class sanic.worker.GunicornWorker
+如果你的应用程序遭受内存泄漏，你可以将 Gunicorn 配置为在处理完指定数量的请求后正常重启工作程序。这是一种便利的方法来帮助限制内存泄漏的影响。
+"""
+
 import asyncio
 import logging
 import os
