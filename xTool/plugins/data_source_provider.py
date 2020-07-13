@@ -4,11 +4,11 @@ from typing import Callable
 from asyncio import AbstractEventLoop
 from xTool.plugins.plugin import register_plugin, PluginType
 from xTool.plugins.exceptions import PluginDataSourceException
-from xTool.plugins.provider import BaseDataProvider
+from xTool.plugins.provider import IBaseDataProvider
 
 
 @register_plugin(PluginType.CONFIG_DATA_SOURCE)
-class FileDataProvider(BaseDataProvider):
+class FileDataProvider(IBaseDataProvider):
     def __init__(self):
         super().__init__()
         self.options = None

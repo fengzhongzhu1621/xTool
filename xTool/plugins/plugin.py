@@ -71,7 +71,7 @@ class PluginMeta(type):
         return new_class
 
 
-class PluginComponent(metaclass=PluginMeta):
+class PluginRegister(metaclass=PluginMeta):
     def __init__(self):
         pass
 

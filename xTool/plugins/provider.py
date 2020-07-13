@@ -5,7 +5,7 @@ from typing import Callable
 from asyncio import AbstractEventLoop
 
 
-class BaseDataProvider(metaclass=ABCMeta):
+class IBaseDataProvider:
     """数据源提供者 。"""
     @abstractmethod
     def load(self, file_path: str, options: dict) -> bytes:
