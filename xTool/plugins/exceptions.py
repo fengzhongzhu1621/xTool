@@ -11,3 +11,7 @@ class PluginDataSourceException(PluginException):
 
 class PluginDecoderException(PluginException):
     pass
+
+
+class PluginTypeNotFound(PluginException):
+    pass

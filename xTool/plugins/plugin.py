@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from enum import IntEnum, unique
-from abc import ABCMeta, abstractmethod
+from xTool.plugins.exceptions import PluginTypeNotFound
 
 
 @unique
@@ -11,20 +11,6 @@ class PluginType(IntEnum):
     # 配置：范围 [2 - 20]
     CONFIG_DATA_SOURCE = 2
     CONFIG_DECODER = 3
-
-
-class BasePlugin(metaclass=ABCMeta):
-    pass
-
-
-class Plugin:
-    def __init__(self, cls, plugin_type, plugin_name):
-        self._cls = cls
-        self.name = plugin_name
-        self.type = plugin_type
-
-    def create_instance(self):
-        return self._cls()
 
 
 class PluginManager:
@@ -50,6 +36,46 @@ class PluginManager:
 DefaultPluginManager = PluginManager()
 
 
+class Plugin:
+    def __init__(self, cls, plugin_type, plugin_name):
+        self._cls = cls
+        self.name = plugin_name
+        self.type = plugin_type
+
+    def create_instance(self):
+        return self._cls()
+
+
+class PluginMeta(type):
+    def __new__(cls, name, bases, attrs):
+        super_new = super().__new__
+        parents = [b for b in bases if isinstance(b, PluginMeta)]
+        if not parents:
+            return super_new(cls, name, bases, attrs)
+        new_class = super_new(cls, name, bases, attrs)
+
+        for obj_name, obj in attrs.items():
+            setattr(new_class, obj_name, obj)
+        class_name = new_class.__name__
+        plugin_type = getattr(new_class, "plugin_type", "")
+        if not plugin_type:
+            raise PluginTypeNotFound("plugin_type not set in class %s" % class_name)
+        plugin_name = getattr(new_class, "plugin_name", "")
+        if not plugin_name:
+            plugin_name = class_name
+        register_ignore = getattr(new_class, "register_ignore", False)
+
+        if not register_ignore:
+            plugin = Plugin(new_class, plugin_type, plugin_name)
+            DefaultPluginManager.add_plugin(plugin_type, plugin_name, plugin)
+        return new_class
+
+
+class PluginComponent(metaclass=PluginMeta):
+    def __init__(self):
+        pass
+
+
 def register_plugin(plugin_type, plugin_name=None):
     """将类注册为一个插件 ."""
     def decorator(cls):
@@ -69,6 +95,7 @@ def get_plugin_instance(plugin_type, plugin_name):
         plugin = DefaultPluginManager.get_plugin(plugin_type, plugin_name)
         if not plugin:
             return None
+        # 懒加载
         plugin_instance = plugin.create_instance()
         DefaultPluginManager.add_plugin_instance(plugin_type, plugin_name, plugin_instance)
     return plugin_instance

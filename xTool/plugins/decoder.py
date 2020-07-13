@@ -3,7 +3,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class BaseDecoder(metaclass=ABCMeta):
+class IBaseDecoder:
     @abstractmethod
     def decode(self, config_data: bytes, options: dict) -> dict:
         raise NotImplementedError

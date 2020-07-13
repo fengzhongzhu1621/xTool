@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import ujson as json
-from xTool.plugins.decoder import BaseDecoder
-from xTool.plugins.plugin import PluginType, register_plugin
+from xTool.plugins.decoder import IBaseDecoder
+from xTool.plugins.plugin import PluginType, PluginComponent
 from xTool.misc import tou
 
 
-@register_plugin(PluginType.CONFIG_DECODER)
-class JSONDecoder(BaseDecoder):
+class JSONDecoder(IBaseDecoder, PluginComponent):
+    plugin_type = PluginType.CONFIG_DECODER
 
     def __init__(self):
         super().__init__()
