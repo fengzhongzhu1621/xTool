@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-class ProtocolServer:
-    def __init__(self, loop, server_coroutine):
+class WorkerProcessManager:
+    def __init__(self, loop, server_options):
         self.loop = loop
-        self.server_coroutine = server_coroutine
+        self.server_options = server_options
 
     def close(self):
         pass
@@ -15,5 +15,7 @@ class ProtocolServer:
     def restart_child_process(self, pid):
         pass
 
-    def start_process(self):
+    def run_worker_process(self):
+        """启动工作进程 ."""
         pass
+

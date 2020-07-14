@@ -2,4 +2,6 @@
 
 
 class ServerOptions:
-    pass
+    def get_worker_num(self):
+        """获得工作进程的数量 ."""
+        return 1

@@ -9,7 +9,7 @@ import errno
 from xTool.servers.options import ServerOptions
 from xTool.servers.service import Service, ServiceDesc
 from xTool.servers.exceptions import ServiceNotFoundError
-from xTool.servers.protocol_server import ProtocolServer
+from xTool.servers.process_manager import WorkerProcessManager
 from xTool.misc import OS_IS_WINDOWS
 from xTool.utils.processes import ctrlc_workaround_for_windows
 
@@ -19,7 +19,7 @@ class ServiceServer:
                  register_sys_signals=True):
         self.server_options = server_options
         self.services = {}
-        self.server_engine = None
+        self.process_manager = None
         self.register_sys_signals = register_sys_signals
         self.is_stopping = False
         self.loop = None
@@ -55,7 +55,7 @@ class ServiceServer:
     def stop(self):
         if not self.is_stopping:
             try:
-                self.server_engine.close()
+                self.process_manager.close()
             except Exception as ex:
                 logging.error("close server engine failure: %s", str(ex))
 
@@ -96,8 +96,8 @@ class ServiceServer:
                 exitcode = status >> 8
                 logging.info('child process %s exit with exitcode %s', cpid, exitcode)
                 # 子进程退出时，父进程重新拉起子进程
-                if self.server_engine.find_child_process(cpid):
-                    self.server_engine.restart_child_process(cpid)
+                if self.process_manager.find_child_process(cpid):
+                    self.process_manager.restart_child_process(cpid)
         except ChildProcessError:
             exit()
         except OSError as e:
@@ -120,7 +120,7 @@ class ServiceServer:
                 self.loop.add_signal_handler(sig, self.handle_stop_signal)
             self.loop.add_signal_handler(signal.SIGCHLD, self.handle_child_process_exit)
 
-    def serve_forever(self, server_engine=None):
+    def serve_forever(self, process_manager=None):
         """启动服务器 ."""
         # 创建loop
         loop = asyncio.get_event_loop()
@@ -128,16 +128,15 @@ class ServiceServer:
         self.loop = loop
 
         # 创建engine
-        server_coroutine = None
-        self.server_engine = server_engine if server_engine else ProtocolServer(
+        self.process_manager = process_manager if process_manager else WorkerProcessManager(
             loop=loop,
-            server_coroutine=server_coroutine)
+            server_options=self.server_options)
 
         # 运行所有的服务
         self.run_all_services()
 
         # 启动执行引擎
-        self.server_engine.start_process()
+        self.process_manager.run_worker_process()
 
         # 获得主进程ID
         pid = os.getpid()
