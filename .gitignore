@@ -133,3 +133,5 @@ rat-results.txt
 .pydevproject
 .pytest_cache/
 .settings/
+
+test.py

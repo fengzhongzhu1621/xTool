@@ -9,6 +9,7 @@ except ImportError:
 import psutil
 import asyncio
 import signal
+import logging
 
 from xTool.misc import USE_WINDOWS
 
@@ -226,6 +227,7 @@ def ctrlc_workaround_for_windows(app):
 
     def ctrlc_handler(sig, frame):
         """SIGINT信号处理函数 ."""
+        logging.info("receive signal %s", sig)
         nonlocal die
         if die:
             # 如果收到重复的SIGINT信号，则抛出异常

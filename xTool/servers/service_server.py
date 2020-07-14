@@ -53,7 +53,6 @@ class ServiceServer:
             self.loop.create_task(task)
 
     def stop(self):
-        """停止服务器 ."""
         if not self.is_stopping:
             try:
                 self.server_engine.close()
@@ -75,6 +74,11 @@ class ServiceServer:
             else:
                 self.loop.stop()
             self.is_stopping = True
+
+    def handle_stop_signal(self, signum, stackframe):
+        """停止服务器 ."""
+        logging.info("receive signal %s", signum)
+        self.stop()
 
     def handle_child_process_exit(self):
         """子进程退出时系统会向父进程发送 SIGCHLD 信号，
@@ -113,7 +117,7 @@ class ServiceServer:
         else:
             sigs = [signal.SIGTERM, signal.SIGINT, signal.SIGUSR2, signal.SIGSEGV]
             for sig in sigs:
-                self.loop.add_signal_handler(sig, self.stop)
+                self.loop.add_signal_handler(sig, self.handle_stop_signal)
             self.loop.add_signal_handler(signal.SIGCHLD, self.handle_child_process_exit)
 
     def serve_forever(self, server_engine=None):
@@ -135,11 +139,12 @@ class ServiceServer:
         # 启动执行引擎
         self.server_engine.start_process()
 
+        # 获得主进程ID
+        pid = os.getpid()
+
         try:
             # 注册信号处理函数
             self.register_signal()
-            # 获得主进程ID
-            pid = os.getpid()
             # 启动server
             logging.info("Starting worker [%s]", pid)
             self.loop.run_forever()
