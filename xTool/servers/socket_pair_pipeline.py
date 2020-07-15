@@ -1,7 +1,53 @@
 # -*- coding: utf-8 -*-
 
 import socket
+from abc import abstractmethod
 from xTool.misc import OS_IS_WINDOWS
+
+
+class BaseSocketPairPipelineConnector:
+    __slots__ = ["_socket"]
+
+    def __init__(self, one_of_socket_pair):
+        self._socket = one_of_socket_pair
+
+    @property
+    def fileno(self):
+        return self._socket.fileno()
+
+    def send(self, data):
+        self._socket.sendall(data)
+
+    def recv(self, length):
+        return self._socket.recv(length)
+
+    def shutdown(self, how: int) -> None:
+        self._socket.shutdown(how)
+
+    def close(self):
+        self._socket.close()
+
+    @abstractmethod
+    def close_other_side(self):
+        raise NotImplementedError
+
+
+class SocketPairPipelineServerConnector(BaseSocketPairPipelineConnector):
+    def __init__(self, socket_pair):
+        self.server_sock, self.client_sock = socket_pair
+        super().__init__(self.server_sock)
+
+    def close_other_side(self):
+        self.client_sock.close()
+
+
+class SocketPairPipelineClientConnector(BaseSocketPairPipelineConnector):
+    def __init__(self, socket_pair):
+        self.server_sock, self.client_sock = socket_pair
+        super().__init__(self.client_sock)
+
+    def close_other_side(self):
+        self.server_sock.close()
 
 
 class SocketPairPipeline:
@@ -21,31 +67,55 @@ class SocketPairPipeline:
             # 参数1（domain）：表示协议族，在Linux下只能为AF_LOCAL或者AF_UNIX。（自从Linux 2.6.27后也支持SOCK_NONBLOCK和SOCK_CLOEXEC）
             # 参数2（type）：表示协议，可以是SOCK_STREAM或者SOCK_DGRAM。SOCK_STREAM是基于TCP的，而SOCK_DGRAM是基于UDP的
             # 参数3（protocol）：表示类型，只能为0
-            socket_pair = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM, 0)
-        self.left_sock, self.right_sock = socket_pair
+            socket_pair = socket.socketpair(
+                socket.AF_UNIX, socket.SOCK_STREAM, 0)
+        self.socket_pair = socket_pair
+        self.server_sock, self.client_sock = self.socket_pair
 
     @property
-    def left_fileno(self):
-        return self.left_sock.fileno()
+    def server_fileno(self):
+        return self.server_sock.fileno()
 
     @property
-    def right_fileno(self):
-        return self.right_sock.fileno()
+    def client_fileno(self):
+        return self.client_sock.fileno()
 
-    def send_into_left(self, data):
-        self.left_sock.sendall(data)
+    def create_connectors(self):
+        return (
+            SocketPairPipelineServerConnector(self.socket_pair),
+            SocketPairPipelineClientConnector(self.socket_pair)
+        )
 
-    def recv_from_left(self, length):
-        return self.left_sock.recv(length)
+    def send_to_client(self, data):
+        self.server_sock.sendall(data)
 
-    def send_into_right(self, data):
-        self.right_sock.sendall(data)
+    def recv_from_client(self, length):
+        return self.server_sock.recv(length)
 
-    def recv_from_right(self, length):
-        return self.right_sock.recv(length)
+    def send_to_server(self, data):
+        self.client_sock.sendall(data)
 
-    def close_left(self):
-        self.right_sock.close()
+    def recv_from_server(self, length):
+        return self.client_sock.recv(length)
 
-    def close_right(self):
-        self.right_sock.close()
+    def close_server(self):
+        self.server_sock.close()
+
+    def close_client(self):
+        self.client_sock.close()
+
+    def shutdown_client(self, how: int) -> None:
+        """关闭客户端socket
+
+        :param how:  socket.SHUT_RD: int; socket.SHUT_RDWR: int
+        :return:
+        """
+        self.client_sock.shutdown(how)
+
+    def shutdown_server(self, how: int) -> None:
+        """关闭服务端socket
+
+        :param how:  socket.SHUT_RD: int; socket.SHUT_RDWR: int
+        :return:
+        """
+        self.server_sock.shutdown(how)

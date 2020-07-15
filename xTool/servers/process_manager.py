@@ -6,7 +6,7 @@ from xTool.servers.dispatcher_process import DispatcherProcess
 from xTool.servers.socket_pair_pipeline import SocketPairPipeline
 
 
-class ExecutorProcessManager:
+class ProcessManager:
     def __init__(self, loop, server_options):
         self.loop = loop
         self.server_options = server_options
@@ -57,6 +57,8 @@ class ExecutorProcessManager:
             executor_process.start()
 
     def start_processes(self):
-        self.start_dispatcher_process()
+        if self.dispatcher_enabled:
+            self.start_dispatcher_process()
+        if self.executor_enabled:
+            self.start_executor_process()
         self.start_worker_process()
-        self.start_executor_process()
