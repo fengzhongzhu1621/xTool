@@ -22,9 +22,8 @@ import xTool.apps.sanic  # noqa
 from xTool.collections.header import Header
 from xTool.exceptions import InvalidUsage, ServerError
 from xTool.log.log import logger
-from xTool.request import Request
+from xTool.request import Request, StreamBuffer
 from xTool.response import HTTPResponse, StreamingHTTPResponse
-from xTool.servers.server import StreamBuffer
 from xTool.servers.websocket import WebSocketConnection
 
 
