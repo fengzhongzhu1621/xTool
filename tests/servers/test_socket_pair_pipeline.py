@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import multiprocessing
-
 import pytest
 from xTool.servers.socket_pair_pipeline import SocketPairPipeline
 
@@ -9,6 +8,10 @@ from xTool.servers.socket_pair_pipeline import SocketPairPipeline
 def _task(server_connector, message):
     server_connector.close_other_side()
     server_connector.send(message)
+
+
+def _task_with_queue(queue, message):
+    queue.put(message)
 
 
 class TestSocketPairPipeline:
@@ -65,4 +68,15 @@ class TestSocketPairPipeline:
         child.join()
         client_connector.close_other_side()
         actual = client_connector.recv(100)
+        assert actual == message
+
+    def test_communicate_use_queue(self):
+        """测试父子进程之间的通信 ."""
+        queue = multiprocessing.Queue()
+        message = b"hello world!"
+
+        child = multiprocessing.Process(target=_task_with_queue, args=(queue, message))
+        child.start()
+        child.join()
+        actual = queue.get()
         assert actual == message
