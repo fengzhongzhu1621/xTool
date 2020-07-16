@@ -19,3 +19,11 @@ class WorkerProtocol(asyncio.Protocol):
 
     def connection_lost(self, exc):
         """连接丢失时执行 ."""
+
+    def close(self):
+        """
+        Force close the connection.
+        """
+        if self.transport is not None:
+            self.transport.close()
+            self.transport = None
