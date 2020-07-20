@@ -34,4 +34,17 @@ def parse_netloc_to_hostname(uri_parts):
             hostname = hostname.split(":", 1)[0]
         hostname = unquote(hostname)
     return hostname
- 
+
+
+def int2ip(ipnum):
+    seg1 = int(ipnum / 16777216) % 256
+    seg2 = int(ipnum / 65536) % 256
+    seg3 = int(ipnum / 256) % 256
+    seg4 = int(ipnum) % 256
+    return '{}.{}.{}.{}'.format(seg1, seg2, seg3, seg4)
+
+
+def ip2int(ip):
+    seg0, seg1, seg2, seg3 = (int(seg) for seg in ip.split('.'))
+    res = (16777216 * seg0) + (65536 * seg1) + (256 * seg2) + seg3
+    return res
