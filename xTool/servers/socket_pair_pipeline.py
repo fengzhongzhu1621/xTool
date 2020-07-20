@@ -3,9 +3,10 @@
 import socket
 from abc import abstractmethod
 from xTool.misc import OS_IS_WINDOWS
+from xTool.servers.pipeline import IPipelineConnector
 
 
-class BaseSocketPairPipelineConnector:
+class BaseSocketPairPipelineConnector(IPipelineConnector):
     __slots__ = ["_socket"]
 
     def __init__(self, one_of_socket_pair):

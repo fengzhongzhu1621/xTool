@@ -7,6 +7,7 @@ from signal import SIGTERM
 
 from xTool.servers.protocols.http_protocol import HttpProtocol
 from xTool.servers.signal import Signal
+from xTool.servers.pipeline import IPipelineConnector
 
 
 class WorkerProcess(multiprocessing.Process):
@@ -15,7 +16,7 @@ class WorkerProcess(multiprocessing.Process):
                  port,
                  app,
                  loop,
-                 pineline_connector,
+                 pineline_connector: IPipelineConnector,
                  protocol_factory=HttpProtocol,
                  connections=None,
                  signal=Signal(),
