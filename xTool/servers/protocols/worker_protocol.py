@@ -8,6 +8,7 @@ class WorkerProtocol(asyncio.Protocol):
 
     def __init__(self, *args, **kargs):
         self.transport = None
+        self.parser = None
 
     def connection_made(self, transport):
         """创建连接时执行 ."""
@@ -15,7 +16,9 @@ class WorkerProtocol(asyncio.Protocol):
 
     def data_received(self, data: bytes):
         """接受到数据时调用 ."""
-        pass
+        self.parser.feed_data(data)
+        self.parser.read()
+        self.parser.write()
 
     def connection_lost(self, exc):
         """连接丢失时执行 ."""
@@ -27,3 +30,15 @@ class WorkerProtocol(asyncio.Protocol):
         if self.transport is not None:
             self.transport.close()
             self.transport = None
+
+    def read_request_data(self):
+        pass
+
+    def write_response_data(self):
+        pass
+
+    def on_message_complete(self):
+        pass
+
+    def execute_request_handler(self):
+        pass

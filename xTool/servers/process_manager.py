@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from xTool.servers.executor_process import ExecutorProcess
-from xTool.servers.worker_process import WorkerProcess
+from xTool.servers.process.worker_process import WorkerProcess
 from xTool.servers.dispatcher_process import DispatcherProcess
 from xTool.servers.socket_pair_pipeline import SocketPairPipeline
 
