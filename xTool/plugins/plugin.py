@@ -11,9 +11,15 @@ class PluginType(IntEnum):
     # 默认类型
     CONFIG_NORMAL = 2
 
-    # 配置：范围 [10 - 20]
+    # 配置：范围 [10 - 100]
     CONFIG_DATA_SOURCE = 10
     CONFIG_DECODER = 11
+
+    # 协议
+    SERVER_TRANSPORT = 101
+
+    # 第三方服务：名字注册服务
+    NAMING_REGISTRY_SERVICE = 201
 
 
 class PluginManager:

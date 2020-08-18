@@ -64,6 +64,9 @@ else:
     from inspect import getargspec
 
 
+b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode('latin1'))
+
+
 if not PY2:
     import builtins
     import functools
