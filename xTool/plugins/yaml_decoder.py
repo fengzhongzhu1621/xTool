@@ -17,4 +17,4 @@ class YamlDecoder(IBaseDecoder, PluginRegister):
         return config
 
     def set_options(self, options: dict) -> None:
-        self.options=options
+        self.options = options

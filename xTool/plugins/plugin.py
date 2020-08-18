@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
 
 from enum import IntEnum, unique
-from xTool.plugins.exceptions import PluginTypeNotFound
+# from xTool.plugins.exceptions import PluginTypeNotFound
 
 
 @unique
 class PluginType(IntEnum):
     UNITTEST = 1
 
-    # 配置：范围 [2 - 20]
-    CONFIG_DATA_SOURCE = 2
-    CONFIG_DECODER = 3
+    # 默认类型
+    CONFIG_NORMAL = 2
+
+    # 配置：范围 [10 - 20]
+    CONFIG_DATA_SOURCE = 10
+    CONFIG_DECODER = 11
 
 
 class PluginManager:
     __slots__ = ("_plugins", "_plugin_instances")
 
     def __init__(self):
+        # 线程安全
         self._plugins = {}
         self._plugin_instances = {}
 
@@ -57,23 +61,22 @@ class PluginMeta(type):
         for obj_name, obj in attrs.items():
             setattr(new_class, obj_name, obj)
         class_name = new_class.__name__
+        # 获得插件类型
         plugin_type = getattr(new_class, "plugin_type", "")
         if not plugin_type:
-            raise PluginTypeNotFound("plugin_type not set in class %s" % class_name)
+            plugin_type = PluginType.CONFIG_NORMAL
+            # raise PluginTypeNotFound("plugin_type not set in class %s" % class_name)
+        # 获得插件名称，默认为类名
         plugin_name = getattr(new_class, "plugin_name", "")
         if not plugin_name:
             plugin_name = class_name
+        # 是否忽略此插件
         register_ignore = getattr(new_class, "register_ignore", False)
-
+        # 创建插件类
         if not register_ignore:
             plugin = Plugin(new_class, plugin_type, plugin_name)
             DefaultPluginManager.add_plugin(plugin_type, plugin_name, plugin)
         return new_class
-
-
-class PluginRegister(metaclass=PluginMeta):
-    def __init__(self):
-        pass
 
 
 def register_plugin(plugin_type, plugin_name=None):
@@ -89,13 +92,16 @@ def register_plugin(plugin_type, plugin_name=None):
 
 
 def get_plugin_instance(plugin_type, plugin_name):
-    """获得插件，如果没有则创建 ."""
+    """懒加载的方式获得插件，如果没有则创建，是一个单例模式 ."""
+    # 从缓存中获取插件实例
     plugin_instance = DefaultPluginManager.get_plugin_instance(plugin_type, plugin_name)
     if not plugin_instance:
+        # 从缓存中获取插件类
         plugin = DefaultPluginManager.get_plugin(plugin_type, plugin_name)
         if not plugin:
             return None
-        # 懒加载
+        # 创建插件实例
         plugin_instance = plugin.create_instance()
+        # 缓存插件实例
         DefaultPluginManager.add_plugin_instance(plugin_type, plugin_name, plugin_instance)
     return plugin_instance
