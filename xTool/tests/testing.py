@@ -1,8 +1,21 @@
 # -*- coding: utf-8 -*-
 
+import sys
+import gc
+import contextlib
 from socket import socket
 from json import JSONDecodeError
 import asyncio
+from typing import (  # noqa
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterator,
+    List,
+    Optional,
+    Type,
+    Union,
+)
 
 import httpx
 import websockets
@@ -20,7 +33,8 @@ PORT = None
 
 old_conn = None
 CONFIG_FOR_TESTS = {"KEEP_ALIVE_TIMEOUT": 2, "KEEP_ALIVE": True}
-KEEP_ALIVE_TIMEOUT_REUSE_PORT = 42101  # test_keep_alive_timeout_reuse doesn't work with random port
+# test_keep_alive_timeout_reuse doesn't work with random port
+KEEP_ALIVE_TIMEOUT_REUSE_PORT = 42101
 
 
 class SanicTestClient:
@@ -398,8 +412,10 @@ class ReuseableSanicTestClient(SanicTestClient):
             _server = self._server
         else:
             _server_co = self.app.create_server(
-                host=HOST, debug=debug, port=KEEP_ALIVE_TIMEOUT_REUSE_PORT, **server_kwargs
-            )
+                host=HOST,
+                debug=debug,
+                port=KEEP_ALIVE_TIMEOUT_REUSE_PORT,
+                **server_kwargs)
 
             server.trigger_events(
                 self.app.listeners["before_server_start"], loop
@@ -545,3 +561,59 @@ class DelayableSanicTestClient(SanicTestClient):
 
     def get_new_session(self):
         return DelayableSanicSession(request_delay=self._request_delay)
+
+
+_LOOP_FACTORY = Callable[[], asyncio.AbstractEventLoop]
+
+
+def setup_test_loop(
+        loop_factory: _LOOP_FACTORY = asyncio.new_event_loop
+) -> asyncio.AbstractEventLoop:
+    """Create and return an asyncio.BaseEventLoop
+    instance.
+    The caller should also call teardown_test_loop,
+    once they are done with the loop.
+    """
+    loop = loop_factory()
+    try:
+        module = loop.__class__.__module__
+        skip_watcher = 'uvloop' in module
+    except AttributeError:  # pragma: no cover
+        # Just in case
+        skip_watcher = True
+    asyncio.set_event_loop(loop)
+    if sys.platform != "win32" and not skip_watcher:
+        policy = asyncio.get_event_loop_policy()
+        watcher = asyncio.SafeChildWatcher()
+        watcher.attach_loop(loop)
+        with contextlib.suppress(NotImplementedError):
+            policy.set_child_watcher(watcher)
+    return loop
+
+
+def teardown_test_loop(loop: asyncio.AbstractEventLoop,
+                       fast: bool = False) -> None:
+    """Teardown and cleanup an event_loop created
+    by setup_test_loop.
+    """
+    closed = loop.is_closed()
+    if not closed:
+        loop.call_soon(loop.stop)
+        loop.run_forever()
+        loop.close()
+
+    if not fast:
+        gc.collect()
+
+    asyncio.set_event_loop(None)
+
+
+@contextlib.contextmanager
+def loop_context(loop_factory: _LOOP_FACTORY = asyncio.new_event_loop,
+                 fast: bool = False) -> Iterator[asyncio.AbstractEventLoop]:
+    """A contextmanager that creates an event_loop, for test purposes.
+    Handles the creation and cleanup of a test loop.
+    """
+    loop = setup_test_loop(loop_factory)
+    yield loop
+    teardown_test_loop(loop, fast=fast)
