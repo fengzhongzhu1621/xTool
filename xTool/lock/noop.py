@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 class _NoopLock(object):
     __slots__ = ()
 

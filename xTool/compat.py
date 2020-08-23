@@ -5,8 +5,22 @@ import operator
 import atexit
 import itertools
 import logging
+import socket
+
+
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
+PY_36 = sys.version_info >= (3, 6)
+PY_37 = sys.version_info >= (3, 7)
+PY_38 = sys.version_info >= (3, 8)
+
+
+IS_HPUX = sys.platform.startswith('hp-ux')
+# Specifies whether the current runtime is HP-UX.
+IS_LINUX = sys.platform.startswith('linux')
+# Specifies whether the current runtime is HP-UX.
+IS_UNIX = hasattr(socket, 'AF_UNIX')
+# Specifies whether the current runtime is *NIX.
 
 
 def _identity(x): return x
