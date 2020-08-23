@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import asyncio
 import random
 import re
 import string
@@ -10,6 +11,10 @@ import pytest
 
 from xTool.apps.sanic import Sanic
 from xTool.routers.router import RouteExists, Router
+from xTool.tests.testing import loop_context
+
+
+# pytest_plugins = ['xTool.tests.pytest_plugin']
 
 
 random.seed("Pack my box with five dozen liquor jugs.")
@@ -131,3 +136,21 @@ def url_param_generator():
 @pytest.fixture
 def app(request):
     return Sanic(request.node.name)
+
+
+@pytest.fixture
+def selector_loop():
+    if sys.version_info < (3, 7):
+        policy = asyncio.get_event_loop_policy()
+        policy._loop_factory = asyncio.SelectorEventLoop  # type: ignore
+    else:
+        if sys.version_info >= (3, 8):
+            policy = asyncio.WindowsSelectorEventLoopPolicy()  # type: ignore
+        else:
+            policy = asyncio.DefaultEventLoopPolicy()
+        asyncio.set_event_loop_policy(policy)
+
+    with loop_context(policy.new_event_loop) as _loop:
+        asyncio.set_event_loop(_loop)
+        yield _loop
+

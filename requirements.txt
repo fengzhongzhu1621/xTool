@@ -17,3 +17,5 @@ httpx
 websockets
 ujson
 PyYAML>=5.1
+trio
+cython

@@ -185,7 +185,7 @@ def do_setup():
             'docutils>=0.14',
         ],
         extras_require={
-            'dev': ['pytest', 'pyyaml'],
+            'dev': ['pytest', 'pyyaml', 'pytest-sanic'],
             'fast': ['uvloop']
         },
         ext_modules=cythonize(ext_modules),
