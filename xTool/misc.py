@@ -21,6 +21,7 @@ import warnings
 import itertools
 import hashlib
 from functools import reduce
+from math import ceil
 from typing import (
     Optional,
 )
@@ -51,6 +52,9 @@ if PY3:
 else:
     izip_longest = itertools.izip_longest
 zip_longest = izip_longest
+
+
+sentinel = object()  # type: Any
 
 
 def get_encodings():
@@ -541,3 +545,10 @@ def get_running_loop(
                 "The object should be created from async function",
                 stack_info=True)
     return loop
+
+
+def call_later(cb, timeout, loop):  # type: ignore
+    if timeout is not None and timeout > 0:
+        # loop.time() 以float类型返回当前时间循环的内部时间
+        when = ceil(loop.time() + timeout)
+        return loop.call_at(when, cb)
