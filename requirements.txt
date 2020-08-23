@@ -19,3 +19,5 @@ ujson
 PyYAML>=5.1
 trio
 cython
+aiodns
+ipaddress

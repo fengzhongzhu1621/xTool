@@ -5,6 +5,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import logging
 import asyncio
 import os
 import io
@@ -20,6 +21,9 @@ import warnings
 import itertools
 import hashlib
 from functools import reduce
+from typing import (
+    Optional,
+)
 
 import numpy as np
 import psutil
@@ -522,3 +526,18 @@ def load_uvlopo():
             asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     except ImportError:
         pass
+
+
+def get_running_loop(
+    loop: Optional[asyncio.AbstractEventLoop]=None
+) -> asyncio.AbstractEventLoop:
+    if loop is None:
+        loop = asyncio.get_event_loop()
+    if not loop.is_running():
+        warnings.warn("The object should be created from async function",
+                      DeprecationWarning, stacklevel=3)
+        if loop.get_debug():
+            logging.warning(
+                "The object should be created from async function",
+                stack_info=True)
+    return loop
