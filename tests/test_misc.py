@@ -1,10 +1,8 @@
-#coding: utf-8
+# -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
 
 import os
-from datetime import timedelta
-import subprocess
 
 import pytest
 

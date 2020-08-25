@@ -111,3 +111,8 @@ def get_plugin_instance(plugin_type, plugin_name):
         # 缓存插件实例
         DefaultPluginManager.add_plugin_instance(plugin_type, plugin_name, plugin_instance)
     return plugin_instance
+
+
+class PluginRegister(metaclass=PluginMeta):
+    def __init__(self):
+        pass
