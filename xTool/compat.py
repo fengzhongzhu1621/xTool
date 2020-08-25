@@ -80,7 +80,6 @@ else:
 
 b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode('latin1'))
 
-
 if not PY2:
     import builtins
     import functools
@@ -176,6 +175,14 @@ else:
         _BaseString = str
     else:
         _BaseString = Union[bytes, unicode_type]
+
+
+if PY3:
+    if sys.version_info >= (3, 6):
+        PathLike = Union[str, 'os.PathLike[str]']
+    else:
+        import pathlib  # noqa
+        PathLike = Union[str, pathlib.PurePath]
 
 try:
     from sys import is_finalizing
