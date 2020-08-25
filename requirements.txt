@@ -20,3 +20,4 @@ PyYAML>=5.1
 trio
 cython
 ipaddress
+beautifulsoup4
