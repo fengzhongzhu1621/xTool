@@ -3,7 +3,7 @@ import socket
 from typing import Any, Dict, List, Optional
 from abc import ABC, abstractmethod
 
-from xTool.misc import get_running_loop
+from xTool.aiomisc import get_running_loop
 
 __all__ = ('ThreadedResolver', 'AsyncResolver', 'DefaultResolver')
 
@@ -134,4 +134,5 @@ class AsyncResolver(AbstractResolver):
         return self._resolver.cancel()
 
 
+# 默认使用aiohttp.ThreadResolver, 异步版本在某些情况下会解析失败
 DefaultResolver = AsyncResolver if aiodns_default else ThreadedResolver

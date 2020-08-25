@@ -11,7 +11,8 @@ from socket import SO_REUSEADDR, SOL_SOCKET, socket
 
 from xTool.log.log import logger
 from xTool.utils.processes import ctrlc_workaround_for_windows
-from xTool.misc import OS_IS_WINDOWS, load_uvlopo
+from xTool.misc import OS_IS_WINDOWS
+from xTool.aiomisc import load_uvlopo
 from xTool.servers.protocols.http_protocol import HttpProtocol
 from xTool.servers.trigger import trigger_events
 from xTool.servers.signal import Signal

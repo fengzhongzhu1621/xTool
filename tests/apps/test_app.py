@@ -11,7 +11,7 @@ import pytest
 from xTool.apps.sanic import Sanic
 from xTool.exceptions import HttpStatusException
 from xTool.response import text
-from xTool.misc import uvloop_installed
+from xTool.aiomisc import uvloop_installed
 
 
 def test_app_loop_running(app):

@@ -16,7 +16,6 @@ from typing import (
 
 
 class DNSCacheTable:
-
     def __init__(self, ttl: Optional[float] = None) -> None:
         # 存放主机地址
         self._addrs_rr = {}  # type: Dict[Tuple[str, int], Tuple[Iterator[Dict[str, Any]], int]]  # noqa
@@ -68,7 +67,9 @@ class DNSCacheTable:
 def clear_dns_cache(cached_hosts: DNSCacheTable,
                     host: Optional[str] = None,
                     port: Optional[int] = None) -> None:
-    """Remove specified host/port or clear all dns local cache."""
+    """Remove specified host/port or clear all dns local cache.
+    清除内部DNS缓存。如果host和port指定了信息会删除指定的DNS，否则清除所有。
+    """
     if host is not None and port is not None:
         cached_hosts.remove((host, port))
     elif host is not None or port is not None:
