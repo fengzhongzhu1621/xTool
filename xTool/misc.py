@@ -5,8 +5,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import logging
-import asyncio
 import os
 import io
 import re
@@ -21,10 +19,6 @@ import warnings
 import itertools
 import hashlib
 from functools import reduce
-from math import ceil
-from typing import (
-    Optional,
-)
 
 import numpy as np
 import psutil
@@ -55,6 +49,14 @@ zip_longest = izip_longest
 
 
 sentinel = object()  # type: Any
+
+
+CHAR = set(chr(i) for i in range(0, 128))
+CTL = set(chr(i) for i in range(0, 32)) | {chr(127), }
+SEPARATORS = {'(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']',
+              '?', '=', '{', '}', ' ', chr(9)}
+# 按位异或
+TOKEN = CHAR ^ CTL ^ SEPARATORS
 
 
 def get_encodings():
@@ -281,7 +283,17 @@ def chunked(it, chunk_len):
         yield group
 
 
+def chunk_list(iterable, size):
+    iterable = iter(iterable)
+
+    item = list(itertools.islice(iterable, size))
+    while item:
+        yield item
+        item = list(itertools.islice(iterable, size))
+
+
 def get_random_string(length=32,
+
                       allowed_chars='abcdefghijklmnopqrstuvwxyz'
                                     'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
     """
@@ -507,48 +519,7 @@ def make_snake_case(s):
     return SNAKE_CASE_STEP2.sub(r'\1_\2', first).lower()
 
 
-def uvloop_installed():
-    try:
-        import uvloop  # noqa
-
-        return True
-    except ImportError:
-        return False
-
-
 def md5(src):
     m = hashlib.md5()
     m.update(tob(src))
     return m.hexdigest()
-
-
-def load_uvlopo():
-    try:
-        import uvloop  # type: ignore
-
-        if not isinstance(asyncio.get_event_loop_policy(), uvloop.EventLoopPolicy):
-            asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-    except ImportError:
-        pass
-
-
-def get_running_loop(
-    loop: Optional[asyncio.AbstractEventLoop]=None
-) -> asyncio.AbstractEventLoop:
-    if loop is None:
-        loop = asyncio.get_event_loop()
-    if not loop.is_running():
-        warnings.warn("The object should be created from async function",
-                      DeprecationWarning, stacklevel=3)
-        if loop.get_debug():
-            logging.warning(
-                "The object should be created from async function",
-                stack_info=True)
-    return loop
-
-
-def call_later(cb, timeout, loop):  # type: ignore
-    if timeout is not None and timeout > 0:
-        # loop.time() 以float类型返回当前时间循环的内部时间
-        when = ceil(loop.time() + timeout)
-        return loop.call_at(when, cb)
