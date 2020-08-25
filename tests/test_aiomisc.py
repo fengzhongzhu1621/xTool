@@ -29,6 +29,25 @@ async def test_awaitable_decorator(loop):
     assert (await pass_future()) == 1
     assert (await no_awaitable()) == 1
 
+    async def do_callback(func, *args):
+        awaitable_func = aiomisc.awaitable(func)
+
+        return await awaitable_func(*args)
+
+    await do_callback(asyncio.sleep, 0.01)
+    await do_callback(lambda: 45)
+
+
+async def test_cancel_tasks_wait(loop):
+    done, pending = await asyncio.wait([
+        asyncio.sleep(i) for i in range(10)
+    ], timeout=5)
+    for task in pending:
+        assert task.done()
+
+        with pytest.raises(asyncio.CancelledError):
+            await task
+
 
 async def test_cancel_tasks(loop):
     semaphore = asyncio.Semaphore(10)
