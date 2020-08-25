@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import asyncio
 from math import ceil
 from functools import wraps
+import asyncio
 from typing import (  # noqa
     Awaitable,
     Any,
     Optional,
 )
 import warnings
+from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import cpu_count
+from contextlib import suppress
 
 try:
     import uvloop
@@ -37,6 +40,34 @@ def load_uvlopo():
             asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     except ImportError:
         pass
+
+
+def create_default_event_loop(
+    pool_size=None, policy=event_loop_policy,
+    debug=False,
+):
+    with suppress(RuntimeError):
+        asyncio.get_event_loop().close()
+
+    # 创建新的事件循环
+    asyncio.set_event_loop_policy(policy)
+    loop = asyncio.new_event_loop()
+    loop.set_debug(debug)
+    asyncio.set_event_loop(loop)
+    # 设置线程池
+    pool_size = pool_size or cpu_count()
+    thread_pool = ThreadPoolExecutor(pool_size)
+    loop.set_default_executor(thread_pool)
+
+    return loop, thread_pool
+
+
+def new_event_loop(
+    pool_size=None,
+    policy=event_loop_policy,
+) -> asyncio.AbstractEventLoop:
+    loop, _ = create_default_event_loop(pool_size, policy)
+    return loop
 
 
 def get_running_loop(

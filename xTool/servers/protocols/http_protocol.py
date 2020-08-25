@@ -10,7 +10,7 @@ from httptools import HttpRequestParser  # type: ignore
 from httptools.parser.errors import HttpParserError  # type: ignore
 
 from xTool.log.log import access_logger, logger
-from xTool.collections.header import Header
+from xTool.algorithms.collections.header import Header
 from xTool.request import EXPECT_HEADER, Request, StreamBuffer
 from xTool.response import HTTPResponse
 from xTool.servers.signal import Signal

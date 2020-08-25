@@ -19,7 +19,7 @@ from urllib.parse import quote
 
 import xTool.apps.sanic  # noqa
 
-from xTool.collections.header import Header
+from xTool.algorithms.collections.header import Header
 from xTool.exceptions import InvalidUsage, ServerError
 from xTool.log.log import logger
 from xTool.request import Request, StreamBuffer

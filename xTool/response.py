@@ -10,7 +10,7 @@ from urllib.parse import quote_plus
 from xTool.cookies.cookies import CookieJar
 from xTool.headers import format_http1, format_http1_response
 from xTool.header import remove_entity_headers
-from xTool.collections.header import Header
+from xTool.algorithms.collections.header import Header
 from xTool.status import has_message_body
 from xTool.compat import open_async
 

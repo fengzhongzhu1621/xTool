@@ -2,7 +2,7 @@
 
 from collections import defaultdict, namedtuple
 
-from xTool.collections.blueprint_group import BlueprintGroup
+from xTool.algorithms.collections import BlueprintGroup
 from xTool.constants import HTTP_METHODS
 from xTool.views import CompositionView
 
