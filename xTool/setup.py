@@ -167,3 +167,16 @@ def read_readme_rst():
     with open_local(["README.rst"]) as rm:
         long_description = rm.read()
     return long_description
+
+
+def load_requirements(fname):
+    """ load requirements from a pip requirements file
+
+    examples:
+        extras_require={
+            'develop': load_requirements('requirements.dev.txt'),
+        },
+    """
+    with open(fname) as f:
+        line_iter = (line.strip() for line in f.readlines())
+        return [line for line in line_iter if line and line[0] != '#']
