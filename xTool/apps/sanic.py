@@ -18,7 +18,7 @@ from urllib.parse import urlencode, urlunparse
 
 from xTool import reloader_helpers
 from xTool.servers.asgi import ASGIApp
-from xTool.algorithms.collections import BlueprintGroup
+from xTool.algorithms.collections.blueprint_group import BlueprintGroup
 from xTool.utils.configuration import Config
 from xTool.constants import HTTP_METHODS
 from xTool.exceptions import HttpStatusException, ServerError, URLBuildError

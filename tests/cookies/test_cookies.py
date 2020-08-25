@@ -6,7 +6,7 @@ from http.cookies import SimpleCookie
 
 import pytest
 from xTool.cookies.cookies import CookieJar, Cookie
-from xTool.collections.header import Header
+from xTool.algorithms.collections.header import Header
 from xTool.response import text
 
 
