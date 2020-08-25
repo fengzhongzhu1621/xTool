@@ -8,6 +8,7 @@ from typing import (  # noqa
     Awaitable,
     Any,
     Optional,
+    Iterable,
 )
 import warnings
 from concurrent.futures import ThreadPoolExecutor
@@ -131,7 +132,6 @@ def awaitable(func):
     def wrap(*args, **kwargs):
         # 执行业务函数
         result = func(*args, **kwargs)
-
         if hasattr(result, "__await__"):
             return result
         if asyncio.iscoroutine(result) or asyncio.isfuture(result):
@@ -140,6 +140,48 @@ def awaitable(func):
         return awaiter(result)
 
     return wrap
+
+
+def cancel_tasks(tasks: Iterable[asyncio.Future]) -> asyncio.Future:
+    """取消任务 ."""
+    future = asyncio.get_event_loop().create_future()
+    future.set_result(None)
+
+    # 如果没有要取消的任务，返回一个future
+    if not tasks:
+        return future
+
+    cancelled_tasks = []
+    exc = asyncio.CancelledError()
+
+    for task in tasks:
+        # 忽略完成的任务
+        if task.done():
+            continue
+
+        if isinstance(task, asyncio.Task):
+            # 取消任务
+            task.cancel()
+            cancelled_tasks.append(task)
+        elif isinstance(task, asyncio.Future):
+            # 将future标为执行完成，并设置Exception
+            task.set_exception(exc)
+        else:
+            logging.warning(
+                "Skipping object %r because it's not a Task or Future", task,
+            )
+
+    if not cancelled_tasks:
+        return future
+
+    # 创建等待任务取消的future
+    waiter = asyncio.ensure_future(
+        asyncio.gather(
+            *cancelled_tasks, return_exceptions=True
+        ),
+    )
+
+    return waiter
 
 
 if __name__ == "__main__":
