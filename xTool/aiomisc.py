@@ -9,6 +9,7 @@ from typing import (  # noqa
     Any,
     Optional,
     Iterable,
+    Tuple,
 )
 import warnings
 from concurrent.futures import ThreadPoolExecutor
@@ -20,6 +21,9 @@ try:
     event_loop_policy = uvloop.EventLoopPolicy()
 except ImportError:
     event_loop_policy = asyncio.DefaultEventLoopPolicy()
+
+
+OptionsType = Iterable[Tuple[int, int, int]]
 
 
 def uvloop_installed():
