@@ -38,10 +38,38 @@ async def test_awaitable_decorator(loop):
     await do_callback(lambda: 45)
 
 
+def test_shield(loop):
+    results = []
+
+    @aiomisc.shield
+    async def coro():
+        nonlocal results
+        await asyncio.sleep(0.5)
+        results.append(True)
+
+    async def main(loop):
+        task = loop.create_task(coro())
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
+        finally:
+            await asyncio.sleep(1)
+
+    loop.run_until_complete(asyncio.wait_for(main(loop), timeout=10))
+
+    assert results == [True]
+
+
 async def test_cancel_tasks_wait(loop):
     done, pending = await asyncio.wait([
         asyncio.sleep(i) for i in range(10)
     ], timeout=5)
+
+    # 取消任务
+    await aiomisc.cancel_tasks(pending)
+
     for task in pending:
         assert task.done()
 

@@ -142,6 +142,32 @@ def awaitable(func):
     return wrap
 
 
+def shield(func):
+    """ 保护一个 可等待对象 防止其被 取消
+    Simple and useful decorator for wrap the coroutine to `asyncio.shield`.
+
+    假如有个Task(叫做something)被shield保护，如下：
+
+    outer = shield(something())
+    res = await outer
+    如果outer被取消了，不会影响Task本身(something)的执行。
+
+    >>> @shield
+    ... async def non_cancelable_func():
+    ...     await asyncio.sleep(1)
+
+    """
+
+    async def awaiter(future):
+        return await future
+
+    @wraps(func)
+    def wrap(*args, **kwargs):
+        return wraps(func)(awaiter)(asyncio.shield(func(*args, **kwargs)))
+
+    return wrap
+
+
 def cancel_tasks(tasks: Iterable[asyncio.Future]) -> asyncio.Future:
     """取消任务 ."""
     future = asyncio.get_event_loop().create_future()
