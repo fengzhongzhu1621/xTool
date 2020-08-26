@@ -44,9 +44,11 @@ class UDPServer(SimpleServer):
 
             self.make_socket = partial(
                 bind_socket,
-                socket.AF_INET6 if ":" in address else socket.AF_INET,
-                socket.SOCK_DGRAM,
-                address=address, port=port, options=options,
+                address,
+                port,
+                family=socket.AF_INET6 if ":" in address else socket.AF_INET,
+                type=socket.SOCK_DGRAM,
+                options=options,
                 proto_name="udp",
             )
         elif not isinstance(sock, socket.socket):
@@ -55,7 +57,7 @@ class UDPServer(SimpleServer):
             self.make_socket = lambda: sock
 
         self.server = None
-        if protocol_factory:
+        if not protocol_factory:
             protocol_factory = UDPSimpleProtocol
         self.protocol_factory = protocol_factory
         self._protocol = None

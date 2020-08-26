@@ -54,3 +54,11 @@ def bind_socket(
         logging.info("Listening %s://%s:%s", proto_name, *sock_addr)
 
     return sock
+
+
+def get_unused_port() -> int:
+    sock = socket.socket()
+    sock.bind(("", 0))
+    port = sock.getsockname()[-1]
+    sock.close()
+    return port

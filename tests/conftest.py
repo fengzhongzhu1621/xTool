@@ -6,12 +6,14 @@ import re
 import string
 import sys
 import uuid
+import socket
 
 import pytest
 
 from xTool.apps.sanic import Sanic
 from xTool.routers.router import RouteExists, Router
 from xTool.tests.testing import loop_context
+from xTool.servers.helpers import get_unused_port
 
 
 # pytest_plugins = ['xTool.tests.pytest_plugin']
@@ -154,3 +156,7 @@ def selector_loop():
         asyncio.set_event_loop(_loop)
         yield _loop
 
+
+@pytest.fixture
+def aiomisc_unused_port() -> int:
+    return get_unused_port()
