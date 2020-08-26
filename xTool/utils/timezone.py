@@ -203,3 +203,10 @@ def utc_datetime(*args, **kwargs):
         kwargs['tzinfo'] = TIMEZONE_UTC
 
     return dt.datetime(*args, **kwargs)
+
+
+def now(timezone=None):
+    """根据时区获得当前时间 ."""
+    if not timezone:
+        return dt.datetime.now()
+    return dt.datetime.now(timezone)

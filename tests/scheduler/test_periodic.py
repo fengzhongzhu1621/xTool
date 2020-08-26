@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 
-from xTool.periodic import PeriodicCallback
+from xTool.scheduler.periodic import PeriodicCallback
 
 
 async def test_periodic(loop):
