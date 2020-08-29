@@ -83,7 +83,7 @@ class MemoryTracer(Service):
                 "size_diff": self.humanize(stat.size_diff),
                 "traceback": stat.traceback,
             }
-        print(results)
+
         self.logger("Top memory usage:\n%s", results)
 
     @threaded

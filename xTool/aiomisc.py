@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import logging
 from math import ceil
 from functools import wraps
 import asyncio
@@ -18,13 +17,16 @@ from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import cpu_count
 from contextlib import suppress
 from functools import partial
-from xTool.compat import PY_37
+import logging
+
 try:
     import uvloop
     event_loop_policy = uvloop.EventLoopPolicy()
 except ImportError:
     event_loop_policy = asyncio.DefaultEventLoopPolicy()
 
+
+log = logging.getLogger(__name__)
 
 T = TypeVar('T')
 OptionsType = Iterable[Tuple[int, int, int]]
@@ -116,7 +118,7 @@ def get_running_loop(
         warnings.warn("The object should be created from async function",
                       DeprecationWarning, stacklevel=3)
         if loop.get_debug():
-            logging.warning(
+            log.warning(
                 "The object should be created from async function",
                 stack_info=True)
     return loop
@@ -240,7 +242,7 @@ def cancel_tasks(tasks: Iterable[asyncio.Future]) -> asyncio.Future:
             # 将future标为执行完成，并设置Exception
             task.set_exception(exc)
         else:
-            logging.warning(
+            log.warning(
                 "Skipping object %r because it's not a Task or Future", task,
             )
 
