@@ -10,12 +10,15 @@ from typing import (  # noqa
     Optional,
     Iterable,
     Tuple,
+    TypeVar,
+    Callable,
 )
 import warnings
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import cpu_count
 from contextlib import suppress
-
+from functools import partial
+from xTool.compat import PY_37
 try:
     import uvloop
     event_loop_policy = uvloop.EventLoopPolicy()
@@ -23,7 +26,44 @@ except ImportError:
     event_loop_policy = asyncio.DefaultEventLoopPolicy()
 
 
+T = TypeVar('T')
 OptionsType = Iterable[Tuple[int, int, int]]
+F = TypeVar('F', bound=Callable[..., Any])
+
+
+try:
+    import contextvars
+
+    def context_partial(func: F, *args: Any, **kwargs: Any) -> Any:
+        context = contextvars.copy_context()
+        return partial(context.run, func, *args, **kwargs)
+
+except ImportError:
+    context_partial = partial
+
+
+try:
+    from trio import open_file as open_async, Path  # type: ignore
+
+    def stat_async(path):
+        return Path(path).stat()
+except ImportError:
+
+    try:
+        from aiofiles import open as aio_open  # type: ignore
+        from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
+        async def open_async(file, mode="r", **kwargs):
+            return aio_open(file, mode, **kwargs)
+    except ImportError:
+        pass
+
+
+def create_task(loop, coro):
+    if PY_37:
+        func = loop.create_task
+    else:
+        func = asyncio.ensure_future
+    return func(coro)
 
 
 def uvloop_installed():
@@ -144,6 +184,17 @@ def awaitable(func):
         return awaiter(result)
 
     return wrap
+
+
+async def awaiter(future: asyncio.Future) -> T:
+    """等待future执行结束，返回执行结果 ."""
+    try:
+        result = await future
+        return result
+    except asyncio.CancelledError as e:
+        if not future.done():
+            future.set_exception(e)
+        raise
 
 
 def shield(func):

@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import asyncio
 import random
 import re
 import string
 import sys
 import uuid
-import socket
 
 import pytest
-
-from xTool.apps.sanic import Sanic
-from xTool.routers.router import RouteExists, Router
-from xTool.tests.testing import loop_context
-from xTool.servers.helpers import get_unused_port
-
 
 # pytest_plugins = ['xTool.tests.pytest_plugin']
 
@@ -23,18 +15,6 @@ random.seed("Pack my box with five dozen liquor jugs.")
 
 if sys.platform in ["win32", "cygwin"]:
     collect_ignore = ["test_worker.py"]
-
-
-async def _handler(request):
-    """
-    Dummy placeholder method used for route resolver when creating a new
-    route into the sanic router. This router is not actually called by the
-    sanic app. So do not worry about the arguments to this method.
-
-    If you change the return value of this method, make sure to propagate the
-    change to any test case that leverages RouteStringGenerator.
-    """
-    return 1
 
 
 TYPE_TO_GENERATOR_MAP = {
@@ -104,59 +84,17 @@ class RouteStringGenerator:
 
 
 @pytest.fixture(scope="function")
-def sanic_router():
-    # noinspection PyProtectedMember
-    def _setup(route_details: tuple) -> (Router, tuple):
-        router = Router()
-        added_router = []
-        for method, route in route_details:
-            try:
-                router._add(
-                    uri=f"/{route}",
-                    methods=frozenset({method}),
-                    host="localhost",
-                    handler=_handler,
-                )
-                added_router.append((method, route))
-            except RouteExists:
-                pass
-        return router, added_router
-
-    return _setup
-
-
-@pytest.fixture(scope="function")
-def route_generator() -> RouteStringGenerator:
-    return RouteStringGenerator()
-
-
-@pytest.fixture(scope="function")
 def url_param_generator():
     return TYPE_TO_GENERATOR_MAP
 
 
 @pytest.fixture
 def app(request):
+    from xTool.apps.sanic import Sanic
     return Sanic(request.node.name)
 
 
 @pytest.fixture
-def selector_loop():
-    if sys.version_info < (3, 7):
-        policy = asyncio.get_event_loop_policy()
-        policy._loop_factory = asyncio.SelectorEventLoop  # type: ignore
-    else:
-        if sys.version_info >= (3, 8):
-            policy = asyncio.WindowsSelectorEventLoopPolicy()  # type: ignore
-        else:
-            policy = asyncio.DefaultEventLoopPolicy()
-        asyncio.set_event_loop_policy(policy)
-
-    with loop_context(policy.new_event_loop) as _loop:
-        asyncio.set_event_loop(_loop)
-        yield _loop
-
-
-@pytest.fixture
-def aiomisc_unused_port() -> int:
+def aiomisc_unused_port():
+    from xTool.servers.helpers import get_unused_port
     return get_unused_port()

@@ -51,6 +51,13 @@ except NameError:
         return hasattr(object, '__call__')
 
 
+if PY3:
+    try:
+        from queue import SimpleQueue
+    except ImportError:
+        from queue import Queue as SimpleQueue  # type: ignore
+
+
 # Python 3.x (and backports) use a modified iterator syntax
 # This will allow 2.x to behave with 3.x iterators
 if not hasattr(__builtins__, 'next'):
@@ -263,12 +270,4 @@ try:
     def stat_async(path):
         return Path(path).stat()
 except ImportError:
-
-    try:
-        from aiofiles import open as aio_open  # type: ignore
-        from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
-
-        async def open_async(file, mode="r", **kwargs):
-            return aio_open(file, mode, **kwargs)
-    except ImportError:
-        pass
+    pass

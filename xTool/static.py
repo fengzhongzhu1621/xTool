@@ -6,7 +6,7 @@ from re import sub
 from time import gmtime, strftime
 from urllib.parse import unquote
 
-from xTool.compat import stat_async
+from xTool.aiomisc import stat_async
 from xTool.exceptions import (
     ContentRangeError,
     FileNotFound,
