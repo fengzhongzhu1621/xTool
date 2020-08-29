@@ -58,14 +58,6 @@ except ImportError:
         pass
 
 
-def create_task(loop, coro):
-    if PY_37:
-        func = loop.create_task
-    else:
-        func = asyncio.ensure_future
-    return func(coro)
-
-
 def uvloop_installed():
     try:
         import uvloop  # noqa
