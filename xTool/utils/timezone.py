@@ -181,32 +181,25 @@ def system_now():
     Get the current date and time in UTC
     :return:
     """
-
-    # pendulum utcnow() is not used as that sets a TimezoneInfo object
-    # instead of a Timezone. This is not pickable and also creates issues
-    # when using replace()
     d = dt.datetime.now()
     d = d.replace(tzinfo=TIMEZONE_SYSTEM)
-
     return d
 
 
 def system_datetime(*args, **kwargs):
     if 'tzinfo' not in kwargs:
         kwargs['tzinfo'] = TIMEZONE_SYSTEM
-
     return dt.datetime(*args, **kwargs)
 
 
 def utc_datetime(*args, **kwargs):
     if 'tzinfo' not in kwargs:
         kwargs['tzinfo'] = TIMEZONE_UTC
-
     return dt.datetime(*args, **kwargs)
 
 
 def now(timezone=None):
     """根据时区获得当前时间 ."""
     if not timezone:
-        return dt.datetime.now()
+        return system_now()
     return dt.datetime.now(timezone)
