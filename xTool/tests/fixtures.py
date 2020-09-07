@@ -6,6 +6,7 @@ import uuid
 import time
 import subprocess
 import shlex
+from contextlib import contextmanager
 
 import pytest
 
@@ -68,3 +69,24 @@ def gunicorn_worker_with_env_var():
     worker = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
     time.sleep(2)
     return worker
+
+
+@pytest.fixture
+def timer():
+    @contextmanager
+    def timer(expected_time=0, *, dispersion=0.5):
+        expected_time = float(expected_time)
+        dispersion_value = expected_time * dispersion
+
+        now = time.monotonic()
+
+        yield
+
+        delta = time.monotonic() - now
+
+        lower_bound = expected_time - dispersion_value
+        upper_bound = expected_time + dispersion_value
+
+        assert lower_bound < delta < upper_bound
+
+    return timer

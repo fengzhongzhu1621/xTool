@@ -7,6 +7,7 @@ import sys
 import uuid
 
 import pytest
+from xTool.tests.fixtures import timer
 
 # pytest_plugins = ['xTool.tests.pytest_plugin']
 
