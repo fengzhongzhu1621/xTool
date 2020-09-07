@@ -150,7 +150,8 @@ install_requires.extend([
 ])
 
 
-ext_modules = []
+ext_modules = [Extension('xTool/decorators._helpers',
+                        ['xTool/decorators/_helpers.c']),]
 
 
 def do_setup():
