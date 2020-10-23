@@ -2,7 +2,13 @@
 
 import importlib
 import socket
-from urllib.parse import unquote
+from xTool.compat import PY3
+if PY3:
+    from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
+    from urllib.parse import unquote
+else:
+    from urllib import urlencode, unquote
+    from urlparse import urlparse, urlunparse, parse_qsl
 
 
 def get_hostname(callable_path=None):
@@ -48,3 +54,41 @@ def ip2int(ip):
     seg0, seg1, seg2, seg3 = (int(seg) for seg in ip.split('.'))
     res = (16777216 * seg0) + (65536 * seg1) + (256 * seg2) + seg3
     return res
+
+
+def url_concat(url, args):
+    """Concatenate url and arguments regardless of whether
+    url has existing query parameters.
+
+    ``args`` may be either a dictionary or a list of key-value pairs
+    (the latter allows for multiple values with the same key.
+
+    >>> url_concat("http://example.com/foo", dict(c="d"))
+    'http://example.com/foo?c=d'
+    >>> url_concat("http://example.com/foo?a=b", dict(c="d"))
+    'http://example.com/foo?a=b&c=d'
+    >>> url_concat("http://example.com/foo?a=b", [("c", "d"), ("c", "d2")])
+    'http://example.com/foo?a=b&c=d&c=d2'
+    """
+    if args is None:
+        return url
+    parsed_url = urlparse(url)
+    if isinstance(args, dict):
+        parsed_query = parse_qsl(parsed_url.query, keep_blank_values=True)
+        parsed_query.extend(args.items())
+    elif isinstance(args, list) or isinstance(args, tuple):
+        parsed_query = parse_qsl(parsed_url.query, keep_blank_values=True)
+        parsed_query.extend(args)
+    else:
+        err = "'args' parameter should be dict, list or tuple. Not {0}".format(
+            type(args))
+        raise TypeError(err)
+    final_query = urlencode(parsed_query)
+    url = urlunparse((
+        parsed_url[0],
+        parsed_url[1],
+        parsed_url[2],
+        parsed_url[3],
+        final_query,
+        parsed_url[5]))
+    return url

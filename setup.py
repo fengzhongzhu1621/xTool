@@ -144,14 +144,16 @@ if os.path.exists("requirements.txt"):
             except ValueError as e:
                 pass
 
-
 install_requires.extend([
 
 ])
 
 
-ext_modules = [Extension('xTool/decorators._helpers',
-                        ['xTool/decorators/_helpers.c']),]
+if PY3:
+    ext_modules = [Extension('xTool/decorators._helpers',
+                             ['xTool/decorators/_helpers.c']), ]
+else:
+    ext_modules = []
 
 
 def do_setup():

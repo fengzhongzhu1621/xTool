@@ -74,7 +74,7 @@ def gunicorn_worker_with_env_var():
 @pytest.fixture
 def timer():
     @contextmanager
-    def timer(expected_time=0, *, dispersion=0.5):
+    def timer(expected_time=0, dispersion=0.5):
         expected_time = float(expected_time)
         dispersion_value = expected_time * dispersion
 
