@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
 try:
+    from collections import UserDict
+except ImportError:
+    pass
+
+
+try:
     import typing  # noqa
     _ObjectDictBase = typing.Dict[str, typing.Any]
 except ImportError:
@@ -41,3 +47,39 @@ class ObjectDict(_ObjectDictBase):
     def __setattr__(self, name, value):
         # type: (str, Any) -> None
         self[name] = value
+
+
+class Row(dict):
+
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
+
+
+class FancyDict(dict):
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError as k:
+            raise AttributeError(k)
+
+    def __setattr__(self, key, value):
+        self[key] = value
+
+    def __delattr__(self, key):
+        try:
+            del self[key]
+        except KeyError as k:
+            raise AttributeError(k)
+
+
+class StripDict(UserDict):
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            key = key.strip()
+        value = super().__getitem__(key)
+        if value and isinstance(value, str):
+            value = str(value).strip()
+        return value
