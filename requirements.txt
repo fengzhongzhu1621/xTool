@@ -21,3 +21,9 @@ trio
 cython
 ipaddress
 beautifulsoup4
+aiohttp
+async_timeout
+pytest
+pytest-sanic
+
+httpx==0.11.1
