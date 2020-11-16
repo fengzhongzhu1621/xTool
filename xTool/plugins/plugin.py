@@ -60,9 +60,11 @@ class Plugin:
         self._cls = cls
         self.name = plugin_name
         self.type = plugin_type
+        self.args = args
+        self.kwargs = kwargs
 
     def create_instance(self):
-        return self._cls()
+        return self._cls(*self.args, **self.kwargs)
 
 
 class PluginMeta(type):
