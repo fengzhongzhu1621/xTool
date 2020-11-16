@@ -6,6 +6,7 @@ from enum import IntEnum, unique
 
 @unique
 class PluginType(IntEnum):
+    # 单元测试
     UNITTEST = 1
 
     # 默认类型
@@ -27,8 +28,8 @@ class PluginManager:
 
     def __init__(self):
         # 线程安全
-        self._plugins = {}
-        self._plugin_instances = {}
+        self._plugins = {}          # 存放所有的插件
+        self._plugin_instances = {}   # 存放所有的插件实例化对象
 
     def add_plugin(self, plugin_type, plugin_name, plugin_class):
         self._plugins.setdefault(plugin_type, {})[plugin_name] = plugin_class
@@ -37,17 +38,25 @@ class PluginManager:
         return self._plugins.get(plugin_type, {}).get(plugin_name)
 
     def add_plugin_instance(self, plugin_type, plugin_name, plugin_instance):
-        self._plugin_instances.setdefault(plugin_type, {})[plugin_name] = plugin_instance
+        self._plugin_instances.setdefault(
+            plugin_type, {})[plugin_name] = plugin_instance
 
     def get_plugin_instance(self, plugin_type, plugin_name):
         return self._plugin_instances.get(plugin_type, {}).get(plugin_name)
+
+    def clear_plugin_instances(self):
+        self._plugin_instances = {}
+
+    def destroy_plugins(self):
+        self._plugins = {}
+        self._plugin_instances = {}
 
 
 DefaultPluginManager = PluginManager()
 
 
 class Plugin:
-    def __init__(self, cls, plugin_type, plugin_name):
+    def __init__(self, cls, plugin_type, plugin_name, *args, **kwargs):
         self._cls = cls
         self.name = plugin_name
         self.type = plugin_type
@@ -57,6 +66,7 @@ class Plugin:
 
 
 class PluginMeta(type):
+    """插件元类 ."""
     def __new__(cls, name, bases, attrs):
         super_new = super().__new__
         parents = [b for b in bases if isinstance(b, PluginMeta)]
@@ -100,7 +110,8 @@ def register_plugin(plugin_type, plugin_name=None):
 def get_plugin_instance(plugin_type, plugin_name):
     """懒加载的方式获得插件，如果没有则创建，是一个单例模式 ."""
     # 从缓存中获取插件实例
-    plugin_instance = DefaultPluginManager.get_plugin_instance(plugin_type, plugin_name)
+    plugin_instance = DefaultPluginManager.get_plugin_instance(
+        plugin_type, plugin_name)
     if not plugin_instance:
         # 从缓存中获取插件类
         plugin = DefaultPluginManager.get_plugin(plugin_type, plugin_name)
@@ -109,8 +120,14 @@ def get_plugin_instance(plugin_type, plugin_name):
         # 创建插件实例
         plugin_instance = plugin.create_instance()
         # 缓存插件实例
-        DefaultPluginManager.add_plugin_instance(plugin_type, plugin_name, plugin_instance)
+        DefaultPluginManager.add_plugin_instance(
+            plugin_type, plugin_name, plugin_instance)
     return plugin_instance
+
+
+def reload_global_plugin_manager():
+    global DefaultPluginManager
+    DefaultPluginManager.clear_plugin_instances()
 
 
 class PluginRegister(metaclass=PluginMeta):
