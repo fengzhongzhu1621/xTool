@@ -83,3 +83,25 @@ class StripDict(UserDict):
         if value and isinstance(value, str):
             value = str(value).strip()
         return value
+
+
+# based on http://stackoverflow.com/a/2082169/151401
+class CaseInsensitiveDict(dict):
+    """ A case-insensitive dictionary for header storage.
+        A limitation of this approach is the inability to store
+        multiple instances of the same header. If that is changed
+        then we suddenly care about the assembly rules in sec 2.3.
+    """
+    def __init__(self, d=None, **kwargs):
+        super(CaseInsensitiveDict, self).__init__(**kwargs)
+        if d:
+            self.update((k.lower(), v) for k, v in six.iteritems(d))
+
+    def __setitem__(self, key, value):
+        super(CaseInsensitiveDict, self).__setitem__(key.lower(), value)
+
+    def __getitem__(self, key):
+        return super(CaseInsensitiveDict, self).__getitem__(key.lower())
+
+    def __contains__(self, key):
+        return super(CaseInsensitiveDict, self).__contains__(key.lower())
