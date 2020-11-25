@@ -31,8 +31,10 @@ class EventResultOrError:
         self._event.set()
 
     async def wait(self) -> Any:
+        # 创建等待任务
         # 当Event对象的内部信号标志为假时，则wait方法一直等到其为真时才返回
         waiter = self._loop.create_task(self._event.wait())
+        # 等待队列
         self._waiters.append(waiter)
         try:
             # 等待Event对象的内部信号标志为True

@@ -28,8 +28,8 @@ class PluginManager:
 
     def __init__(self):
         # 线程安全
-        self._plugins = {}          # 存放所有的插件
-        self._plugin_instances = {}   # 存放所有的插件实例化对象
+        self._plugins = {}              # 存放所有的插件
+        self._plugin_instances = {}     # 存放所有的插件实例化对象，一个插件只有一个实例化对象
 
     def add_plugin(self, plugin_type, plugin_name, plugin_class):
         self._plugins.setdefault(plugin_type, {})[plugin_name] = plugin_class
