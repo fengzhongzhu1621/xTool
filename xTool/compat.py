@@ -34,6 +34,12 @@ except ImportError:
             pass
 
 try:
+    import pwd
+    import grp
+except ImportError:
+    pwd = grp = None
+
+try:
     from collections.abc import Mapping
 except ImportError:
     from collections import Mapping
@@ -75,6 +81,22 @@ if not hasattr(__builtins__, 'any'):
             if item:
                 return True
         return False
+
+
+# Random numbers for rotation temp file names, using secrets module if available (Python 3.6).
+# Otherwise use `random.SystemRandom` if available, then fall back on `random.Random`.
+try:
+    # noinspection PyPackageRequirements,PyCompatibility
+    from secrets import randbits
+except ImportError:
+    import random
+
+    if hasattr(random, "SystemRandom"):  # May not be present in all Python editions
+        # Should be safe to reuse `SystemRandom` - not software state dependant
+        randbits = random.SystemRandom().getrandbits
+    else:
+        def randbits(nb):
+            return random.Random().getrandbits(nb)
 
 
 # inspect.getargspec() raises DeprecationWarnings in Python 3.5.
