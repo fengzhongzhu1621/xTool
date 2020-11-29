@@ -65,10 +65,8 @@ def fix_logging_module():
         def fork_safe_createLock(self):
             self._orig_createLock()
             # 在os.fork()子进程中需要release
-            print("atfork begin")
             atfork(self.lock.acquire,
                    self.lock.release, self.lock.release)
-            print("atfork end")
         # Fix the logging.Handler lock (a major source of deadlocks).
         logging.Handler._orig_createLock = logging.Handler.createLock
         logging.Handler.createLock = fork_safe_createLock

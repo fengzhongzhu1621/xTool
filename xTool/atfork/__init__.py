@@ -206,3 +206,15 @@ def os_forkpty_wrapper():
     return pid, fd
 
 # TODO: Also replace os.fork1() on Solaris.
+
+
+def call_prepare_to_fork():
+    _call_atfork_list(_prepare_call_list)
+
+
+def call_parent_after_fork():
+    _call_atfork_list(_parent_call_list)
+
+
+def call_child_after_fork():
+    _call_atfork_list(_child_call_list)
