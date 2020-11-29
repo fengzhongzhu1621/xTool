@@ -2,7 +2,13 @@
 
 import socket
 
-from xTool.utils.net import get_hostname, int2ip, ip2int, url_concat
+from xTool.utils.net import (
+    get_hostname,
+    int2ip,
+    ip2int,
+    url_concat,
+    is_ip_v4,
+    is_ip_v6)
 
 
 def test_get_hostname():
@@ -20,6 +26,22 @@ def test_int2ip():
 
 
 def test_url_concat():
-    assert url_concat("http://example.com/foo", dict(c="d")) == 'http://example.com/foo?c=d'
-    assert url_concat("http://example.com/foo?a=b", dict(c="d")) == 'http://example.com/foo?a=b&c=d'
-    assert url_concat("http://example.com/foo?a=b", [("c", "d"), ("c", "d2")]) == 'http://example.com/foo?a=b&c=d&c=d2'
+    assert url_concat("http://example.com/foo",
+                      dict(c="d")) == 'http://example.com/foo?c=d'
+    assert url_concat("http://example.com/foo?a=b",
+                      dict(c="d")) == 'http://example.com/foo?a=b&c=d'
+    assert url_concat("http://example.com/foo?a=b",
+                      [("c", "d"), ("c", "d2")]) == 'http://example.com/foo?a=b&c=d&c=d2'
+
+
+def test_is_ip_v4():
+    assert is_ip_v4("1.1.1.1")
+    assert not is_ip_v4("1.1.1.1.1")
+    assert not is_ip_v4("1.1.1.1/24")
+
+
+def test_is_ip_v6():
+    assert not is_ip_v6("1.1.1.1")
+    assert not is_ip_v6("1.1.1.1.1")
+    assert not is_ip_v6("1.1.1.1/24")
+    assert is_ip_v6("2001:db8::1")

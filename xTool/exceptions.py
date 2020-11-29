@@ -317,6 +317,10 @@ class PoolNotFound(XToolNotFoundException):
     pass
 
 
+class PortInvalidError(XToolException):
+    pass
+
+
 class XToolTimeoutError(AssertionError):
 
     """Thrown when a timeout occurs in the `timeout` context manager."""

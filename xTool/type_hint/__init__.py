@@ -15,6 +15,7 @@ from typing import (  # noqa
 T = TypeVar('T')
 OptionsType = Iterable[Tuple[int, int, int]]
 F = TypeVar('F', bound=Callable[..., Any])
+IP_ADDRESS = Tuple[str, int]
 
 
 def get_class_object_init_type(class_obj: object, name: str) -> type:

@@ -2,11 +2,13 @@
 
 import importlib
 import socket
+import ipaddress
 
 import netifaces
 
 from xTool.compat import urlencode, urlparse, urlunparse, parse_qsl, unquote
 from xTool.misc import tob
+from xTool.exceptions import PortInvalidError
 
 
 def get_hostname(callable_path=None):
@@ -144,3 +146,76 @@ def join_host_port(host: str, port: int) -> str:
     else:
         # IPV4
         return host + ':' + str(port)
+
+
+def is_port_valid(port: int):
+    if 0 <= int(port) <= 65535:
+        return True
+    else:
+        return False
+
+
+def is_unix_socket(port: int):
+    if int(port) == 0:
+        return True
+    else:
+        return False
+
+
+def is_ip_v4(ip: str):
+    try:
+        addr4 = ipaddress.ip_address(ip)
+    except ValueError:
+        return False
+    return addr4.version == 4
+
+
+def is_ip_v6(ip: str):
+    try:
+        addr6 = ipaddress.ip_address(ip)
+    except ValueError:
+        return False
+    return addr6.version == 6
+
+
+def new_socket(ip: str, is_tcp: bool = True):
+    sock = None
+    if is_ip_v4(ip):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
+    elif is_ip_v6(ip):
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
+    return sock
+
+
+def is_tcp_port_open(ip, port):
+    """判断端口是否占用 ."""
+    sock = None
+    try:
+        if not is_port_valid():
+            raise PortInvalidError("端口%s无效" % ip)
+        sock = new_socket(ip, is_tcp=True)
+        # 出错时返回出错码,而不是抛出异常
+        result = sock.connect_ex((ip, port))
+        if result == 0:
+            # 地址可以访问，说明端口已经被占用
+            return False
+        return True
+    finally:
+        if sock:
+            sock.close()
+
+
+def is_udp_port_open(ip, port):
+    """判断端口是否占用 ."""
+    sock = None
+    try:
+        if not is_port_valid():
+            raise PortInvalidError("端口%s无效" % ip)
+        sock = new_socket(ip, is_tcp=False)
+        sock.bind((ip, port))
+        return True
+    except Exception as exc_info:  # pylint: disable=broad-except
+        return False
+    finally:
+        if sock:
+            sock.close()
