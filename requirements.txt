@@ -25,6 +25,7 @@ aiohttp
 async_timeout
 pytest
 pytest-sanic
-pyatfork
+netifaces
+
 # 用于sanic指定版本
 httpx==0.11.1

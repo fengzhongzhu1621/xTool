@@ -103,8 +103,12 @@ except ImportError:
 # The two functions have compatible interfaces for the parts we need.
 if PY3:
     from inspect import getfullargspec as getargspec
+    from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
+    from urllib.parse import unquote
 else:
     from inspect import getargspec
+    from urllib import urlencode, unquote
+    from urlparse import urlparse, urlunparse, parse_qsl
 
 
 b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode('latin1'))

@@ -2,13 +2,11 @@
 
 import importlib
 import socket
-from xTool.compat import PY3
-if PY3:
-    from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
-    from urllib.parse import unquote
-else:
-    from urllib import urlencode, unquote
-    from urlparse import urlparse, urlunparse, parse_qsl
+
+import netifaces
+
+from xTool.compat import urlencode, urlparse, urlunparse, parse_qsl, unquote
+from xTool.misc import tob
 
 
 def get_hostname(callable_path=None):
@@ -21,9 +19,9 @@ def get_hostname(callable_path=None):
     # 加载指定模块，获得模块定义的主机属性名
     module_path, attr_name = callable_path.split(':')
     module = importlib.import_module(module_path)
-    callable = getattr(module, attr_name)
+    func = getattr(module, attr_name)
     # 执行属性方法返回结果
-    return callable()
+    return func()
 
 
 def parse_netloc_to_hostname(uri_parts):
@@ -92,3 +90,47 @@ def url_concat(url, args):
         final_query,
         parsed_url[5]))
     return url
+
+
+def get_local_host_ip(ifname=b'eth1', ip: str = None, port: int = None):
+    """获得本机的IP地址 ."""
+    import platform
+    import socket
+    if not ifname and ip and port:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect((ip, port))
+            return s.getsockname()[0]
+        finally:
+            s.close()
+    if platform.system() == 'Linux':
+        import fcntl
+        import struct
+        ifname = tob(ifname)
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            o_ip = socket.inet_ntoa(fcntl.ioctl(
+                s.fileno(),
+                0x8915,
+                struct.pack('256s', ifname[:15])
+            )[20:24])
+        finally:
+            s.close()
+    else:
+        o_ip = socket.gethostbyname(socket.gethostname())
+    return o_ip
+
+
+def find_internal_ip_on_device_network(dev_net: str):
+    if not dev_net:
+        return ""
+    if dev_net not in netifaces.interfaces():
+        return ""
+    ip_address = ""
+    nic_addrs = netifaces.ifaddresses(dev_net)
+    if netifaces.AF_INET in nic_addrs:
+        ip_address = nic_addrs[netifaces.AF_INET][0]['addr']
+    elif netifaces.AF_INET6 in nic_addrs:
+        ip_address = nic_addrs[netifaces.AF_INET6][0]['addr']
+
+    return ip_address

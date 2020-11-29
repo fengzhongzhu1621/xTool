@@ -102,7 +102,7 @@ def get_cur_info(number=1):
     return (frame.f_code.co_name, frame.f_lineno)
 
 
-def runCommand(command):
+def run_command(command):
     print(command)
     proc = subprocess.Popen(command,
                             shell=True,
@@ -118,44 +118,15 @@ def runCommand(command):
     assert not proc.returncode
 
 
-def getRunCommandResult(command):
+def get_run_command_result(command):
     proc = subprocess.Popen(command,
                             shell=True,
                             close_fds=False if USE_WINDOWS else False,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE
                             )
-    (stdoutdata, stderrdata) = proc.communicate()
-    return (proc.returncode, stdoutdata, stderrdata)
-
-
-def get_local_host_ip(ifname=b'eth1', ip: str = None, port: int = None):
-    """获得本机的IP地址 ."""
-    import platform
-    import socket
-    if not ifname and ip and port:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect((ip, port))
-            return s.getsockname()[0]
-        finally:
-            s.close()
-    if platform.system() == 'Linux':
-        import fcntl
-        import struct
-        ifname = tob(ifname)
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            o_ip = socket.inet_ntoa(fcntl.ioctl(
-                s.fileno(),
-                0x8915,
-                struct.pack('256s', ifname[:15])
-            )[20:24])
-        finally:
-            s.close()
-    else:
-        o_ip = socket.gethostbyname(socket.gethostname())
-    return o_ip
+    stdout_data, stderr_data = proc.communicate()
+    return proc.returncode, stdout_data, stderr_data
 
 
 def json_ser(obj):
@@ -192,41 +163,7 @@ class NumpyJsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def listData(rows, key, value):
-    """
-        将两个字段转换为词典格式
-    """
-    result = {}
-    for row in rows:
-        result[row[key]] = row[value]
-    return result
-
-
-def getFileLines(path):
-    """
-        获得文件行数
-    """
-    (returncode, stdoutdata, stderrdata) = getRunCommandResult("wc -l %s" % path)
-    if returncode == 0 and stdoutdata:
-        return int(stdoutdata.split(' ')[0])
-    return 0
-
-
-def getDirLines(path, pattern=None):
-    """
-        获得目录下文件名符合pattern规则的文件行数
-    """
-    import fnmatch
-    lines = 0
-    for dirpath, dirnames, filenames in os.walk(path):
-        for file_name in filenames:
-            full_path = os.path.join(dirpath, file_name)
-            if not pattern or fnmatch.fnmatch(file_name, pattern):
-                lines += getFileLines(full_path)
-    return lines
-
-
-def isMemoryAvailable(limit=80):
+def is_memory_available(limit=80):
     """检查内存空间是否可用 """
     virtualMemory = psutil.virtual_memory()
     percent = virtualMemory.percent
@@ -235,48 +172,13 @@ def isMemoryAvailable(limit=80):
     return True
 
 
-def isDiskAvailable(dirname, limit=80):
+def is_disk_available(dirname, limit=80):
     """检查磁盘空间是否可用 """
     diskUsage = psutil.disk_usage(dirname)
     percent = diskUsage.percent
     if percent > limit:
         return False
     return True
-
-
-def format_row(row):
-    """日志行按空白字符分隔 """
-    lines = re.split(r"\s", row.strip())
-    return [i for i in lines if i]
-
-
-def get_col_count(row):
-    """获得文本列数 """
-    return len(format_row(row))
-
-
-def get_file_rowcol_count(filePath):
-    """ 获得文件行数和列数
-        - 忽略空行
-        - 根据第一行识别列数
-    """
-    row = 0
-    col = 0
-    with open(filePath, 'r') as fb:
-        for line in fb:
-            line = line.strip()
-            if line:
-                row += 1
-                # 根据第一行识别列数
-                if row == 1:
-                    col = get_col_count(line)
-    return (row, col)
-
-
-def get_file_row(filePath):
-    """获得文件行数 ."""
-    with open(filePath, 'r') as rFb:
-        return sum(1 for row in rFb if row.strip())
 
 
 def grouper(n, iterable, padvalue=None):

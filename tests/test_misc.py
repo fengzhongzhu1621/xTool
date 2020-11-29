@@ -29,74 +29,28 @@ def test_get_cur_info():
     assert value[0] == actual[0]
 
 
-def test_runCommand():
-    misc.runCommand("echo 1")
+def test_run_command():
+    misc.run_command("echo 1")
 
 
-def test_getRunCommandResult():
-    actual = misc.getRunCommandResult("echo 1")
+def test_get_run_command_result():
+    actual = misc.get_run_command_result("echo 1")
     expect = (0, b'1' + misc.tob(os.linesep), b'')
     assert actual == expect
 
 
-def test_listData():
-    rows = [{
-        'key': 'abc',
-        'value': 'def',
-    }]
-    key = 'key'
-    value = 'value'
-    actual = misc.listData(rows, key, value)
-    expect = {u'abc': u'def'}
-    assert expect == actual
-
-
-def test_isMemoryAvailable():
-    actual = misc.isMemoryAvailable(limit=1)
+def test_is_memory_available():
+    actual = misc.is_memory_available(limit=1)
     assert actual is False
-    actual = misc.isMemoryAvailable(limit=100)
+    actual = misc.is_memory_available(limit=100)
     assert actual is True
 
 
-def test_isDiskAvailable():
-    actual = misc.isDiskAvailable(".", limit=1)
+def test_is_disk_available():
+    actual = misc.is_disk_available(".", limit=1)
     assert actual is False
-    actual = misc.isDiskAvailable(".", limit=100)
+    actual = misc.is_disk_available(".", limit=100)
     assert actual is True
-
-
-def test_format_row():
-    row = " a  b \t c "
-    actual = misc.format_row(row)
-    expect = ['a', 'b', 'c']
-    assert actual == expect
-    row = ""
-    actual = misc.format_row(row)
-    assert actual == []
-
-
-def test_get_col_count():
-    row = " a  b \t c "
-    actual = misc.get_col_count(row)
-    assert actual == 3
-    row = ""
-    actual = misc.get_col_count(row)
-    assert actual == 0
-
-
-def test_get_file_rowcol_count():
-    dirname = os.path.dirname(__name__)
-    filePath = os.path.abspath(os.path.join(dirname, "tests/data/a.txt"))
-    (row, col) = misc.get_file_rowcol_count(filePath)
-    assert row == 2
-    assert col == 3
-
-
-def test_get_file_row():
-    dirname = os.path.dirname(__name__)
-    filePath = os.path.abspath(os.path.join(dirname, "tests/data/a.txt"))
-    row = misc.get_file_row(filePath)
-    assert row == 2
 
 
 def test_grouper():
