@@ -27,5 +27,4 @@ pytest
 pytest-sanic
 netifaces
 
-# 用于sanic指定版本
 httpx==0.11.1

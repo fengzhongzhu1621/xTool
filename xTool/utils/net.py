@@ -127,10 +127,10 @@ def find_internal_ip_on_device_network(dev_net: str):
     if dev_net not in netifaces.interfaces():
         return ""
     ip_address = ""
-    nic_addrs = netifaces.ifaddresses(dev_net)
-    if netifaces.AF_INET in nic_addrs:
-        ip_address = nic_addrs[netifaces.AF_INET][0]['addr']
-    elif netifaces.AF_INET6 in nic_addrs:
-        ip_address = nic_addrs[netifaces.AF_INET6][0]['addr']
+    net_address = netifaces.ifaddresses(dev_net)
+    if netifaces.AF_INET in net_address:
+        ip_address = net_address[netifaces.AF_INET][0]['addr']
+    elif netifaces.AF_INET6 in net_address:
+        ip_address = net_address[netifaces.AF_INET6][0]['addr']
 
     return ip_address
