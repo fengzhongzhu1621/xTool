@@ -126,11 +126,21 @@ def find_internal_ip_on_device_network(dev_net: str):
         return ""
     if dev_net not in netifaces.interfaces():
         return ""
-    ip_address = ""
+
     net_address = netifaces.ifaddresses(dev_net)
     if netifaces.AF_INET in net_address:
         ip_address = net_address[netifaces.AF_INET][0]['addr']
     elif netifaces.AF_INET6 in net_address:
         ip_address = net_address[netifaces.AF_INET6][0]['addr']
-
+    else:
+        ip_address = ""
     return ip_address
+
+
+def join_host_port(host: str, port: int) -> str:
+    if ":" in host:
+        # IPV6：带有端口号的IPV6地址字符串形式，地址部分应用"[]"括起来，在后面跟着":"带上端口号
+        return '[' + host + ']:' + str(port)
+    else:
+        # IPV4
+        return host + ':' + str(port)
