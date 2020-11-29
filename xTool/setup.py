@@ -46,6 +46,18 @@ else:
     def cythonize(obj): return obj
 
 
+def add_pywin32_to_install_requires():
+    if "windows" in sys.platform.lower():
+        install_requires = []
+        try:
+            import win32file
+        except ImportError:
+            # Only require pywin32 if not already installed
+            # version 223 introduced ability to install from pip
+            install_requires.append("pywin32>=223")
+        return install_requires
+
+
 def _have_sqlite_extension_support():
     import shutil
     import tempfile
