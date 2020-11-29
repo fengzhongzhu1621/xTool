@@ -147,7 +147,6 @@ if not PY2:
         raise value
     implements_to_string = _identity
     xrange = range
-
 else:
     import __builtin__
     import itertools
