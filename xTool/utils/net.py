@@ -191,7 +191,7 @@ def new_socket(ip: str, is_tcp: bool = True):
     return sock
 
 
-def new_tcp_server_socket(ip: str, port: int, backlog=1500, reuse_port=False):
+def new_tcp_server_socket(ip: str, port: int, backlog=100, reuse_port=False):
     sock = new_socket(ip, is_tcp=True)
     # 用来控制是否开启Nagle算法，关闭Socket的缓冲,确保数据及时发送
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
