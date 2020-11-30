@@ -181,9 +181,34 @@ def is_ip_v6(ip: str):
 def new_socket(ip: str, is_tcp: bool = True):
     sock = None
     if is_ip_v4(ip):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
+        sock = socket.socket(
+            socket.AF_INET,
+            socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
     elif is_ip_v6(ip):
-        sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
+        sock = socket.socket(
+            socket.AF_INET6,
+            socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
+    return sock
+
+
+def new_tcp_socket(ip: str, port: int, backlog=1500, reuse_port=False):
+    sock = new_socket(ip, is_tcp=True)
+    # 用来控制是否开启Nagle算法，关闭Socket的缓冲,确保数据及时发送
+    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    # 一般来说，一个端口释放后会等待两分钟之后才能再被使用，SO_REUSEADDR是让端口释放后立即就可以被再次使用
+    # 用于对TCP套接字处于TIME_WAIT状态下的socket，才可以重复绑定使用
+    # server程序总是应该在调用bind()之前设置SO_REUSEADDR套接字选项。TCP，先调用close()的一方会进入TIME_WAIT状态
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    if reuse_port:
+        # 支持多个进程或者线程绑定到同一端口，提高服务器程序的吞吐性能
+        # 允许多个套接字 bind()/listen() 同一个TCP/UDP端口
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    sock.bind((ip, port))
+    # backlog参数指定队列中最多可容纳的等待接受的传入连接数
+    # 表示的是服务器拒绝(超过限制数量的)连接之前，操作系统可以挂起的最大连接数量。
+    # 也可以看作是"排队的数量"
+    sock.listen(backlog)
+    sock.setblocking(False)
     return sock
 
 

@@ -3,7 +3,7 @@
 from xTool.servers.executor_process import ExecutorProcess
 from xTool.servers.process.worker_process import WorkerProcess
 from xTool.servers.dispatcher_process import DispatcherProcess
-from xTool.servers.socket_pair_pipeline import SocketPairPipeline
+from xTool.servers.pipeline import SocketPairPipeline
 
 
 class ProcessManager:
