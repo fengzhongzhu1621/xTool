@@ -18,7 +18,6 @@ import random
 import warnings
 import itertools
 import hashlib
-from functools import reduce
 
 import numpy as np
 import psutil
@@ -266,12 +265,6 @@ def print_bin(data):
             dump_list.append(".")
 
     print("".join(dump_list))
-
-
-def ipv4_into_int(ip):
-    # 先把 192.168.1.13 变成16进制的 c0.a8.01.0d ，再去了“.”后转成10进制的 3232235789 即可。
-    # (((((192 * 256) + 168) * 256) + 1) * 256) + 13
-    return reduce(lambda x, y: (x << 8) + y, map(int, ip.split('.')))
 
 
 def strict_bool(s):

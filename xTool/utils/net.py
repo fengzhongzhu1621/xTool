@@ -6,7 +6,12 @@ import ipaddress
 
 import netifaces
 
-from xTool.compat import urlencode, urlparse, urlunparse, parse_qsl, unquote
+from xTool.compat import (
+    urlencode,
+    urlparse,
+    urlunparse,
+    parse_qsl,
+    unquote)
 from xTool.misc import tob
 from xTool.exceptions import PortInvalidError
 
@@ -40,20 +45,6 @@ def parse_netloc_to_hostname(uri_parts):
             hostname = hostname.split(":", 1)[0]
         hostname = unquote(hostname)
     return hostname
-
-
-def int2ip(ipnum):
-    seg1 = int(ipnum / 16777216) % 256
-    seg2 = int(ipnum / 65536) % 256
-    seg3 = int(ipnum / 256) % 256
-    seg4 = int(ipnum) % 256
-    return '{}.{}.{}.{}'.format(seg1, seg2, seg3, seg4)
-
-
-def ip2int(ip):
-    seg0, seg1, seg2, seg3 = (int(seg) for seg in ip.split('.'))
-    res = (16777216 * seg0) + (65536 * seg1) + (256 * seg2) + seg3
-    return res
 
 
 def url_concat(url, args):
@@ -244,3 +235,47 @@ def is_udp_port_open(ip, port):
     finally:
         if sock:
             sock.close()
+
+
+def ipv4_to_bytes(ip):
+    return socket.inet_pton(socket.AF_INET, ip)
+
+
+def bytes_to_ipv4(ip_bytes):
+    return socket.inet_ntop(socket.AF_INET, ip_bytes)
+
+
+def ipv6_to_bytes(ip):
+    return socket.inet_pton(socket.AF_INET6, ip)
+
+
+def bytes_to_ipv6(ip_bytes):
+    return socket.inet_ntop(socket.AF_INET6, ip_bytes)
+
+
+def int_2_ipv4(ipnum):
+    seg1 = int(ipnum / 16777216) % 256
+    seg2 = int(ipnum / 65536) % 256
+    seg3 = int(ipnum / 256) % 256
+    seg4 = int(ipnum) % 256
+    return '{}.{}.{}.{}'.format(seg1, seg2, seg3, seg4)
+
+
+def ipv4_2_int(ip):
+    seg0, seg1, seg2, seg3 = (int(seg) for seg in ip.split('.'))
+    res = (16777216 * seg0) + (65536 * seg1) + (256 * seg2) + seg3
+    return res
+
+
+def ip_to_bytes(ip):
+    if is_ip_v4(ip):
+        return ipv4_to_bytes(ip)
+    elif is_ip_v6(ip):
+        return ipv6_to_bytes(ip)
+
+
+def bytes_to_ip(ip_bytes):
+    if len(ip_bytes) == 4:
+        return bytes_to_ipv4(ip_bytes)
+    elif len(ip_bytes) == 16:
+        return bytes_to_ipv6(ip_bytes)

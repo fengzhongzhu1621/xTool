@@ -4,8 +4,8 @@ import socket
 
 from xTool.utils.net import (
     get_hostname,
-    int2ip,
-    ip2int,
+    int_2_ipv4,
+    ipv4_2_int,
     url_concat,
     is_ip_v4,
     is_ip_v6)
@@ -20,8 +20,8 @@ def test_get_hostname():
 
 def test_int2ip():
     ip = "1.2.3.4"
-    ip_int = ip2int(ip)
-    actual = int2ip(ip_int)
+    ip_int = ipv4_2_int(ip)
+    actual = int_2_ipv4(ip_int)
     assert actual == ip
 
 
