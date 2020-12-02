@@ -3,6 +3,7 @@
 import importlib
 import socket
 import ipaddress
+import struct
 
 import netifaces
 
@@ -253,18 +254,21 @@ def bytes_to_ipv6(ip_bytes):
     return socket.inet_ntop(socket.AF_INET6, ip_bytes)
 
 
-def int_2_ipv4(ipnum):
-    seg1 = int(ipnum / 16777216) % 256
-    seg2 = int(ipnum / 65536) % 256
-    seg3 = int(ipnum / 256) % 256
-    seg4 = int(ipnum) % 256
-    return '{}.{}.{}.{}'.format(seg1, seg2, seg3, seg4)
-
-
 def ipv4_2_int(ip):
-    seg0, seg1, seg2, seg3 = (int(seg) for seg in ip.split('.'))
-    res = (16777216 * seg0) + (65536 * seg1) + (256 * seg2) + seg3
-    return res
+    return struct.unpack("!L", socket.inet_aton(ip))[0]
+
+
+def int_2_ipv4(ip_num):
+    return socket.inet_ntoa(struct.pack('!L', ip_num))
+
+
+def ipv6_2_long(ipv6):
+    hi, lo = struct.unpack('!QQ', socket.inet_pton(socket.AF_INET6, ipv6))
+    return (hi << 64) | lo
+
+
+def long_2_ipv6(ip_num):
+    return socket.inet_ntop(socket.AF_INET6, struct.pack('!QQ', ip_num >> 64, ip_num & 0xffffffffffffffff))
 
 
 def ip_to_bytes(ip):
