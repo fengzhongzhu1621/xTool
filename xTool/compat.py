@@ -84,44 +84,38 @@ if not hasattr(__builtins__, 'any'):
 
 
 # Random numbers for rotation temp file names, using secrets module if available (Python 3.6).
-# Otherwise use `random.SystemRandom` if available, then fall back on `random.Random`.
+# Otherwise use `random.SystemRandom` if available, then fall back on
+# `random.Random`.
 try:
     # noinspection PyPackageRequirements,PyCompatibility
     from secrets import randbits
 except ImportError:
     import random
 
-    if hasattr(random, "SystemRandom"):  # May not be present in all Python editions
+    if hasattr(
+            random,
+            "SystemRandom"):  # May not be present in all Python editions
         # Should be safe to reuse `SystemRandom` - not software state dependant
         randbits = random.SystemRandom().getrandbits
     else:
         def randbits(nb):
             return random.Random().getrandbits(nb)
 
+b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode('latin1'))
 
-# inspect.getargspec() raises DeprecationWarnings in Python 3.5.
-# The two functions have compatible interfaces for the parts we need.
+
 if PY3:
     from inspect import getfullargspec as getargspec
     from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
     from urllib.parse import unquote
-else:
-    from inspect import getargspec
-    from urllib import urlencode, unquote
-    from urlparse import urlparse, urlunparse, parse_qsl
-
-
-b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode('latin1'))
-
-if not PY2:
     import builtins
     import functools
     try:
         from collections.abc import Callable
     except ImportError:
         from collections import Callable
+    from io import StringIO
 
-    def callable_(c): return isinstance(c, Callable)
     reduce = functools.reduce
     zip = builtins.zip
     xrange = builtins.range
@@ -140,20 +134,42 @@ if not PY2:
     basestring_type = str
     print_ = getattr(builtins, 'print')
     izip_longest = itertools.zip_longest
+    implements_to_string = _identity
+    xrange = range
+
     def iterkeys(d): return iter(d.keys())
     def itervalues(d): return iter(d.values())
     def iteritems(d): return iter(d.items())
-    from io import StringIO
+    def callable_(c): return isinstance(c, Callable)
 
     def reraise(tp, value, tb=None):
+        """
+        Examples:
+            reraise(*sys.exc_info())
+
+            try:
+                1/0
+            except Exception as err:  # pylint: disable=broad-except
+                error = err.with_traceback(sys.exc_info()[2]
+                raise error
+        """
         if value.__traceback__ is not tb:
             raise value.with_traceback(tb)
         raise value
-    implements_to_string = _identity
-    xrange = range
+
+    def raise_exc_info(exc_info):
+        try:
+            raise exc_info[1].with_traceback(exc_info[2])
+        finally:
+            exc_info = None
+
 else:
+    from inspect import getargspec
+    from urllib import urlencode, unquote
+    from urlparse import urlparse, urlunparse, parse_qsl
     import __builtin__
     import itertools
+
     builtins = __builtin__
     reduce = __builtin__.reduce
     zip = itertools.izip
@@ -175,8 +191,13 @@ else:
     def itervalues(d): return d.itervalues()
     def iteritems(d): return d.iteritems()
     from cStringIO import StringIO
+
     exec('def reraise(tp, value, tb=None):\n raise tp, value, tb')
 
+    exec("""
+def raise_exc_info(exc_info):
+    raise exc_info[0], exc_info[1], exc_info[2]
+""")
     def print_(s):
         sys.stdout.write(s)
         sys.stdout.write('\n')
@@ -188,33 +209,6 @@ else:
 
     FileNotFoundError = EnvironmentError
 
-try:
-    import typing  # noqa
-    from typing import cast
-    _ObjectDictBase = typing.Dict[str, typing.Any]
-except ImportError:
-    _ObjectDictBase = dict
-
-    def cast(typ, x):
-        return x
-else:
-    # More imports that are only needed in type comments.
-    import datetime  # noqa
-    import types  # noqa
-    from typing import Any, AnyStr, Union, Optional, Dict, Mapping  # noqa
-    from typing import Tuple, Match, Callable  # noqa
-    if PY3:
-        _BaseString = str
-    else:
-        _BaseString = Union[bytes, unicode_type]
-
-
-if PY3:
-    if sys.version_info >= (3, 6):
-        PathLike = Union[str, 'os.PathLike[str]']
-    else:
-        import pathlib  # noqa
-        PathLike = Union[str, pathlib.PurePath]
 
 try:
     from sys import is_finalizing
@@ -229,43 +223,6 @@ except ImportError:
             return L != []
         return is_finalizing
     is_finalizing = _get_emulated_is_finalizing()
-
-
-class ObjectDict(_ObjectDictBase):
-    """Makes a dictionary behave like an object, with attribute-style access.
-    """
-
-    def __getattr__(self, name):
-        # type: (str) -> Any
-        try:
-            return self[name]
-        except KeyError:
-            raise AttributeError(name)
-
-    def __setattr__(self, name, value):
-        # type: (str, Any) -> None
-        self[name] = value
-# Stubs to make mypy happy (and later for actual type-checking).
-
-
-def raise_exc_info(exc_info):
-    # type: (Tuple[type, BaseException, types.TracebackType]) -> None
-    pass
-
-
-if PY3:
-    exec("""
-def raise_exc_info(exc_info):
-    try:
-        raise exc_info[1].with_traceback(exc_info[2])
-    finally:
-        exc_info = None
-""")
-else:
-    exec("""
-def raise_exc_info(exc_info):
-    raise exc_info[0], exc_info[1], exc_info[2]
-""")
 
 
 def with_metaclass(meta, *bases):

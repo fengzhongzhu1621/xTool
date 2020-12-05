@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from xTool.servers.pipeline import IPipelineConnector
 from xTool.misc import OS_IS_WINDOWS
 from abc import abstractmethod
 import socket

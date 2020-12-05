@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import sys
 from typing import get_type_hints
 from typing import (  # noqa
     Awaitable,
@@ -11,6 +12,33 @@ from typing import (  # noqa
     Callable,
     Union,
 )
+from xTool.compat import PY3, unicode_type
+
+try:
+    import typing  # noqa
+    from typing import cast
+    ObjectDictBase = typing.Dict[str, typing.Any]
+except ImportError:
+    ObjectDictBase = dict
+
+    def cast(typ, x):
+        return x
+else:
+    from typing import Any, AnyStr, Union, Optional, Dict, Mapping  # noqa
+    from typing import Tuple, Match, Callable  # noqa
+    if PY3:
+        BaseString = str
+    else:
+        BaseString = Union[bytes, unicode_type]
+
+
+if PY3:
+    if sys.version_info >= (3, 6):
+        PathLike = Union[str, 'os.PathLike[str]']
+    else:
+        import pathlib  # noqa
+        PathLike = Union[str, pathlib.PurePath]
+
 
 T = TypeVar('T')
 OptionsType = Iterable[Tuple[int, int, int]]
