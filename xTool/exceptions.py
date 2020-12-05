@@ -332,14 +332,16 @@ class XToolTimeoutError(AssertionError):
         return repr(self.value)
 
 
+class ErrorType:
+    pass
+
+
 class ErrorCode(Enum):
     # 成功
     ErrCodeSuccess = 0
 
 
 class SDKError(Exception):
-    """sdk返回异常 ."""
-
     def __init__(self, message: str, err_code: ErrorCode = None):
         super().__init__(err_code, message)
         self.err_code: ErrorCode = err_code

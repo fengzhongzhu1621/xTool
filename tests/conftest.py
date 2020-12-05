@@ -97,5 +97,5 @@ def app(request):
 
 @pytest.fixture
 def aiomisc_unused_port():
-    from xTool.servers.helpers import get_unused_port
+    from xTool.utils.net import get_unused_port
     return get_unused_port()

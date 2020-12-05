@@ -13,6 +13,7 @@ class reify:
     effectively replacing the function it decorates with an instance
     variable.  It is, in Python parlance, a data descriptor.
 
+    懒加载装饰器，将第一次调用方法的返回结果存储在类变量中
     """
 
     def __init__(self, wrapped: Callable[..., Any]) -> None:

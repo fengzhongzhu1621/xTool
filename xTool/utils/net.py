@@ -283,3 +283,11 @@ def bytes_to_ip(ip_bytes):
         return bytes_to_ipv4(ip_bytes)
     elif len(ip_bytes) == 16:
         return bytes_to_ipv6(ip_bytes)
+
+
+def get_unused_port() -> int:
+    sock = socket.socket()
+    sock.bind(("", 0))
+    port = sock.getsockname()[-1]
+    sock.close()
+    return port
