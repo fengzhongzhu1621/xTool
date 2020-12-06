@@ -7,18 +7,25 @@
 from abc import ABCMeta, abstractmethod
 
 
-class Method(metaclass=ABCMeta):
-    @abstractmethod
+class Method:
     def process_direct(self, *args, **kwargs):
         raise NotImplementedError
 
     def process(self, *args, **kwargs):
         return self.process_direct(*args, **kwargs)
 
+    async def process_direct(self, *args, **kwargs):
+        raise NotImplementedError
 
-class IFilter(metaclass=ABCMeta):
-    @abstractmethod
+    async def async_process(self, *args, **kwargs):
+        return await self.async_process_direct(*args, **kwargs)
+
+
+class IFilter:
     def process(self, chain, method: Method, *args, **kwargs):
+        raise NotImplementedError
+
+    async def async_process(self, chain, method: Method, *args, **kwargs):
         raise NotImplementedError
 
 
@@ -28,8 +35,15 @@ class BeforeFilter(IFilter):
         result = chain.process(*args, **kwargs)
         return result
 
-    @abstractmethod
+    async def async_process(self, chain, method: Method, *args, **kwargs):
+        await self.async_before_process(*args, **kwargs)
+        result = await chain.async_process(*args, **kwargs)
+        return result
+
     def before_process(self, *args, **kwargs):
+        raise NotImplementedError
+
+    async def async_before_process(self, *args, **kwargs):
         raise NotImplementedError
 
 
@@ -39,8 +53,15 @@ class AfterFilter(IFilter):
         self.after_process(*args, **kwargs)
         return result
 
-    @abstractmethod
+    async def async_process(self, chain, method: Method, *args, **kwargs):
+        result = await chain.async_process(*args, **kwargs)
+        await self.async_after_process(*args, **kwargs)
+        return result
+
     def after_process(self, *args, **kwargs):
+        raise NotImplementedError
+
+    async def async_after_process(self, *args, **kwargs):
         raise NotImplementedError
 
 
@@ -70,4 +91,11 @@ class FilterChain(IFilterChain):
             result = self.next_filter().process(self, self.method, *args, **kwargs)
         else:
             result = self.method.process(*args, **kwargs)
+        return result
+
+    async def async_process(self, *args, **kwargs):
+        if self.index < len(self.filters):
+            result = await self.next_filter().async_process(self, self.method, *args, **kwargs)
+        else:
+            result = await self.method.async_process(*args, **kwargs)
         return result
