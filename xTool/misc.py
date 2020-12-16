@@ -18,6 +18,7 @@ import random
 import warnings
 import itertools
 import hashlib
+import collections
 
 import numpy as np
 import psutil
@@ -224,11 +225,7 @@ def get_random_string(length=32,
 def print_bin(data):
     """以比较整齐的格式打印二进制数据，用于设计二进制数据的调试过程
 
-        >>> print_bin("\x00\x01\x31\x32\x44hdj139")
-        >>> 0000: 00 01 31 32 44 68 64 6a 31 33 39 74 65 6e 63 65  ..12Dhdj139
-
         `code source <http://code.oa.com/v2/weima/detail/70493>`_
-
     """
     assert isinstance(data, basestring)
 
@@ -441,3 +438,7 @@ def humanize(num, suffix="B"):
             return "%3.1f%s%s" % (num, unit, suffix)
         num /= 1024.0
     return "%.1f%s%s" % (num, "Yi", suffix)
+
+
+def is_iterable(obj):
+    return isinstance(obj, collections.Iterable)
