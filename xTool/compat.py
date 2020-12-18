@@ -115,6 +115,7 @@ if PY3:
     except ImportError:
         from collections import Callable
     from io import StringIO
+    import http.cookies as Cookie
 
     reduce = functools.reduce
     zip = builtins.zip
@@ -169,6 +170,7 @@ else:
     from urlparse import urlparse, urlunparse, parse_qsl
     import __builtin__
     import itertools
+    import Cookie
 
     builtins = __builtin__
     reduce = __builtin__.reduce
