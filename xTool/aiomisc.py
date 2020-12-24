@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import sys
 from math import ceil
 from functools import wraps
 import asyncio
@@ -54,10 +55,43 @@ except ImportError:
     try:
         from aiofiles import open as aio_open  # type: ignore
         from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
+
         async def open_async(file, mode="r", **kwargs):
             return aio_open(file, mode, **kwargs)
     except ImportError:
         pass
+
+
+if sys.version_info >= (3, 7):
+    from asyncio import get_running_loop as __get_running_loop
+    from asyncio import create_task
+else:
+    from asyncio import _get_running_loop
+
+    def __get_running_loop():
+        loop = _get_running_loop()
+        if loop is None:
+            raise RuntimeError("no running event loop")
+        return loop
+
+    def create_task(coro):
+        loop = __get_running_loop()
+        return loop.create_task(coro)
+
+
+def get_running_loop(
+    loop: Optional[asyncio.AbstractEventLoop] = None
+) -> asyncio.AbstractEventLoop:
+    if loop is None:
+        loop = __get_running_loop()
+    if not loop.is_running():
+        warnings.warn("The object should be created from async function",
+                      DeprecationWarning, stacklevel=3)
+        if loop.get_debug():
+            log.warning(
+                "The object should be created from async function",
+                stack_info=True)
+    return loop
 
 
 def uvloop_installed():
@@ -106,21 +140,6 @@ def new_event_loop(
     policy=event_loop_policy,
 ) -> asyncio.AbstractEventLoop:
     loop, _ = create_default_event_loop(pool_size, policy)
-    return loop
-
-
-def get_running_loop(
-    loop: Optional[asyncio.AbstractEventLoop] = None
-) -> asyncio.AbstractEventLoop:
-    if loop is None:
-        loop = asyncio.get_event_loop()
-    if not loop.is_running():
-        warnings.warn("The object should be created from async function",
-                      DeprecationWarning, stacklevel=3)
-        if loop.get_debug():
-            log.warning(
-                "The object should be created from async function",
-                stack_info=True)
     return loop
 
 
