@@ -63,27 +63,27 @@ except ImportError:
 
 
 if sys.version_info >= (3, 7):
-    from asyncio import get_running_loop as __get_running_loop
+    from asyncio import get_running_loop
     from asyncio import create_task
 else:
     from asyncio import _get_running_loop
 
-    def __get_running_loop():
+    def get_running_loop():
         loop = _get_running_loop()
         if loop is None:
             raise RuntimeError("no running event loop")
         return loop
 
     def create_task(coro):
-        loop = __get_running_loop()
+        loop = get_running_loop()
         return loop.create_task(coro)
 
 
-def get_running_loop(
+def get_and_check_running_loop(
     loop: Optional[asyncio.AbstractEventLoop] = None
 ) -> asyncio.AbstractEventLoop:
     if loop is None:
-        loop = __get_running_loop()
+        loop = asyncio.get_event_loop()
     if not loop.is_running():
         warnings.warn("The object should be created from async function",
                       DeprecationWarning, stacklevel=3)
