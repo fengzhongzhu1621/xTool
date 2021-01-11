@@ -442,3 +442,24 @@ def humanize(num, suffix="B"):
 
 def is_iterable(obj):
     return isinstance(obj, collections.Iterable)
+
+
+if hasattr(sys, "_getframe"):
+    def get_current_frame(): return sys._getframe(3)
+else:  # pragma: no cover
+
+    def get_current_frame():
+        """Return the frame object for the caller's stack frame."""
+        try:
+            raise Exception
+        except Exception:
+            return sys.exc_info()[2].tb_frame.f_back
+
+
+def get_bool_env(name: str, default=None) -> bool:
+    value = os.getenv(name, default)
+    if not value:
+        return False
+    if value in ("False", "false", "0"):
+        return False
+    return True
