@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from enum import IntEnum, unique
-# from xTool.plugins.exceptions import PluginTypeNotFound
 
 
 @unique
@@ -27,7 +26,6 @@ class PluginManager:
     __slots__ = ("_plugins", "_plugin_instances")
 
     def __init__(self):
-        # 线程安全
         self._plugins = {}              # 存放所有的插件
         self._plugin_instances = {}     # 存放所有的插件实例化对象，一个插件只有一个实例化对象
 
@@ -92,18 +90,20 @@ class PluginMeta(type):
         register_ignore = getattr(new_class, "register_ignore", False)
         # 创建插件类
         if not register_ignore:
+            # 将类包装为一个插件
             plugin = Plugin(new_class, plugin_type, plugin_name)
             DefaultPluginManager.add_plugin(plugin_type, plugin_name, plugin)
         return new_class
 
 
-def register_plugin(plugin_type, plugin_name=None):
-    """将类注册为一个插件 ."""
+def register_plugin(plugin_type, plugin_name=None, *args, **kwargs):
+    """将类/函数注册为一个插件 ."""
     def decorator(cls):
         nonlocal plugin_name
         if not plugin_name:
             plugin_name = cls.__name__
-        plugin = Plugin(cls, plugin_type, plugin_name)
+        # 将类包装为一个插件
+        plugin = Plugin(cls, plugin_type, plugin_name, *args, **kwargs)
         DefaultPluginManager.add_plugin(plugin_type, plugin_name, plugin)
         return cls
     return decorator
