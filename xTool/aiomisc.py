@@ -278,6 +278,14 @@ def cancel_tasks(tasks: Iterable[asyncio.Future]) -> asyncio.Future:
     return waiter
 
 
+def set_exception(waiter, exc):
+    """将future标为执行完成，并设置Exception ."""
+    if waiter is not None:
+        # 判断任务是否已经取消，如果已取消，返回True
+        if not waiter.cancelled():
+            waiter.set_exception(exc)
+
+
 if __name__ == "__main__":
     async def noop2(*args, **kwargs):
         return asyncio.sleep(1)
