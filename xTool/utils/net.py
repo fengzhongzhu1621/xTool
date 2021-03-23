@@ -154,7 +154,7 @@ def is_unix_socket(port: int):
         return False
 
 
-def is_ip_v4(ip: str):
+def is_ip_v4_deprecated(ip: str) -> bool:
     try:
         addr4 = ipaddress.ip_address(ip)
     except ValueError:
@@ -162,12 +162,31 @@ def is_ip_v4(ip: str):
     return addr4.version == 4
 
 
-def is_ip_v6(ip: str):
+def is_ip_v6_deprecated(ip: str) -> bool:
     try:
         addr6 = ipaddress.ip_address(ip)
     except ValueError:
         return False
     return addr6.version == 6
+
+
+def is_ip_v4(ip: str) -> bool:
+    try:
+        # 将点分文本的IP地址转换为二进制网络字节序”的IP地址
+        socket.inet_pton(socket.AF_INET, ip)
+    except socket.error:
+        return False
+    return True
+
+
+def is_ip_v6(ip: str) -> bool:
+    """判断IP是否为ipv6, 比使用ipaddress性能更高 ."""
+    try:
+        # 将点分文本的IP地址转换为二进制网络字节序”的IP地址
+        socket.inet_pton(socket.AF_INET6, ip)
+    except socket.error:
+        return False
+    return True
 
 
 def new_socket(ip: str, is_tcp: bool = True):
