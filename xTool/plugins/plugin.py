@@ -11,18 +11,8 @@ class PluginType(IntEnum):
     # 默认类型
     CONFIG_NORMAL = 2
 
-    # 配置：范围 [10 - 100]
-    CONFIG_DATA_SOURCE = 10
-    CONFIG_DECODER = 11
 
-    # 协议
-    SERVER_TRANSPORT = 101
-
-    # 第三方服务：名字注册服务
-    NAMING_REGISTRY_SERVICE = 201
-
-
-class PluginManager:
+class PluginStore:
     __slots__ = ("_plugins", "_plugin_instances")
 
     def __init__(self):
@@ -50,7 +40,7 @@ class PluginManager:
         self._plugin_instances = {}
 
 
-DefaultPluginManager = PluginManager()
+DefaultPluginStore = PluginStore()
 
 
 class Plugin:
@@ -92,7 +82,7 @@ class PluginMeta(type):
         if not register_ignore:
             # 将类包装为一个插件
             plugin = Plugin(new_class, plugin_type, plugin_name)
-            DefaultPluginManager.add_plugin(plugin_type, plugin_name, plugin)
+            DefaultPluginStore.add_plugin(plugin_type, plugin_name, plugin)
         return new_class
 
 
@@ -104,7 +94,7 @@ def register_plugin(plugin_type, plugin_name=None, *args, **kwargs):
             plugin_name = cls.__name__
         # 将类包装为一个插件
         plugin = Plugin(cls, plugin_type, plugin_name, *args, **kwargs)
-        DefaultPluginManager.add_plugin(plugin_type, plugin_name, plugin)
+        DefaultPluginStore.add_plugin(plugin_type, plugin_name, plugin)
         return cls
     return decorator
 
@@ -112,24 +102,24 @@ def register_plugin(plugin_type, plugin_name=None, *args, **kwargs):
 def get_plugin_instance(plugin_type, plugin_name):
     """懒加载的方式获得插件，如果没有则创建，是一个单例模式 ."""
     # 从缓存中获取插件实例
-    plugin_instance = DefaultPluginManager.get_plugin_instance(
+    plugin_instance = DefaultPluginStore.get_plugin_instance(
         plugin_type, plugin_name)
     if not plugin_instance:
         # 从缓存中获取插件类
-        plugin = DefaultPluginManager.get_plugin(plugin_type, plugin_name)
+        plugin = DefaultPluginStore.get_plugin(plugin_type, plugin_name)
         if not plugin:
             return None
         # 创建插件实例
         plugin_instance = plugin.create_instance()
         # 缓存插件实例
-        DefaultPluginManager.add_plugin_instance(
+        DefaultPluginStore.add_plugin_instance(
             plugin_type, plugin_name, plugin_instance)
     return plugin_instance
 
 
-def reload_global_plugin_manager():
-    global DefaultPluginManager
-    DefaultPluginManager.clear_plugin_instances()
+def reload_global_plugin_store():
+    global DefaultPluginStore
+    DefaultPluginStore.clear_plugin_instances()
 
 
 class PluginRegister(metaclass=PluginMeta):

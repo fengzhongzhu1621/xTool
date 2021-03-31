@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from asyncio import open_connection
 import sys
 from math import ceil
 from functools import wraps
@@ -19,6 +20,10 @@ from multiprocessing import cpu_count
 from contextlib import suppress
 from functools import partial
 import logging
+import socket
+
+from xTool.utils.net import is_ip_v6
+
 
 try:
     import uvloop
@@ -284,6 +289,22 @@ def set_exception(waiter, exc):
         # 判断任务是否已经取消，如果已取消，返回True
         if not waiter.cancelled():
             waiter.set_exception(exc)
+
+
+def set_result(waiter, value):
+    """设置future的返回结果 ."""
+    if waiter is not None:
+        if not waiter.cancelled():
+            waiter.set_result(value)
+
+
+async def open_connection(host: str, port: int, timeout: float, loop: asyncio.AbstractEventLoop):
+    if is_ip_v6(host):
+        family = socket.AF_INET6
+    else:
+        family = socket.AF_UNSPEC
+    return await asyncio.wait_for(open_connection(host=host, port=port, loop=loop, family=family),
+                                  timeout, loop=loop)
 
 
 if __name__ == "__main__":
