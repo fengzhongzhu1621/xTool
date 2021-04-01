@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from enum import Enum
+from enum import Enum, unique
 
 from .status import STATUS_CODES
 
@@ -332,17 +332,31 @@ class XToolTimeoutError(AssertionError):
         return repr(self.value)
 
 
-class ErrorType:
-    pass
+@unique
+class ErrorType(Enum):
+    SDKError = 1
 
 
+@unique
 class ErrorCode(Enum):
     # 成功
-    ErrCodeSuccess = 0
+    ERR_OK = 0
+    ERR_UNKNOWN = -1
+
+
+@unique
+class ErrMessage(Enum):
+    ERR_UNKNOWN = "Unkown error"
+    ERR_OK = "OK"
+
+
+class BaseErrorException(Exception):
+    def __init__(self, exception_type: int, code: int, message: str):
+        self.type = exception_type
+        self.code = code
+        self.message = str(message)
 
 
 class SDKError(Exception):
-    def __init__(self, message: str, err_code: ErrorCode = None):
-        super().__init__(err_code, message)
-        self.err_code: ErrorCode = err_code
-        self.msg: str = message
+    def __init__(self, code: ErrorCode, message: str):
+        super().__init__(ErrorType.SDKError, code, message)
