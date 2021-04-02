@@ -4,11 +4,11 @@ import socket
 
 from xTool.utils.net import (
     get_hostname,
-    int_2_ipv4,
-    ipv4_2_int,
+    int_to_ipv4,
+    ipv4_to_int,
     url_concat,
-    is_ip_v4,
-    is_ip_v6)
+    is_ipv4,
+    is_ipv6)
 
 
 def test_get_hostname():
@@ -20,8 +20,8 @@ def test_get_hostname():
 
 def test_int2ip():
     ip = "1.2.3.4"
-    ip_int = ipv4_2_int(ip)
-    actual = int_2_ipv4(ip_int)
+    ip_int = ipv4_to_int(ip)
+    actual = int_to_ipv4(ip_int)
     assert actual == ip
 
 
@@ -34,14 +34,14 @@ def test_url_concat():
                       [("c", "d"), ("c", "d2")]) == 'http://example.com/foo?a=b&c=d&c=d2'
 
 
-def test_is_ip_v4():
-    assert is_ip_v4("1.1.1.1")
-    assert not is_ip_v4("1.1.1.1.1")
-    assert not is_ip_v4("1.1.1.1/24")
+def test_is_ipv4():
+    assert is_ipv4("1.1.1.1")
+    assert not is_ipv4("1.1.1.1.1")
+    assert not is_ipv4("1.1.1.1/24")
 
 
-def test_is_ip_v6():
-    assert not is_ip_v6("1.1.1.1")
-    assert not is_ip_v6("1.1.1.1.1")
-    assert not is_ip_v6("1.1.1.1/24")
-    assert is_ip_v6("2001:db8::1")
+def test_is_ipv6():
+    assert not is_ipv6("1.1.1.1")
+    assert not is_ipv6("1.1.1.1.1")
+    assert not is_ipv6("1.1.1.1/24")
+    assert is_ipv6("2001:db8::1")

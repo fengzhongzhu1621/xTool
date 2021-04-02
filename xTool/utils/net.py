@@ -17,7 +17,7 @@ from xTool.misc import tob
 from xTool.exceptions import PortInvalidError
 
 
-def get_hostname(callable_path=None):
+def get_hostname(callable_path=None) -> str:
     """获得主机名 ."""
     if not callable_path:
         return socket.getfqdn()
@@ -86,7 +86,7 @@ def url_concat(url, args):
     return url
 
 
-def get_local_host_ip(ifname=b'eth1', ip: str = None, port: int = None):
+def get_local_host_ip(ifname=b'eth1', ip: str = None, port: int = None) -> str:
     """获得本机的IP地址 ."""
     import platform
     import socket
@@ -115,7 +115,7 @@ def get_local_host_ip(ifname=b'eth1', ip: str = None, port: int = None):
     return o_ip
 
 
-def find_internal_ip_on_device_network(dev_net: str):
+def find_internal_ip_on_device_network(dev_net: str) -> str:
     if not dev_net:
         return ""
     if dev_net not in netifaces.interfaces():
@@ -131,30 +131,30 @@ def find_internal_ip_on_device_network(dev_net: str):
     return ip_address
 
 
-def join_host_port(host: str, port: int) -> str:
+def join_address(host: str, port: int) -> str:
     if ":" in host:
         # IPV6：带有端口号的IPV6地址字符串形式，地址部分应用"[]"括起来，在后面跟着":"带上端口号
-        return '[' + host + ']:' + str(port)
+        return "[{}]:{}".format(host, port)
     else:
         # IPV4
-        return host + ':' + str(port)
+        return "{}:{}".format(host, port)
 
 
-def is_port_valid(port: int):
+def is_port_valid(port: int) -> bool:
     if 0 <= int(port) <= 65535:
         return True
     else:
         return False
 
 
-def is_unix_socket(port: int):
+def is_unix_socket(port: int) -> bool:
     if int(port) == 0:
         return True
     else:
         return False
 
 
-def is_ip_v4_deprecated(ip: str) -> bool:
+def is_ipv4_deprecated(ip: str) -> bool:
     try:
         addr4 = ipaddress.ip_address(ip)
     except ValueError:
@@ -162,7 +162,7 @@ def is_ip_v4_deprecated(ip: str) -> bool:
     return addr4.version == 4
 
 
-def is_ip_v6_deprecated(ip: str) -> bool:
+def is_ipv6_deprecated(ip: str) -> bool:
     try:
         addr6 = ipaddress.ip_address(ip)
     except ValueError:
@@ -170,7 +170,7 @@ def is_ip_v6_deprecated(ip: str) -> bool:
     return addr6.version == 6
 
 
-def is_ip_v4(ip: str) -> bool:
+def is_ipv4(ip: str) -> bool:
     try:
         # 将点分文本的IP地址转换为二进制网络字节序”的IP地址
         socket.inet_pton(socket.AF_INET, ip)
@@ -179,7 +179,7 @@ def is_ip_v4(ip: str) -> bool:
     return True
 
 
-def is_ip_v6(ip: str) -> bool:
+def is_ipv6(ip: str) -> bool:
     """判断IP是否为ipv6, 比使用ipaddress性能更高 ."""
     try:
         # 将点分文本的IP地址转换为二进制网络字节序”的IP地址
@@ -191,11 +191,11 @@ def is_ip_v6(ip: str) -> bool:
 
 def new_socket(ip: str, is_tcp: bool = True):
     sock = None
-    if is_ip_v4(ip):
+    if is_ipv4(ip):
         sock = socket.socket(
             socket.AF_INET,
             socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
-    elif is_ip_v6(ip):
+    elif is_ipv6(ip):
         sock = socket.socket(
             socket.AF_INET6,
             socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
@@ -223,7 +223,7 @@ def new_tcp_server_socket(ip: str, port: int, backlog=100, reuse_port=False):
     return sock
 
 
-def is_tcp_port_open(ip, port):
+def is_tcp_port_open(ip, port) -> bool:
     """判断端口是否占用 ."""
     sock = None
     try:
@@ -241,7 +241,7 @@ def is_tcp_port_open(ip, port):
             sock.close()
 
 
-def is_udp_port_open(ip, port):
+def is_udp_port_open(ip, port) -> bool:
     """判断端口是否占用 ."""
     sock = None
     try:
@@ -273,27 +273,27 @@ def bytes_to_ipv6(ip_bytes):
     return socket.inet_ntop(socket.AF_INET6, ip_bytes)
 
 
-def ipv4_2_int(ip):
+def ipv4_to_int(ip):
     return struct.unpack("!L", socket.inet_aton(ip))[0]
 
 
-def int_2_ipv4(ip_num):
+def int_to_ipv4(ip_num):
     return socket.inet_ntoa(struct.pack('!L', ip_num))
 
 
-def ipv6_2_long(ipv6):
+def ipv6_to_long(ipv6):
     hi, lo = struct.unpack('!QQ', socket.inet_pton(socket.AF_INET6, ipv6))
     return (hi << 64) | lo
 
 
-def long_2_ipv6(ip_num):
+def long_to_ipv6(ip_num):
     return socket.inet_ntop(socket.AF_INET6, struct.pack('!QQ', ip_num >> 64, ip_num & 0xffffffffffffffff))
 
 
 def ip_to_bytes(ip):
-    if is_ip_v4(ip):
+    if is_ipv4(ip):
         return ipv4_to_bytes(ip)
-    elif is_ip_v6(ip):
+    elif is_ipv6(ip):
         return ipv6_to_bytes(ip)
 
 

@@ -23,7 +23,7 @@ from functools import partial
 import logging
 import socket
 
-from xTool.utils.net import is_ip_v6
+from xTool.utils.net import is_ipv6
 
 
 try:
@@ -326,7 +326,7 @@ def wakeup_waiter(waiter):
 
 
 async def open_connection(host: str, port: int, timeout: float, loop: asyncio.AbstractEventLoop):
-    if is_ip_v6(host):
+    if is_ipv6(host):
         family = socket.AF_INET6
     else:
         family = socket.AF_UNSPEC
