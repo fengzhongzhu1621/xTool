@@ -5,6 +5,7 @@ import sys
 from math import ceil
 from functools import wraps
 import asyncio
+from asyncio import events
 from typing import (  # noqa
     Awaitable,
     Any,
@@ -297,6 +298,21 @@ def set_result(waiter, value):
     if waiter is not None:
         if not waiter.cancelled():
             waiter.set_result(value)
+
+
+async def wait_for_data(loop=None):
+    """等待数据准备好 ."""
+    if loop is None:
+        _loop = events.get_event_loop()
+    else:
+        _loop = loop
+    _waiter = _loop.create_future()
+    try:
+        # 等待future的返回结果
+        await _waiter
+    finally:
+        _waiter = None
+    return _waiter
 
 
 async def open_connection(host: str, port: int, timeout: float, loop: asyncio.AbstractEventLoop):
