@@ -22,6 +22,7 @@ import collections
 
 import numpy as np
 import psutil
+from asyncio.constants import DEBUG_STACK_DEPTH
 
 from xTool.compat import basestring
 
@@ -463,3 +464,22 @@ def get_bool_env(name: str, default=None) -> bool:
     if value in ("False", "false", "0"):
         return False
     return True
+
+
+def extract_stack(f=None, limit=None):
+    """Replacement for traceback.extract_stack() that only does the
+    necessary work for asyncio debug mode.
+	
+	来自python3.9 asyncio
+    """
+    if f is None:
+        f = sys._getframe().f_back
+    if limit is None:
+        # Limit the amount of work to a reasonable amount, as extract_stack()
+        # can be called for each coroutine and future in debug mode.
+        limit = DEBUG_STACK_DEPTH
+    stack = traceback.StackSummary.extract(traceback.walk_stack(f),
+                                           limit=limit,
+                                           lookup_lines=False)
+    stack.reverse()
+    return stack
