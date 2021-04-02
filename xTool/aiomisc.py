@@ -315,6 +315,16 @@ async def wait_for_data(loop=None):
     return _waiter
 
 
+def wakeup_waiter(waiter):
+    """唤醒等待者 ."""
+    _waiter = waiter
+    if _waiter is not None:
+        waiter = None
+        if not _waiter.cancelled():
+            _waiter.set_result(None)
+    return waiter
+
+
 async def open_connection(host: str, port: int, timeout: float, loop: asyncio.AbstractEventLoop):
     if is_ip_v6(host):
         family = socket.AF_INET6
