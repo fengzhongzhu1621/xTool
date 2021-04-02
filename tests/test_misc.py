@@ -15,11 +15,11 @@ def test_get_encodings():
     assert 'utf8' in items
 
 
-def test_exceptionToString():
+def test_exception_to_string():
     try:
         1 / 0
     except Exception:
-        value = misc.exceptionToString()
+        value = misc.exception_to_string()
         assert "ZeroDivisionError" in value
 
 

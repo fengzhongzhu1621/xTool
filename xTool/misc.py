@@ -79,7 +79,7 @@ def get_encodings():
             yield prefenc
 
 
-def exceptionToString():
+def exception_to_string():
     exc = sys.exc_info()
     return "".join(traceback.format_exception(*exc))
 
