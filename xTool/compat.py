@@ -9,7 +9,11 @@ import socket
 
 
 PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] == 3
+PY3 = sys.version_info[0] >= 3
+
+PY34 = sys.version_info >= (3, 4)
+PY35 = sys.version_info >= (3, 5)
+PY352 = sys.version_info >= (3, 5, 2)
 PY_36 = sys.version_info >= (3, 6)
 PY_37 = sys.version_info >= (3, 7)
 PY_38 = sys.version_info >= (3, 8)
@@ -255,3 +259,14 @@ try:
         return Path(path).stat()
 except ImportError:
     pass
+
+
+def flatten_list_bytes(list_of_data):
+    """Concatenate a sequence of bytes-like objects."""
+    if not PY34:
+        # On Python 3.3 and older, bytes.join() doesn't handle
+        # memoryview.
+        list_of_data = (
+            bytes(data) if isinstance(data, memoryview) else data
+            for data in list_of_data)
+    return b''.join(list_of_data)

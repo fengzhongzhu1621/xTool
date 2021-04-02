@@ -286,7 +286,8 @@ def cancel_tasks(tasks: Iterable[asyncio.Future]) -> asyncio.Future:
 def set_exception(waiter, exc):
     """将future标为执行完成，并设置Exception ."""
     if waiter is not None:
-        # 判断任务是否已经取消，如果已取消，返回True
+        # 判断waiter任务是否已经取消
+        # 如果没有取消，将waiter future标为执行完成，并设置Exception
         if not waiter.cancelled():
             waiter.set_exception(exc)
 
