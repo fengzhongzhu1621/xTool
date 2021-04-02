@@ -5,6 +5,7 @@ import gc
 import contextlib
 from socket import socket
 from json import JSONDecodeError
+from functools import wrap
 import asyncio
 from typing import (  # noqa
     TYPE_CHECKING,
@@ -617,3 +618,11 @@ def loop_context(loop_factory: _LOOP_FACTORY = asyncio.new_event_loop,
     loop = setup_test_loop(loop_factory)
     yield loop
     teardown_test_loop(loop, fast=fast)
+
+
+def pytest_async(func):
+    @wrap(func)
+    def wrapper(*args, **kwargs):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(func(*args, **kwargs))
+    return wrapper
