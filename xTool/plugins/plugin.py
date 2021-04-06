@@ -11,6 +11,10 @@ class PluginType(IntEnum):
     # 默认类型
     CONFIG_NORMAL = 2
 
+    # 过滤器
+    BEFORE_FILTER = 3
+    AFTER_FILTER = 4
+
 
 class PluginStore:
     __slots__ = ("_plugins", "_plugin_instances")
