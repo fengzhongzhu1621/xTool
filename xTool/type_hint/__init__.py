@@ -2,7 +2,7 @@
 
 import sys
 from typing import get_type_hints
-from typing import (  # noqa
+from typing import (   # type: ignore # noqa # pylint: disable=unused-import
     Awaitable,
     Any,
     Optional,
@@ -15,7 +15,7 @@ from typing import (  # noqa
 from xTool.compat import PY3, unicode_type
 
 try:
-    import typing  # noqa
+    import typing   # type: ignore # noqa # pylint: disable=unused-import
     from typing import cast
     ObjectDictBase = typing.Dict[str, typing.Any]
 except ImportError:
@@ -44,6 +44,18 @@ T = TypeVar('T')
 OptionsType = Iterable[Tuple[int, int, int]]
 F = TypeVar('F', bound=Callable[..., Any])
 IP_ADDRESS = Tuple[str, int]
+
+
+try:
+    # Protocol and TypedDict are only added to typing module starting from
+    # python 3.8
+    from typing import (  # type: ignore # noqa # pylint: disable=unused-import
+        Protocol,
+        TypedDict,
+        runtime_checkable,
+    )
+except ImportError:
+    from typing_extensions import Protocol, TypedDict, runtime_checkable  # type: ignore # noqa
 
 
 def get_class_object_init_type(class_obj: object, name: str) -> type:
