@@ -26,5 +26,5 @@ async_timeout
 pytest
 pytest-sanic
 netifaces
-
+typing_extensions
 httpx==0.11.1
