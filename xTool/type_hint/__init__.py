@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+"""
+* Optional[...]是Union[..., None]的简写符号，告诉类型检查器需要特定类型的对象，或者需要None。
+...代表任何有效的类型提示，包括复杂的复合类型或更多类型的Union[]。每当你有一个默认值None的关键字参数时，你应该使用Optional。
+
+"""
+
 import sys
 from typing import get_type_hints
 from typing import (   # type: ignore # noqa # pylint: disable=unused-import

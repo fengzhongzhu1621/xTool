@@ -15,6 +15,10 @@ class PluginType(IntEnum):
     BEFORE_FILTER = 3
     AFTER_FILTER = 4
 
+    STATS_LOGGER = 10
+    STATS_NAME_HANDLER = 11             # stats名称验证器
+    STATS_NAME_ALLOW_VALIDATOR = 12     # 只允许指定的metrics name
+
 
 class PluginStore:
     __slots__ = ("_plugins", "_plugin_instances")
@@ -103,7 +107,7 @@ def register_plugin(plugin_type, plugin_name=None, *args, **kwargs):
     return decorator
 
 
-def get_plugin_instance(plugin_type, plugin_name):
+def get_plugin_instance(plugin_type: int, plugin_name: str):
     """懒加载的方式获得插件，如果没有则创建，是一个单例模式 ."""
     # 从缓存中获取插件实例
     plugin_instance = DefaultPluginStore.get_plugin_instance(

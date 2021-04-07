@@ -321,6 +321,10 @@ class PortInvalidError(XToolException):
     pass
 
 
+class InvalidStatsNameException(XToolException):
+    """Raise when name of the stats is invalid"""
+
+
 class XToolTimeoutError(AssertionError):
 
     """Thrown when a timeout occurs in the `timeout` context manager."""
