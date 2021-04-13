@@ -4,6 +4,10 @@ import textwrap
 import string
 import logging
 from functools import wraps
+from collections import deque
+import socket
+import random
+from datetime import timedelta
 
 from typing import Callable, Optional, TypeVar, cast, Sequence, Union
 from xTool.type_hint import Protocol
@@ -19,6 +23,235 @@ log = logging.getLogger(__name__)
 T = TypeVar("T", bound=Callable)  # pylint: disable=invalid-name
 ALLOWED_CHARACTERS = set(string.ascii_letters + string.digits + '_.-')
 STATS_NAME_DEFAULT_MAX_LENGTH = 250
+
+
+class StatsClientBase(object):
+    """A Base class for various statsd clients."""
+
+    def close(self):
+        """Used to close and clean up any underlying resources."""
+        raise NotImplementedError()
+
+    def _send(self):
+        raise NotImplementedError()
+
+    def pipeline(self):
+        raise NotImplementedError()
+
+    def timer(self, stat, rate=1):
+        return Timer(self, stat, rate)
+
+    def timing(self, stat, delta, rate=1):
+        """
+        Send new timing information.
+
+        `delta` can be either a number of milliseconds or a timedelta.
+        """
+        if isinstance(delta, timedelta):
+            # Convert timedelta to number of milliseconds.
+            delta = delta.total_seconds() * 1000.
+        self._send_stat(stat, '%0.6f|ms' % delta, rate)
+
+    def incr(self, stat, count=1, rate=1):
+        """Increment a stat by `count`."""
+        self._send_stat(stat, '%s|c' % count, rate)
+
+    def decr(self, stat, count=1, rate=1):
+        """Decrement a stat by `count`."""
+        self.incr(stat, -count, rate)
+
+    def gauge(self, stat, value, rate=1, delta=False):
+        """Set a gauge value."""
+        if value < 0 and not delta:
+            if rate < 1:
+                if random.random() > rate:
+                    return
+            with self.pipeline() as pipe:
+                pipe._send_stat(stat, '0|g', 1)
+                pipe._send_stat(stat, '%s|g' % value, 1)
+        else:
+            prefix = '+' if delta and value >= 0 else ''
+            self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
+
+    def set(self, stat, value, rate=1):
+        """Set a set value."""
+        self._send_stat(stat, '%s|s' % value, rate)
+
+    def _send_stat(self, stat, value, rate):
+        self._after(self._prepare(stat, value, rate))
+
+    def _prepare(self, stat, value, rate):
+        """客户端采样 ."""
+        if rate < 1:
+            if random.random() > rate:
+                return
+            value = '%s|@%s' % (value, rate)
+        # metrics名称添加前缀
+        if self._prefix:
+            stat = '%s.%s' % (self._prefix, stat)
+
+        return '%s:%s' % (stat, value)
+
+    def _after(self, data):
+        if data:
+            self._send(data)
+
+
+class PipelineBase(StatsClientBase):
+
+    def __init__(self, client):
+        self._client = client
+        # 命令前缀
+        self._prefix = client._prefix
+        # 缓存命令
+        self._stats = deque()
+
+    def _send(self):
+        raise NotImplementedError()
+
+    def _after(self, data):
+        """发送命令时，先缓存到队列；上下文结束时再批量发给服务器 ."""
+        if data is not None:
+            self._stats.append(data)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, typ, value, tb):
+        self.send()
+
+    def send(self):
+        if not self._stats:
+            return
+        self._send()
+
+    def pipeline(self):
+        return self.__class__(self)
+
+
+class StatsClient(StatsClientBase):
+    """A client for statsd. （线程安全） """
+
+    def __init__(self, host='localhost', port=8125, prefix=None,
+                 maxudpsize=512, ipv6=False):
+        """Create a new client."""
+        fam = socket.AF_INET6 if ipv6 else socket.AF_INET
+        family, _, _, _, addr = socket.getaddrinfo(
+            host, port, fam, socket.SOCK_DGRAM)[0]
+        self._addr = addr
+        self._sock = socket.socket(family, socket.SOCK_DGRAM)
+        self._prefix = prefix
+        self._maxudpsize = maxudpsize
+
+    def _send(self, data):
+        """Send data to statsd."""
+        try:
+            self._sock.sendto(data.encode('ascii'), self._addr)
+        except (socket.error, RuntimeError):
+            # No time for love, Dr. Jones!
+            pass
+
+    def close(self):
+        if self._sock and hasattr(self._sock, 'close'):
+            self._sock.close()
+        self._sock = None
+
+    def pipeline(self):
+        return Pipeline(self)
+
+
+class Pipeline(PipelineBase):
+    """命令管道(线程不安全) ."""
+
+    def __init__(self, client):
+        super().__init__(client)
+        # 客户端缓冲区的大小
+        self._maxudpsize = client._maxudpsize
+
+    def _send(self):
+        data = self._stats.popleft()
+        while self._stats:
+            # Use popleft to preserve the order of the stats.
+            stat = self._stats.popleft()
+            if len(stat) + len(data) + 1 >= self._maxudpsize:
+                # 缓冲区满发送
+                self._client._after(data)
+                data = stat
+            else:
+                # 多条命令换行分割
+                data = "{}\n{}".format(data, stat)
+        # 队列为空时发送剩余数据
+        self._client._after(data)
+
+
+class StreamPipeline(PipelineBase):
+    def _send(self):
+        self._client._after('\n'.join(self._stats))
+        self._stats.clear()
+
+
+class StreamClientBase(StatsClientBase):
+    def connect(self):
+        raise NotImplementedError()
+
+    def close(self):
+        if self._sock and hasattr(self._sock, 'close'):
+            self._sock.close()
+        self._sock = None
+
+    def reconnect(self):
+        self.close()
+        self.connect()
+
+    def pipeline(self):
+        return StreamPipeline(self)
+
+    def _send(self, data):
+        """Send data to statsd."""
+        if not self._sock:
+            self.connect()
+        self._do_send(data)
+
+    def _do_send(self, data):
+        self._sock.sendall(data.encode('ascii') + b'\n')
+
+
+class TCPStatsClient(StreamClientBase):
+    """TCP version of StatsClient."""
+
+    def __init__(self, host='localhost', port=8125, prefix=None,
+                 timeout=None, ipv6=False):
+        """Create a new client."""
+        self._host = host
+        self._port = port
+        self._ipv6 = ipv6
+        self._timeout = timeout
+        self._prefix = prefix
+        self._sock = None
+
+    def connect(self):
+        fam = socket.AF_INET6 if self._ipv6 else socket.AF_INET
+        family, _, _, _, addr = socket.getaddrinfo(
+            self._host, self._port, fam, socket.SOCK_STREAM)[0]
+        self._sock = socket.socket(family, socket.SOCK_STREAM)
+        self._sock.settimeout(self._timeout)
+        self._sock.connect(addr)
+
+
+class UnixSocketStatsClient(StreamClientBase):
+    """Unix domain socket version of StatsClient."""
+
+    def __init__(self, socket_path, prefix=None, timeout=None):
+        """Create a new client."""
+        self._socket_path = socket_path
+        self._timeout = timeout
+        self._prefix = prefix
+        self._sock = None
+
+    def connect(self):
+        self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self._sock.settimeout(self._timeout)
+        self._sock.connect(self._socket_path)
 
 
 class StatsdTimer(object):
