@@ -11,4 +11,5 @@ class TestSafeStatsdLogger(TestCase):
         self.stats_logger = SafeStatsdLogger(statsd_client)
 
     def test_incr(self):
-        pass
+        for i in range(10):
+            self.stats_logger.incr("test_incr")

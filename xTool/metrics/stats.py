@@ -1,21 +1,77 @@
 # -*- coding: utf-8 -*-
 
-import time
 import textwrap
 import string
 import logging
 from functools import wraps
 
-from typing import Callable, Optional, TypeVar, cast, List, Sequence, Union
+from typing import Callable, Optional, TypeVar, cast, Sequence, Union
 from xTool.type_hint import Protocol
 from xTool.exceptions import InvalidStatsNameException
 from xTool.plugins.plugin import PluginType, register_plugin, get_plugin_instance
+from xTool.utils.timer import Timer
+from xTool.decorators.utils import safe_wraps
+from xTool.utils.dates import time_now
+
 
 log = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=Callable)  # pylint: disable=invalid-name
 ALLOWED_CHARACTERS = set(string.ascii_letters + string.digits + '_.-')
 STATS_NAME_DEFAULT_MAX_LENGTH = 250
+
+
+class StatsdTimer(object):
+    """A context manager/decorator for statsd.timing()."""
+
+    def __init__(self, client, stat, rate=1):
+        self.client = client
+        self.stat = stat
+        self.rate = rate
+        self.ms = None
+        self._sent = False
+        self._start_time = None
+
+    def __call__(self, f):
+        """Thread-safe timing function decorator."""
+        @safe_wraps(f)
+        def _wrapped(*args, **kwargs):
+            start_time = time_now()
+            try:
+                return f(*args, **kwargs)
+            finally:
+                elapsed_time_ms = 1000.0 * (time_now() - start_time)
+                self.client.timing(self.stat, elapsed_time_ms, self.rate)
+        return _wrapped
+
+    def __enter__(self):
+        return self.start()
+
+    def __exit__(self, typ, value, tb):
+        self.stop()
+
+    def start(self):
+        self.ms = None
+        self._sent = False
+        self._start_time = time_now()
+        return self
+
+    def stop(self, send=True):
+        if self._start_time is None:
+            raise RuntimeError('Timer has not started.')
+        dt = time_now() - self._start_time
+        self.ms = 1000.0 * dt  # Convert to milliseconds.
+        if send:
+            self.send()
+        return self
+
+    def send(self):
+        if self.ms is None:
+            raise RuntimeError('No data recorded.')
+        if self._sent:
+            raise RuntimeError('Already sent data.')
+        self._sent = True
+        self.client.timing(self.stat, self.ms, self.rate)
 
 
 class TimerProtocol(Protocol):
@@ -63,39 +119,6 @@ class StatsLogger(Protocol):
     @classmethod
     def timer(cls, *args, **kwargs) -> TimerProtocol:
         """Timer metric that can be cancelled"""
-
-
-class Timer:
-    """
-    Timer that records duration, and optional sends to statsd backend.
-
-    This class lets us have an accurate timer with the logic in one place (so
-    that we don't use datetime math for duration -- it is error prone).
-    """
-    _start_time: Optional[float]
-    duration: Optional[float]
-
-    def __init__(self, real_timer=None):
-        self.real_timer = real_timer
-
-    def __enter__(self):
-        return self.start()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.stop()
-
-    def start(self):
-        """Start the timer"""
-        if self.real_timer:
-            self.real_timer.start()
-        self._start_time = time.perf_counter()
-        return self
-
-    def stop(self, send=True):  # pylint: disable=unused-argument
-        """Stop the timer, and optionally send it to stats backend"""
-        self.duration: float = time.perf_counter() - self._start_time
-        if send and self.real_timer:
-            self.real_timer.stop()
 
 
 class StatsNameConfig:
@@ -177,7 +200,8 @@ def validate_stat(fn: T) -> T:
 
 
 class AllowListValidatorProtocol(Protocol):
-    def set_allow_list(self, allow_list: Optional[Union[Sequence[str], str]]) -> None:
+    def set_allow_list(
+            self, allow_list: Optional[Union[Sequence[str], str]]) -> None:
         ...
 
     def test(self, stat: str) -> bool:
@@ -193,7 +217,8 @@ class DefaultAllowListValidator:
         self.allow_list = None
         self.set_allow_list(allow_list)
 
-    def set_allow_list(self, allow_list: Optional[Union[Sequence[str], str]]) -> None:
+    def set_allow_list(
+            self, allow_list: Optional[Union[Sequence[str], str]]) -> None:
         if allow_list:
             # pylint: disable=consider-using-generator
             if isinstance(allow_list, str):
