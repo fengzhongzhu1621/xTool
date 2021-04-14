@@ -66,10 +66,12 @@ class StatsClientBase(object):
             if rate < 1:
                 if random.random() > rate:
                     return
+            # 重置为负数
             with self.pipeline() as pipe:
                 pipe._send_stat(stat, '0|g', 1)
                 pipe._send_stat(stat, '%s|g' % value, 1)
         else:
+            # 需要对前面的值进行加法操作
             prefix = '+' if delta and value >= 0 else ''
             self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
 
@@ -474,10 +476,26 @@ def get_current_allow_list_validator(
     return get_plugin_instance(PluginType.STATS_NAME_ALLOW_VALIDATOR, name)
 
 
+class StatsParamConfig:
+    def __init__(
+            self,
+            statsd_host="localhost",
+            statsd_port=8125,
+            statsd_prefix=None,
+            constant_tags=None):
+        self.statsd_host = statsd_host
+        self.statsd_port = statsd_port
+        self.statsd_prefix = statsd_prefix
+        if constant_tags is None or constant_tags == '':
+            self.constant_tags = []
+        else:
+            self.constant_tags = [key_value for key_value in constant_tags.split(',')]
+
+
 class BaseStatsdLogger:
     def __init__(
             self,
-            statsd_client,
+            statsd_client=None,
             stats_name_config: Optional[StatsNameConfig] = None,
             allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None):
         self.statsd = statsd_client
@@ -485,6 +503,9 @@ class BaseStatsdLogger:
         self.allow_name_validator_config = None
         self.allow_list_validator = None
         self.set_validator(stats_name_config, allow_name_validator_config)
+
+    def create_client(self, statsd_config: StatsParamConfig):
+        raise NotImplementedError
 
     def set_validator(self, stats_name_config, allow_name_validator_config):
         self.stats_name_config = stats_name_config
@@ -525,6 +546,10 @@ class DummyStatsLogger:
         """Timer metric that can be cancelled"""
         return Timer()
 
+    @classmethod
+    def set(cls, stat, dt):
+        """Stats set"""
+
 
 @register_plugin(plugin_type=PluginType.STATS_LOGGER, plugin_name="statsd")
 class SafeStatsdLogger(BaseStatsdLogger):
@@ -532,10 +557,19 @@ class SafeStatsdLogger(BaseStatsdLogger):
 
     def __init__(
             self,
-            statsd_client,
+            statsd_client=None,
             stats_name_config: Optional[StatsNameConfig] = None,
             allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None):
         super().__init__(statsd_client, stats_name_config, allow_name_validator_config)
+
+    def create_client(self, statsd_config: StatsParamConfig):
+        from statsd import StatsClient
+        statsd = StatsClient(
+            host=statsd_config.statsd_host,
+            port=statsd_config.statsd_port,
+            prefix=statsd_config.statsd_prefix
+        )
+        self.statsd = statsd
 
     @validate_stat
     def incr(self, stat, count=1, rate=1):
@@ -580,6 +614,12 @@ class SafeStatsdLogger(BaseStatsdLogger):
             return Timer(self.statsd.timer(stat, *args, **kwargs))
         return Timer()
 
+    @validate_stat
+    def set(self, stat, dt):
+        if self.allow_list_validator.test(stat):
+            return self.statsd.set(stat, dt)
+        return None
+
 
 @register_plugin(plugin_type=PluginType.STATS_LOGGER, plugin_name="dog_statsd")
 class SafeDogStatsdLogger(BaseStatsdLogger):
@@ -587,13 +627,23 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
 
     def __init__(
             self,
-            dog_statsd_client,
+            dog_statsd_client=None,
             stats_name_config: Optional[StatsNameConfig] = None,
             allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None):
         super().__init__(
             dog_statsd_client,
             stats_name_config,
             allow_name_validator_config)
+
+    def create_client(self, statsd_config: StatsParamConfig):
+        from datadog import DogStatsd
+        statsd = DogStatsd(
+            host=statsd_config.statsd_host,
+            port=statsd_config.statsd_port,
+            namespace=statsd_config.statsd_prefix,
+            constant_tags=statsd_config.statsd_prefix
+        )
+        self.statsd = statsd
 
     @validate_stat
     def incr(self, stat, count=1, rate=1, tags=None):
@@ -643,8 +693,13 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
                     **kwargs))
         return Timer()
 
+    @classmethod
+    def set(cls, stat, dt):
+        """Stats set"""
+
 
 def get_current_stats_logger(
         name: Optional[str] = None) -> StatsLogger:
+    """获得默认的statsd client ."""
     name = name if name else "default"
     return get_plugin_instance(PluginType.STATS_LOGGER, name)

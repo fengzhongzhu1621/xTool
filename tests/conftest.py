@@ -5,11 +5,19 @@ import re
 import string
 import sys
 import uuid
-
+import logging
 import pytest
 from xTool.tests.fixtures import timer
 
 # pytest_plugins = ['xTool.tests.pytest_plugin']
+
+logging_format = """module: %(module)s; \
+function: %(funcName)s(); \
+message: %(message)s"""
+
+logging.basicConfig(
+    format=logging_format, level=logging.INFO
+)
 
 
 random.seed("Pack my box with five dozen liquor jugs.")
