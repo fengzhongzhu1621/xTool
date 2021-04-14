@@ -39,9 +39,11 @@ class TestSafeStatsdLogger(TestCase):
 def test_get_current_stats_logger():
     stats_logger = get_current_stats_logger("statsd")
 
+    # 设置客户端
     statsd_config = StatsParamConfig()
     stats_logger.create_client(statsd_config)
 
+    # 设置验证器
     stats_name_config = None
     allow_name_validator_config = None
     stats_logger.set_validator(stats_name_config, allow_name_validator_config)
