@@ -142,6 +142,7 @@ class StatsClient(StatsClientBase):
             host, port, fam, socket.SOCK_DGRAM)[0]
         self._addr = addr
         self._sock = socket.socket(family, socket.SOCK_DGRAM)
+        self._sock.setblocking(False)
         self._prefix = prefix
         self._maxudpsize = maxudpsize
 
