@@ -150,8 +150,18 @@ install_requires.extend([
 
 
 if PY3:
-    ext_modules = [Extension('xTool/decorators._helpers',
-                             ['xTool/decorators/_helpers.c']), ]
+    ext_modules = [
+        Extension('xTool/decorators._helpers',
+                  ['xTool/decorators/_helpers.c']),
+        Extension(
+            "xTool.cython.example",
+            [
+                "xTool/cython/example.pyx"
+            ],
+            extra_compile_args=['-O3'],
+            include_dirs=['.']
+        ),
+    ]
 else:
     ext_modules = []
 
