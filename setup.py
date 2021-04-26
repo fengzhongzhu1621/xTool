@@ -158,8 +158,10 @@ if PY3:
             [
                 "xTool/cython/example.pyx"
             ],
-            extra_compile_args=['-O3'],
-            include_dirs=['.']
+            extra_compile_args=["-std=c++11", '-O3'],
+            include_dirs=['.'],
+            language="c++",
+            extra_link_args=["-std=c++11"]
         ),
     ]
 else:

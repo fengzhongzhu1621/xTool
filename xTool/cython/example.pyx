@@ -3,6 +3,7 @@
 
 from libc.string cimport strcpy
 from libc.string cimport memset
+from cpython.ref cimport PyObject,Py_INCREF,Py_DECREF
 
 
 cdef class CythonDemo:
