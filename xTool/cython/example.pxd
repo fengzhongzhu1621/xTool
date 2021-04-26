@@ -37,5 +37,7 @@ cdef class CythonDemo:
         int int_a
         char char_a[16]
         bint b_int_a
+        queue[int] queue_a
 
-    cpdef str action_strcpy(self)
+    cpdef str strcpy(self)
+    cpdef int get_queue_size(self)
