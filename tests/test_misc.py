@@ -165,3 +165,15 @@ def test_make_snake_case():
 
 def test_md5():
     assert misc.md5("1") == "c4ca4238a0b923820dcc509a6f75849b"
+
+
+def test_use_times_generator():
+    auto_id_generator = misc.UseTimesGenerator()
+    actual = auto_id_generator("a")
+    assert actual == 1
+    actual = auto_id_generator("b")
+    assert actual == 1
+    actual = auto_id_generator("b")
+    assert actual == 2
+    actual = auto_id_generator("c")
+    assert actual == 1

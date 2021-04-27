@@ -469,8 +469,8 @@ def get_bool_env(name: str, default=None) -> bool:
 def extract_stack(f=None, limit=None):
     """Replacement for traceback.extract_stack() that only does the
     necessary work for asyncio debug mode.
-	
-	来自python3.9 asyncio
+
+        来自python3.9 asyncio
     """
     if f is None:
         f = sys._getframe().f_back
@@ -483,3 +483,22 @@ def extract_stack(f=None, limit=None):
                                            lookup_lines=False)
     stack.reverse()
     return stack
+
+
+class UseTimesGenerator:
+    """获得每个对象的使用次数 ."""
+    def __init__(self):
+        self.cache = {}
+
+    def __call__(self, obj: object):
+        """获得自增ID，范围1 ～ 4294967295，线程不安全 ."""
+        if obj not in self.cache:
+            # 初始值为1
+            value = 1
+            self.cache[obj] = 1
+        else:
+            # 下一值自增
+            old_value = self.cache[obj]
+            value = (old_value + 1) & 0xffffffff
+        self.cache[obj] = value
+        return value
