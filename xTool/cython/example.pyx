@@ -22,17 +22,25 @@ cdef class CythonDemo:
         self.queue_a.push(200)
         return self.queue_a.size()
 
-    cpdef int enqueue(self, int value):
+    cdef int _enqueue(self, int value) nogil:
         cdef lock_guard[recursive_mutex]* lck = new lock_guard[recursive_mutex](self.enqueue_mtx)
         self.queue_a.push(value)
         del lck
         return 0
 
-    cpdef int dequeue(self):
+    cpdef int enqueue(self, int value):
+        cdef int ret = self._enqueue(value)
+        return ret
+
+    cdef int _dequeue(self) nogil:
         cdef lock_guard[recursive_mutex]* lck = new lock_guard[recursive_mutex](self.dequeue_mtx)
         # 获得队首元素的引用
         cdef int value = self.queue_a.front()
         # 弹出队首元素
         self.queue_a.pop()
         del lck
+        return value
+
+    cpdef int dequeue(self):
+        cdef int value = self._dequeue()
         return value

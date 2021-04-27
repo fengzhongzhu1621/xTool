@@ -46,5 +46,7 @@ cdef class CythonDemo:
 
     cpdef str strcpy(self)
     cpdef uint get_queue_size(self)
+    cdef int _enqueue(self, int value) nogil
     cpdef int enqueue(self, int value)
+    cdef int _dequeue(self) nogil
     cpdef int dequeue(self)
