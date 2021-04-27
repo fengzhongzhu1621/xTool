@@ -4,6 +4,7 @@
 from libc.string cimport strcpy
 from libc.string cimport memset
 from cpython.ref cimport PyObject,Py_INCREF,Py_DECREF
+from cpython.bytes cimport PyBytes_FromStringAndSize
 
 
 cdef class CythonDemo:
@@ -16,7 +17,22 @@ cdef class CythonDemo:
         result = self.char_a.decode('utf8')
         return result
 
-    cpdef int get_queue_size(self):
+    cpdef uint get_queue_size(self):
         self.queue_a.push(100)
         self.queue_a.push(200)
         return self.queue_a.size()
+
+    cpdef int enqueue(self, int value):
+        cdef lock_guard[recursive_mutex]* lck = new lock_guard[recursive_mutex](self.enqueue_mtx)
+        self.queue_a.push(value)
+        del lck
+        return 0
+
+    cpdef int dequeue(self):
+        cdef lock_guard[recursive_mutex]* lck = new lock_guard[recursive_mutex](self.dequeue_mtx)
+        # 获得队首元素的引用
+        cdef int value = self.queue_a.front()
+        # 弹出队首元素
+        self.queue_a.pop()
+        del lck
+        return value

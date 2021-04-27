@@ -1,7 +1,7 @@
 #!python
 # cython: language_level=3, boundscheck=False, wraparound=False
 
-from libcpp.queue cimport queue
+from libcpp.queue cimport queue     # 线程不安全的
 
 from cpython.ref cimport PyObject
 
@@ -28,6 +28,7 @@ cdef extern from "<mutex>" namespace "std" nogil:
         pass
 
     cdef cppclass lock_guard[T]:
+        # 构造函数
         lock_guard(recursive_mutex rm)
 
 
@@ -38,6 +39,12 @@ cdef class CythonDemo:
         char char_a[16]
         bint b_int_a
         queue[int] queue_a
+        # 入队锁
+        recursive_mutex enqueue_mtx
+        # 出队锁
+        recursive_mutex dequeue_mtx
 
     cpdef str strcpy(self)
-    cpdef int get_queue_size(self)
+    cpdef uint get_queue_size(self)
+    cpdef int enqueue(self, int value)
+    cpdef int dequeue(self)

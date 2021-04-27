@@ -15,3 +15,9 @@ class TestCythonDemo(TestCase):
     def test_get_queue_size(self):
         actual = self.demo.get_queue_size()
         assert actual == 2
+
+    def test_enqueue(self):
+        actual = self.demo.enqueue(300)
+        assert actual == 0
+        actual = self.demo.dequeue()
+        assert actual == 300
