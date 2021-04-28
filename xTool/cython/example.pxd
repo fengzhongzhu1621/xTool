@@ -4,6 +4,7 @@
 from libcpp.queue cimport queue     # 线程不安全的
 
 from cpython.ref cimport PyObject
+from libc.stdint cimport (uint8_t, uint16_t, uint32_t, int32_t)
 
 
 ctypedef unsigned short ushort

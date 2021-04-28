@@ -11,7 +11,7 @@
         ],
         "name": "xTool.codec.pickle_codec",
         "sources": [
-            "xTool/codec/pickle_codec.pyx"
+            "xTool/codec/pickle_codec_c.pyx"
         ]
     },
     "module_name": "xTool.codec.pickle_codec"
@@ -831,19 +831,19 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "xTool/codec/pickle_codec.pyx",
+  "xTool/codec/pickle_codec_c.pyx",
   "stringsource",
 };
 
 /*--- Type declarations ---*/
 struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec;
 
-/* "xTool/codec/pickle_codec.pxd":5
+/* "xTool/codec/pickle_codec_c.pyx":7
  * 
  * 
  * cdef class PickleCodec:             # <<<<<<<<<<<<<<
- *     cpdef bytes encode(self, object obj)
- *     cpdef object decode(self, bytes data)
+ *     cpdef bytes encode(self, object obj):
+ *         return pickle.dumps(obj)
  */
 struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec {
   PyObject_HEAD
@@ -851,14 +851,6 @@ struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec {
 };
 
 
-
-/* "xTool/codec/pickle_codec.pyx":7
- * 
- * 
- * cdef class PickleCodec:             # <<<<<<<<<<<<<<
- *     cpdef bytes encode(self, object obj):
- *         return pickle.dumps(obj)
- */
 
 struct __pyx_vtabstruct_5xTool_5codec_12pickle_codec_PickleCodec {
   PyObject *(*encode)(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *, PyObject *, int __pyx_skip_dispatch);
@@ -1276,7 +1268,7 @@ static PyObject *__pyx_tuple_;
 static PyObject *__pyx_codeobj__2;
 /* Late includes */
 
-/* "xTool/codec/pickle_codec.pyx":8
+/* "xTool/codec/pickle_codec_c.pyx":8
  * 
  * cdef class PickleCodec:
  *     cpdef bytes encode(self, object obj):             # <<<<<<<<<<<<<<
@@ -1344,7 +1336,7 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_encode(CYTHO
     #endif
   }
 
-  /* "xTool/codec/pickle_codec.pyx":9
+  /* "xTool/codec/pickle_codec_c.pyx":9
  * cdef class PickleCodec:
  *     cpdef bytes encode(self, object obj):
  *         return pickle.dumps(obj)             # <<<<<<<<<<<<<<
@@ -1377,7 +1369,7 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_encode(CYTHO
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "xTool/codec/pickle_codec.pyx":8
+  /* "xTool/codec/pickle_codec_c.pyx":8
  * 
  * cdef class PickleCodec:
  *     cpdef bytes encode(self, object obj):             # <<<<<<<<<<<<<<
@@ -1438,7 +1430,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_encode(stru
   return __pyx_r;
 }
 
-/* "xTool/codec/pickle_codec.pyx":11
+/* "xTool/codec/pickle_codec_c.pyx":11
  *         return pickle.dumps(obj)
  * 
  *     cpdef object decode(self, bytes data):             # <<<<<<<<<<<<<<
@@ -1504,7 +1496,7 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_decode(CYTHO
     #endif
   }
 
-  /* "xTool/codec/pickle_codec.pyx":12
+  /* "xTool/codec/pickle_codec_c.pyx":12
  * 
  *     cpdef object decode(self, bytes data):
  *         return pickle.loads(data)             # <<<<<<<<<<<<<<
@@ -1534,7 +1526,7 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_decode(CYTHO
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "xTool/codec/pickle_codec.pyx":11
+  /* "xTool/codec/pickle_codec_c.pyx":11
  *         return pickle.dumps(obj)
  * 
  *     cpdef object decode(self, bytes data):             # <<<<<<<<<<<<<<
@@ -2760,7 +2752,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "xTool/codec/pickle_codec.pyx":4
+  /* "xTool/codec/pickle_codec_c.pyx":4
  * #cython: language_level=3, boundscheck=False, wraparound=False
  * 
  * import pickle             # <<<<<<<<<<<<<<
@@ -2782,7 +2774,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_PickleCodec, __pyx_t_1) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "xTool/codec/pickle_codec.pyx":1
+  /* "xTool/codec/pickle_codec_c.pyx":1
  * #!python             # <<<<<<<<<<<<<<
  * #cython: language_level=3, boundscheck=False, wraparound=False
  * 

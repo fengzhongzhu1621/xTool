@@ -650,6 +650,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include <queue>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <mutex>
 #ifdef _OPENMP
 #include <omp.h>
@@ -864,7 +865,7 @@ static const char *__pyx_f[] = {
   "type.pxd",
 };
 
-/* "xTool/cython/example.pxd":9
+/* "xTool/cython/example.pxd":10
  * 
  * 
  * ctypedef unsigned short ushort             # <<<<<<<<<<<<<<
@@ -873,7 +874,7 @@ static const char *__pyx_f[] = {
  */
 typedef unsigned short __pyx_t_5xTool_6cython_7example_ushort;
 
-/* "xTool/cython/example.pxd":10
+/* "xTool/cython/example.pxd":11
  * 
  * ctypedef unsigned short ushort
  * ctypedef unsigned int uint             # <<<<<<<<<<<<<<
@@ -882,7 +883,7 @@ typedef unsigned short __pyx_t_5xTool_6cython_7example_ushort;
  */
 typedef unsigned int __pyx_t_5xTool_6cython_7example_uint;
 
-/* "xTool/cython/example.pxd":11
+/* "xTool/cython/example.pxd":12
  * ctypedef unsigned short ushort
  * ctypedef unsigned int uint
  * ctypedef unsigned long ulong             # <<<<<<<<<<<<<<
@@ -894,7 +895,7 @@ typedef unsigned long __pyx_t_5xTool_6cython_7example_ulong;
 /*--- Type declarations ---*/
 struct __pyx_obj_5xTool_6cython_7example_CythonDemo;
 
-/* "xTool/cython/example.pxd":35
+/* "xTool/cython/example.pxd":36
  * 
  * 
  * cdef class CythonDemo:             # <<<<<<<<<<<<<<
@@ -1293,6 +1294,8 @@ static PyTypeObject *__pyx_ptype_7cpython_4type_type = 0;
 /* Module declarations from 'cpython.object' */
 
 /* Module declarations from 'cpython.ref' */
+
+/* Module declarations from 'libc.stdint' */
 
 /* Module declarations from 'cpython.bytes' */
 
@@ -2195,7 +2198,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_8dequeue(struct _
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pxd":37
+/* "xTool/cython/example.pxd":38
  * cdef class CythonDemo:
  *     cdef:
  *         public object object_a             # <<<<<<<<<<<<<<

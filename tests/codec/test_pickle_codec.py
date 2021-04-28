@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pickle
-from timeit import Timer
+from timeit import Timer, timeit
 from xTool.codec.pickle_codec import PickleCodec
 
 
@@ -17,17 +17,22 @@ py_codec = PyPickleCodec()
 cython_codec = PickleCodec()
 
 
-@Timer
-def benchmark_py_picke_codec():
-    value = py_codec.encode({"a": 1, "b": 2})
-    py_codec.decode(value)
+# @Timer
+def test_benchmark_py_picke_codec():
+    value = {"a": 1, "b": 2}
+    value_codec = py_codec.encode(value)
+    actual = py_codec.decode(value_codec)
+    assert actual == value
+
+# @Timer
+def test_benchmark_cython_picke_codec():
+    value = {"a": 1, "b": 2}
+    value_codec = cython_codec.encode(value)
+    actual = cython_codec.decode(value_codec)
+    assert actual == value
 
 
-@Timer
-def benchmark_cython_picke_codec():
-    value = cython_codec.encode({"a": 1, "b": 2})
-    cython_codec.decode(value)
-
-
-print("benchmark_py_picke_codec: ", benchmark_py_picke_codec.timeit())
-print("benchmark_cython_picke_codec: ", benchmark_cython_picke_codec.timeit())
+print("benchmark_py_picke_codec: ", Timer(
+    test_benchmark_py_picke_codec).timeit())
+print("benchmark_cython_picke_codec: ", Timer(
+    test_benchmark_cython_picke_codec).timeit())
