@@ -9,12 +9,12 @@
         "include_dirs": [
             "."
         ],
-        "name": "xTool.codec.pickle_codec",
+        "name": "xTool.codec.pickle_codec_c",
         "sources": [
             "xTool/codec/pickle_codec_c.pyx"
         ]
     },
-    "module_name": "xTool.codec.pickle_codec"
+    "module_name": "xTool.codec.pickle_codec_c"
 }
 END: Cython Metadata */
 
@@ -620,8 +620,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__xTool__codec__pickle_codec
-#define __PYX_HAVE_API__xTool__codec__pickle_codec
+#define __PYX_HAVE__xTool__codec__pickle_codec_c
+#define __PYX_HAVE_API__xTool__codec__pickle_codec_c
 /* Early includes */
 #ifdef _OPENMP
 #include <omp.h>
@@ -836,7 +836,21 @@ static const char *__pyx_f[] = {
 };
 
 /*--- Type declarations ---*/
-struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec;
+struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec;
+
+/* "xTool/codec/pickle_codec_c.pxd":5
+ * 
+ * 
+ * cdef class PickleCodec:             # <<<<<<<<<<<<<<
+ *     cpdef bytes encode(self, object obj)
+ *     cpdef object decode(self, bytes data)
+ */
+struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec {
+  PyObject_HEAD
+  struct __pyx_vtabstruct_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_vtab;
+};
+
+
 
 /* "xTool/codec/pickle_codec_c.pyx":7
  * 
@@ -845,18 +859,12 @@ struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec;
  *     cpdef bytes encode(self, object obj):
  *         return pickle.dumps(obj)
  */
-struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec {
-  PyObject_HEAD
-  struct __pyx_vtabstruct_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_vtab;
+
+struct __pyx_vtabstruct_5xTool_5codec_14pickle_codec_c_PickleCodec {
+  PyObject *(*encode)(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *, PyObject *, int __pyx_skip_dispatch);
+  PyObject *(*decode)(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *, PyObject *, int __pyx_skip_dispatch);
 };
-
-
-
-struct __pyx_vtabstruct_5xTool_5codec_12pickle_codec_PickleCodec {
-  PyObject *(*encode)(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *, PyObject *, int __pyx_skip_dispatch);
-  PyObject *(*decode)(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *, PyObject *, int __pyx_skip_dispatch);
-};
-static struct __pyx_vtabstruct_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_vtabptr_5xTool_5codec_12pickle_codec_PickleCodec;
+static struct __pyx_vtabstruct_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_vtabptr_5xTool_5codec_14pickle_codec_c_PickleCodec;
 
 /* --- Runtime support code (head) --- */
 /* Refnanny.proto */
@@ -1184,17 +1192,17 @@ static int __Pyx_check_binary_version(void);
 /* InitStrings.proto */
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
-static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_encode(CYTHON_UNUSED struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v_obj, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_decode(CYTHON_UNUSED struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v_data, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5xTool_5codec_14pickle_codec_c_11PickleCodec_encode(CYTHON_UNUSED struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v_obj, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5xTool_5codec_14pickle_codec_c_11PickleCodec_decode(CYTHON_UNUSED struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v_data, int __pyx_skip_dispatch); /* proto*/
 
-/* Module declarations from 'xTool.codec.pickle_codec' */
-static PyTypeObject *__pyx_ptype_5xTool_5codec_12pickle_codec_PickleCodec = 0;
-static PyObject *__pyx_f_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCodec__set_state(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *, PyObject *); /*proto*/
-#define __Pyx_MODULE_NAME "xTool.codec.pickle_codec"
-extern int __pyx_module_is_main_xTool__codec__pickle_codec;
-int __pyx_module_is_main_xTool__codec__pickle_codec = 0;
+/* Module declarations from 'xTool.codec.pickle_codec_c' */
+static PyTypeObject *__pyx_ptype_5xTool_5codec_14pickle_codec_c_PickleCodec = 0;
+static PyObject *__pyx_f_5xTool_5codec_14pickle_codec_c___pyx_unpickle_PickleCodec__set_state(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *, PyObject *); /*proto*/
+#define __Pyx_MODULE_NAME "xTool.codec.pickle_codec_c"
+extern int __pyx_module_is_main_xTool__codec__pickle_codec_c;
+int __pyx_module_is_main_xTool__codec__pickle_codec_c = 0;
 
-/* Implementation of 'xTool.codec.pickle_codec' */
+/* Implementation of 'xTool.codec.pickle_codec_c' */
 static const char __pyx_k_new[] = "__new__";
 static const char __pyx_k_dict[] = "__dict__";
 static const char __pyx_k_main[] = "__main__";
@@ -1224,7 +1232,7 @@ static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_pyx_unpickle_PickleCodec[] = "__pyx_unpickle_PickleCodec";
-static const char __pyx_k_xTool_codec_pickle_codec[] = "xTool.codec.pickle_codec";
+static const char __pyx_k_xTool_codec_pickle_codec_c[] = "xTool.codec.pickle_codec_c";
 static const char __pyx_k_Incompatible_checksums_s_vs_0xd4[] = "Incompatible checksums (%s vs 0xd41d8cd = ())";
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0xd4;
 static PyObject *__pyx_n_s_PickleCodec;
@@ -1256,13 +1264,13 @@ static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_kp_s_stringsource;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_update;
-static PyObject *__pyx_n_s_xTool_codec_pickle_codec;
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_encode(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v_obj); /* proto */
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_2decode(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v_data); /* proto */
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_4__reduce_cython__(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_6__setstate_cython__(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCodec(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
-static PyObject *__pyx_tp_new_5xTool_5codec_12pickle_codec_PickleCodec(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_n_s_xTool_codec_pickle_codec_c;
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_encode(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v_obj); /* proto */
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_2decode(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v_data); /* proto */
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_4__reduce_cython__(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_6__setstate_cython__(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c___pyx_unpickle_PickleCodec(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_tp_new_5xTool_5codec_14pickle_codec_c_PickleCodec(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_int_222419149;
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_codeobj__2;
@@ -1276,8 +1284,8 @@ static PyObject *__pyx_codeobj__2;
  * 
  */
 
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_1encode(PyObject *__pyx_v_self, PyObject *__pyx_v_obj); /*proto*/
-static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_encode(CYTHON_UNUSED struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v_obj, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_1encode(PyObject *__pyx_v_self, PyObject *__pyx_v_obj); /*proto*/
+static PyObject *__pyx_f_5xTool_5codec_14pickle_codec_c_11PickleCodec_encode(CYTHON_UNUSED struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v_obj, int __pyx_skip_dispatch) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1299,7 +1307,7 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_encode(CYTHO
       #endif
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_1encode)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_1encode)) {
         __Pyx_XDECREF(__pyx_r);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
@@ -1383,7 +1391,7 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_encode(CYTHO
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("xTool.codec.pickle_codec.PickleCodec.encode", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("xTool.codec.pickle_codec_c.PickleCodec.encode", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1392,19 +1400,19 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_encode(CYTHO
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_1encode(PyObject *__pyx_v_self, PyObject *__pyx_v_obj); /*proto*/
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_1encode(PyObject *__pyx_v_self, PyObject *__pyx_v_obj) {
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_1encode(PyObject *__pyx_v_self, PyObject *__pyx_v_obj); /*proto*/
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_1encode(PyObject *__pyx_v_self, PyObject *__pyx_v_obj) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("encode (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_encode(((struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *)__pyx_v_self), ((PyObject *)__pyx_v_obj));
+  __pyx_r = __pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_encode(((struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *)__pyx_v_self), ((PyObject *)__pyx_v_obj));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_encode(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v_obj) {
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_encode(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v_obj) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1413,7 +1421,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_encode(stru
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("encode", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_encode(__pyx_v_self, __pyx_v_obj, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5xTool_5codec_14pickle_codec_c_11PickleCodec_encode(__pyx_v_self, __pyx_v_obj, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1422,7 +1430,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_encode(stru
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("xTool.codec.pickle_codec.PickleCodec.encode", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("xTool.codec.pickle_codec_c.PickleCodec.encode", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1437,8 +1445,8 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_encode(stru
  *         return pickle.loads(data)
  */
 
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_3decode(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
-static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_decode(CYTHON_UNUSED struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v_data, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_3decode(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
+static PyObject *__pyx_f_5xTool_5codec_14pickle_codec_c_11PickleCodec_decode(CYTHON_UNUSED struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v_data, int __pyx_skip_dispatch) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1460,7 +1468,7 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_decode(CYTHO
       #endif
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_decode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_3decode)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_3decode)) {
         __Pyx_XDECREF(__pyx_r);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
@@ -1539,7 +1547,7 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_decode(CYTHO
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("xTool.codec.pickle_codec.PickleCodec.decode", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("xTool.codec.pickle_codec_c.PickleCodec.decode", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1548,8 +1556,8 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_decode(CYTHO
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_3decode(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_3decode(PyObject *__pyx_v_self, PyObject *__pyx_v_data) {
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_3decode(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_3decode(PyObject *__pyx_v_self, PyObject *__pyx_v_data) {
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -1557,7 +1565,7 @@ static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_3decode(PyO
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("decode (wrapper)", 0);
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_data), (&PyBytes_Type), 1, "data", 1))) __PYX_ERR(0, 11, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_2decode(((struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *)__pyx_v_self), ((PyObject*)__pyx_v_data));
+  __pyx_r = __pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_2decode(((struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *)__pyx_v_self), ((PyObject*)__pyx_v_data));
 
   /* function exit code */
   goto __pyx_L0;
@@ -1568,7 +1576,7 @@ static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_3decode(PyO
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_2decode(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v_data) {
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_2decode(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v_data) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1577,7 +1585,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_2decode(str
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("decode", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_decode(__pyx_v_self, __pyx_v_data, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5xTool_5codec_14pickle_codec_c_11PickleCodec_decode(__pyx_v_self, __pyx_v_data, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1586,7 +1594,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_2decode(str
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("xTool.codec.pickle_codec.PickleCodec.decode", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("xTool.codec.pickle_codec_c.PickleCodec.decode", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1601,19 +1609,19 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_2decode(str
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_5__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_5__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_5__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_5__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_4__reduce_cython__(((struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_4__reduce_cython__(((struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_4__reduce_cython__(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self) {
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_4__reduce_cython__(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self) {
   PyObject *__pyx_v_state = 0;
   PyObject *__pyx_v__dict = 0;
   int __pyx_v_use_setstate;
@@ -1812,7 +1820,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_4__reduce_c
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("xTool.codec.pickle_codec.PickleCodec.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("xTool.codec.pickle_codec_c.PickleCodec.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_state);
@@ -1830,19 +1838,19 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_4__reduce_c
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_7__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_7__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_7__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_7__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_6__setstate_cython__(((struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_6__setstate_cython__(((struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_6__setstate_cython__(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c_11PickleCodec_6__setstate_cython__(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1857,7 +1865,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_6__setstate
  *     __pyx_unpickle_PickleCodec__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
  */
   if (!(likely(PyTuple_CheckExact(__pyx_v___pyx_state))||((__pyx_v___pyx_state) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_v___pyx_state)->tp_name), 0))) __PYX_ERR(1, 17, __pyx_L1_error)
-  __pyx_t_1 = __pyx_f_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCodec__set_state(__pyx_v_self, ((PyObject*)__pyx_v___pyx_state)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 17, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5xTool_5codec_14pickle_codec_c___pyx_unpickle_PickleCodec__set_state(__pyx_v_self, ((PyObject*)__pyx_v___pyx_state)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
@@ -1873,7 +1881,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_6__setstate
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("xTool.codec.pickle_codec.PickleCodec.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("xTool.codec.pickle_codec_c.PickleCodec.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1888,9 +1896,9 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec_11PickleCodec_6__setstate
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_1__pyx_unpickle_PickleCodec(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5xTool_5codec_12pickle_codec_1__pyx_unpickle_PickleCodec = {"__pyx_unpickle_PickleCodec", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5xTool_5codec_12pickle_codec_1__pyx_unpickle_PickleCodec, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_1__pyx_unpickle_PickleCodec(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_1__pyx_unpickle_PickleCodec(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5xTool_5codec_14pickle_codec_c_1__pyx_unpickle_PickleCodec = {"__pyx_unpickle_PickleCodec", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5xTool_5codec_14pickle_codec_c_1__pyx_unpickle_PickleCodec, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5xTool_5codec_14pickle_codec_c_1__pyx_unpickle_PickleCodec(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v___pyx_type = 0;
   long __pyx_v___pyx_checksum;
   PyObject *__pyx_v___pyx_state = 0;
@@ -1952,18 +1960,18 @@ static PyObject *__pyx_pw_5xTool_5codec_12pickle_codec_1__pyx_unpickle_PickleCod
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__pyx_unpickle_PickleCodec", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 1, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("xTool.codec.pickle_codec.__pyx_unpickle_PickleCodec", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("xTool.codec.pickle_codec_c.__pyx_unpickle_PickleCodec", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCodec(__pyx_self, __pyx_v___pyx_type, __pyx_v___pyx_checksum, __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5xTool_5codec_14pickle_codec_c___pyx_unpickle_PickleCodec(__pyx_self, __pyx_v___pyx_type, __pyx_v___pyx_checksum, __pyx_v___pyx_state);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCodec(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5xTool_5codec_14pickle_codec_c___pyx_unpickle_PickleCodec(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_v___pyx_PickleError = 0;
   PyObject *__pyx_v___pyx_result = 0;
   PyObject *__pyx_r = NULL;
@@ -2060,7 +2068,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCode
  *     if __pyx_state is not None:
  *         __pyx_unpickle_PickleCodec__set_state(<PickleCodec> __pyx_result, __pyx_state)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5xTool_5codec_12pickle_codec_PickleCodec), __pyx_n_s_new); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 7, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5xTool_5codec_14pickle_codec_c_PickleCodec), __pyx_n_s_new); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -2099,7 +2107,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCode
  * cdef __pyx_unpickle_PickleCodec__set_state(PickleCodec __pyx_result, tuple __pyx_state):
  */
     if (!(likely(PyTuple_CheckExact(__pyx_v___pyx_state))||((__pyx_v___pyx_state) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_v___pyx_state)->tp_name), 0))) __PYX_ERR(1, 9, __pyx_L1_error)
-    __pyx_t_3 = __pyx_f_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCodec__set_state(((struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *)__pyx_v___pyx_result), ((PyObject*)__pyx_v___pyx_state)); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 9, __pyx_L1_error)
+    __pyx_t_3 = __pyx_f_5xTool_5codec_14pickle_codec_c___pyx_unpickle_PickleCodec__set_state(((struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *)__pyx_v___pyx_result), ((PyObject*)__pyx_v___pyx_state)); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 9, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
@@ -2136,7 +2144,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCode
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("xTool.codec.pickle_codec.__pyx_unpickle_PickleCodec", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("xTool.codec.pickle_codec_c.__pyx_unpickle_PickleCodec", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v___pyx_PickleError);
@@ -2154,7 +2162,7 @@ static PyObject *__pyx_pf_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCode
  *         __pyx_result.__dict__.update(__pyx_state[0])
  */
 
-static PyObject *__pyx_f_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCodec__set_state(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_f_5xTool_5codec_14pickle_codec_c___pyx_unpickle_PickleCodec__set_state(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -2246,17 +2254,17 @@ static PyObject *__pyx_f_5xTool_5codec_12pickle_codec___pyx_unpickle_PickleCodec
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("xTool.codec.pickle_codec.__pyx_unpickle_PickleCodec__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("xTool.codec.pickle_codec_c.__pyx_unpickle_PickleCodec__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static struct __pyx_vtabstruct_5xTool_5codec_12pickle_codec_PickleCodec __pyx_vtable_5xTool_5codec_12pickle_codec_PickleCodec;
+static struct __pyx_vtabstruct_5xTool_5codec_14pickle_codec_c_PickleCodec __pyx_vtable_5xTool_5codec_14pickle_codec_c_PickleCodec;
 
-static PyObject *__pyx_tp_new_5xTool_5codec_12pickle_codec_PickleCodec(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
-  struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *p;
+static PyObject *__pyx_tp_new_5xTool_5codec_14pickle_codec_c_PickleCodec(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+  struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *p;
   PyObject *o;
   if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
     o = (*t->tp_alloc)(t, 0);
@@ -2264,12 +2272,12 @@ static PyObject *__pyx_tp_new_5xTool_5codec_12pickle_codec_PickleCodec(PyTypeObj
     o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_empty_tuple, 0);
   }
   if (unlikely(!o)) return 0;
-  p = ((struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *)o);
-  p->__pyx_vtab = __pyx_vtabptr_5xTool_5codec_12pickle_codec_PickleCodec;
+  p = ((struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *)o);
+  p->__pyx_vtab = __pyx_vtabptr_5xTool_5codec_14pickle_codec_c_PickleCodec;
   return o;
 }
 
-static void __pyx_tp_dealloc_5xTool_5codec_12pickle_codec_PickleCodec(PyObject *o) {
+static void __pyx_tp_dealloc_5xTool_5codec_14pickle_codec_c_PickleCodec(PyObject *o) {
   #if CYTHON_USE_TP_FINALIZE
   if (unlikely(PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE) && Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
     if (PyObject_CallFinalizerFromDealloc(o)) return;
@@ -2278,20 +2286,20 @@ static void __pyx_tp_dealloc_5xTool_5codec_12pickle_codec_PickleCodec(PyObject *
   (*Py_TYPE(o)->tp_free)(o);
 }
 
-static PyMethodDef __pyx_methods_5xTool_5codec_12pickle_codec_PickleCodec[] = {
-  {"encode", (PyCFunction)__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_1encode, METH_O, 0},
-  {"decode", (PyCFunction)__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_3decode, METH_O, 0},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_5__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_5xTool_5codec_12pickle_codec_11PickleCodec_7__setstate_cython__, METH_O, 0},
+static PyMethodDef __pyx_methods_5xTool_5codec_14pickle_codec_c_PickleCodec[] = {
+  {"encode", (PyCFunction)__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_1encode, METH_O, 0},
+  {"decode", (PyCFunction)__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_3decode, METH_O, 0},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_5__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_5xTool_5codec_14pickle_codec_c_11PickleCodec_7__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
-static PyTypeObject __pyx_type_5xTool_5codec_12pickle_codec_PickleCodec = {
+static PyTypeObject __pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec = {
   PyVarObject_HEAD_INIT(0, 0)
-  "xTool.codec.pickle_codec.PickleCodec", /*tp_name*/
-  sizeof(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec), /*tp_basicsize*/
+  "xTool.codec.pickle_codec_c.PickleCodec", /*tp_name*/
+  sizeof(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_5xTool_5codec_12pickle_codec_PickleCodec, /*tp_dealloc*/
+  __pyx_tp_dealloc_5xTool_5codec_14pickle_codec_c_PickleCodec, /*tp_dealloc*/
   #if PY_VERSION_HEX < 0x030800b4
   0, /*tp_print*/
   #endif
@@ -2324,7 +2332,7 @@ static PyTypeObject __pyx_type_5xTool_5codec_12pickle_codec_PickleCodec = {
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
   0, /*tp_iternext*/
-  __pyx_methods_5xTool_5codec_12pickle_codec_PickleCodec, /*tp_methods*/
+  __pyx_methods_5xTool_5codec_14pickle_codec_c_PickleCodec, /*tp_methods*/
   0, /*tp_members*/
   0, /*tp_getset*/
   0, /*tp_base*/
@@ -2334,7 +2342,7 @@ static PyTypeObject __pyx_type_5xTool_5codec_12pickle_codec_PickleCodec = {
   0, /*tp_dictoffset*/
   0, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_5xTool_5codec_12pickle_codec_PickleCodec, /*tp_new*/
+  __pyx_tp_new_5xTool_5codec_14pickle_codec_c_PickleCodec, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -2362,17 +2370,17 @@ static PyMethodDef __pyx_methods[] = {
 #if PY_MAJOR_VERSION >= 3
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 static PyObject* __pyx_pymod_create(PyObject *spec, PyModuleDef *def); /*proto*/
-static int __pyx_pymod_exec_pickle_codec(PyObject* module); /*proto*/
+static int __pyx_pymod_exec_pickle_codec_c(PyObject* module); /*proto*/
 static PyModuleDef_Slot __pyx_moduledef_slots[] = {
   {Py_mod_create, (void*)__pyx_pymod_create},
-  {Py_mod_exec, (void*)__pyx_pymod_exec_pickle_codec},
+  {Py_mod_exec, (void*)__pyx_pymod_exec_pickle_codec_c},
   {0, NULL}
 };
 #endif
 
 static struct PyModuleDef __pyx_moduledef = {
     PyModuleDef_HEAD_INIT,
-    "pickle_codec",
+    "pickle_codec_c",
     0, /* m_doc */
   #if CYTHON_PEP489_MULTI_PHASE_INIT
     0, /* m_size */
@@ -2431,7 +2439,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_stringsource, __pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 0, 1, 0},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_update, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
-  {&__pyx_n_s_xTool_codec_pickle_codec, __pyx_k_xTool_codec_pickle_codec, sizeof(__pyx_k_xTool_codec_pickle_codec), 0, 0, 1, 1},
+  {&__pyx_n_s_xTool_codec_pickle_codec_c, __pyx_k_xTool_codec_pickle_codec_c, sizeof(__pyx_k_xTool_codec_pickle_codec_c), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
@@ -2505,20 +2513,20 @@ static int __Pyx_modinit_type_init_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  __pyx_vtabptr_5xTool_5codec_12pickle_codec_PickleCodec = &__pyx_vtable_5xTool_5codec_12pickle_codec_PickleCodec;
-  __pyx_vtable_5xTool_5codec_12pickle_codec_PickleCodec.encode = (PyObject *(*)(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_encode;
-  __pyx_vtable_5xTool_5codec_12pickle_codec_PickleCodec.decode = (PyObject *(*)(struct __pyx_obj_5xTool_5codec_12pickle_codec_PickleCodec *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5xTool_5codec_12pickle_codec_11PickleCodec_decode;
-  if (PyType_Ready(&__pyx_type_5xTool_5codec_12pickle_codec_PickleCodec) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_vtabptr_5xTool_5codec_14pickle_codec_c_PickleCodec = &__pyx_vtable_5xTool_5codec_14pickle_codec_c_PickleCodec;
+  __pyx_vtable_5xTool_5codec_14pickle_codec_c_PickleCodec.encode = (PyObject *(*)(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5xTool_5codec_14pickle_codec_c_11PickleCodec_encode;
+  __pyx_vtable_5xTool_5codec_14pickle_codec_c_PickleCodec.decode = (PyObject *(*)(struct __pyx_obj_5xTool_5codec_14pickle_codec_c_PickleCodec *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5xTool_5codec_14pickle_codec_c_11PickleCodec_decode;
+  if (PyType_Ready(&__pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
-  __pyx_type_5xTool_5codec_12pickle_codec_PickleCodec.tp_print = 0;
+  __pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec.tp_print = 0;
   #endif
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5xTool_5codec_12pickle_codec_PickleCodec.tp_dictoffset && __pyx_type_5xTool_5codec_12pickle_codec_PickleCodec.tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_type_5xTool_5codec_12pickle_codec_PickleCodec.tp_getattro = __Pyx_PyObject_GenericGetAttr;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec.tp_dictoffset && __pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec.tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_5xTool_5codec_12pickle_codec_PickleCodec.tp_dict, __pyx_vtabptr_5xTool_5codec_12pickle_codec_PickleCodec) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_PickleCodec, (PyObject *)&__pyx_type_5xTool_5codec_12pickle_codec_PickleCodec) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5xTool_5codec_12pickle_codec_PickleCodec) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
-  __pyx_ptype_5xTool_5codec_12pickle_codec_PickleCodec = &__pyx_type_5xTool_5codec_12pickle_codec_PickleCodec;
+  if (__Pyx_SetVtable(__pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec.tp_dict, __pyx_vtabptr_5xTool_5codec_14pickle_codec_c_PickleCodec) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_PickleCodec, (PyObject *)&__pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_ptype_5xTool_5codec_14pickle_codec_c_PickleCodec = &__pyx_type_5xTool_5codec_14pickle_codec_c_PickleCodec;
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -2569,11 +2577,11 @@ static int __Pyx_modinit_function_import_code(void) {
 
 
 #if PY_MAJOR_VERSION < 3
-__Pyx_PyMODINIT_FUNC initpickle_codec(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC initpickle_codec(void)
+__Pyx_PyMODINIT_FUNC initpickle_codec_c(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC initpickle_codec_c(void)
 #else
-__Pyx_PyMODINIT_FUNC PyInit_pickle_codec(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC PyInit_pickle_codec(void)
+__Pyx_PyMODINIT_FUNC PyInit_pickle_codec_c(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC PyInit_pickle_codec_c(void)
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 {
   return PyModuleDef_Init(&__pyx_moduledef);
@@ -2640,7 +2648,7 @@ bad:
 }
 
 
-static CYTHON_SMALL_CODE int __pyx_pymod_exec_pickle_codec(PyObject *__pyx_pyinit_module)
+static CYTHON_SMALL_CODE int __pyx_pymod_exec_pickle_codec_c(PyObject *__pyx_pyinit_module)
 #endif
 #endif
 {
@@ -2652,7 +2660,7 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_pickle_codec(PyObject *__pyx_pyini
   #if CYTHON_PEP489_MULTI_PHASE_INIT
   if (__pyx_m) {
     if (__pyx_m == __pyx_pyinit_module) return 0;
-    PyErr_SetString(PyExc_RuntimeError, "Module 'pickle_codec' has already been imported. Re-initialisation is not supported.");
+    PyErr_SetString(PyExc_RuntimeError, "Module 'pickle_codec_c' has already been imported. Re-initialisation is not supported.");
     return -1;
   }
   #elif PY_MAJOR_VERSION >= 3
@@ -2667,7 +2675,7 @@ if (!__Pyx_RefNanny) {
       Py_FatalError("failed to import 'refnanny' module");
 }
 #endif
-  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_pickle_codec(void)", 0);
+  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_pickle_codec_c(void)", 0);
   if (__Pyx_check_binary_version() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #ifdef __Pxy_PyFrame_Initialize_Offsets
   __Pxy_PyFrame_Initialize_Offsets();
@@ -2706,7 +2714,7 @@ if (!__Pyx_RefNanny) {
   Py_INCREF(__pyx_m);
   #else
   #if PY_MAJOR_VERSION < 3
-  __pyx_m = Py_InitModule4("pickle_codec", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
+  __pyx_m = Py_InitModule4("pickle_codec_c", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
   #else
   __pyx_m = PyModule_Create(&__pyx_moduledef);
   #endif
@@ -2724,14 +2732,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_xTool__codec__pickle_codec) {
+  if (__pyx_module_is_main_xTool__codec__pickle_codec_c) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "xTool.codec.pickle_codec")) {
-      if (unlikely(PyDict_SetItemString(modules, "xTool.codec.pickle_codec", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "xTool.codec.pickle_codec_c")) {
+      if (unlikely(PyDict_SetItemString(modules, "xTool.codec.pickle_codec_c", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -2769,7 +2777,7 @@ if (!__Pyx_RefNanny) {
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5xTool_5codec_12pickle_codec_1__pyx_unpickle_PickleCodec, NULL, __pyx_n_s_xTool_codec_pickle_codec); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5xTool_5codec_14pickle_codec_c_1__pyx_unpickle_PickleCodec, NULL, __pyx_n_s_xTool_codec_pickle_codec_c); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_PickleCodec, __pyx_t_1) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -2791,11 +2799,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_1);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init xTool.codec.pickle_codec", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init xTool.codec.pickle_codec_c", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init xTool.codec.pickle_codec");
+    PyErr_SetString(PyExc_ImportError, "init xTool.codec.pickle_codec_c");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

@@ -164,9 +164,9 @@ if PY3:
             extra_link_args=["-std=c++11"]
         ),
         Extension(
-            "xTool.codec.pickle_codec",
+            "xTool.codec.pickle_codec_c",
             [
-                "xTool/codec/pickle_codec.pyx"
+                "xTool/codec/pickle_codec_c.pyx"
             ],
             extra_compile_args=['-O3'],
             include_dirs=['.'],

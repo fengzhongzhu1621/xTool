@@ -15,9 +15,13 @@ class PluginType(IntEnum):
     BEFORE_FILTER = 3
     AFTER_FILTER = 4
 
+    # metrics
     STATS_LOGGER = 10
     STATS_NAME_HANDLER = 11             # stats名称验证器
     STATS_NAME_ALLOW_VALIDATOR = 12     # 只允许指定的metrics name
+
+    # 编解码
+    CODEC = 20
 
 
 class PluginStore:

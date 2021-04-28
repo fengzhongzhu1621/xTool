@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import pickle
-from timeit import Timer, timeit
-from xTool.codec.pickle_codec import PickleCodec
+from timeit import Timer
+from xTool.codec.pickle_codec_c import PickleCodec
 
 
 class PyPickleCodec:

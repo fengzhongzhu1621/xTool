@@ -701,13 +701,17 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
         """Stats set"""
 
 
-def get_current_stats_logger(
+def get_stats_logger(
         name: Optional[str] = None) -> StatsLogger:
     """获得默认的statsd client ."""
     name = name if name else "default"
     return get_plugin_instance(PluginType.STATS_LOGGER, name)
 
 
-def set_stats_logger(stats_logger: StatsLogger):
+def get_default_stats_logger():
+    return DEFAULT_STATS_LOGGER
+
+
+def set_default_stats_logger(stats_logger: StatsLogger):
     global DEFAULT_STATS_LOGGER
     DEFAULT_STATS_LOGGER = stats_logger
