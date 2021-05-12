@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import pickle
+import rapidjson as json
 from xTool.plugins.plugin import register_plugin, PluginType
-# from .pickle_codec_c import PickleCodec
 from .codec_type import CodecType
 
 
 @register_plugin(
-    PluginType.CODEC, CodecType.PICKLE
+    PluginType.CODEC, CodecType.JSON
 )
-class PickleCodec:
+class JsonCodec:
     @classmethod
     def encode(cls, obj: object) -> bytes:
-        return pickle.dumps(obj, pickle.HIGHEST_PROTOCOL)
+        return json.dumps(obj).encode("utf8")
 
     @classmethod
     def decode(cls, data: bytes) -> object:
-        return pickle.loads(data)
+        return json.loads(data)
