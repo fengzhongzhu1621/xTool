@@ -11,3 +11,4 @@ class CompressType(Enum):
     BZ2 = 2
     GZIP = 3
 
+    SNAPPY = 4
