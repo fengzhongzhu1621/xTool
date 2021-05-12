@@ -1,0 +1,8 @@
+# protoc --python_out=. codec.proto
+
+syntax = "proto3";
+
+
+message Request {
+    string message  = 1;
+}

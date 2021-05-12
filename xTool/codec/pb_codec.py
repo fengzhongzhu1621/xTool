@@ -9,9 +9,9 @@ from .codec_type import CodecType
 )
 class ProtocCodec:
     @classmethod
-    def serialize(cls, obj: object) -> bytes:
+    def encode(cls, obj: object) -> bytes:
         return obj.SerializeToString()
 
     @classmethod
-    def deserialize(cls, obj, data: bytes) -> None:
+    def decode(cls, obj: object, data: bytes) -> None:
         obj.ParseFromString(data)
