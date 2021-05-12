@@ -7,5 +7,7 @@ from enum import unique, Enum
 class CodecType(Enum):
     PICKLE = 1
     JSON = 2
-    PB = 3
-    PB_JSON = 4
+    YAML = 3
+
+    PB = 10
+    PB_JSON = 11

@@ -21,8 +21,8 @@ class PbJsonCodec:
                sort_keys=False,
                use_integers_for_enums=False,
                descriptor_pool=None,
-               float_precision=None) -> str:
-        """PB转化为json"""
+               float_precision=None) -> bytes:
+        """PB转化为json字符串 ."""
         # preserveing_proto_field_name: 设置为 True 可以保留 protobuf
         # 的原有字段名，不然会自动转驼峰，如 request_id 会被自动转化为 requestId
         json_str = MessageToJson(
@@ -34,16 +34,16 @@ class PbJsonCodec:
             use_integers_for_enums=use_integers_for_enums,
             descriptor_pool=descriptor_pool,
             float_precision=float_precision)
-        return json_str
+        return json_str.encode("utf8")
 
     @classmethod
     def decode(
             cls,
             message: object,
-            text: str,
+            text: bytes,
             ignore_unknown_fields=False,
             descriptor_pool=None) -> None:
-        """JSON转化为PB"""
+        """JSON字符串转化为PB对象 ."""
         Parse(
             text,
             message,

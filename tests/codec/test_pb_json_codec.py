@@ -9,7 +9,7 @@ class TestPbJsonCodec:
         request = Request()
         request.message = "hello world"
         value_codec = PbJsonCodec.encode(request)
-        assert value_codec == '{"message": "hello world"}'
+        assert value_codec == b'{"message": "hello world"}'
 
         request2 = Request()
         PbJsonCodec.decode(request2, value_codec)
