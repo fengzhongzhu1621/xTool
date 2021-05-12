@@ -3,7 +3,7 @@
 import time
 from unittest import TestCase
 from statsd import StatsClient
-from xTool.metrics.stats import (SafeStatsdLogger, get_current_stats_logger, StatsParamConfig)
+from xTool.metrics.stats import (SafeStatsdLogger, get_stats_logger, StatsParamConfig)
 
 
 class TestSafeStatsdLogger(TestCase):
@@ -36,8 +36,8 @@ class TestSafeStatsdLogger(TestCase):
         self.stats_logger.set('test_set', "user2")
 
 
-def test_get_current_stats_logger():
-    stats_logger = get_current_stats_logger("statsd")
+def test_get_stats_logger():
+    stats_logger = get_stats_logger("statsd")
 
     # 设置客户端
     statsd_config = StatsParamConfig()
