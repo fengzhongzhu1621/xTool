@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import zlib
+import bz2
 
 from xTool.plugins.plugin import register_plugin, PluginType
 from .compress_type import CompressType
 
 
 @register_plugin(
-    PluginType.COMPRESS, CompressType.ZLIB
+    PluginType.COMPRESS, CompressType.BZ2
 )
-class ZlibCompress:
+class BZ2Compress:
     @classmethod
-    def compress(cls, data: bytes, compression_level=6) -> bytes:
+    def compress(cls, data: bytes, compression_level: int = 6) -> bytes:
         if data is None:
             return data
-        return zlib.dumps(data, compression_level=compression_level)
+        return bz2.compress(data, compression_level)
 
     @classmethod
     def decompress(cls, data: bytes) -> bytes:
         if data is None:
             return data
-        return zlib.decompress(data)
+        return bz2.decompress(data)

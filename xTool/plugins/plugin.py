@@ -22,6 +22,8 @@ class PluginType(IntEnum):
 
     # 编解码
     CODEC = 20
+    # 解压缩
+    COMPRESS = 21
 
 
 class PluginStore:

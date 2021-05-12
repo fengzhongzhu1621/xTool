@@ -1,18 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import rapidjson as json
+import zlib
+
 from xTool.plugins.plugin import register_plugin, PluginType
-from .codec_type import CodecType
+from .compress_type import CompressType
 
 
 @register_plugin(
-    PluginType.CODEC, CodecType.JSON
+    PluginType.COMPRESS, CompressType.ZLIB
 )
-class JsonCodec:
+class ZlibCompress:
     @classmethod
-    def encode(cls, obj: object) -> bytes:
-        return json.dumps(obj).encode("utf8")
+    def compress(cls, data: bytes, compression_level: int = 6) -> bytes:
+        if data is None:
+            return data
+        return zlib.compress(data, compression_level)
 
     @classmethod
-    def decode(cls, data: bytes) -> object:
-        return json.loads(data)
+    def decompress(cls, data: bytes) -> bytes:
+        if data is None:
+            return data
+        return zlib.decompress(data)
