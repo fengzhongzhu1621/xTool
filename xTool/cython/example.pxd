@@ -47,7 +47,11 @@ cdef class CythonDemo:
 
     cpdef str strcpy(self)
     cpdef uint get_queue_size(self)
-    cdef int _enqueue(self, int value) nogil
     cpdef int enqueue(self, int value)
-    cdef int _dequeue(self) nogil
     cpdef int dequeue(self)
+    cpdef void resize(self, size_t length)
+
+    cdef char* malloc(self, size_t length)
+    cdef int _enqueue(self, int value) nogil
+    cdef int _dequeue(self) nogil
+    cdef void memcpy(self, int offset, int length)

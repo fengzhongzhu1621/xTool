@@ -58,6 +58,7 @@ from libc.string cimport strcpy
 from libc.string cimport memset
 from cpython.ref cimport PyObject, Py_INCREF, Py_DECREF
 from cpython.bytes cimport PyBytes_FromStringAndSize
+from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
 
 cdef void endian_byte_to_ushort(char * src, char * dest):
@@ -79,6 +80,33 @@ cdef void endian_byte_to_uint(char * src, char * dest):
 cdef class CythonDemo:
     def __init__(self):
         memset(self.char_a, 0, 16)
+
+    def __cinit__(self):
+        self.buffer_size = 100
+        self.data_length = 0    # 数据的真实大小，可能非常大超出int的范围
+        self.buffer = self.malloc(self.buffer_size)
+        if not self.buffer:
+            raise MemoryError()
+
+    cdef char* malloc(self, size_t length):
+        buffer = <char *> PyMem_Malloc(length * sizeof(char))
+        if not buffer:
+            raise MemoryError()
+        return buffer
+
+    cpdef void resize(self, size_t length):
+        buffer = <char*> PyMem_Realloc(<void *>self.buffer, length * sizeof(char))
+        if not buffer:
+            raise MemoryError()
+        self.buffer_size = length
+        self.buffer = buffer
+
+    cdef void memcpy(self, int offset, int length):
+        cdef uint i = 0
+        while i < length:
+            self.buffer[i] = self.buffer[offset+i]
+            i += 1
+        self.data_length = length
 
     cpdef str strcpy(self):
         str_value = "abc"
@@ -113,3 +141,6 @@ cdef class CythonDemo:
     cpdef int dequeue(self):
         cdef int value = self._dequeue()
         return value
+
+    def __dealloc__(self):
+        PyMem_Free(<void*>self.buffer)
