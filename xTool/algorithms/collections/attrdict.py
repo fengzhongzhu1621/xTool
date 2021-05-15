@@ -4,6 +4,7 @@ try:
     from collections import UserDict
 except ImportError:
     pass
+from typing import Any
 
 
 try:
@@ -38,14 +39,12 @@ class ObjectDict(_ObjectDictBase):
     """
 
     def __getattr__(self, name):
-        # type: (str) -> Any
         try:
             return self[name]
         except KeyError:
             raise AttributeError(name)
 
     def __setattr__(self, name, value):
-        # type: (str, Any) -> None
         self[name] = value
 
 
@@ -92,10 +91,11 @@ class CaseInsensitiveDict(dict):
         multiple instances of the same header. If that is changed
         then we suddenly care about the assembly rules in sec 2.3.
     """
+
     def __init__(self, d=None, **kwargs):
         super(CaseInsensitiveDict, self).__init__(**kwargs)
         if d:
-            self.update((k.lower(), v) for k, v in six.iteritems(d))
+            self.update((k.lower(), v) for k, v in d.items())
 
     def __setitem__(self, key, value):
         super(CaseInsensitiveDict, self).__setitem__(key.lower(), value)
@@ -105,3 +105,10 @@ class CaseInsensitiveDict(dict):
 
     def __contains__(self, key):
         return super(CaseInsensitiveDict, self).__contains__(key.lower())
+
+
+class ConstantDict(dict):
+    """常量字典，不允许修改value值 ."""
+    def __setitem__(self, key: Any, value: Any):
+        raise TypeError("modifying %s object values is not allowed"
+                        % self.__class__.__name__)
