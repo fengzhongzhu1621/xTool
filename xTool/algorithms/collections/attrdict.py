@@ -22,7 +22,10 @@ class AttrDict(dict):
             raise AttributeError(attr)
 
     def __setattr__(self, attr, value):
-        self[attr] = value
+        if attr.startswith("__") and attr.endswith("__"):
+            super().__setattr__(attr, value)
+        else:
+            self[attr] = value
 
     def __iadd__(self, rhs):
         self.update(rhs)
@@ -65,7 +68,10 @@ class FancyDict(dict):
             raise AttributeError(k)
 
     def __setattr__(self, key, value):
-        self[key] = value
+        if key.startswith("__") and key.endswith("__"):
+            super().__setattr__(key, value)
+        else:
+            self[key] = value
 
     def __delattr__(self, key):
         try:
