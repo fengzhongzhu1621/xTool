@@ -41,6 +41,7 @@ Out[17]: 'little'
 ｜ 0x78    |   0x56    |   0x34    |     0x12    |
  ------------------------------------------------
  地址0x0003   地址0x0002   地址0x0001   地址0x0000
+
  当接收方获得网络字节序时，需要将其转化为整型
  获得整数的第一个字节：data[3] << 0， 值为0x00000078，即 p_src[0] >> 24
  获得整数的第一个字节：data[2] << 8， 值为0x00005600，即 (p_src[0] & 0x00ff0000) >> 8
@@ -141,6 +142,12 @@ cdef class CythonDemo:
     cpdef int dequeue(self):
         cdef int value = self._dequeue()
         return value
+
+    cpdef void reset_buffer(self):
+        self.data_length = 0
+
+    cpdef int get_buffer_data_length(self):
+        return self.data_length
 
     def __dealloc__(self):
         PyMem_Free(<void*>self.buffer)

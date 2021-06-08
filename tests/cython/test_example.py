@@ -21,3 +21,7 @@ class TestCythonDemo(TestCase):
         assert actual == 0
         actual = self.demo.dequeue()
         assert actual == 300
+
+    def test_reset_buffer(self):
+        self.demo.reset_buffer()
+        assert self.demo.get_buffer_data_length() == 0

@@ -44,6 +44,10 @@ cdef class CythonDemo:
         recursive_mutex enqueue_mtx
         # 出队锁
         recursive_mutex dequeue_mtx
+        # buffer
+        char* buffer
+        int buffer_size
+        int data_length
 
     cpdef str strcpy(self)
     cpdef uint get_queue_size(self)
@@ -55,3 +59,6 @@ cdef class CythonDemo:
     cdef int _enqueue(self, int value) nogil
     cdef int _dequeue(self) nogil
     cdef void memcpy(self, int offset, int length)
+
+    cpdef void reset_buffer(self)
+    cpdef int get_buffer_data_length(self)
