@@ -56,7 +56,7 @@ Out[17]: 'little'
 """
 
 from libc.string cimport strcpy
-from libc.string cimport memset
+from libc.string cimport memset, memcpy
 from cpython.ref cimport PyObject, Py_INCREF, Py_DECREF
 from cpython.bytes cimport PyBytes_FromStringAndSize
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
@@ -83,8 +83,8 @@ cdef class CythonDemo:
         memset(self.char_a, 0, 16)
 
     def __cinit__(self):
-        self.buffer_size = 100
-        self.data_length = 0    # 数据的真实大小，可能非常大超出int的范围
+        self.data_length = 0    # TODO 数据的真实大小，可能非常大超出int的范围
+        self.buffer_size = 128
         self.buffer = self.malloc(self.buffer_size)
         if not self.buffer:
             raise MemoryError()
@@ -96,11 +96,11 @@ cdef class CythonDemo:
         return buffer
 
     cpdef void resize(self, size_t length):
-        buffer = <char*> PyMem_Realloc(<void *>self.buffer, length * sizeof(char))
-        if not buffer:
+        new_buffer = <char*> PyMem_Realloc(<void *>self.buffer, length * sizeof(char))
+        if not new_buffer:
             raise MemoryError()
         self.buffer_size = length
-        self.buffer = buffer
+        self.buffer = new_buffer
 
     cdef void memcpy(self, int offset, int length):
         cdef uint i = 0
@@ -148,6 +148,20 @@ cdef class CythonDemo:
 
     cpdef int get_buffer_data_length(self):
         return self.data_length
+
+    cpdef void append_buffer(self, bytes data):
+        """填充buffer ."""
+        # 获得需要填充的数据字节大小
+        cdef int append_data_length = len(data)
+        # 如果缓冲区满，则扩充缓冲区
+        if self.data_length + append_data_length > self.buffer_size:
+            self.resize((self.buffer_size + append_data_length) * 2)
+        # 将追加的数据添加到缓冲区
+        cdef char* start_ptr = self.buffer + self.data_length   # 需要追加数据的起始位置
+        cdef char* from_ptr = data
+        memcpy(start_ptr, from_ptr, append_data_length)
+        # 记录追加后的总数据长度
+        self.data_length += append_data_length
 
     def __dealloc__(self):
         PyMem_Free(<void*>self.buffer)

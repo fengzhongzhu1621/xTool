@@ -25,3 +25,8 @@ class TestCythonDemo(TestCase):
     def test_reset_buffer(self):
         self.demo.reset_buffer()
         assert self.demo.get_buffer_data_length() == 0
+
+    def test_append_buffer(self):
+        self.demo.reset_buffer()
+        self.demo.append_buffer(b'123')
+        assert self.demo.get_buffer_data_length() == 3
