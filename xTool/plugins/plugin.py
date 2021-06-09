@@ -27,41 +27,48 @@ class PluginType(IntEnum):
 
 
 class PluginStore:
-    __slots__ = ("_plugins", "_plugin_instances")
+    __slots__ = ("plugins", "plugin_instances")
 
     def __init__(self):
-        self._plugins = {}              # 存放所有的插件
-        self._plugin_instances = {}     # 存放所有的插件实例化对象，一个插件只有一个实例化对象
+        self.plugins = {}              # 存放所有的插件
+        self.plugin_instances = {}     # 存放所有的插件实例化对象，一个插件只有一个实例化对象
 
     def add_plugin(self, plugin_type, plugin_name, plugin_class):
-        self._plugins.setdefault(plugin_type, {})[plugin_name] = plugin_class
+        self.plugins.setdefault(plugin_type, {})[plugin_name] = plugin_class
 
     def get_plugin(self, plugin_type, plugin_name):
-        return self._plugins.get(plugin_type, {}).get(plugin_name)
+        return self.plugins.get(plugin_type, {}).get(plugin_name)
 
     def add_plugin_instance(self, plugin_type, plugin_name, plugin_instance):
-        self._plugin_instances.setdefault(
+        self.plugin_instances.setdefault(
             plugin_type, {})[plugin_name] = plugin_instance
 
     def get_plugin_instance(self, plugin_type, plugin_name):
-        return self._plugin_instances.get(plugin_type, {}).get(plugin_name)
+        return self.plugin_instances.get(plugin_type, {}).get(plugin_name)
 
     def clear_plugin_instances(self):
-        self._plugin_instances = {}
+        self.plugin_instances = {}
 
     def destroy_plugins(self):
-        self._plugins = {}
-        self._plugin_instances = {}
+        self.plugins = {}
+        self.plugin_instances = {}
 
 
 DefaultPluginStore = PluginStore()
 
 
 class Plugin:
-    def __init__(self, cls, plugin_type, plugin_name, *args, **kwargs):
+    def __init__(self,
+                 cls,
+                 plugin_type,
+                 plugin_name,
+                 version: str = "",
+                 init_instance: bool = True, *args, **kwargs):
         self._cls = cls
         self.name = plugin_name
         self.type = plugin_type
+        self.version = version
+        self.init_instance = init_instance
         self.args = args
         self.kwargs = kwargs
 
@@ -100,14 +107,24 @@ class PluginMeta(type):
         return new_class
 
 
-def register_plugin(plugin_type, plugin_name=None, *args, **kwargs):
+def register_plugin(plugin_type: PluginType,
+                    plugin_name: str,
+                    version: str = "",
+                    init_instance: bool = True, *args, **kwargs):
     """将类/函数注册为一个插件 ."""
     def decorator(cls):
         nonlocal plugin_name
         if not plugin_name:
             plugin_name = cls.__name__
         # 将类包装为一个插件
-        plugin = Plugin(cls, plugin_type, plugin_name, *args, **kwargs)
+        plugin = Plugin(
+            cls,
+            plugin_type,
+            plugin_name,
+            version,
+            init_instance,
+            *args,
+            **kwargs)
         DefaultPluginStore.add_plugin(plugin_type, plugin_name, plugin)
         return cls
     return decorator
@@ -139,3 +156,13 @@ def reload_global_plugin_store():
 class PluginRegister(metaclass=PluginMeta):
     def __init__(self):
         pass
+
+
+def load_default_plugins():
+    reload_global_plugin_store()
+    for plugin_type, plugins in DefaultPluginStore.plugin_container.items():
+        for plugin_name, plugin_cls in plugins.items():
+            if plugin_cls.init_instance:
+                plugin_instance = plugin_cls.cls()
+                DefaultPluginStore.set_instance(
+                    plugin_type, plugin_name, plugin_instance)
