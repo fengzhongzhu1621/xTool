@@ -130,6 +130,10 @@ def register_plugin(plugin_type: PluginType,
     return decorator
 
 
+def get_plugin(plugin_type: int, plugin_name: str):
+    return DefaultPluginStore.get_plugin(plugin_type, plugin_name)
+
+
 def get_plugin_instance(plugin_type: int, plugin_name: str):
     """懒加载的方式获得插件，如果没有则创建，是一个单例模式 ."""
     # 从缓存中获取插件实例
