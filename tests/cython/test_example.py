@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import struct
+import binascii
+
 from unittest import TestCase
 from xTool.cython.example import CythonDemo
 
@@ -30,3 +33,17 @@ class TestCythonDemo(TestCase):
         self.demo.reset_buffer()
         self.demo.append_buffer(b'123')
         assert self.demo.get_buffer_data_length() == 3
+
+    def test_read_package(self):
+        self.demo.reset_buffer()
+        package = struct.pack('>HIIIHI', 1234, 20, 0, 0, 0, 0x12345678)
+        self.demo.append_buffer(package)
+        assert package.hex() == "04d2000000140000000000000000000012345678"
+        assert len(package) == 20
+        assert self.demo.get_buffer_data_length() == 20
+        # 包体残缺包
+        package_1 = struct.pack('>HIIIHI', 1234, 20, 0, 0, 0, 0x123456)
+        self.demo.append_buffer(package_1)
+
+        packages = self.demo.read_package()
+        assert packages == [package, package_1]

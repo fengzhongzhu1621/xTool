@@ -63,3 +63,4 @@ cdef class CythonDemo:
     cpdef void reset_buffer(self)
     cpdef int get_buffer_data_length(self)
     cpdef void append_buffer(self, bytes data)
+    cpdef list read_package(self)
