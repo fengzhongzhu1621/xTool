@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import Union, Dict, Hashable, Any, List
+
 import yaml
 from xTool.plugins.plugin import register_plugin, PluginType
 from .codec_type import CodecType
@@ -48,6 +50,6 @@ class YamlCodec:
             sort_keys=sort_keys)
 
     @classmethod
-    def decode(cls, data: str, loader=yaml.FullLoader) -> object:
+    def decode(cls, data: str, loader=yaml.FullLoader) -> Union[Dict[Hashable, Any], List, None]:
         """yaml字符串转化为python对象 ."""
         return yaml.load(data, Loader=loader)
