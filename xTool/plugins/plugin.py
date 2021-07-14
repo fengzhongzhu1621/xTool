@@ -25,6 +25,9 @@ class PluginType(IntEnum):
     # 解压缩
     COMPRESS = 21
 
+    # 配置加载
+    CONFIG_LOADER = 30
+
 
 class PluginStore:
     __slots__ = ("plugins", "plugin_instances")
