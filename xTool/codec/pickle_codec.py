@@ -3,7 +3,7 @@
 import pickle
 from xTool.plugins.plugin import register_plugin, PluginType
 # from .pickle_codec_c import PickleCodec
-from .codec_type import CodecType
+from .base import CodecType
 
 
 @register_plugin(

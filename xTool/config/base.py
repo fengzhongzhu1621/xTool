@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from enum import unique, Enum
+from enum import unique, IntEnum
 
 
 @unique
-class ConfigLoaderType(Enum):
+class ConfigLoaderType(IntEnum):
     FILE = 1

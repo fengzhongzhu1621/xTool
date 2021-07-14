@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from xTool.plugins.plugin import register_plugin, PluginType
-from .codec_type import CodecType
+from .base import CodecType
 
 
 @register_plugin(
