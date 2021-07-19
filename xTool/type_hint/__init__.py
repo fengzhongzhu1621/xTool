@@ -71,5 +71,5 @@ def get_class_object_init_type(class_obj: object, name: str) -> type:
     # 如果参数类型为int且默认值为None，会返回typing.Union[int, NoneType]，需要处理这种特殊情况
     if getattr(object_type, '__origin__', None) == Union:
         union_args = object_type.__args__
-        object_type = union_args[0]
+        object_type = next(arg for arg in union_args if arg != type(None))
     return object_type
