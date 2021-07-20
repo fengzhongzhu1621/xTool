@@ -170,6 +170,14 @@ if PY3:
             ],
             extra_compile_args=['-O3'],
             include_dirs=['.'],
+        ),
+        Extension(
+            "xTool.cython.bytes_order",
+            [
+                "xTool/cython/bytes_order.pyx"
+            ],
+            extra_compile_args=['-O3'],
+            include_dirs=['.'],
         )
     ]
 else:
