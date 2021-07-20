@@ -902,39 +902,6 @@ static const char *__pyx_f[] = {
 #define __Pyx_CLEAR(r)    do { PyObject* tmp = ((PyObject*)(r)); r = NULL; __Pyx_DECREF(tmp);} while(0)
 #define __Pyx_XCLEAR(r)   do { if((r) != NULL) {PyObject* tmp = ((PyObject*)(r)); r = NULL; __Pyx_DECREF(tmp);}} while(0)
 
-/* PyDictVersioning.proto */
-#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
-#define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
-#define __PYX_GET_DICT_VERSION(dict)  (((PyDictObject*)(dict))->ma_version_tag)
-#define __PYX_UPDATE_DICT_CACHE(dict, value, cache_var, version_var)\
-    (version_var) = __PYX_GET_DICT_VERSION(dict);\
-    (cache_var) = (value);
-#define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP) {\
-    static PY_UINT64_T __pyx_dict_version = 0;\
-    static PyObject *__pyx_dict_cached_value = NULL;\
-    if (likely(__PYX_GET_DICT_VERSION(DICT) == __pyx_dict_version)) {\
-        (VAR) = __pyx_dict_cached_value;\
-    } else {\
-        (VAR) = __pyx_dict_cached_value = (LOOKUP);\
-        __pyx_dict_version = __PYX_GET_DICT_VERSION(DICT);\
-    }\
-}
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj);
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj);
-static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version);
-#else
-#define __PYX_GET_DICT_VERSION(dict)  (0)
-#define __PYX_UPDATE_DICT_CACHE(dict, value, cache_var, version_var)
-#define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP)  (VAR) = (LOOKUP);
-#endif
-
-/* PyObjectGetAttrStr.proto */
-#if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject* attr_name);
-#else
-#define __Pyx_PyObject_GetAttrStr(o,n) PyObject_GetAttr(o,n)
-#endif
-
 /* PyThreadStateGet.proto */
 #if CYTHON_FAST_THREAD_STATE
 #define __Pyx_PyThreadState_declare  PyThreadState *__pyx_tstate;
@@ -971,6 +938,50 @@ static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject 
 #define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
 #endif
 
+/* WriteUnraisableException.proto */
+static void __Pyx_WriteUnraisable(const char *name, int clineno,
+                                  int lineno, const char *filename,
+                                  int full_traceback, int nogil);
+
+/* ArgTypeTest.proto */
+#define __Pyx_ArgTypeTest(obj, type, none_allowed, name, exact)\
+    ((likely((Py_TYPE(obj) == type) | (none_allowed && (obj == Py_None)))) ? 1 :\
+        __Pyx__ArgTypeTest(obj, type, name, exact))
+static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact);
+
+/* PyDictVersioning.proto */
+#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
+#define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
+#define __PYX_GET_DICT_VERSION(dict)  (((PyDictObject*)(dict))->ma_version_tag)
+#define __PYX_UPDATE_DICT_CACHE(dict, value, cache_var, version_var)\
+    (version_var) = __PYX_GET_DICT_VERSION(dict);\
+    (cache_var) = (value);
+#define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP) {\
+    static PY_UINT64_T __pyx_dict_version = 0;\
+    static PyObject *__pyx_dict_cached_value = NULL;\
+    if (likely(__PYX_GET_DICT_VERSION(DICT) == __pyx_dict_version)) {\
+        (VAR) = __pyx_dict_cached_value;\
+    } else {\
+        (VAR) = __pyx_dict_cached_value = (LOOKUP);\
+        __pyx_dict_version = __PYX_GET_DICT_VERSION(DICT);\
+    }\
+}
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj);
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj);
+static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version);
+#else
+#define __PYX_GET_DICT_VERSION(dict)  (0)
+#define __PYX_UPDATE_DICT_CACHE(dict, value, cache_var, version_var)
+#define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP)  (VAR) = (LOOKUP);
+#endif
+
+/* PyObjectGetAttrStr.proto */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject* attr_name);
+#else
+#define __Pyx_PyObject_GetAttrStr(o,n) PyObject_GetAttr(o,n)
+#endif
+
 /* CLineInTraceback.proto */
 #ifdef CYTHON_CLINE_IN_TRACEBACK
 #define __Pyx_CLineForTraceback(tstate, c_line)  (((CYTHON_CLINE_IN_TRACEBACK)) ? c_line : 0)
@@ -996,6 +1007,15 @@ static void __pyx_insert_code_object(int code_line, PyCodeObject* code_object);
 /* AddTraceback.proto */
 static void __Pyx_AddTraceback(const char *funcname, int c_line,
                                int py_line, const char *filename);
+
+/* CIntToPy.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_uint8_t(uint8_t value);
+
+/* CIntToPy.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_uint16_t(uint16_t value);
+
+/* CIntToPy.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_uint32_t(uint32_t value);
 
 /* CIntFromPy.proto */
 static CYTHON_INLINE uint8_t __Pyx_PyInt_As_uint8_t(PyObject *);
@@ -1041,6 +1061,9 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 static PyObject *__pyx_f_5xTool_6cython_11bytes_order_endian_uchar_to_bytes(uint8_t, int __pyx_skip_dispatch); /*proto*/
 static PyObject *__pyx_f_5xTool_6cython_11bytes_order_endian_ushort_to_bytes(uint16_t, int __pyx_skip_dispatch); /*proto*/
 static PyObject *__pyx_f_5xTool_6cython_11bytes_order_endian_uint_to_bytes(uint32_t, int __pyx_skip_dispatch); /*proto*/
+static uint8_t __pyx_f_5xTool_6cython_11bytes_order_endian_byte_to_uchar(PyObject *, int __pyx_skip_dispatch); /*proto*/
+static uint16_t __pyx_f_5xTool_6cython_11bytes_order_endian_byte_to_ushort(PyObject *, int __pyx_skip_dispatch); /*proto*/
+static uint32_t __pyx_f_5xTool_6cython_11bytes_order_endian_byte_to_uint(PyObject *, int __pyx_skip_dispatch); /*proto*/
 #define __Pyx_MODULE_NAME "xTool.cython.bytes_order"
 extern int __pyx_module_is_main_xTool__cython__bytes_order;
 int __pyx_module_is_main_xTool__cython__bytes_order = 0;
@@ -1058,13 +1081,16 @@ static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_endian_uchar_to_bytes(CYTHON_UNUSED PyObject *__pyx_self, uint8_t __pyx_v_i); /* proto */
 static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_2endian_ushort_to_bytes(CYTHON_UNUSED PyObject *__pyx_self, uint16_t __pyx_v_i); /* proto */
 static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_4endian_uint_to_bytes(CYTHON_UNUSED PyObject *__pyx_self, uint32_t __pyx_v_i); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_6endian_byte_to_uchar(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_buffer); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_8endian_byte_to_ushort(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_buffer); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_10endian_byte_to_uint(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_buffer); /* proto */
 /* Late includes */
 
 /* "xTool/cython/bytes_order.pyx":23
  * 
  * 
  * cpdef bytes endian_uchar_to_bytes(uint8_t i):             # <<<<<<<<<<<<<<
- *     return ( < char * >&i)[:sizeof(uint8_t)]
+ *     return (< char * >&i)[:sizeof(uint8_t)]
  * 
  */
 
@@ -1081,7 +1107,7 @@ static PyObject *__pyx_f_5xTool_6cython_11bytes_order_endian_uchar_to_bytes(uint
   /* "xTool/cython/bytes_order.pyx":24
  * 
  * cpdef bytes endian_uchar_to_bytes(uint8_t i):
- *     return ( < char * >&i)[:sizeof(uint8_t)]             # <<<<<<<<<<<<<<
+ *     return (< char * >&i)[:sizeof(uint8_t)]             # <<<<<<<<<<<<<<
  * 
  * 
  */
@@ -1096,7 +1122,7 @@ static PyObject *__pyx_f_5xTool_6cython_11bytes_order_endian_uchar_to_bytes(uint
  * 
  * 
  * cpdef bytes endian_uchar_to_bytes(uint8_t i):             # <<<<<<<<<<<<<<
- *     return ( < char * >&i)[:sizeof(uint8_t)]
+ *     return (< char * >&i)[:sizeof(uint8_t)]
  * 
  */
 
@@ -1168,7 +1194,7 @@ static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_endian_uchar_to_bytes(CYT
  * 
  * cpdef bytes endian_ushort_to_bytes(uint16_t i):             # <<<<<<<<<<<<<<
  *     i = (i >> 8) | (i << 8)
- *     return ( < char * >&i)[:sizeof(uint16_t)]
+ *     return (< char * >&i)[:sizeof(uint16_t)]
  */
 
 static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_3endian_ushort_to_bytes(PyObject *__pyx_self, PyObject *__pyx_arg_i); /*proto*/
@@ -1185,7 +1211,7 @@ static PyObject *__pyx_f_5xTool_6cython_11bytes_order_endian_ushort_to_bytes(uin
  * 
  * cpdef bytes endian_ushort_to_bytes(uint16_t i):
  *     i = (i >> 8) | (i << 8)             # <<<<<<<<<<<<<<
- *     return ( < char * >&i)[:sizeof(uint16_t)]
+ *     return (< char * >&i)[:sizeof(uint16_t)]
  * 
  */
   __pyx_v_i = ((__pyx_v_i >> 8) | (__pyx_v_i << 8));
@@ -1193,7 +1219,7 @@ static PyObject *__pyx_f_5xTool_6cython_11bytes_order_endian_ushort_to_bytes(uin
   /* "xTool/cython/bytes_order.pyx":29
  * cpdef bytes endian_ushort_to_bytes(uint16_t i):
  *     i = (i >> 8) | (i << 8)
- *     return ( < char * >&i)[:sizeof(uint16_t)]             # <<<<<<<<<<<<<<
+ *     return (< char * >&i)[:sizeof(uint16_t)]             # <<<<<<<<<<<<<<
  * 
  * 
  */
@@ -1209,7 +1235,7 @@ static PyObject *__pyx_f_5xTool_6cython_11bytes_order_endian_ushort_to_bytes(uin
  * 
  * cpdef bytes endian_ushort_to_bytes(uint16_t i):             # <<<<<<<<<<<<<<
  *     i = (i >> 8) | (i << 8)
- *     return ( < char * >&i)[:sizeof(uint16_t)]
+ *     return (< char * >&i)[:sizeof(uint16_t)]
  */
 
   /* function exit code */
@@ -1298,14 +1324,16 @@ static PyObject *__pyx_f_5xTool_6cython_11bytes_order_endian_uint_to_bytes(uint3
  *         (i >> 8) & 0x0000FF00) | (
  *             (i << 8) & 0x00FF0000) | (             # <<<<<<<<<<<<<<
  *                 i << 24)
- *     return ( < char * >&i)[:sizeof(uint32_t)]
+ *     return (< char * >&i)[:sizeof(uint32_t)]
  */
   __pyx_v_i = ((((__pyx_v_i >> 24) | ((__pyx_v_i >> 8) & 0x0000FF00)) | ((__pyx_v_i << 8) & 0x00FF0000)) | (__pyx_v_i << 24));
 
   /* "xTool/cython/bytes_order.pyx":38
  *             (i << 8) & 0x00FF0000) | (
  *                 i << 24)
- *     return ( < char * >&i)[:sizeof(uint32_t)]             # <<<<<<<<<<<<<<
+ *     return (< char * >&i)[:sizeof(uint32_t)]             # <<<<<<<<<<<<<<
+ * 
+ * 
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1 = __Pyx_PyBytes_FromStringAndSize(((char *)(&__pyx_v_i)) + 0, (sizeof(uint32_t)) - 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
@@ -1385,10 +1413,361 @@ static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_4endian_uint_to_bytes(CYT
   return __pyx_r;
 }
 
+/* "xTool/cython/bytes_order.pyx":41
+ * 
+ * 
+ * cpdef uint8_t endian_byte_to_uchar(bytes buffer):             # <<<<<<<<<<<<<<
+ *     cdef char * from_prt = buffer
+ *     cdef uint8_t src = ( < uint8_t * >from_prt)[0]
+ */
+
+static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_7endian_byte_to_uchar(PyObject *__pyx_self, PyObject *__pyx_v_buffer); /*proto*/
+static uint8_t __pyx_f_5xTool_6cython_11bytes_order_endian_byte_to_uchar(PyObject *__pyx_v_buffer, CYTHON_UNUSED int __pyx_skip_dispatch) {
+  char *__pyx_v_from_prt;
+  uint8_t __pyx_v_src;
+  uint8_t __pyx_r;
+  __Pyx_RefNannyDeclarations
+  char *__pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("endian_byte_to_uchar", 0);
+
+  /* "xTool/cython/bytes_order.pyx":42
+ * 
+ * cpdef uint8_t endian_byte_to_uchar(bytes buffer):
+ *     cdef char * from_prt = buffer             # <<<<<<<<<<<<<<
+ *     cdef uint8_t src = ( < uint8_t * >from_prt)[0]
+ *     return src
+ */
+  if (unlikely(__pyx_v_buffer == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
+    __PYX_ERR(0, 42, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_PyBytes_AsWritableString(__pyx_v_buffer); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_v_from_prt = __pyx_t_1;
+
+  /* "xTool/cython/bytes_order.pyx":43
+ * cpdef uint8_t endian_byte_to_uchar(bytes buffer):
+ *     cdef char * from_prt = buffer
+ *     cdef uint8_t src = ( < uint8_t * >from_prt)[0]             # <<<<<<<<<<<<<<
+ *     return src
+ * 
+ */
+  __pyx_v_src = (((uint8_t *)__pyx_v_from_prt)[0]);
+
+  /* "xTool/cython/bytes_order.pyx":44
+ *     cdef char * from_prt = buffer
+ *     cdef uint8_t src = ( < uint8_t * >from_prt)[0]
+ *     return src             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __pyx_r = __pyx_v_src;
+  goto __pyx_L0;
+
+  /* "xTool/cython/bytes_order.pyx":41
+ * 
+ * 
+ * cpdef uint8_t endian_byte_to_uchar(bytes buffer):             # <<<<<<<<<<<<<<
+ *     cdef char * from_prt = buffer
+ *     cdef uint8_t src = ( < uint8_t * >from_prt)[0]
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_WriteUnraisable("xTool.cython.bytes_order.endian_byte_to_uchar", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_7endian_byte_to_uchar(PyObject *__pyx_self, PyObject *__pyx_v_buffer); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_7endian_byte_to_uchar(PyObject *__pyx_self, PyObject *__pyx_v_buffer) {
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("endian_byte_to_uchar (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_buffer), (&PyBytes_Type), 1, "buffer", 1))) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5xTool_6cython_11bytes_order_6endian_byte_to_uchar(__pyx_self, ((PyObject*)__pyx_v_buffer));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_6endian_byte_to_uchar(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_buffer) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("endian_byte_to_uchar", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_uint8_t(__pyx_f_5xTool_6cython_11bytes_order_endian_byte_to_uchar(__pyx_v_buffer, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("xTool.cython.bytes_order.endian_byte_to_uchar", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "xTool/cython/bytes_order.pyx":47
+ * 
+ * 
+ * cpdef uint16_t endian_byte_to_ushort(bytes buffer):             # <<<<<<<<<<<<<<
+ *     cdef char * from_prt = buffer
+ *     cdef uint16_t src = ( < uint16_t * >from_prt)[0]
+ */
+
+static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_9endian_byte_to_ushort(PyObject *__pyx_self, PyObject *__pyx_v_buffer); /*proto*/
+static uint16_t __pyx_f_5xTool_6cython_11bytes_order_endian_byte_to_ushort(PyObject *__pyx_v_buffer, CYTHON_UNUSED int __pyx_skip_dispatch) {
+  char *__pyx_v_from_prt;
+  uint16_t __pyx_v_src;
+  uint16_t __pyx_r;
+  __Pyx_RefNannyDeclarations
+  char *__pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("endian_byte_to_ushort", 0);
+
+  /* "xTool/cython/bytes_order.pyx":48
+ * 
+ * cpdef uint16_t endian_byte_to_ushort(bytes buffer):
+ *     cdef char * from_prt = buffer             # <<<<<<<<<<<<<<
+ *     cdef uint16_t src = ( < uint16_t * >from_prt)[0]
+ *     return (src >> 8) | (src << 8)
+ */
+  if (unlikely(__pyx_v_buffer == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
+    __PYX_ERR(0, 48, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_PyBytes_AsWritableString(__pyx_v_buffer); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L1_error)
+  __pyx_v_from_prt = __pyx_t_1;
+
+  /* "xTool/cython/bytes_order.pyx":49
+ * cpdef uint16_t endian_byte_to_ushort(bytes buffer):
+ *     cdef char * from_prt = buffer
+ *     cdef uint16_t src = ( < uint16_t * >from_prt)[0]             # <<<<<<<<<<<<<<
+ *     return (src >> 8) | (src << 8)
+ * 
+ */
+  __pyx_v_src = (((uint16_t *)__pyx_v_from_prt)[0]);
+
+  /* "xTool/cython/bytes_order.pyx":50
+ *     cdef char * from_prt = buffer
+ *     cdef uint16_t src = ( < uint16_t * >from_prt)[0]
+ *     return (src >> 8) | (src << 8)             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __pyx_r = ((__pyx_v_src >> 8) | (__pyx_v_src << 8));
+  goto __pyx_L0;
+
+  /* "xTool/cython/bytes_order.pyx":47
+ * 
+ * 
+ * cpdef uint16_t endian_byte_to_ushort(bytes buffer):             # <<<<<<<<<<<<<<
+ *     cdef char * from_prt = buffer
+ *     cdef uint16_t src = ( < uint16_t * >from_prt)[0]
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_WriteUnraisable("xTool.cython.bytes_order.endian_byte_to_ushort", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_9endian_byte_to_ushort(PyObject *__pyx_self, PyObject *__pyx_v_buffer); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_9endian_byte_to_ushort(PyObject *__pyx_self, PyObject *__pyx_v_buffer) {
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("endian_byte_to_ushort (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_buffer), (&PyBytes_Type), 1, "buffer", 1))) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5xTool_6cython_11bytes_order_8endian_byte_to_ushort(__pyx_self, ((PyObject*)__pyx_v_buffer));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_8endian_byte_to_ushort(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_buffer) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("endian_byte_to_ushort", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_uint16_t(__pyx_f_5xTool_6cython_11bytes_order_endian_byte_to_ushort(__pyx_v_buffer, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("xTool.cython.bytes_order.endian_byte_to_ushort", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "xTool/cython/bytes_order.pyx":53
+ * 
+ * 
+ * cpdef uint32_t endian_byte_to_uint(bytes buffer):             # <<<<<<<<<<<<<<
+ *     cdef char * from_prt = buffer
+ *     cdef uint32_t src = ( < uint32_t * >from_prt)[0]
+ */
+
+static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_11endian_byte_to_uint(PyObject *__pyx_self, PyObject *__pyx_v_buffer); /*proto*/
+static uint32_t __pyx_f_5xTool_6cython_11bytes_order_endian_byte_to_uint(PyObject *__pyx_v_buffer, CYTHON_UNUSED int __pyx_skip_dispatch) {
+  char *__pyx_v_from_prt;
+  uint32_t __pyx_v_src;
+  uint32_t __pyx_r;
+  __Pyx_RefNannyDeclarations
+  char *__pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("endian_byte_to_uint", 0);
+
+  /* "xTool/cython/bytes_order.pyx":54
+ * 
+ * cpdef uint32_t endian_byte_to_uint(bytes buffer):
+ *     cdef char * from_prt = buffer             # <<<<<<<<<<<<<<
+ *     cdef uint32_t src = ( < uint32_t * >from_prt)[0]
+ *     return (src & 0x000000FFU) << 24 | (src & 0x0000FF00U) << 8 | (src & 0x00FF0000U) >> 8 | (src & 0xFF000000U) >> 24
+ */
+  if (unlikely(__pyx_v_buffer == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
+    __PYX_ERR(0, 54, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_PyBytes_AsWritableString(__pyx_v_buffer); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_v_from_prt = __pyx_t_1;
+
+  /* "xTool/cython/bytes_order.pyx":55
+ * cpdef uint32_t endian_byte_to_uint(bytes buffer):
+ *     cdef char * from_prt = buffer
+ *     cdef uint32_t src = ( < uint32_t * >from_prt)[0]             # <<<<<<<<<<<<<<
+ *     return (src & 0x000000FFU) << 24 | (src & 0x0000FF00U) << 8 | (src & 0x00FF0000U) >> 8 | (src & 0xFF000000U) >> 24
+ */
+  __pyx_v_src = (((uint32_t *)__pyx_v_from_prt)[0]);
+
+  /* "xTool/cython/bytes_order.pyx":56
+ *     cdef char * from_prt = buffer
+ *     cdef uint32_t src = ( < uint32_t * >from_prt)[0]
+ *     return (src & 0x000000FFU) << 24 | (src & 0x0000FF00U) << 8 | (src & 0x00FF0000U) >> 8 | (src & 0xFF000000U) >> 24             # <<<<<<<<<<<<<<
+ */
+  __pyx_r = (((((__pyx_v_src & 0x000000FFU) << 24) | ((__pyx_v_src & 0x0000FF00U) << 8)) | ((__pyx_v_src & 0x00FF0000U) >> 8)) | ((__pyx_v_src & 0xFF000000U) >> 24));
+  goto __pyx_L0;
+
+  /* "xTool/cython/bytes_order.pyx":53
+ * 
+ * 
+ * cpdef uint32_t endian_byte_to_uint(bytes buffer):             # <<<<<<<<<<<<<<
+ *     cdef char * from_prt = buffer
+ *     cdef uint32_t src = ( < uint32_t * >from_prt)[0]
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_WriteUnraisable("xTool.cython.bytes_order.endian_byte_to_uint", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_11endian_byte_to_uint(PyObject *__pyx_self, PyObject *__pyx_v_buffer); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_11bytes_order_11endian_byte_to_uint(PyObject *__pyx_self, PyObject *__pyx_v_buffer) {
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("endian_byte_to_uint (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_buffer), (&PyBytes_Type), 1, "buffer", 1))) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5xTool_6cython_11bytes_order_10endian_byte_to_uint(__pyx_self, ((PyObject*)__pyx_v_buffer));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5xTool_6cython_11bytes_order_10endian_byte_to_uint(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_buffer) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("endian_byte_to_uint", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_uint32_t(__pyx_f_5xTool_6cython_11bytes_order_endian_byte_to_uint(__pyx_v_buffer, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("xTool.cython.bytes_order.endian_byte_to_uint", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
 static PyMethodDef __pyx_methods[] = {
   {"endian_uchar_to_bytes", (PyCFunction)__pyx_pw_5xTool_6cython_11bytes_order_1endian_uchar_to_bytes, METH_O, 0},
   {"endian_ushort_to_bytes", (PyCFunction)__pyx_pw_5xTool_6cython_11bytes_order_3endian_ushort_to_bytes, METH_O, 0},
   {"endian_uint_to_bytes", (PyCFunction)__pyx_pw_5xTool_6cython_11bytes_order_5endian_uint_to_bytes, METH_O, 0},
+  {"endian_byte_to_uchar", (PyCFunction)__pyx_pw_5xTool_6cython_11bytes_order_7endian_byte_to_uchar, METH_O, 0},
+  {"endian_byte_to_ushort", (PyCFunction)__pyx_pw_5xTool_6cython_11bytes_order_9endian_byte_to_ushort, METH_O, 0},
+  {"endian_byte_to_uint", (PyCFunction)__pyx_pw_5xTool_6cython_11bytes_order_11endian_byte_to_uint, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -1776,6 +2155,93 @@ end:
 }
 #endif
 
+/* PyErrFetchRestore */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    tmp_type = tstate->curexc_type;
+    tmp_value = tstate->curexc_value;
+    tmp_tb = tstate->curexc_traceback;
+    tstate->curexc_type = type;
+    tstate->curexc_value = value;
+    tstate->curexc_traceback = tb;
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+}
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    *type = tstate->curexc_type;
+    *value = tstate->curexc_value;
+    *tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+}
+#endif
+
+/* WriteUnraisableException */
+static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
+                                  CYTHON_UNUSED int lineno, CYTHON_UNUSED const char *filename,
+                                  int full_traceback, CYTHON_UNUSED int nogil) {
+    PyObject *old_exc, *old_val, *old_tb;
+    PyObject *ctx;
+    __Pyx_PyThreadState_declare
+#ifdef WITH_THREAD
+    PyGILState_STATE state;
+    if (nogil)
+        state = PyGILState_Ensure();
+#ifdef _MSC_VER
+    else state = (PyGILState_STATE)-1;
+#endif
+#endif
+    __Pyx_PyThreadState_assign
+    __Pyx_ErrFetch(&old_exc, &old_val, &old_tb);
+    if (full_traceback) {
+        Py_XINCREF(old_exc);
+        Py_XINCREF(old_val);
+        Py_XINCREF(old_tb);
+        __Pyx_ErrRestore(old_exc, old_val, old_tb);
+        PyErr_PrintEx(1);
+    }
+    #if PY_MAJOR_VERSION < 3
+    ctx = PyString_FromString(name);
+    #else
+    ctx = PyUnicode_FromString(name);
+    #endif
+    __Pyx_ErrRestore(old_exc, old_val, old_tb);
+    if (!ctx) {
+        PyErr_WriteUnraisable(Py_None);
+    } else {
+        PyErr_WriteUnraisable(ctx);
+        Py_DECREF(ctx);
+    }
+#ifdef WITH_THREAD
+    if (nogil)
+        PyGILState_Release(state);
+#endif
+}
+
+/* ArgTypeTest */
+static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact)
+{
+    if (unlikely(!type)) {
+        PyErr_SetString(PyExc_SystemError, "Missing type object");
+        return 0;
+    }
+    else if (exact) {
+        #if PY_MAJOR_VERSION == 2
+        if ((type == &PyBaseString_Type) && likely(__Pyx_PyBaseString_CheckExact(obj))) return 1;
+        #endif
+    }
+    else {
+        if (likely(__Pyx_TypeCheck(obj, type))) return 1;
+    }
+    PyErr_Format(PyExc_TypeError,
+        "Argument '%.200s' has incorrect type (expected %.200s, got %.200s)",
+        name, type->tp_name, Py_TYPE(obj)->tp_name);
+    return 0;
+}
+
 /* PyDictVersioning */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
@@ -1813,30 +2279,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject
         return tp->tp_getattr(obj, PyString_AS_STRING(attr_name));
 #endif
     return PyObject_GetAttr(obj, attr_name);
-}
-#endif
-
-/* PyErrFetchRestore */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    tmp_type = tstate->curexc_type;
-    tmp_value = tstate->curexc_value;
-    tmp_tb = tstate->curexc_traceback;
-    tstate->curexc_type = type;
-    tstate->curexc_value = value;
-    tstate->curexc_traceback = tb;
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-}
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-    *type = tstate->curexc_type;
-    *value = tstate->curexc_value;
-    *tb = tstate->curexc_traceback;
-    tstate->curexc_type = 0;
-    tstate->curexc_value = 0;
-    tstate->curexc_traceback = 0;
 }
 #endif
 
@@ -2068,6 +2510,99 @@ bad:
         }\
         return (target_type) value;\
     }
+
+/* CIntToPy */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_uint8_t(uint8_t value) {
+    const uint8_t neg_one = (uint8_t) ((uint8_t) 0 - (uint8_t) 1), const_zero = (uint8_t) 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(uint8_t) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(uint8_t) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(uint8_t) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(uint8_t) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(uint8_t) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(uint8_t),
+                                     little, !is_unsigned);
+    }
+}
+
+/* CIntToPy */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_uint16_t(uint16_t value) {
+    const uint16_t neg_one = (uint16_t) ((uint16_t) 0 - (uint16_t) 1), const_zero = (uint16_t) 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(uint16_t) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(uint16_t) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(uint16_t) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(uint16_t) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(uint16_t) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(uint16_t),
+                                     little, !is_unsigned);
+    }
+}
+
+/* CIntToPy */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_uint32_t(uint32_t value) {
+    const uint32_t neg_one = (uint32_t) ((uint32_t) 0 - (uint32_t) 1), const_zero = (uint32_t) 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(uint32_t) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(uint32_t) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(uint32_t) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(uint32_t) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(uint32_t) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(uint32_t),
+                                     little, !is_unsigned);
+    }
+}
 
 /* CIntFromPy */
 static CYTHON_INLINE uint8_t __Pyx_PyInt_As_uint8_t(PyObject *x) {
