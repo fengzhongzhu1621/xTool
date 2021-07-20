@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import struct
-import binascii
 
 from unittest import TestCase
 from xTool.cython.example import CythonDemo
@@ -36,6 +35,7 @@ class TestCythonDemo(TestCase):
 
     def test_read_package(self):
         self.demo.reset_buffer()
+        # 大端规则
         package = struct.pack('>HIIIHI', 1234, 20, 0, 0, 0, 0x12345678)
         self.demo.append_buffer(package)
         assert package.hex() == "04d2000000140000000000000000000012345678"

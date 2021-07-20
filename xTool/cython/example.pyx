@@ -63,12 +63,14 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
 
 cdef void endian_byte_to_ushort(char * src, char * dest):
+    """大端字节转换为无符号短整型 ."""
     cdef ushort * p_src = <ushort * > src
     cdef ushort * p_dest = <ushort * > dest
     p_dest[0] = (p_src[0] >> 8) | (p_src[0] << 8)
 
 
 cdef void endian_byte_to_uint(char * src, char * dest):
+    """大端字节转换为无符号整型 ."""
     cdef uint * p_src = <uint * > src
     cdef uint * p_dest = <uint * > dest
     p_dest[0] = (
