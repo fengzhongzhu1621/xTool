@@ -12,12 +12,12 @@ from .base import CodecType
 )
 class UrlKvCodec:
     @classmethod
-    def encode(cls, data: Dict, encoding=None) -> str:
+    def encode(cls, data: Dict) -> str:
         return "&".join(["{}={}".format(key, quote(str(value).encode("utf8")) if value is not None else "")
                          for key, value in data.items()])
 
     @classmethod
-    def decode(cls, data: str, encoding=None) -> Dict:
+    def decode(cls, data: str) -> Dict:
         items = data.split("&")
         new_data = [item.split("=", 1) for item in items]
         new_data_with_unquote = [

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from typing import Union
+
 import rapidjson as json
+
 from xTool.plugins.plugin import register_plugin, PluginType
 from xTool.misc import tob
 from .base import CodecType
