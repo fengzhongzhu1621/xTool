@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from enum import IntEnum, unique
+from typing import Union
+from enum import Enum, IntEnum, unique
 
 
 @unique
@@ -66,12 +67,12 @@ class Plugin:
                  plugin_type,
                  plugin_name,
                  version: str = "",
-                 init_instance: bool = True, *args, **kwargs):
+                 can_init_instance: bool = True, *args, **kwargs):
         self._cls = cls
         self.name = plugin_name
         self.type = plugin_type
         self.version = version
-        self.init_instance = init_instance
+        self.can_init_instance = can_init_instance
         self.args = args
         self.kwargs = kwargs
 
@@ -111,9 +112,9 @@ class PluginMeta(type):
 
 
 def register_plugin(plugin_type: PluginType,
-                    plugin_name: str,
+                    plugin_name: Union[str, Enum],
                     version: str = "",
-                    init_instance: bool = True, *args, **kwargs):
+                    can_init_instance: bool = True, *args, **kwargs):
     """将类/函数注册为一个插件 ."""
     def decorator(cls):
         nonlocal plugin_name
@@ -125,7 +126,7 @@ def register_plugin(plugin_type: PluginType,
             plugin_type,
             plugin_name,
             version,
-            init_instance,
+            can_init_instance,
             *args,
             **kwargs)
         DefaultPluginStore.add_plugin(plugin_type, plugin_name, plugin)
@@ -167,9 +168,9 @@ class PluginRegister(metaclass=PluginMeta):
 
 def load_default_plugins():
     reload_global_plugin_store()
-    for plugin_type, plugins in DefaultPluginStore.plugin_container.items():
+    for plugin_type, plugins in DefaultPluginStore.plugins.items():
         for plugin_name, plugin_cls in plugins.items():
-            if plugin_cls.init_instance:
+            if plugin_cls.can_init_instance:
                 plugin_instance = plugin_cls.cls()
                 DefaultPluginStore.set_instance(
                     plugin_type, plugin_name, plugin_instance)

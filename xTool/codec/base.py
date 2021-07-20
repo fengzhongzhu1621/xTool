@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from enum import unique, Enum
+from enum import unique, IntEnum
 
 
 @unique
-class CodecType(Enum):
+class CodecType(IntEnum):
+    DUMMY = 0
+
     PICKLE = 1
     JSON = 2
     YAML = 3

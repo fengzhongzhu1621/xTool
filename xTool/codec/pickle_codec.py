@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from typing import Union
 import pickle
+
 from xTool.plugins.plugin import register_plugin, PluginType
 # from .pickle_codec_c import PickleCodec
 from xTool.misc import tob

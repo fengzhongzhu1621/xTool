@@ -3,7 +3,7 @@
 import gzip
 
 from xTool.plugins.plugin import register_plugin, PluginType
-from .compress_type import CompressType
+from .base import CompressType
 
 
 @register_plugin(
