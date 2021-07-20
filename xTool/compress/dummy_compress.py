@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import Optional
+
 from xTool.plugins.plugin import register_plugin, PluginType
 from .base import CompressType
 
@@ -9,9 +11,9 @@ from .base import CompressType
 )
 class DummyCompress:
     @classmethod
-    def compress(cls, data: bytes, compression_level: int = 6) -> bytes:
+    def compress(cls, data: bytes, _: int = 6) -> Optional[bytes]:
         return data
 
     @classmethod
-    def decompress(cls, data: bytes) -> bytes:
+    def decompress(cls, data: bytes) -> Optional[bytes]:
         return data

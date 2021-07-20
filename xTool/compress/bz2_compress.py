@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import bz2
+from typing import Optional
 
 from xTool.plugins.plugin import register_plugin, PluginType
 from .base import CompressType
@@ -11,13 +12,13 @@ from .base import CompressType
 )
 class Bz2Compress:
     @classmethod
-    def compress(cls, data: bytes, compression_level: int = 6) -> bytes:
+    def compress(cls, data: bytes, compression_level: int = 6) -> Optional[bytes]:
         if data is None:
             return data
         return bz2.compress(data, compression_level)
 
     @classmethod
-    def decompress(cls, data: bytes) -> bytes:
+    def decompress(cls, data: bytes) -> Optional[bytes]:
         if data is None:
             return data
         return bz2.decompress(data)
