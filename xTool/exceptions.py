@@ -361,6 +361,6 @@ class BaseErrorException(Exception):
         self.message = str(message)
 
 
-class SDKError(Exception):
+class SDKError(BaseErrorException):
     def __init__(self, code: ErrorCode, message: str):
         super().__init__(ErrorType.SDKError, code, message)
