@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-class _NoopLock(object):
+class NoopLock(object):
     __slots__ = ()
 
     def __enter__(self):

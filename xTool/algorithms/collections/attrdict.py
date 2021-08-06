@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+可以使用第三方库：attrdict
+"""
+
 try:
     from collections import UserDict
 except ImportError:
