@@ -163,6 +163,15 @@ def test_camel_to_snake():
     assert actual == "api_response_factory"
 
 
+def test_snake_to_camel():
+    actual = misc.snake_to_camel("api_response", title_case=True)
+    assert actual == "ApiResponse"
+    actual = misc.snake_to_camel("api_response_factory", title_case=True)
+    assert actual == "ApiResponseFactory"
+    actual = misc.snake_to_camel("api_response_factory", title_case=False)
+    assert actual == "apiResponseFactory"
+
+
 def test_md5():
     assert misc.md5("1") == "c4ca4238a0b923820dcc509a6f75849b"
 

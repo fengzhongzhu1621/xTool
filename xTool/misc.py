@@ -427,6 +427,17 @@ def camel_to_snake(s):
     return SNAKE_CASE_STEP2.sub(r'\1_\2', first).lower()
 
 
+def snake_to_camel(name, title_case=False):
+    """将下划线命名改为驼峰命名 ."""
+    items = name.split("_")
+    first_item = items[0].title() if title_case else items[0]
+    if len(items) == 1:
+        return first_item
+    other_items = [item.title() for item in items[1:]]
+    camel_name = "{}{}".format(first_item, ''.join(other_items))
+    return camel_name
+
+
 def md5(src):
     m = hashlib.md5()
     m.update(tob(src))
