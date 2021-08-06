@@ -154,12 +154,12 @@ def test_quote():
     assert actual == "a,b.a;b"
 
 
-def test_make_snake_case():
-    actual = misc.make_snake_case("API_Response")
+def test_camel_to_snake():
+    actual = misc.camel_to_snake("API_Response")
     assert actual == "api_response"
-    actual = misc.make_snake_case("APIResponse")
+    actual = misc.camel_to_snake("APIResponse")
     assert actual == "api_response"
-    actual = misc.make_snake_case("APIResponseFactory")
+    actual = misc.camel_to_snake("APIResponseFactory")
     assert actual == "api_response_factory"
 
 

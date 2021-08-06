@@ -421,7 +421,8 @@ SNAKE_CASE_STEP1 = re.compile('(.)_*([A-Z][a-z]+)')
 SNAKE_CASE_STEP2 = re.compile('([a-z0-9])_*([A-Z])')
 
 
-def make_snake_case(s):
+def camel_to_snake(s):
+    """将驼峰命名转换为下划线方式的小写命名 ."""
     first = SNAKE_CASE_STEP1.sub(r'\1_\2', s)
     return SNAKE_CASE_STEP2.sub(r'\1_\2', first).lower()
 
