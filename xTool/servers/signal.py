@@ -14,8 +14,12 @@ def register_signal_hander(loop, handle_stop_signal, handle_child_process_exit):
     # SIGUSR2 31,12,17 A 用户自定义信号2
     # SIGSEGV 11 C 无效的内存引用
     # SIGCHLD 20,17,18 B 子进程结束信号；每当子进程终止的时候，它会向父进程发送SIGCHLD信号。父进程可以设置一个信号处理程序来接受SIGCHLD和整理已经终止的子进程。
-    sigs = [signal.SIGTERM, signal.SIGINT, signal.SIGUSR2, signal.SIGSEGV]
-    for sig in sigs:
-        loop.add_signal_handler(sig, handle_stop_signal)
-    if handle_child_process_exit:
-        loop.add_signal_handler(signal.SIGCHLD, handle_child_process_exit)
+    try:
+        sigs = [signal.SIGTERM, signal.SIGINT, signal.SIGUSR2, signal.SIGSEGV]
+        for sig in sigs:
+            loop.add_signal_handler(sig, handle_stop_signal)
+        # 监听子进程是否退出
+        if handle_child_process_exit:
+            loop.add_signal_handler(signal.SIGCHLD, handle_child_process_exit)
+    except (SystemExit, KeyboardInterrupt):
+        loop.stop()
