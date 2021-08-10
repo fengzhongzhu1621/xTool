@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import signal
 import platform
@@ -15,7 +11,7 @@ class timeout(LoggingMixin):
     """超时上下文管理器: 给耗时操作增加统一的TimeOut超时处理机制（仅用于单进程）
     To be used in a ``with`` block and timeout its content.
 
-    e.g. 
+    e.g.
         try:
             with timeout(int(
                     task_copy.execution_timeout.total_seconds())):
@@ -45,14 +41,16 @@ class timeout(LoggingMixin):
                 signal.signal(signal.SIGALRM, self.handle_timeout)
                 signal.alarm(self.seconds)
             except ValueError as e:
-                self.log.warning("timeout can't be used in the current context")
+                self.log.warning(
+                    "timeout can't be used in the current context")
                 self.log.exception(e)
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, _, value, traceback):
         if self.use_signals:
             try:
                 # 关闭信号
                 signal.alarm(0)
             except ValueError as e:
-                self.log.warning("timeout can't be used in the current context")
+                self.log.warning(
+                    "timeout can't be used in the current context")
                 self.log.exception(e)
