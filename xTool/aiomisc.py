@@ -121,6 +121,10 @@ def load_uvlopo():
         pass
 
 
+async def null_callback(*args):
+    return args
+
+
 def create_default_event_loop(
     pool_size=None, policy=event_loop_policy,
     debug=False,
@@ -203,6 +207,16 @@ def awaitable(func):
         return awaiter(result)
 
     return wrap
+
+
+def wrap_func(func):
+    """将函数转换为协程 ."""
+    if not asyncio.iscoroutinefunction(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+    return func
 
 
 async def awaiter(future: asyncio.Future) -> T:
