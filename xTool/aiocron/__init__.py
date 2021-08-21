@@ -49,32 +49,25 @@ class Cron(object):
 
     def start(self):
         """Start scheduling"""
-        print("start")
         self.stop()
         self.initialize()
         self.handle = self.loop.call_at(self.get_next(), self.call_next)
-        print("start", "self.handle = ", self.handle)
 
     def stop(self):
         """Stop scheduling"""
-        print("stop self.handle =", self.handle)
         if self.handle is not None:
             self.handle.cancel()
         self.handle = self.future = self.croniter = None
-        print("stop", "self.handle = ", self.handle, "self.future = ", self.future, "self.croniter = ", self.croniter)
 
     async def next(self, *args):
         """yield from .next()"""
-        print("next start")
         self.initialize()
         self.future = asyncio.Future(loop=self.loop)
         self.handle = self.loop.call_at(self.get_next(), self.call_func, *args)
-        print("next", "self.handle = ", self.handle)
         return (await self.future)
 
     def initialize(self):
         """Initialize croniter and related times"""
-        print("initialize", "self.croniter = ", self.croniter)
         if self.croniter is None:
             self.time = time.time()
             self.datetime = datetime.now(self.tz)
@@ -88,23 +81,18 @@ class Cron(object):
 
     def call_next(self):
         """Set next hop in the loop. Call task"""
-        print("call next", "self.handle = ", self.handle)
         if self.handle is not None:
-            print("call next", "self.handle.cancel")
             # 创建future的时候，task为pending，事件循环调用执行的时候当然就是running，调用完毕自然就是done，
             # 如果需要停止事件循环，就需要先把task取消，状态为cancel。
             # 即在下一次事件循环，
             self.handle.cancel()
-            print("call next", "after self.handle.cancel self.handle", self.handle)
         next_time = self.get_next()
         # 在 3.8 版更改: 在 Python 3.7 和更早版本的默认事件循环实现中，when 和当前时间相差不能超过一天。 在这 Python 3.8 中已被修复。
-        print("call_next", "next self.handle = ", self.handle)
         self.handle = self.loop.call_at(next_time, self.call_next)
         self.call_func()
 
     def call_func(self, *args, **kwargs):
         """Called. Take care of exceptions using gather"""
-        print("call_func start")
         asyncio.gather(
             self.cron(*args, **kwargs),     # 业务逻辑处理函数
             loop=self.loop, return_exceptions=True
