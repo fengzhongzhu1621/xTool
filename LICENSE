@@ -242,6 +242,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     (MIT License) aiomisc-10.2.0 (https://github.com/aiokitchen/aiomisc)
     (MIT License) aiologger-0.6.0 (https://github.com/b2wdigital/aiologger)
     (MIT License) statsd 3.3.0 (https://github.com/jsocol/pystatsd)
+    (MIT License) aiocron 1.6 (https://github.com/gawel/aiocron)
 
 ========================================================================
 BSD 2-Clause licenses

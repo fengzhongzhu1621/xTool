@@ -498,6 +498,7 @@ def extract_stack(f=None, limit=None):
 
 class UseTimesGenerator:
     """获得每个对象的使用次数 ."""
+
     def __init__(self):
         self.cache = {}
 
@@ -513,3 +514,16 @@ class UseTimesGenerator:
             value = (old_value + 1) & 0xffffffff
         self.cache[obj] = value
         return value
+
+
+def flatten(items):
+    """摊平表格 .
+
+    Examples:
+         [1, 2, [3, 4, [5, 6], 7], 8] -> 1 2 3 4 5 6 7 8
+    """
+    for x in items:
+        if isinstance(x, collections.Iterable):
+            yield from flatten(x)
+        else:
+            yield x

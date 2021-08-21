@@ -210,7 +210,7 @@ def awaitable(func):
 
 
 def wrap_func(func):
-    """将函数转换为协程 ."""
+    """将函数转换为协程，参考asyncio.coroutine ."""
     if not asyncio.iscoroutinefunction(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
