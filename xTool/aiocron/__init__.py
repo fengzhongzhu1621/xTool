@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+"""
+异步定时器，精确到分钟级别
+
+如果当前的任务没有执行完成，下一个调度不会等待上一个任务执行完毕，所以业务层需要自行解决任务的幂等问题
+"""
 from croniter.croniter import croniter
 from datetime import datetime
 from tzlocal import get_localzone
