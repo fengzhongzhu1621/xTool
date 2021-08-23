@@ -22,6 +22,21 @@ def test_str():
     assert '* * * * *' in str(t)
 
 
+def test_sleep():
+    loop = asyncio.new_event_loop()
+
+    future = asyncio.Future(loop=loop)
+
+    @crontab('* * * * * *', loop=loop)
+    async def t():
+        print(datetime.datetime.now(), "t.begin")
+        await asyncio.sleep(3)
+        print(datetime.datetime.now(), "t.end")
+
+    # t.start()
+    # loop.run_until_complete(future)
+
+
 def test_cron():
     loop = asyncio.new_event_loop()
 

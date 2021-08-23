@@ -93,6 +93,7 @@ class Cron(object):
 
     def call_func(self, *args, **kwargs):
         """Called. Take care of exceptions using gather"""
+        # 如果业务逻辑返回异常，则不会退出，会将异常放在future中
         asyncio.gather(
             self.cron(*args, **kwargs),     # 业务逻辑处理函数
             loop=self.loop, return_exceptions=True
