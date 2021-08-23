@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-异步定时器，精确到分钟级别
+异步定时器，精确到秒级别
 
 如果当前的任务没有执行完成，下一个调度不会等待上一个任务执行完毕，所以业务层需要自行解决任务的幂等问题
 """
@@ -19,7 +19,7 @@ async def null_callback(*args):
 
 
 def wrap_func(func):
-    """wrap in a coroutine"""
+    """将方法转换为协程 ."""
     if not asyncio.iscoroutinefunction(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
