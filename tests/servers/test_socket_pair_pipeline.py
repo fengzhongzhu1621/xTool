@@ -37,7 +37,8 @@ class TestSocketPairPipeline:
         message = b"hello world!"
         pipeline.send_to_server(message)
         pipeline.close_server()
-        with pytest.raises(ConnectionResetError):
+        # with pytest.raises(ConnectionResetError):
+        with pytest.raises(BrokenPipeError):
             pipeline.send_to_server(message)
         with pytest.raises(OSError):
             pipeline.send_to_client(message)
