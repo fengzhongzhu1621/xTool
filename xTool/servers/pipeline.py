@@ -71,7 +71,7 @@ class SocketPairPipeline:
     def create_connectors(self):
         return (
             SocketPairPipelineServerConnector(self.socket_pair),
-            SocketPairPipelineClientConnector(self.socket_pair)
+            SocketPairPipelineClientConnector(self.socket_pair),
         )
 
     def send_to_client(self, data):

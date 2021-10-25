@@ -287,7 +287,12 @@ def ipv6_to_long(ipv6):
 
 
 def long_to_ipv6(ip_num):
-    return socket.inet_ntop(socket.AF_INET6, struct.pack('!QQ', ip_num >> 64, ip_num & 0xffffffffffffffff))
+    return socket.inet_ntop(
+        socket.AF_INET6,
+        struct.pack(
+            '!QQ',
+            ip_num >> 64,
+            ip_num & 0xffffffffffffffff))
 
 
 def ip_to_bytes(ip):

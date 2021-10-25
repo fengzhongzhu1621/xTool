@@ -92,7 +92,8 @@ class Cron(object):
             # 即在下一次事件循环，
             self.handle.cancel()
         next_time = self.get_next()
-        # 在 3.8 版更改: 在 Python 3.7 和更早版本的默认事件循环实现中，when 和当前时间相差不能超过一天。 在这 Python 3.8 中已被修复。
+        # 在 3.8 版更改: 在 Python 3.7 和更早版本的默认事件循环实现中，when 和当前时间相差不能超过一天。 在这 Python
+        # 3.8 中已被修复。
         self.handle = self.loop.call_at(next_time, self.call_next)
         self.call_func()
 
@@ -102,7 +103,7 @@ class Cron(object):
         asyncio.gather(
             self.cron(*args, **kwargs),     # 业务逻辑处理函数
             loop=self.loop, return_exceptions=True
-            ).add_done_callback(self.set_result)
+        ).add_done_callback(self.set_result)
 
     def set_result(self, result):
         """Set future's result if needed (can be an exception).

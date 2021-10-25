@@ -64,7 +64,9 @@ class TestSocketPairPipeline:
 
         message = b"hello world!"
 
-        child = multiprocessing.Process(target=_task, args=(server_connector, message))
+        child = multiprocessing.Process(
+            target=_task, args=(
+                server_connector, message))
         child.start()
         child.join()
         client_connector.close_other_side()
@@ -76,7 +78,9 @@ class TestSocketPairPipeline:
         queue = multiprocessing.Queue()
         message = b"hello world!"
 
-        child = multiprocessing.Process(target=_task_with_queue, args=(queue, message))
+        child = multiprocessing.Process(
+            target=_task_with_queue, args=(
+                queue, message))
         child.start()
         child.join()
         actual = queue.get()
