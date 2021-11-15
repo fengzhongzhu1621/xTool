@@ -4,7 +4,6 @@ from enum import Enum, unique
 
 from .status import STATUS_CODES
 
-
 _http_status_exceptions = {}
 
 
@@ -47,7 +46,7 @@ class InvalidUsage(HttpStatusException):
 
 @add_status_code(405)
 class MethodNotSupported(HttpStatusException):
-    def __init__(self, message, method, allowed_methods):
+    def __init__(self, message, _, allowed_methods):
         super().__init__(message)
         self.headers = {"Allow": ", ".join(allowed_methods)}
 
@@ -326,7 +325,6 @@ class InvalidStatsNameException(XToolException):
 
 
 class XToolTimeoutError(AssertionError):
-
     """Thrown when a timeout occurs in the `timeout` context manager."""
 
     def __init__(self, value="Timed Out"):
@@ -343,6 +341,7 @@ class ErrorType(Enum):
 
 @unique
 class ErrorCode(Enum):
+    """错误码类型 ."""
     # 成功
     ERR_OK = 0
     ERR_UNKNOWN = -1
@@ -355,7 +354,7 @@ class ErrMessage(Enum):
 
 
 class BaseErrorException(Exception):
-    def __init__(self, exception_type: int, code: int, message: str):
+    def __init__(self, exception_type: ErrorType, code: ErrorCode, message: str):
         self.type = exception_type
         self.code = code
         self.message = str(message)
