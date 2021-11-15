@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from enum import Enum, unique
+from enum import Enum, unique, IntEnum
 
 from .status import STATUS_CODES
 
@@ -335,12 +335,12 @@ class XToolTimeoutError(AssertionError):
 
 
 @unique
-class ErrorType(Enum):
+class ErrorType(IntEnum):
     SDKError = 1
 
 
 @unique
-class ErrorCode(Enum):
+class ErrorCode(IntEnum):
     """错误码类型 ."""
     # 成功
     ERR_OK = 0
@@ -363,3 +363,7 @@ class BaseErrorException(Exception):
 class SDKError(BaseErrorException):
     def __init__(self, code: ErrorCode, message: str):
         super().__init__(ErrorType.SDKError, code, message)
+
+
+def new_sdk_error(code: ErrorCode, message: str):
+    return SDKError(code, message)
