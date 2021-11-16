@@ -18,8 +18,8 @@ class PluginType(IntEnum):
 
     # metrics
     STATS_LOGGER = 10
-    STATS_NAME_HANDLER = 11             # stats名称验证器
-    STATS_NAME_ALLOW_VALIDATOR = 12     # 只允许指定的metrics name
+    STATS_NAME_HANDLER = 11  # stats名称验证器
+    STATS_NAME_ALLOW_VALIDATOR = 12  # 只允许指定的metrics name
 
     # 编解码
     CODEC = 20
@@ -34,8 +34,8 @@ class PluginStore:
     __slots__ = ("plugins", "plugin_instances")
 
     def __init__(self):
-        self.plugins = {}              # 存放所有的插件
-        self.plugin_instances = {}     # 存放所有的插件实例化对象，一个插件只有一个实例化对象
+        self.plugins = {}  # 存放所有的插件
+        self.plugin_instances = {}  # 存放所有的插件实例化对象，一个插件只有一个实例化对象
 
     def add_plugin(self, plugin_type, plugin_name, plugin_class):
         self.plugins.setdefault(plugin_type, {})[plugin_name] = plugin_class
@@ -49,9 +49,6 @@ class PluginStore:
 
     def get_plugin_instance(self, plugin_type, plugin_name):
         return self.plugin_instances.get(plugin_type, {}).get(plugin_name)
-
-    def clear_plugin_instances(self):
-        self.plugin_instances = {}
 
     def destroy_plugins(self):
         self.plugins = {}
@@ -82,6 +79,7 @@ class Plugin:
 
 class PluginMeta(type):
     """插件元类 ."""
+
     def __new__(cls, name, bases, attrs):
         super_new = super().__new__
         parents = [b for b in bases if isinstance(b, PluginMeta)]
@@ -107,6 +105,7 @@ class PluginMeta(type):
         if not register_ignore:
             # 将类包装为一个插件
             plugin = Plugin(new_class, plugin_type, plugin_name)
+            # 将插件添加到仓库
             DefaultPluginStore.add_plugin(plugin_type, plugin_name, plugin)
         return new_class
 
@@ -116,6 +115,7 @@ def register_plugin(plugin_type: PluginType,
                     version: str = "",
                     can_init_instance: bool = True, *args, **kwargs):
     """将类/函数注册为一个插件 ."""
+
     def decorator(cls):
         nonlocal plugin_name
         if not plugin_name:
@@ -129,13 +129,21 @@ def register_plugin(plugin_type: PluginType,
             can_init_instance,
             *args,
             **kwargs)
+        # 将插件添加到仓库
         DefaultPluginStore.add_plugin(plugin_type, plugin_name, plugin)
         return cls
+
     return decorator
 
 
 def get_plugin(plugin_type: int, plugin_name: str):
+    """从仓库中获取插件 ."""
     return DefaultPluginStore.get_plugin(plugin_type, plugin_name)
+
+
+def set_plugin_instance(plugin_type: int, plugin_name: str, plugin_instance: Plugin):
+    DefaultPluginStore.add_plugin_instance(
+        plugin_type, plugin_name, plugin_instance)
 
 
 def get_plugin_instance(plugin_type: int, plugin_name: str):
@@ -145,7 +153,7 @@ def get_plugin_instance(plugin_type: int, plugin_name: str):
         plugin_type, plugin_name)
     if not plugin_instance:
         # 从缓存中获取插件类
-        plugin = DefaultPluginStore.get_plugin(plugin_type, plugin_name)
+        plugin = get_plugin(plugin_type, plugin_name)
         if not plugin:
             return None
         # 创建插件实例
@@ -156,21 +164,19 @@ def get_plugin_instance(plugin_type: int, plugin_name: str):
     return plugin_instance
 
 
-def reload_global_plugin_store():
-    global DefaultPluginStore
-    DefaultPluginStore.clear_plugin_instances()
-
-
 class PluginRegister(metaclass=PluginMeta):
     def __init__(self):
         pass
 
 
-def load_default_plugins():
-    reload_global_plugin_store()
+def load_plugins():
+    # 遍历所有插件类型
     for plugin_type, plugins in DefaultPluginStore.plugins.items():
+        # 遍历所有的插件类
         for plugin_name, plugin_cls in plugins.items():
+            # 判断插件类是否可以实例化
             if plugin_cls.can_init_instance:
+                # 创建插件实例
                 plugin_instance = plugin_cls.cls()
-                DefaultPluginStore.set_instance(
-                    plugin_type, plugin_name, plugin_instance)
+                # 缓冲插件实例
+                set_plugin_instance(plugin_type, plugin_name, plugin_instance)

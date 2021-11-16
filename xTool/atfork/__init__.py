@@ -126,7 +126,7 @@ def _call_atfork_list(call_list):
 
 def prepare_to_fork_acquire():
     """Acquire our lock and call all prepare callables."""
-    # os.fock前加锁
+    # os.fork前加锁
     _fork_lock.acquire()
     # 在fork子进程之前触发的函数执行
     _prepare_call_exceptions.extend(_call_atfork_list(_prepare_call_list))

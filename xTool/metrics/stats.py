@@ -17,7 +17,6 @@ from xTool.utils.timer import Timer
 from xTool.decorators.utils import safe_wraps
 from xTool.utils.dates import time_now
 
-
 log = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=Callable)  # pylint: disable=invalid-name
@@ -28,18 +27,25 @@ STATS_NAME_DEFAULT_MAX_LENGTH = 250
 class StatsClientBase(object):
     """A Base class for various statsd clients."""
 
+    def __init__(self):
+        # 指令前缀
+        self._prefix = None
+
     def close(self):
         """Used to close and clean up any underlying resources."""
         raise NotImplementedError()
 
-    def _send(self):
+    def _send(self, *args, **kwargs):
+        """发送指标，调用服务端接口 ."""
         raise NotImplementedError()
 
     def pipeline(self):
+        """一次发送多个命令 ."""
         raise NotImplementedError()
 
     def timer(self, stat, rate=1):
-        return Timer(self, stat, rate)
+        """创建一个计时器，计算一个操作的耗时，单位是ms ."""
+        return StatsdTimer(self, stat, rate)
 
     def timing(self, stat, delta, rate=1):
         """
@@ -53,22 +59,25 @@ class StatsClientBase(object):
         self._send_stat(stat, '%0.6f|ms' % delta, rate)
 
     def incr(self, stat, count=1, rate=1):
-        """Increment a stat by `count`."""
+        """Increment a stat by `count`. 区间计数 ."""
         self._send_stat(stat, '%s|c' % count, rate)
 
     def decr(self, stat, count=1, rate=1):
-        """Decrement a stat by `count`."""
+        """Decrement a stat by `count`. 区间计数 ."""
         self.incr(stat, -count, rate)
 
     def gauge(self, stat, value, rate=1, delta=False):
-        """Set a gauge value."""
+        """Set a gauge value. 发送一个测量值，flush时不会清空，保持原有值 ."""
         if value < 0 and not delta:
+            # 客户端采样，减少请求调用
             if rate < 1:
                 if random.random() > rate:
                     return
             # 重置为负数
             with self.pipeline() as pipe:
+                # 重置为初始值0
                 pipe._send_stat(stat, '0|g', 1)
+                # 初始化值为一个负数
                 pipe._send_stat(stat, '%s|g' % value, 1)
         else:
             # 需要对前面的值进行加法操作
@@ -76,10 +85,11 @@ class StatsClientBase(object):
             self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
 
     def set(self, stat, value, rate=1):
-        """Set a set value."""
+        """Set a set value. 记录flush期间，不重复的值 ."""
         self._send_stat(stat, '%s|s' % value, rate)
 
     def _send_stat(self, stat, value, rate):
+        """发送指标 ."""
         self._after(self._prepare(stat, value, rate))
 
     def _prepare(self, stat, value, rate):
@@ -102,6 +112,7 @@ class StatsClientBase(object):
 class PipelineBase(StatsClientBase):
 
     def __init__(self, client):
+        super().__init__()
         self._client = client
         # 命令前缀
         self._prefix = client._prefix
@@ -114,6 +125,7 @@ class PipelineBase(StatsClientBase):
     def _after(self, data):
         """发送命令时，先缓存到队列；上下文结束时再批量发给服务器 ."""
         if data is not None:
+            # 队列尾部添加数据
             self._stats.append(data)
 
     def __enter__(self):
@@ -137,13 +149,17 @@ class StatsClient(StatsClientBase):
     def __init__(self, host='localhost', port=8125, prefix=None,
                  maxudpsize=512, ipv6=False):
         """Create a new client."""
+        super().__init__()
+        # 解析主机地址
         fam = socket.AF_INET6 if ipv6 else socket.AF_INET
         family, _, _, _, addr = socket.getaddrinfo(
             host, port, fam, socket.SOCK_DGRAM)[0]
         self._addr = addr
+        # 创建socket
         self._sock = socket.socket(family, socket.SOCK_DGRAM)
         self._sock.setblocking(False)
         self._prefix = prefix
+        # 仅用于管道缓冲
         self._maxudpsize = maxudpsize
 
     def _send(self, data):
@@ -160,6 +176,7 @@ class StatsClient(StatsClientBase):
         self._sock = None
 
     def pipeline(self):
+        """创建管道client ."""
         return Pipeline(self)
 
 
@@ -172,28 +189,34 @@ class Pipeline(PipelineBase):
         self._maxudpsize = client._maxudpsize
 
     def _send(self):
+        # 从队列中获取数据
         data = self._stats.popleft()
         while self._stats:
             # Use popleft to preserve the order of the stats.
             stat = self._stats.popleft()
             if len(stat) + len(data) + 1 >= self._maxudpsize:
-                # 缓冲区满发送
+                # 缓冲区满发送，向服务器发送剩余数据
                 self._client._after(data)
                 data = stat
             else:
                 # 多条命令换行分割
                 data = "{}\n{}".format(data, stat)
-        # 队列为空时发送剩余数据
+        # 队列为空时向服务器发送剩余数据
         self._client._after(data)
 
 
 class StreamPipeline(PipelineBase):
     def _send(self):
         self._client._after('\n'.join(self._stats))
+        # 清空队列
         self._stats.clear()
 
 
 class StreamClientBase(StatsClientBase):
+    def __init__(self):
+        super().__init__()
+        self._sock = None
+
     def connect(self):
         raise NotImplementedError()
 
@@ -225,6 +248,7 @@ class TCPStatsClient(StreamClientBase):
     def __init__(self, host='localhost', port=8125, prefix=None,
                  timeout=None, ipv6=False):
         """Create a new client."""
+        super().__init__()
         self._host = host
         self._port = port
         self._ipv6 = ipv6
@@ -246,6 +270,7 @@ class UnixSocketStatsClient(StreamClientBase):
 
     def __init__(self, socket_path, prefix=None, timeout=None):
         """Create a new client."""
+        super().__init__()
         self._socket_path = socket_path
         self._timeout = timeout
         self._prefix = prefix
@@ -261,15 +286,16 @@ class StatsdTimer(object):
     """A context manager/decorator for statsd.timing()."""
 
     def __init__(self, client, stat, rate=1):
-        self.client = client
-        self.stat = stat
-        self.rate = rate
-        self.ms = None
-        self._sent = False
+        self.client = client  # statd客户端
+        self.stat = stat  # 指标
+        self.rate = rate  # 采样
+        self.ms = None  # 耗时
+        self._sent = False  # 是否已经发送
         self._start_time = None
 
     def __call__(self, f):
         """Thread-safe timing function decorator."""
+
         @safe_wraps(f)
         def _wrapped(*args, **kwargs):
             start_time = time_now()
@@ -278,6 +304,7 @@ class StatsdTimer(object):
             finally:
                 elapsed_time_ms = 1000.0 * (time_now() - start_time)
                 self.client.timing(self.stat, elapsed_time_ms, self.rate)
+
         return _wrapped
 
     def __enter__(self):
@@ -287,16 +314,20 @@ class StatsdTimer(object):
         self.stop()
 
     def start(self):
+        """开始计时 ."""
         self.ms = None
         self._sent = False
         self._start_time = time_now()
         return self
 
     def stop(self, send=True):
+        """结束计时，并发送指标 ."""
         if self._start_time is None:
             raise RuntimeError('Timer has not started.')
+        # 计算耗时（ms）
         dt = time_now() - self._start_time
         self.ms = 1000.0 * dt  # Convert to milliseconds.
+        # 发送指标
         if send:
             self.send()
         return self
@@ -306,7 +337,9 @@ class StatsdTimer(object):
             raise RuntimeError('No data recorded.')
         if self._sent:
             raise RuntimeError('Already sent data.')
+        # 标记指标已经发送
         self._sent = True
+        # 发送指标
         self.client.timing(self.stat, self.ms, self.rate)
 
 
@@ -637,7 +670,7 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
             allow_name_validator_config)
 
     def create_client(self, statsd_config: StatsParamConfig):
-        from datadog import DogStatsd
+        from datadog import DogStatsd  # noqa
         statsd = DogStatsd(
             host=statsd_config.statsd_host,
             port=statsd_config.statsd_port,

@@ -117,6 +117,7 @@ class AtforkTest(unittest.TestCase):
 
         def raise_something():
             raise RuntimeError()
+
         errors = atfork._call_atfork_list([raise_something] * 2)
         self.assertEqual(2, len(errors))
         for exc_info in errors:
@@ -158,6 +159,7 @@ class AtforkTest(unittest.TestCase):
     def _test_fork_failure(self, orig_fork_attrname, fork_wrapper):
         def failing_fork():
             raise OSError(0, 'testing a fork failure')
+
         atfork.atfork(self._pre, self._parent, self._child)
         orig_orig_fork = getattr(atfork, orig_fork_attrname)
         try:
