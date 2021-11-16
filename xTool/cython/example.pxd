@@ -48,12 +48,17 @@ cdef class CythonDemo:
         char* buffer
         int buffer_size
         int data_length
+        # 必须声明
+        bytearray buf
 
     cpdef str strcpy(self)
     cpdef uint get_queue_size(self)
     cpdef int enqueue(self, int value)
     cpdef int dequeue(self)
     cpdef void resize(self, size_t length)
+
+    cpdef void reset(self)
+    cpdef void append_buffer_data(self, bytes data)
 
     cdef char* malloc(self, size_t length)
     cdef int _enqueue(self, int value) nogil

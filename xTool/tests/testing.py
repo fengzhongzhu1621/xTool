@@ -621,6 +621,7 @@ def loop_context(loop_factory: _LOOP_FACTORY = asyncio.new_event_loop,
 
 
 def pytest_async(func):
+    """协程装饰器，用于测试协程方法 ."""
     @wraps(func)
     def wrapper(*args, **kwargs):
         loop = asyncio.get_event_loop()

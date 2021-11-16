@@ -915,6 +915,7 @@ struct __pyx_obj_5xTool_6cython_7example_CythonDemo {
   char *buffer;
   int buffer_size;
   int data_length;
+  PyObject *buf;
 };
 
 
@@ -933,6 +934,8 @@ struct __pyx_vtabstruct_5xTool_6cython_7example_CythonDemo {
   int (*enqueue)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, int, int __pyx_skip_dispatch);
   int (*dequeue)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, int __pyx_skip_dispatch);
   void (*resize)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, size_t, int __pyx_skip_dispatch);
+  void (*reset)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, int __pyx_skip_dispatch);
+  void (*append_buffer_data)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, PyObject *, int __pyx_skip_dispatch);
   char *(*malloc)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, size_t);
   int (*_enqueue)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, int);
   int (*_dequeue)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *);
@@ -1025,6 +1028,48 @@ static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
 /* KeywordStringCheck.proto */
 static int __Pyx_CheckKeywordStrings(PyObject *kwdict, const char* function_name, int kw_allowed);
 
+/* PyFunctionFastCall.proto */
+#if CYTHON_FAST_PYCALL
+#define __Pyx_PyFunction_FastCall(func, args, nargs)\
+    __Pyx_PyFunction_FastCallDict((func), (args), (nargs), NULL)
+#if 1 || PY_VERSION_HEX < 0x030600B1
+static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs);
+#else
+#define __Pyx_PyFunction_FastCallDict(func, args, nargs, kwargs) _PyFunction_FastCallDict(func, args, nargs, kwargs)
+#endif
+#define __Pyx_BUILD_ASSERT_EXPR(cond)\
+    (sizeof(char [1 - 2*!(cond)]) - 1)
+#ifndef Py_MEMBER_SIZE
+#define Py_MEMBER_SIZE(type, member) sizeof(((type *)0)->member)
+#endif
+  static size_t __pyx_pyframe_localsplus_offset = 0;
+  #include "frameobject.h"
+  #define __Pxy_PyFrame_Initialize_Offsets()\
+    ((void)__Pyx_BUILD_ASSERT_EXPR(sizeof(PyFrameObject) == offsetof(PyFrameObject, f_localsplus) + Py_MEMBER_SIZE(PyFrameObject, f_localsplus)),\
+     (void)(__pyx_pyframe_localsplus_offset = ((size_t)PyFrame_Type.tp_basicsize) - Py_MEMBER_SIZE(PyFrameObject, f_localsplus)))
+  #define __Pyx_PyFrame_GetLocalsplus(frame)\
+    (assert(__pyx_pyframe_localsplus_offset), (PyObject **)(((char *)(frame)) + __pyx_pyframe_localsplus_offset))
+#endif
+
+/* PyObjectCall.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
+#else
+#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
+#endif
+
+/* PyObjectCallMethO.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
+#endif
+
+/* PyObjectCallNoArg.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
+#else
+#define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
+#endif
+
 /* PyThreadStateGet.proto */
 #if CYTHON_FAST_THREAD_STATE
 #define __Pyx_PyThreadState_declare  PyThreadState *__pyx_tstate;
@@ -1099,53 +1144,17 @@ static CYTHON_INLINE PyObject *__Pyx_PyCFunction_FastCall(PyObject *func, PyObje
 #define __Pyx_PyCFunction_FastCall(func, args, nargs)  (assert(0), NULL)
 #endif
 
-/* PyFunctionFastCall.proto */
-#if CYTHON_FAST_PYCALL
-#define __Pyx_PyFunction_FastCall(func, args, nargs)\
-    __Pyx_PyFunction_FastCallDict((func), (args), (nargs), NULL)
-#if 1 || PY_VERSION_HEX < 0x030600B1
-static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs);
-#else
-#define __Pyx_PyFunction_FastCallDict(func, args, nargs, kwargs) _PyFunction_FastCallDict(func, args, nargs, kwargs)
-#endif
-#define __Pyx_BUILD_ASSERT_EXPR(cond)\
-    (sizeof(char [1 - 2*!(cond)]) - 1)
-#ifndef Py_MEMBER_SIZE
-#define Py_MEMBER_SIZE(type, member) sizeof(((type *)0)->member)
-#endif
-  static size_t __pyx_pyframe_localsplus_offset = 0;
-  #include "frameobject.h"
-  #define __Pxy_PyFrame_Initialize_Offsets()\
-    ((void)__Pyx_BUILD_ASSERT_EXPR(sizeof(PyFrameObject) == offsetof(PyFrameObject, f_localsplus) + Py_MEMBER_SIZE(PyFrameObject, f_localsplus)),\
-     (void)(__pyx_pyframe_localsplus_offset = ((size_t)PyFrame_Type.tp_basicsize) - Py_MEMBER_SIZE(PyFrameObject, f_localsplus)))
-  #define __Pyx_PyFrame_GetLocalsplus(frame)\
-    (assert(__pyx_pyframe_localsplus_offset), (PyObject **)(((char *)(frame)) + __pyx_pyframe_localsplus_offset))
-#endif
-
-/* PyObjectCall.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
-#else
-#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
-#endif
-
 /* PyObjectCall2Args.proto */
 static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
-
-/* PyObjectCallMethO.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
-#endif
 
 /* PyObjectCallOneArg.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
 
-/* PyObjectCallNoArg.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
-#else
-#define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
-#endif
+/* ArgTypeTest.proto */
+#define __Pyx_ArgTypeTest(obj, type, none_allowed, name, exact)\
+    ((likely((Py_TYPE(obj) == type) | (none_allowed && (obj == Py_None)))) ? 1 :\
+        __Pyx__ArgTypeTest(obj, type, name, exact))
+static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact);
 
 /* IncludeStringH.proto */
 #include <string.h>
@@ -1169,12 +1178,6 @@ static CYTHON_INLINE PyObject* __Pyx_decode_c_string(
          const char* cstring, Py_ssize_t start, Py_ssize_t stop,
          const char* encoding, const char* errors,
          PyObject* (*decode_func)(const char *s, Py_ssize_t size, const char *errors));
-
-/* ArgTypeTest.proto */
-#define __Pyx_ArgTypeTest(obj, type, none_allowed, name, exact)\
-    ((likely((Py_TYPE(obj) == type) | (none_allowed && (obj == Py_None)))) ? 1 :\
-        __Pyx__ArgTypeTest(obj, type, name, exact))
-static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact);
 
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
@@ -1309,6 +1312,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 static char *__pyx_f_5xTool_6cython_7example_10CythonDemo_malloc(CYTHON_UNUSED struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, size_t __pyx_v_length); /* proto*/
 static void __pyx_f_5xTool_6cython_7example_10CythonDemo_resize(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, size_t __pyx_v_length, int __pyx_skip_dispatch); /* proto*/
+static void __pyx_f_5xTool_6cython_7example_10CythonDemo_reset(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
+static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer_data(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_data, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5xTool_6cython_7example_10CythonDemo_memcpy(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_v_offset, int __pyx_v_length); /* proto*/
 static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static __pyx_t_5xTool_6cython_7example_uint __pyx_f_5xTool_6cython_7example_10CythonDemo_get_queue_size(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
@@ -1361,6 +1366,8 @@ static const char __pyx_k_abc[] = "abc";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_reset[] = "reset";
+static const char __pyx_k_extend[] = "extend";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_resize[] = "resize";
 static const char __pyx_k_strcpy[] = "strcpy";
@@ -1379,6 +1386,7 @@ static const char __pyx_k_append_buffer[] = "append_buffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_get_queue_size[] = "get_queue_size";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
+static const char __pyx_k_append_buffer_data[] = "append_buffer_data";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_get_buffer_data_length[] = "get_buffer_data_length";
 static const char __pyx_k_framer_head_magic_not_match[] = "framer head magic not match";
@@ -1390,9 +1398,11 @@ static PyObject *__pyx_n_s_MemoryError;
 static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_n_u_abc;
 static PyObject *__pyx_n_s_append_buffer;
+static PyObject *__pyx_n_s_append_buffer_data;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_dequeue;
 static PyObject *__pyx_n_s_enqueue;
+static PyObject *__pyx_n_s_extend;
 static PyObject *__pyx_kp_u_frame_header_length_not_match;
 static PyObject *__pyx_kp_u_framer_head_magic_not_match;
 static PyObject *__pyx_n_s_get_buffer_data_length;
@@ -1406,6 +1416,7 @@ static PyObject *__pyx_n_s_read_package;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
+static PyObject *__pyx_n_s_reset;
 static PyObject *__pyx_n_s_reset_buffer;
 static PyObject *__pyx_n_s_resize;
 static PyObject *__pyx_n_s_setstate;
@@ -1415,20 +1426,22 @@ static PyObject *__pyx_n_s_test;
 static int __pyx_pf_5xTool_6cython_7example_10CythonDemo___init__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
 static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_2__cinit__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_4resize(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, size_t __pyx_v_length); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_6strcpy(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_8get_queue_size(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_10enqueue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_v_value); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_12dequeue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_14reset_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_16get_buffer_data_length(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_18append_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_data); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_20read_package(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
-static void __pyx_pf_5xTool_6cython_7example_10CythonDemo_22__dealloc__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_6reset(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_8append_buffer_data(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_data); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_10strcpy(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_12get_queue_size(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_14enqueue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_16dequeue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_18reset_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_20get_buffer_data_length(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_22append_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_data); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_24read_package(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
+static void __pyx_pf_5xTool_6cython_7example_10CythonDemo_26__dealloc__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_8object_a___get__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
 static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_8object_a_2__set__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_8object_a_4__del__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_24__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_26__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_28__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_30__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_tp_new_5xTool_6cython_7example_CythonDemo(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
@@ -1547,7 +1560,7 @@ static void __pyx_f_5xTool_6cython_7example_endian_byte_to_uint(char *__pyx_v_sr
  * cdef class CythonDemo:
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         memset(self.char_a, 0, 16)
- * 
+ *         self.buf = bytearray()
  */
 
 /* Python wrapper */
@@ -1569,33 +1582,58 @@ static int __pyx_pw_5xTool_6cython_7example_10CythonDemo_1__init__(PyObject *__p
 static int __pyx_pf_5xTool_6cython_7example_10CythonDemo___init__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
   /* "xTool/cython/example.pyx":91
  * cdef class CythonDemo:
  *     def __init__(self):
  *         memset(self.char_a, 0, 16)             # <<<<<<<<<<<<<<
+ *         self.buf = bytearray()
+ * 
+ */
+  (void)(memset(__pyx_v_self->char_a, 0, 16));
+
+  /* "xTool/cython/example.pyx":92
+ *     def __init__(self):
+ *         memset(self.char_a, 0, 16)
+ *         self.buf = bytearray()             # <<<<<<<<<<<<<<
  * 
  *     def __cinit__(self):
  */
-  (void)(memset(__pyx_v_self->char_a, 0, 16));
+  __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)(&PyByteArray_Type))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->buf);
+  __Pyx_DECREF(__pyx_v_self->buf);
+  __pyx_v_self->buf = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
 
   /* "xTool/cython/example.pyx":90
  * 
  * cdef class CythonDemo:
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         memset(self.char_a, 0, 16)
- * 
+ *         self.buf = bytearray()
  */
 
   /* function exit code */
   __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("xTool.cython.example.CythonDemo.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":93
- *         memset(self.char_a, 0, 16)
+/* "xTool/cython/example.pyx":94
+ *         self.buf = bytearray()
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
  *         self.data_length = 0    # TODO int
@@ -1627,7 +1665,7 @@ static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_2__cinit__(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "xTool/cython/example.pyx":94
+  /* "xTool/cython/example.pyx":95
  * 
  *     def __cinit__(self):
  *         self.data_length = 0    # TODO int             # <<<<<<<<<<<<<<
@@ -1636,7 +1674,7 @@ static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_2__cinit__(struct __pyx
  */
   __pyx_v_self->data_length = 0;
 
-  /* "xTool/cython/example.pyx":95
+  /* "xTool/cython/example.pyx":96
  *     def __cinit__(self):
  *         self.data_length = 0    # TODO int
  *         self.buffer_size = 128             # <<<<<<<<<<<<<<
@@ -1645,7 +1683,7 @@ static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_2__cinit__(struct __pyx
  */
   __pyx_v_self->buffer_size = 0x80;
 
-  /* "xTool/cython/example.pyx":96
+  /* "xTool/cython/example.pyx":97
  *         self.data_length = 0    # TODO int
  *         self.buffer_size = 128
  *         self.buffer = self.malloc(self.buffer_size)             # <<<<<<<<<<<<<<
@@ -1654,7 +1692,7 @@ static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_2__cinit__(struct __pyx
  */
   __pyx_v_self->buffer = ((struct __pyx_vtabstruct_5xTool_6cython_7example_CythonDemo *)__pyx_v_self->__pyx_vtab)->malloc(__pyx_v_self, __pyx_v_self->buffer_size);
 
-  /* "xTool/cython/example.pyx":97
+  /* "xTool/cython/example.pyx":98
  *         self.buffer_size = 128
  *         self.buffer = self.malloc(self.buffer_size)
  *         if not self.buffer:             # <<<<<<<<<<<<<<
@@ -1664,16 +1702,16 @@ static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_2__cinit__(struct __pyx
   __pyx_t_1 = ((!(__pyx_v_self->buffer != 0)) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "xTool/cython/example.pyx":98
+    /* "xTool/cython/example.pyx":99
  *         self.buffer = self.malloc(self.buffer_size)
  *         if not self.buffer:
  *             raise MemoryError()             # <<<<<<<<<<<<<<
  * 
  *     cdef char * malloc(self, size_t length):
  */
-    PyErr_NoMemory(); __PYX_ERR(0, 98, __pyx_L1_error)
+    PyErr_NoMemory(); __PYX_ERR(0, 99, __pyx_L1_error)
 
-    /* "xTool/cython/example.pyx":97
+    /* "xTool/cython/example.pyx":98
  *         self.buffer_size = 128
  *         self.buffer = self.malloc(self.buffer_size)
  *         if not self.buffer:             # <<<<<<<<<<<<<<
@@ -1682,8 +1720,8 @@ static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_2__cinit__(struct __pyx
  */
   }
 
-  /* "xTool/cython/example.pyx":93
- *         memset(self.char_a, 0, 16)
+  /* "xTool/cython/example.pyx":94
+ *         self.buf = bytearray()
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
  *         self.data_length = 0    # TODO int
@@ -1701,7 +1739,7 @@ static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_2__cinit__(struct __pyx
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":100
+/* "xTool/cython/example.pyx":101
  *             raise MemoryError()
  * 
  *     cdef char * malloc(self, size_t length):             # <<<<<<<<<<<<<<
@@ -1719,7 +1757,7 @@ static char *__pyx_f_5xTool_6cython_7example_10CythonDemo_malloc(CYTHON_UNUSED s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("malloc", 0);
 
-  /* "xTool/cython/example.pyx":101
+  /* "xTool/cython/example.pyx":102
  * 
  *     cdef char * malloc(self, size_t length):
  *         buffer = <char * > PyMem_Malloc(length * sizeof(char))             # <<<<<<<<<<<<<<
@@ -1728,7 +1766,7 @@ static char *__pyx_f_5xTool_6cython_7example_10CythonDemo_malloc(CYTHON_UNUSED s
  */
   __pyx_v_buffer = ((char *)PyMem_Malloc((__pyx_v_length * (sizeof(char)))));
 
-  /* "xTool/cython/example.pyx":102
+  /* "xTool/cython/example.pyx":103
  *     cdef char * malloc(self, size_t length):
  *         buffer = <char * > PyMem_Malloc(length * sizeof(char))
  *         if not buffer:             # <<<<<<<<<<<<<<
@@ -1738,16 +1776,16 @@ static char *__pyx_f_5xTool_6cython_7example_10CythonDemo_malloc(CYTHON_UNUSED s
   __pyx_t_1 = ((!(__pyx_v_buffer != 0)) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "xTool/cython/example.pyx":103
+    /* "xTool/cython/example.pyx":104
  *         buffer = <char * > PyMem_Malloc(length * sizeof(char))
  *         if not buffer:
  *             raise MemoryError()             # <<<<<<<<<<<<<<
  *         return buffer
  * 
  */
-    PyErr_NoMemory(); __PYX_ERR(0, 103, __pyx_L1_error)
+    PyErr_NoMemory(); __PYX_ERR(0, 104, __pyx_L1_error)
 
-    /* "xTool/cython/example.pyx":102
+    /* "xTool/cython/example.pyx":103
  *     cdef char * malloc(self, size_t length):
  *         buffer = <char * > PyMem_Malloc(length * sizeof(char))
  *         if not buffer:             # <<<<<<<<<<<<<<
@@ -1756,7 +1794,7 @@ static char *__pyx_f_5xTool_6cython_7example_10CythonDemo_malloc(CYTHON_UNUSED s
  */
   }
 
-  /* "xTool/cython/example.pyx":104
+  /* "xTool/cython/example.pyx":105
  *         if not buffer:
  *             raise MemoryError()
  *         return buffer             # <<<<<<<<<<<<<<
@@ -1766,7 +1804,7 @@ static char *__pyx_f_5xTool_6cython_7example_10CythonDemo_malloc(CYTHON_UNUSED s
   __pyx_r = __pyx_v_buffer;
   goto __pyx_L0;
 
-  /* "xTool/cython/example.pyx":100
+  /* "xTool/cython/example.pyx":101
  *             raise MemoryError()
  * 
  *     cdef char * malloc(self, size_t length):             # <<<<<<<<<<<<<<
@@ -1783,7 +1821,7 @@ static char *__pyx_f_5xTool_6cython_7example_10CythonDemo_malloc(CYTHON_UNUSED s
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":106
+/* "xTool/cython/example.pyx":107
  *         return buffer
  * 
  *     cpdef void resize(self, size_t length):             # <<<<<<<<<<<<<<
@@ -1814,10 +1852,10 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_resize(struct __pyx_obj
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_resize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_resize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_5resize)) {
-        __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_length); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_length); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 107, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -1833,7 +1871,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_resize(struct __pyx_obj
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -1853,7 +1891,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_resize(struct __pyx_obj
     #endif
   }
 
-  /* "xTool/cython/example.pyx":107
+  /* "xTool/cython/example.pyx":108
  * 
  *     cpdef void resize(self, size_t length):
  *         new_buffer = <char*> PyMem_Realloc( < void * >self.buffer, length * sizeof(char))             # <<<<<<<<<<<<<<
@@ -1862,7 +1900,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_resize(struct __pyx_obj
  */
   __pyx_v_new_buffer = ((char *)PyMem_Realloc(((void *)__pyx_v_self->buffer), (__pyx_v_length * (sizeof(char)))));
 
-  /* "xTool/cython/example.pyx":108
+  /* "xTool/cython/example.pyx":109
  *     cpdef void resize(self, size_t length):
  *         new_buffer = <char*> PyMem_Realloc( < void * >self.buffer, length * sizeof(char))
  *         if not new_buffer:             # <<<<<<<<<<<<<<
@@ -1872,16 +1910,16 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_resize(struct __pyx_obj
   __pyx_t_6 = ((!(__pyx_v_new_buffer != 0)) != 0);
   if (unlikely(__pyx_t_6)) {
 
-    /* "xTool/cython/example.pyx":109
+    /* "xTool/cython/example.pyx":110
  *         new_buffer = <char*> PyMem_Realloc( < void * >self.buffer, length * sizeof(char))
  *         if not new_buffer:
  *             raise MemoryError()             # <<<<<<<<<<<<<<
  *         self.buffer_size = length
  *         self.buffer = new_buffer
  */
-    PyErr_NoMemory(); __PYX_ERR(0, 109, __pyx_L1_error)
+    PyErr_NoMemory(); __PYX_ERR(0, 110, __pyx_L1_error)
 
-    /* "xTool/cython/example.pyx":108
+    /* "xTool/cython/example.pyx":109
  *     cpdef void resize(self, size_t length):
  *         new_buffer = <char*> PyMem_Realloc( < void * >self.buffer, length * sizeof(char))
  *         if not new_buffer:             # <<<<<<<<<<<<<<
@@ -1890,7 +1928,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_resize(struct __pyx_obj
  */
   }
 
-  /* "xTool/cython/example.pyx":110
+  /* "xTool/cython/example.pyx":111
  *         if not new_buffer:
  *             raise MemoryError()
  *         self.buffer_size = length             # <<<<<<<<<<<<<<
@@ -1899,16 +1937,16 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_resize(struct __pyx_obj
  */
   __pyx_v_self->buffer_size = __pyx_v_length;
 
-  /* "xTool/cython/example.pyx":111
+  /* "xTool/cython/example.pyx":112
  *             raise MemoryError()
  *         self.buffer_size = length
  *         self.buffer = new_buffer             # <<<<<<<<<<<<<<
  * 
- *     cdef void memcpy(self, int offset, int length):
+ *     cpdef void reset(self):
  */
   __pyx_v_self->buffer = __pyx_v_new_buffer;
 
-  /* "xTool/cython/example.pyx":106
+  /* "xTool/cython/example.pyx":107
  *         return buffer
  * 
  *     cpdef void resize(self, size_t length):             # <<<<<<<<<<<<<<
@@ -1940,7 +1978,7 @@ static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_5resize(PyObject 
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("resize (wrapper)", 0);
   assert(__pyx_arg_length); {
-    __pyx_v_length = __Pyx_PyInt_As_size_t(__pyx_arg_length); if (unlikely((__pyx_v_length == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 106, __pyx_L3_error)
+    __pyx_v_length = __Pyx_PyInt_As_size_t(__pyx_arg_length); if (unlikely((__pyx_v_length == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 107, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -1964,7 +2002,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_4resize(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("resize", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5xTool_6cython_7example_10CythonDemo_resize(__pyx_v_self, __pyx_v_length, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5xTool_6cython_7example_10CythonDemo_resize(__pyx_v_self, __pyx_v_length, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1981,8 +2019,303 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_4resize(struct __
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":113
+/* "xTool/cython/example.pyx":114
  *         self.buffer = new_buffer
+ * 
+ *     cpdef void reset(self):             # <<<<<<<<<<<<<<
+ *         self.buf = bytearray()
+ * 
+ */
+
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_7reset(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static void __pyx_f_5xTool_6cython_7example_10CythonDemo_reset(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch) {
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("reset", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely((Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0) || (Py_TYPE(((PyObject *)__pyx_v_self))->tp_flags & (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_reset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_7reset)) {
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+          if (likely(__pyx_t_4)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+            __Pyx_INCREF(__pyx_t_4);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_3, function);
+          }
+        }
+        __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_type_dict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "xTool/cython/example.pyx":115
+ * 
+ *     cpdef void reset(self):
+ *         self.buf = bytearray()             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef void append_buffer_data(self, bytes data):
+ */
+  __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)(&PyByteArray_Type))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->buf);
+  __Pyx_DECREF(__pyx_v_self->buf);
+  __pyx_v_self->buf = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "xTool/cython/example.pyx":114
+ *         self.buffer = new_buffer
+ * 
+ *     cpdef void reset(self):             # <<<<<<<<<<<<<<
+ *         self.buf = bytearray()
+ * 
+ */
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_WriteUnraisable("xTool.cython.example.CythonDemo.reset", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_7reset(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_7reset(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("reset (wrapper)", 0);
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_6reset(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_6reset(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("reset", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5xTool_6cython_7example_10CythonDemo_reset(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("xTool.cython.example.CythonDemo.reset", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "xTool/cython/example.pyx":117
+ *         self.buf = bytearray()
+ * 
+ *     cpdef void append_buffer_data(self, bytes data):             # <<<<<<<<<<<<<<
+ *         self.buf.extend(data)
+ * 
+ */
+
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_9append_buffer_data(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
+static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer_data(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_data, int __pyx_skip_dispatch) {
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("append_buffer_data", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely((Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0) || (Py_TYPE(((PyObject *)__pyx_v_self))->tp_flags & (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_append_buffer_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_9append_buffer_data)) {
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+          if (likely(__pyx_t_4)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+            __Pyx_INCREF(__pyx_t_4);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_3, function);
+          }
+        }
+        __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_data) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_data);
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_type_dict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "xTool/cython/example.pyx":118
+ * 
+ *     cpdef void append_buffer_data(self, bytes data):
+ *         self.buf.extend(data)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef void memcpy(self, int offset, int length):
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->buf, __pyx_n_s_extend); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 118, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_data) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_data);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "xTool/cython/example.pyx":117
+ *         self.buf = bytearray()
+ * 
+ *     cpdef void append_buffer_data(self, bytes data):             # <<<<<<<<<<<<<<
+ *         self.buf.extend(data)
+ * 
+ */
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_WriteUnraisable("xTool.cython.example.CythonDemo.append_buffer_data", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_9append_buffer_data(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_9append_buffer_data(PyObject *__pyx_v_self, PyObject *__pyx_v_data) {
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("append_buffer_data (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_data), (&PyBytes_Type), 1, "data", 1))) __PYX_ERR(0, 117, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_8append_buffer_data(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self), ((PyObject*)__pyx_v_data));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_8append_buffer_data(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_data) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("append_buffer_data", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer_data(__pyx_v_self, __pyx_v_data, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("xTool.cython.example.CythonDemo.append_buffer_data", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "xTool/cython/example.pyx":120
+ *         self.buf.extend(data)
  * 
  *     cdef void memcpy(self, int offset, int length):             # <<<<<<<<<<<<<<
  *         cdef uint i = 0
@@ -1995,7 +2328,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_memcpy(struct __pyx_obj
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("memcpy", 0);
 
-  /* "xTool/cython/example.pyx":114
+  /* "xTool/cython/example.pyx":121
  * 
  *     cdef void memcpy(self, int offset, int length):
  *         cdef uint i = 0             # <<<<<<<<<<<<<<
@@ -2004,7 +2337,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_memcpy(struct __pyx_obj
  */
   __pyx_v_i = 0;
 
-  /* "xTool/cython/example.pyx":115
+  /* "xTool/cython/example.pyx":122
  *     cdef void memcpy(self, int offset, int length):
  *         cdef uint i = 0
  *         while i < length:             # <<<<<<<<<<<<<<
@@ -2015,7 +2348,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_memcpy(struct __pyx_obj
     __pyx_t_1 = ((__pyx_v_i < __pyx_v_length) != 0);
     if (!__pyx_t_1) break;
 
-    /* "xTool/cython/example.pyx":116
+    /* "xTool/cython/example.pyx":123
  *         cdef uint i = 0
  *         while i < length:
  *             self.buffer[i] = self.buffer[offset + i]             # <<<<<<<<<<<<<<
@@ -2024,7 +2357,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_memcpy(struct __pyx_obj
  */
     (__pyx_v_self->buffer[__pyx_v_i]) = (__pyx_v_self->buffer[(__pyx_v_offset + __pyx_v_i)]);
 
-    /* "xTool/cython/example.pyx":117
+    /* "xTool/cython/example.pyx":124
  *         while i < length:
  *             self.buffer[i] = self.buffer[offset + i]
  *             i += 1             # <<<<<<<<<<<<<<
@@ -2034,7 +2367,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_memcpy(struct __pyx_obj
     __pyx_v_i = (__pyx_v_i + 1);
   }
 
-  /* "xTool/cython/example.pyx":118
+  /* "xTool/cython/example.pyx":125
  *             self.buffer[i] = self.buffer[offset + i]
  *             i += 1
  *         self.data_length = length             # <<<<<<<<<<<<<<
@@ -2043,8 +2376,8 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_memcpy(struct __pyx_obj
  */
   __pyx_v_self->data_length = __pyx_v_length;
 
-  /* "xTool/cython/example.pyx":113
- *         self.buffer = new_buffer
+  /* "xTool/cython/example.pyx":120
+ *         self.buf.extend(data)
  * 
  *     cdef void memcpy(self, int offset, int length):             # <<<<<<<<<<<<<<
  *         cdef uint i = 0
@@ -2055,7 +2388,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_memcpy(struct __pyx_obj
   __Pyx_RefNannyFinishContext();
 }
 
-/* "xTool/cython/example.pyx":120
+/* "xTool/cython/example.pyx":127
  *         self.data_length = length
  * 
  *     cpdef str strcpy(self):             # <<<<<<<<<<<<<<
@@ -2063,7 +2396,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_memcpy(struct __pyx_obj
  *         strcpy(self.char_a, str_value.encode("utf8"))
  */
 
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_7strcpy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_11strcpy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch) {
   PyObject *__pyx_v_str_value = NULL;
   PyObject *__pyx_v_result = NULL;
@@ -2088,9 +2421,9 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(struct __py
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_strcpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_strcpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_7strcpy)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_11strcpy)) {
         __Pyx_XDECREF(__pyx_r);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
@@ -2105,10 +2438,10 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(struct __py
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 120, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 127, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 120, __pyx_L1_error)
+        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 127, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -2127,7 +2460,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(struct __py
     #endif
   }
 
-  /* "xTool/cython/example.pyx":121
+  /* "xTool/cython/example.pyx":128
  * 
  *     cpdef str strcpy(self):
  *         str_value = "abc"             # <<<<<<<<<<<<<<
@@ -2137,20 +2470,20 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(struct __py
   __Pyx_INCREF(__pyx_n_u_abc);
   __pyx_v_str_value = __pyx_n_u_abc;
 
-  /* "xTool/cython/example.pyx":122
+  /* "xTool/cython/example.pyx":129
  *     cpdef str strcpy(self):
  *         str_value = "abc"
  *         strcpy(self.char_a, str_value.encode("utf8"))             # <<<<<<<<<<<<<<
  *         result = self.char_a.decode('utf8')
  *         return result
  */
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_str_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_str_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyBytes_AsString(__pyx_t_1); if (unlikely((!__pyx_t_5) && PyErr_Occurred())) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyBytes_AsString(__pyx_t_1); if (unlikely((!__pyx_t_5) && PyErr_Occurred())) __PYX_ERR(0, 129, __pyx_L1_error)
   (void)(strcpy(__pyx_v_self->char_a, __pyx_t_5));
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "xTool/cython/example.pyx":123
+  /* "xTool/cython/example.pyx":130
  *         str_value = "abc"
  *         strcpy(self.char_a, str_value.encode("utf8"))
  *         result = self.char_a.decode('utf8')             # <<<<<<<<<<<<<<
@@ -2158,13 +2491,13 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(struct __py
  * 
  */
   __pyx_t_6 = __pyx_v_self->char_a;
-  __pyx_t_1 = __Pyx_decode_c_string(__pyx_t_6, 0, strlen(__pyx_t_6), NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_decode_c_string(__pyx_t_6, 0, strlen(__pyx_t_6), NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_t_1);
   __pyx_v_result = __pyx_t_1;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "xTool/cython/example.pyx":124
+  /* "xTool/cython/example.pyx":131
  *         strcpy(self.char_a, str_value.encode("utf8"))
  *         result = self.char_a.decode('utf8')
  *         return result             # <<<<<<<<<<<<<<
@@ -2172,12 +2505,12 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(struct __py
  *     cpdef uint get_queue_size(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  if (!(likely(PyUnicode_CheckExact(__pyx_v_result))||((__pyx_v_result) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_result)->tp_name), 0))) __PYX_ERR(0, 124, __pyx_L1_error)
+  if (!(likely(PyUnicode_CheckExact(__pyx_v_result))||((__pyx_v_result) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_result)->tp_name), 0))) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_INCREF(__pyx_v_result);
   __pyx_r = ((PyObject*)__pyx_v_result);
   goto __pyx_L0;
 
-  /* "xTool/cython/example.pyx":120
+  /* "xTool/cython/example.pyx":127
  *         self.data_length = length
  * 
  *     cpdef str strcpy(self):             # <<<<<<<<<<<<<<
@@ -2202,19 +2535,19 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(struct __py
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_7strcpy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_7strcpy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_11strcpy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_11strcpy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("strcpy (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_6strcpy(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_10strcpy(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_6strcpy(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_10strcpy(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2223,7 +2556,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_6strcpy(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("strcpy", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5xTool_6cython_7example_10CythonDemo_strcpy(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2240,7 +2573,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_6strcpy(struct __
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":126
+/* "xTool/cython/example.pyx":133
  *         return result
  * 
  *     cpdef uint get_queue_size(self):             # <<<<<<<<<<<<<<
@@ -2248,7 +2581,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_6strcpy(struct __
  *         self.queue_a.push(200)
  */
 
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_9get_queue_size(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_13get_queue_size(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static __pyx_t_5xTool_6cython_7example_uint __pyx_f_5xTool_6cython_7example_10CythonDemo_get_queue_size(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch) {
   __pyx_t_5xTool_6cython_7example_uint __pyx_r;
   __Pyx_RefNannyDeclarations
@@ -2270,9 +2603,9 @@ static __pyx_t_5xTool_6cython_7example_uint __pyx_f_5xTool_6cython_7example_10Cy
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_queue_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_queue_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_9get_queue_size)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_13get_queue_size)) {
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
         if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -2286,10 +2619,10 @@ static __pyx_t_5xTool_6cython_7example_uint __pyx_f_5xTool_6cython_7example_10Cy
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 133, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_5 = __Pyx_PyInt_As_unsigned_int(__pyx_t_2); if (unlikely((__pyx_t_5 == (unsigned int)-1) && PyErr_Occurred())) __PYX_ERR(0, 126, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_As_unsigned_int(__pyx_t_2); if (unlikely((__pyx_t_5 == (unsigned int)-1) && PyErr_Occurred())) __PYX_ERR(0, 133, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_5;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -2308,7 +2641,7 @@ static __pyx_t_5xTool_6cython_7example_uint __pyx_f_5xTool_6cython_7example_10Cy
     #endif
   }
 
-  /* "xTool/cython/example.pyx":127
+  /* "xTool/cython/example.pyx":134
  * 
  *     cpdef uint get_queue_size(self):
  *         self.queue_a.push(100)             # <<<<<<<<<<<<<<
@@ -2317,7 +2650,7 @@ static __pyx_t_5xTool_6cython_7example_uint __pyx_f_5xTool_6cython_7example_10Cy
  */
   __pyx_v_self->queue_a.push(0x64);
 
-  /* "xTool/cython/example.pyx":128
+  /* "xTool/cython/example.pyx":135
  *     cpdef uint get_queue_size(self):
  *         self.queue_a.push(100)
  *         self.queue_a.push(200)             # <<<<<<<<<<<<<<
@@ -2326,7 +2659,7 @@ static __pyx_t_5xTool_6cython_7example_uint __pyx_f_5xTool_6cython_7example_10Cy
  */
   __pyx_v_self->queue_a.push(0xC8);
 
-  /* "xTool/cython/example.pyx":129
+  /* "xTool/cython/example.pyx":136
  *         self.queue_a.push(100)
  *         self.queue_a.push(200)
  *         return self.queue_a.size()             # <<<<<<<<<<<<<<
@@ -2336,7 +2669,7 @@ static __pyx_t_5xTool_6cython_7example_uint __pyx_f_5xTool_6cython_7example_10Cy
   __pyx_r = __pyx_v_self->queue_a.size();
   goto __pyx_L0;
 
-  /* "xTool/cython/example.pyx":126
+  /* "xTool/cython/example.pyx":133
  *         return result
  * 
  *     cpdef uint get_queue_size(self):             # <<<<<<<<<<<<<<
@@ -2358,19 +2691,19 @@ static __pyx_t_5xTool_6cython_7example_uint __pyx_f_5xTool_6cython_7example_10Cy
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_9get_queue_size(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_9get_queue_size(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_13get_queue_size(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_13get_queue_size(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_queue_size (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_8get_queue_size(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_12get_queue_size(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_8get_queue_size(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_12get_queue_size(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2379,7 +2712,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_8get_queue_size(s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_queue_size", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_unsigned_int(__pyx_f_5xTool_6cython_7example_10CythonDemo_get_queue_size(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_unsigned_int(__pyx_f_5xTool_6cython_7example_10CythonDemo_get_queue_size(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2396,7 +2729,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_8get_queue_size(s
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":131
+/* "xTool/cython/example.pyx":138
  *         return self.queue_a.size()
  * 
  *     cdef int _enqueue(self, int value) nogil:             # <<<<<<<<<<<<<<
@@ -2408,7 +2741,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__enqueue(struct __pyx_ob
   std::lock_guard<std::recursive_mutex>  *__pyx_v_lck;
   int __pyx_r;
 
-  /* "xTool/cython/example.pyx":132
+  /* "xTool/cython/example.pyx":139
  * 
  *     cdef int _enqueue(self, int value) nogil:
  *         cdef lock_guard[recursive_mutex] * lck = new lock_guard[recursive_mutex](self.enqueue_mtx)             # <<<<<<<<<<<<<<
@@ -2417,7 +2750,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__enqueue(struct __pyx_ob
  */
   __pyx_v_lck = new std::lock_guard<std::recursive_mutex> (__pyx_v_self->enqueue_mtx);
 
-  /* "xTool/cython/example.pyx":133
+  /* "xTool/cython/example.pyx":140
  *     cdef int _enqueue(self, int value) nogil:
  *         cdef lock_guard[recursive_mutex] * lck = new lock_guard[recursive_mutex](self.enqueue_mtx)
  *         self.queue_a.push(value)             # <<<<<<<<<<<<<<
@@ -2426,7 +2759,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__enqueue(struct __pyx_ob
  */
   __pyx_v_self->queue_a.push(__pyx_v_value);
 
-  /* "xTool/cython/example.pyx":134
+  /* "xTool/cython/example.pyx":141
  *         cdef lock_guard[recursive_mutex] * lck = new lock_guard[recursive_mutex](self.enqueue_mtx)
  *         self.queue_a.push(value)
  *         del lck             # <<<<<<<<<<<<<<
@@ -2435,7 +2768,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__enqueue(struct __pyx_ob
  */
   delete __pyx_v_lck;
 
-  /* "xTool/cython/example.pyx":135
+  /* "xTool/cython/example.pyx":142
  *         self.queue_a.push(value)
  *         del lck
  *         return 0             # <<<<<<<<<<<<<<
@@ -2445,7 +2778,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__enqueue(struct __pyx_ob
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "xTool/cython/example.pyx":131
+  /* "xTool/cython/example.pyx":138
  *         return self.queue_a.size()
  * 
  *     cdef int _enqueue(self, int value) nogil:             # <<<<<<<<<<<<<<
@@ -2458,7 +2791,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__enqueue(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":137
+/* "xTool/cython/example.pyx":144
  *         return 0
  * 
  *     cpdef int enqueue(self, int value):             # <<<<<<<<<<<<<<
@@ -2466,7 +2799,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__enqueue(struct __pyx_ob
  *         return ret
  */
 
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_11enqueue(PyObject *__pyx_v_self, PyObject *__pyx_arg_value); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_15enqueue(PyObject *__pyx_v_self, PyObject *__pyx_arg_value); /*proto*/
 static int __pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_v_value, int __pyx_skip_dispatch) {
   int __pyx_v_ret;
   int __pyx_r;
@@ -2490,10 +2823,10 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue(struct __pyx_obj
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_enqueue); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_enqueue); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_11enqueue)) {
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_value); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_15enqueue)) {
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_value); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -2509,10 +2842,10 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue(struct __pyx_obj
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 144, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 137, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 144, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -2531,7 +2864,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue(struct __pyx_obj
     #endif
   }
 
-  /* "xTool/cython/example.pyx":138
+  /* "xTool/cython/example.pyx":145
  * 
  *     cpdef int enqueue(self, int value):
  *         cdef int ret = self._enqueue(value)             # <<<<<<<<<<<<<<
@@ -2540,7 +2873,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue(struct __pyx_obj
  */
   __pyx_v_ret = ((struct __pyx_vtabstruct_5xTool_6cython_7example_CythonDemo *)__pyx_v_self->__pyx_vtab)->_enqueue(__pyx_v_self, __pyx_v_value);
 
-  /* "xTool/cython/example.pyx":139
+  /* "xTool/cython/example.pyx":146
  *     cpdef int enqueue(self, int value):
  *         cdef int ret = self._enqueue(value)
  *         return ret             # <<<<<<<<<<<<<<
@@ -2550,7 +2883,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue(struct __pyx_obj
   __pyx_r = __pyx_v_ret;
   goto __pyx_L0;
 
-  /* "xTool/cython/example.pyx":137
+  /* "xTool/cython/example.pyx":144
  *         return 0
  * 
  *     cpdef int enqueue(self, int value):             # <<<<<<<<<<<<<<
@@ -2573,8 +2906,8 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue(struct __pyx_obj
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_11enqueue(PyObject *__pyx_v_self, PyObject *__pyx_arg_value); /*proto*/
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_11enqueue(PyObject *__pyx_v_self, PyObject *__pyx_arg_value) {
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_15enqueue(PyObject *__pyx_v_self, PyObject *__pyx_arg_value); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_15enqueue(PyObject *__pyx_v_self, PyObject *__pyx_arg_value) {
   int __pyx_v_value;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -2583,7 +2916,7 @@ static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_11enqueue(PyObjec
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("enqueue (wrapper)", 0);
   assert(__pyx_arg_value); {
-    __pyx_v_value = __Pyx_PyInt_As_int(__pyx_arg_value); if (unlikely((__pyx_v_value == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 137, __pyx_L3_error)
+    __pyx_v_value = __Pyx_PyInt_As_int(__pyx_arg_value); if (unlikely((__pyx_v_value == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 144, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -2591,14 +2924,14 @@ static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_11enqueue(PyObjec
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_10enqueue(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self), ((int)__pyx_v_value));
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_14enqueue(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self), ((int)__pyx_v_value));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_10enqueue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_v_value) {
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_14enqueue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_v_value) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2607,7 +2940,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_10enqueue(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("enqueue", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue(__pyx_v_self, __pyx_v_value, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue(__pyx_v_self, __pyx_v_value, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2624,7 +2957,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_10enqueue(struct 
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":141
+/* "xTool/cython/example.pyx":148
  *         return ret
  * 
  *     cdef int _dequeue(self) nogil:             # <<<<<<<<<<<<<<
@@ -2637,7 +2970,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__dequeue(struct __pyx_ob
   int __pyx_v_value;
   int __pyx_r;
 
-  /* "xTool/cython/example.pyx":142
+  /* "xTool/cython/example.pyx":149
  * 
  *     cdef int _dequeue(self) nogil:
  *         cdef lock_guard[recursive_mutex] * lck = new lock_guard[recursive_mutex](self.dequeue_mtx)             # <<<<<<<<<<<<<<
@@ -2646,7 +2979,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__dequeue(struct __pyx_ob
  */
   __pyx_v_lck = new std::lock_guard<std::recursive_mutex> (__pyx_v_self->dequeue_mtx);
 
-  /* "xTool/cython/example.pyx":144
+  /* "xTool/cython/example.pyx":151
  *         cdef lock_guard[recursive_mutex] * lck = new lock_guard[recursive_mutex](self.dequeue_mtx)
  *         #
  *         cdef int value = self.queue_a.front()             # <<<<<<<<<<<<<<
@@ -2655,7 +2988,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__dequeue(struct __pyx_ob
  */
   __pyx_v_value = __pyx_v_self->queue_a.front();
 
-  /* "xTool/cython/example.pyx":146
+  /* "xTool/cython/example.pyx":153
  *         cdef int value = self.queue_a.front()
  *         #
  *         self.queue_a.pop()             # <<<<<<<<<<<<<<
@@ -2664,7 +2997,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__dequeue(struct __pyx_ob
  */
   __pyx_v_self->queue_a.pop();
 
-  /* "xTool/cython/example.pyx":147
+  /* "xTool/cython/example.pyx":154
  *         #
  *         self.queue_a.pop()
  *         del lck             # <<<<<<<<<<<<<<
@@ -2673,7 +3006,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__dequeue(struct __pyx_ob
  */
   delete __pyx_v_lck;
 
-  /* "xTool/cython/example.pyx":148
+  /* "xTool/cython/example.pyx":155
  *         self.queue_a.pop()
  *         del lck
  *         return value             # <<<<<<<<<<<<<<
@@ -2683,7 +3016,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__dequeue(struct __pyx_ob
   __pyx_r = __pyx_v_value;
   goto __pyx_L0;
 
-  /* "xTool/cython/example.pyx":141
+  /* "xTool/cython/example.pyx":148
  *         return ret
  * 
  *     cdef int _dequeue(self) nogil:             # <<<<<<<<<<<<<<
@@ -2696,7 +3029,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__dequeue(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":150
+/* "xTool/cython/example.pyx":157
  *         return value
  * 
  *     cpdef int dequeue(self):             # <<<<<<<<<<<<<<
@@ -2704,7 +3037,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo__dequeue(struct __pyx_ob
  *         return value
  */
 
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_13dequeue(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_17dequeue(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static int __pyx_f_5xTool_6cython_7example_10CythonDemo_dequeue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch) {
   int __pyx_v_value;
   int __pyx_r;
@@ -2727,288 +3060,9 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_dequeue(struct __pyx_obj
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_dequeue); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_dequeue); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 157, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_13dequeue)) {
-        __Pyx_INCREF(__pyx_t_1);
-        __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-          if (likely(__pyx_t_4)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-            __Pyx_INCREF(__pyx_t_4);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_3, function);
-          }
-        }
-        __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
-        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 150, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_r = __pyx_t_5;
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        goto __pyx_L0;
-      }
-      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
-      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
-      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
-      if (unlikely(__pyx_type_dict_guard != __pyx_tp_dict_version)) {
-        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
-      }
-      #endif
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
-    }
-    #endif
-  }
-
-  /* "xTool/cython/example.pyx":151
- * 
- *     cpdef int dequeue(self):
- *         cdef int value = self._dequeue()             # <<<<<<<<<<<<<<
- *         return value
- * 
- */
-  __pyx_v_value = ((struct __pyx_vtabstruct_5xTool_6cython_7example_CythonDemo *)__pyx_v_self->__pyx_vtab)->_dequeue(__pyx_v_self);
-
-  /* "xTool/cython/example.pyx":152
- *     cpdef int dequeue(self):
- *         cdef int value = self._dequeue()
- *         return value             # <<<<<<<<<<<<<<
- * 
- *     cpdef void reset_buffer(self):
- */
-  __pyx_r = __pyx_v_value;
-  goto __pyx_L0;
-
-  /* "xTool/cython/example.pyx":150
- *         return value
- * 
- *     cpdef int dequeue(self):             # <<<<<<<<<<<<<<
- *         cdef int value = self._dequeue()
- *         return value
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_WriteUnraisable("xTool.cython.example.CythonDemo.dequeue", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
-  __pyx_r = 0;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_13dequeue(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_13dequeue(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("dequeue (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_12dequeue(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_12dequeue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("dequeue", 0);
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5xTool_6cython_7example_10CythonDemo_dequeue(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
-  goto __pyx_L0;
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("xTool.cython.example.CythonDemo.dequeue", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "xTool/cython/example.pyx":154
- *         return value
- * 
- *     cpdef void reset_buffer(self):             # <<<<<<<<<<<<<<
- *         self.data_length = 0
- * 
- */
-
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_15reset_buffer(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static void __pyx_f_5xTool_6cython_7example_10CythonDemo_reset_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch) {
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("reset_buffer", 0);
-  /* Check if called by wrapper */
-  if (unlikely(__pyx_skip_dispatch)) ;
-  /* Check if overridden in Python */
-  else if (unlikely((Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0) || (Py_TYPE(((PyObject *)__pyx_v_self))->tp_flags & (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))) {
-    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
-    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
-    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
-      PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
-      #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_reset_buffer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_15reset_buffer)) {
-        __Pyx_INCREF(__pyx_t_1);
-        __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-          if (likely(__pyx_t_4)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-            __Pyx_INCREF(__pyx_t_4);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_3, function);
-          }
-        }
-        __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
-        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        goto __pyx_L0;
-      }
-      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
-      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
-      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
-      if (unlikely(__pyx_type_dict_guard != __pyx_tp_dict_version)) {
-        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
-      }
-      #endif
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
-    }
-    #endif
-  }
-
-  /* "xTool/cython/example.pyx":155
- * 
- *     cpdef void reset_buffer(self):
- *         self.data_length = 0             # <<<<<<<<<<<<<<
- * 
- *     cpdef int get_buffer_data_length(self):
- */
-  __pyx_v_self->data_length = 0;
-
-  /* "xTool/cython/example.pyx":154
- *         return value
- * 
- *     cpdef void reset_buffer(self):             # <<<<<<<<<<<<<<
- *         self.data_length = 0
- * 
- */
-
-  /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_WriteUnraisable("xTool.cython.example.CythonDemo.reset_buffer", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-}
-
-/* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_15reset_buffer(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_15reset_buffer(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("reset_buffer (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_14reset_buffer(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_14reset_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("reset_buffer", 0);
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5xTool_6cython_7example_10CythonDemo_reset_buffer(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
-  goto __pyx_L0;
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("xTool.cython.example.CythonDemo.reset_buffer", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "xTool/cython/example.pyx":157
- *         self.data_length = 0
- * 
- *     cpdef int get_buffer_data_length(self):             # <<<<<<<<<<<<<<
- *         return self.data_length
- * 
- */
-
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_17get_buffer_data_length(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static int __pyx_f_5xTool_6cython_7example_10CythonDemo_get_buffer_data_length(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch) {
-  int __pyx_r;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  int __pyx_t_5;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_buffer_data_length", 0);
-  /* Check if called by wrapper */
-  if (unlikely(__pyx_skip_dispatch)) ;
-  /* Check if overridden in Python */
-  else if (unlikely((Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0) || (Py_TYPE(((PyObject *)__pyx_v_self))->tp_flags & (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))) {
-    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
-    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
-    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
-      PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
-      #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_buffer_data_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 157, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_17get_buffer_data_length)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_17dequeue)) {
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
         if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -3046,6 +3100,285 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_get_buffer_data_length(s
 
   /* "xTool/cython/example.pyx":158
  * 
+ *     cpdef int dequeue(self):
+ *         cdef int value = self._dequeue()             # <<<<<<<<<<<<<<
+ *         return value
+ * 
+ */
+  __pyx_v_value = ((struct __pyx_vtabstruct_5xTool_6cython_7example_CythonDemo *)__pyx_v_self->__pyx_vtab)->_dequeue(__pyx_v_self);
+
+  /* "xTool/cython/example.pyx":159
+ *     cpdef int dequeue(self):
+ *         cdef int value = self._dequeue()
+ *         return value             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef void reset_buffer(self):
+ */
+  __pyx_r = __pyx_v_value;
+  goto __pyx_L0;
+
+  /* "xTool/cython/example.pyx":157
+ *         return value
+ * 
+ *     cpdef int dequeue(self):             # <<<<<<<<<<<<<<
+ *         cdef int value = self._dequeue()
+ *         return value
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_WriteUnraisable("xTool.cython.example.CythonDemo.dequeue", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_17dequeue(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_17dequeue(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("dequeue (wrapper)", 0);
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_16dequeue(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_16dequeue(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("dequeue", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5xTool_6cython_7example_10CythonDemo_dequeue(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("xTool.cython.example.CythonDemo.dequeue", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "xTool/cython/example.pyx":161
+ *         return value
+ * 
+ *     cpdef void reset_buffer(self):             # <<<<<<<<<<<<<<
+ *         self.data_length = 0
+ * 
+ */
+
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_19reset_buffer(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static void __pyx_f_5xTool_6cython_7example_10CythonDemo_reset_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch) {
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("reset_buffer", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely((Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0) || (Py_TYPE(((PyObject *)__pyx_v_self))->tp_flags & (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_reset_buffer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_19reset_buffer)) {
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+          if (likely(__pyx_t_4)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+            __Pyx_INCREF(__pyx_t_4);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_3, function);
+          }
+        }
+        __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_type_dict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "xTool/cython/example.pyx":162
+ * 
+ *     cpdef void reset_buffer(self):
+ *         self.data_length = 0             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef int get_buffer_data_length(self):
+ */
+  __pyx_v_self->data_length = 0;
+
+  /* "xTool/cython/example.pyx":161
+ *         return value
+ * 
+ *     cpdef void reset_buffer(self):             # <<<<<<<<<<<<<<
+ *         self.data_length = 0
+ * 
+ */
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_WriteUnraisable("xTool.cython.example.CythonDemo.reset_buffer", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_19reset_buffer(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_19reset_buffer(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("reset_buffer (wrapper)", 0);
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_18reset_buffer(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_18reset_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("reset_buffer", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5xTool_6cython_7example_10CythonDemo_reset_buffer(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("xTool.cython.example.CythonDemo.reset_buffer", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "xTool/cython/example.pyx":164
+ *         self.data_length = 0
+ * 
+ *     cpdef int get_buffer_data_length(self):             # <<<<<<<<<<<<<<
+ *         return self.data_length
+ * 
+ */
+
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_21get_buffer_data_length(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static int __pyx_f_5xTool_6cython_7example_10CythonDemo_get_buffer_data_length(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_5;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_buffer_data_length", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely((Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0) || (Py_TYPE(((PyObject *)__pyx_v_self))->tp_flags & (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_buffer_data_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_21get_buffer_data_length)) {
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+          if (likely(__pyx_t_4)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+            __Pyx_INCREF(__pyx_t_4);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_3, function);
+          }
+        }
+        __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 164, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __pyx_r = __pyx_t_5;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_type_dict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "xTool/cython/example.pyx":165
+ * 
  *     cpdef int get_buffer_data_length(self):
  *         return self.data_length             # <<<<<<<<<<<<<<
  * 
@@ -3054,7 +3387,7 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_get_buffer_data_length(s
   __pyx_r = __pyx_v_self->data_length;
   goto __pyx_L0;
 
-  /* "xTool/cython/example.pyx":157
+  /* "xTool/cython/example.pyx":164
  *         self.data_length = 0
  * 
  *     cpdef int get_buffer_data_length(self):             # <<<<<<<<<<<<<<
@@ -3076,19 +3409,19 @@ static int __pyx_f_5xTool_6cython_7example_10CythonDemo_get_buffer_data_length(s
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_17get_buffer_data_length(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_17get_buffer_data_length(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_21get_buffer_data_length(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_21get_buffer_data_length(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_buffer_data_length (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_16get_buffer_data_length(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_20get_buffer_data_length(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_16get_buffer_data_length(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_20get_buffer_data_length(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3097,7 +3430,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_16get_buffer_data
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_buffer_data_length", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5xTool_6cython_7example_10CythonDemo_get_buffer_data_length(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5xTool_6cython_7example_10CythonDemo_get_buffer_data_length(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3114,7 +3447,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_16get_buffer_data
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":160
+/* "xTool/cython/example.pyx":167
  *         return self.data_length
  * 
  *     cpdef void append_buffer(self, bytes data):             # <<<<<<<<<<<<<<
@@ -3122,7 +3455,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_16get_buffer_data
  *         #
  */
 
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_19append_buffer(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_23append_buffer(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
 static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_data, int __pyx_skip_dispatch) {
   int __pyx_v_append_data_length;
   char *__pyx_v_start_ptr;
@@ -3148,9 +3481,9 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_append_buffer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 160, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_append_buffer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_19append_buffer)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_23append_buffer)) {
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
         if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -3164,7 +3497,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_data) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_data);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 160, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3184,7 +3517,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
     #endif
   }
 
-  /* "xTool/cython/example.pyx":163
+  /* "xTool/cython/example.pyx":170
  *         """buffer ."""
  *         #
  *         cdef int append_data_length = len(data)             # <<<<<<<<<<<<<<
@@ -3193,12 +3526,12 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
  */
   if (unlikely(__pyx_v_data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 163, __pyx_L1_error)
+    __PYX_ERR(0, 170, __pyx_L1_error)
   }
-  __pyx_t_5 = PyBytes_GET_SIZE(__pyx_v_data); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 163, __pyx_L1_error)
+  __pyx_t_5 = PyBytes_GET_SIZE(__pyx_v_data); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 170, __pyx_L1_error)
   __pyx_v_append_data_length = __pyx_t_5;
 
-  /* "xTool/cython/example.pyx":165
+  /* "xTool/cython/example.pyx":172
  *         cdef int append_data_length = len(data)
  *         #
  *         if self.data_length + append_data_length > self.buffer_size:             # <<<<<<<<<<<<<<
@@ -3208,7 +3541,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
   __pyx_t_6 = (((__pyx_v_self->data_length + __pyx_v_append_data_length) > __pyx_v_self->buffer_size) != 0);
   if (__pyx_t_6) {
 
-    /* "xTool/cython/example.pyx":166
+    /* "xTool/cython/example.pyx":173
  *         #
  *         if self.data_length + append_data_length > self.buffer_size:
  *             self.resize((self.buffer_size + append_data_length) * 2)             # <<<<<<<<<<<<<<
@@ -3217,7 +3550,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
  */
     ((struct __pyx_vtabstruct_5xTool_6cython_7example_CythonDemo *)__pyx_v_self->__pyx_vtab)->resize(__pyx_v_self, ((__pyx_v_self->buffer_size + __pyx_v_append_data_length) * 2), 0);
 
-    /* "xTool/cython/example.pyx":165
+    /* "xTool/cython/example.pyx":172
  *         cdef int append_data_length = len(data)
  *         #
  *         if self.data_length + append_data_length > self.buffer_size:             # <<<<<<<<<<<<<<
@@ -3226,7 +3559,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
  */
   }
 
-  /* "xTool/cython/example.pyx":168
+  /* "xTool/cython/example.pyx":175
  *             self.resize((self.buffer_size + append_data_length) * 2)
  *         #
  *         cdef char * start_ptr = self.buffer + self.data_length   #             # <<<<<<<<<<<<<<
@@ -3235,7 +3568,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
  */
   __pyx_v_start_ptr = (__pyx_v_self->buffer + __pyx_v_self->data_length);
 
-  /* "xTool/cython/example.pyx":169
+  /* "xTool/cython/example.pyx":176
  *         #
  *         cdef char * start_ptr = self.buffer + self.data_length   #
  *         cdef char * from_ptr = data             # <<<<<<<<<<<<<<
@@ -3244,12 +3577,12 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
  */
   if (unlikely(__pyx_v_data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-    __PYX_ERR(0, 169, __pyx_L1_error)
+    __PYX_ERR(0, 176, __pyx_L1_error)
   }
-  __pyx_t_7 = __Pyx_PyBytes_AsWritableString(__pyx_v_data); if (unlikely((!__pyx_t_7) && PyErr_Occurred())) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyBytes_AsWritableString(__pyx_v_data); if (unlikely((!__pyx_t_7) && PyErr_Occurred())) __PYX_ERR(0, 176, __pyx_L1_error)
   __pyx_v_from_ptr = __pyx_t_7;
 
-  /* "xTool/cython/example.pyx":170
+  /* "xTool/cython/example.pyx":177
  *         cdef char * start_ptr = self.buffer + self.data_length   #
  *         cdef char * from_ptr = data
  *         memcpy(start_ptr, from_ptr, append_data_length)             # <<<<<<<<<<<<<<
@@ -3258,7 +3591,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
  */
   (void)(memcpy(__pyx_v_start_ptr, __pyx_v_from_ptr, __pyx_v_append_data_length));
 
-  /* "xTool/cython/example.pyx":172
+  /* "xTool/cython/example.pyx":179
  *         memcpy(start_ptr, from_ptr, append_data_length)
  *         #
  *         self.data_length += append_data_length             # <<<<<<<<<<<<<<
@@ -3267,7 +3600,7 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
  */
   __pyx_v_self->data_length = (__pyx_v_self->data_length + __pyx_v_append_data_length);
 
-  /* "xTool/cython/example.pyx":160
+  /* "xTool/cython/example.pyx":167
  *         return self.data_length
  * 
  *     cpdef void append_buffer(self, bytes data):             # <<<<<<<<<<<<<<
@@ -3288,17 +3621,17 @@ static void __pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(struct __
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_19append_buffer(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
-static char __pyx_doc_5xTool_6cython_7example_10CythonDemo_18append_buffer[] = "\345\241\253\345\205\205buffer .";
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_19append_buffer(PyObject *__pyx_v_self, PyObject *__pyx_v_data) {
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_23append_buffer(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
+static char __pyx_doc_5xTool_6cython_7example_10CythonDemo_22append_buffer[] = "\345\241\253\345\205\205buffer .";
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_23append_buffer(PyObject *__pyx_v_self, PyObject *__pyx_v_data) {
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("append_buffer (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_data), (&PyBytes_Type), 1, "data", 1))) __PYX_ERR(0, 160, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_18append_buffer(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self), ((PyObject*)__pyx_v_data));
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_data), (&PyBytes_Type), 1, "data", 1))) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_22append_buffer(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self), ((PyObject*)__pyx_v_data));
 
   /* function exit code */
   goto __pyx_L0;
@@ -3309,7 +3642,7 @@ static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_19append_buffer(P
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_18append_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_data) {
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_22append_buffer(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, PyObject *__pyx_v_data) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3318,7 +3651,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_18append_buffer(s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("append_buffer", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(__pyx_v_self, __pyx_v_data, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 160, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer(__pyx_v_self, __pyx_v_data, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3335,7 +3668,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_18append_buffer(s
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":174
+/* "xTool/cython/example.pyx":181
  *         self.data_length += append_data_length
  * 
  *     cpdef list read_package(self):             # <<<<<<<<<<<<<<
@@ -3343,7 +3676,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_18append_buffer(s
  *         packages = []
  */
 
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_21read_package(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_25read_package(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, int __pyx_skip_dispatch) {
   PyObject *__pyx_v_packages = NULL;
   int __pyx_v_package_start_index;
@@ -3371,9 +3704,9 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_read_package); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_read_package); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_21read_package)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5xTool_6cython_7example_10CythonDemo_25read_package)) {
         __Pyx_XDECREF(__pyx_r);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
@@ -3388,10 +3721,10 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 174, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 181, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 174, __pyx_L1_error)
+        if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 181, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3410,19 +3743,19 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
     #endif
   }
 
-  /* "xTool/cython/example.pyx":176
+  /* "xTool/cython/example.pyx":183
  *     cpdef list read_package(self):
  *         """ ."""
  *         packages = []             # <<<<<<<<<<<<<<
  *         cdef int package_start_index = 0
  *         cdef ushort magic = 0
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_packages = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "xTool/cython/example.pyx":177
+  /* "xTool/cython/example.pyx":184
  *         """ ."""
  *         packages = []
  *         cdef int package_start_index = 0             # <<<<<<<<<<<<<<
@@ -3431,7 +3764,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
   __pyx_v_package_start_index = 0;
 
-  /* "xTool/cython/example.pyx":178
+  /* "xTool/cython/example.pyx":185
  *         packages = []
  *         cdef int package_start_index = 0
  *         cdef ushort magic = 0             # <<<<<<<<<<<<<<
@@ -3440,7 +3773,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
   __pyx_v_magic = 0;
 
-  /* "xTool/cython/example.pyx":179
+  /* "xTool/cython/example.pyx":186
  *         cdef int package_start_index = 0
  *         cdef ushort magic = 0
  *         cdef uint package_len = 0             # <<<<<<<<<<<<<<
@@ -3449,7 +3782,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
   __pyx_v_package_len = 0;
 
-  /* "xTool/cython/example.pyx":187
+  /* "xTool/cython/example.pyx":194
  * 
  *         # package
  *         while package_start_index + FRAME_HEAD_LEN <= self.data_length:             # <<<<<<<<<<<<<<
@@ -3460,7 +3793,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
     __pyx_t_5 = (((__pyx_v_package_start_index + __pyx_v_5xTool_6cython_7example_FRAME_HEAD_LEN) <= __pyx_v_self->data_length) != 0);
     if (!__pyx_t_5) break;
 
-    /* "xTool/cython/example.pyx":189
+    /* "xTool/cython/example.pyx":196
  *         while package_start_index + FRAME_HEAD_LEN <= self.data_length:
  *             # magic
  *             endian_byte_to_ushort(self.buffer + package_start_index, < char*> & magic)             # <<<<<<<<<<<<<<
@@ -3469,7 +3802,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
     __pyx_f_5xTool_6cython_7example_endian_byte_to_ushort((__pyx_v_self->buffer + __pyx_v_package_start_index), ((char *)(&__pyx_v_magic)));
 
-    /* "xTool/cython/example.pyx":190
+    /* "xTool/cython/example.pyx":197
  *             # magic
  *             endian_byte_to_ushort(self.buffer + package_start_index, < char*> & magic)
  *             if magic != FRMAE_HEAD_MAGIC_VALUE:             # <<<<<<<<<<<<<<
@@ -3479,20 +3812,20 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
     __pyx_t_5 = ((__pyx_v_magic != __pyx_v_5xTool_6cython_7example_FRMAE_HEAD_MAGIC_VALUE) != 0);
     if (unlikely(__pyx_t_5)) {
 
-      /* "xTool/cython/example.pyx":191
+      /* "xTool/cython/example.pyx":198
  *             endian_byte_to_ushort(self.buffer + package_start_index, < char*> & magic)
  *             if magic != FRMAE_HEAD_MAGIC_VALUE:
  *                 raise Exception("framer head magic not match")             # <<<<<<<<<<<<<<
  *             #
  *             endian_byte_to_uint(self.buffer + package_start_index + 2, < char*> & package_len)
  */
-      __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple_, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple_, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_Raise(__pyx_t_1, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __PYX_ERR(0, 191, __pyx_L1_error)
+      __PYX_ERR(0, 198, __pyx_L1_error)
 
-      /* "xTool/cython/example.pyx":190
+      /* "xTool/cython/example.pyx":197
  *             # magic
  *             endian_byte_to_ushort(self.buffer + package_start_index, < char*> & magic)
  *             if magic != FRMAE_HEAD_MAGIC_VALUE:             # <<<<<<<<<<<<<<
@@ -3501,7 +3834,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
     }
 
-    /* "xTool/cython/example.pyx":193
+    /* "xTool/cython/example.pyx":200
  *                 raise Exception("framer head magic not match")
  *             #
  *             endian_byte_to_uint(self.buffer + package_start_index + 2, < char*> & package_len)             # <<<<<<<<<<<<<<
@@ -3510,7 +3843,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
     __pyx_f_5xTool_6cython_7example_endian_byte_to_uint(((__pyx_v_self->buffer + __pyx_v_package_start_index) + 2), ((char *)(&__pyx_v_package_len)));
 
-    /* "xTool/cython/example.pyx":194
+    /* "xTool/cython/example.pyx":201
  *             #
  *             endian_byte_to_uint(self.buffer + package_start_index + 2, < char*> & package_len)
  *             if package_len <= FRAME_HEAD_LEN:             # <<<<<<<<<<<<<<
@@ -3520,20 +3853,20 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
     __pyx_t_5 = ((__pyx_v_package_len <= __pyx_v_5xTool_6cython_7example_FRAME_HEAD_LEN) != 0);
     if (unlikely(__pyx_t_5)) {
 
-      /* "xTool/cython/example.pyx":195
+      /* "xTool/cython/example.pyx":202
  *             endian_byte_to_uint(self.buffer + package_start_index + 2, < char*> & package_len)
  *             if package_len <= FRAME_HEAD_LEN:
  *                 raise Exception("frame header length not match")             # <<<<<<<<<<<<<<
  *             #
  *             if package_start_index + package_len > self.data_length:
  */
-      __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_Raise(__pyx_t_1, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __PYX_ERR(0, 195, __pyx_L1_error)
+      __PYX_ERR(0, 202, __pyx_L1_error)
 
-      /* "xTool/cython/example.pyx":194
+      /* "xTool/cython/example.pyx":201
  *             #
  *             endian_byte_to_uint(self.buffer + package_start_index + 2, < char*> & package_len)
  *             if package_len <= FRAME_HEAD_LEN:             # <<<<<<<<<<<<<<
@@ -3542,7 +3875,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
     }
 
-    /* "xTool/cython/example.pyx":197
+    /* "xTool/cython/example.pyx":204
  *                 raise Exception("frame header length not match")
  *             #
  *             if package_start_index + package_len > self.data_length:             # <<<<<<<<<<<<<<
@@ -3552,7 +3885,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
     __pyx_t_5 = (((__pyx_v_package_start_index + __pyx_v_package_len) > __pyx_v_self->data_length) != 0);
     if (__pyx_t_5) {
 
-      /* "xTool/cython/example.pyx":199
+      /* "xTool/cython/example.pyx":206
  *             if package_start_index + package_len > self.data_length:
  *                 #
  *                 if package_start_index > 0:             # <<<<<<<<<<<<<<
@@ -3562,7 +3895,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
       __pyx_t_5 = ((__pyx_v_package_start_index > 0) != 0);
       if (__pyx_t_5) {
 
-        /* "xTool/cython/example.pyx":200
+        /* "xTool/cython/example.pyx":207
  *                 #
  *                 if package_start_index > 0:
  *                     self.memcpy(             # <<<<<<<<<<<<<<
@@ -3571,7 +3904,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
         ((struct __pyx_vtabstruct_5xTool_6cython_7example_CythonDemo *)__pyx_v_self->__pyx_vtab)->memcpy(__pyx_v_self, __pyx_v_package_start_index, (__pyx_v_self->data_length - __pyx_v_package_start_index));
 
-        /* "xTool/cython/example.pyx":204
+        /* "xTool/cython/example.pyx":211
  *                         self.data_length -
  *                         package_start_index)
  *                     self.data_length -= package_start_index             # <<<<<<<<<<<<<<
@@ -3580,7 +3913,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
         __pyx_v_self->data_length = (__pyx_v_self->data_length - __pyx_v_package_start_index);
 
-        /* "xTool/cython/example.pyx":199
+        /* "xTool/cython/example.pyx":206
  *             if package_start_index + package_len > self.data_length:
  *                 #
  *                 if package_start_index > 0:             # <<<<<<<<<<<<<<
@@ -3589,7 +3922,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
       }
 
-      /* "xTool/cython/example.pyx":205
+      /* "xTool/cython/example.pyx":212
  *                         package_start_index)
  *                     self.data_length -= package_start_index
  *                 return packages             # <<<<<<<<<<<<<<
@@ -3601,7 +3934,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
       __pyx_r = __pyx_v_packages;
       goto __pyx_L0;
 
-      /* "xTool/cython/example.pyx":197
+      /* "xTool/cython/example.pyx":204
  *                 raise Exception("frame header length not match")
  *             #
  *             if package_start_index + package_len > self.data_length:             # <<<<<<<<<<<<<<
@@ -3610,7 +3943,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
     }
 
-    /* "xTool/cython/example.pyx":208
+    /* "xTool/cython/example.pyx":215
  *             else:
  *                 #
  *                 packages.append(             # <<<<<<<<<<<<<<
@@ -3619,30 +3952,30 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
     /*else*/ {
 
-      /* "xTool/cython/example.pyx":209
+      /* "xTool/cython/example.pyx":216
  *                 #
  *                 packages.append(
  *                     bytes(self.buffer[package_start_index:package_start_index + package_len]))             # <<<<<<<<<<<<<<
  *                 #
  *                 package_start_index += package_len
  */
-      __pyx_t_1 = __Pyx_PyBytes_FromStringAndSize(__pyx_v_self->buffer + __pyx_v_package_start_index, (__pyx_v_package_start_index + __pyx_v_package_len) - __pyx_v_package_start_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyBytes_FromStringAndSize(__pyx_v_self->buffer + __pyx_v_package_start_index, (__pyx_v_package_start_index + __pyx_v_package_len) - __pyx_v_package_start_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 216, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "xTool/cython/example.pyx":208
+      /* "xTool/cython/example.pyx":215
  *             else:
  *                 #
  *                 packages.append(             # <<<<<<<<<<<<<<
  *                     bytes(self.buffer[package_start_index:package_start_index + package_len]))
  *                 #
  */
-      __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_packages, __pyx_t_2); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 208, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_packages, __pyx_t_2); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 215, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "xTool/cython/example.pyx":211
+      /* "xTool/cython/example.pyx":218
  *                     bytes(self.buffer[package_start_index:package_start_index + package_len]))
  *                 #
  *                 package_start_index += package_len             # <<<<<<<<<<<<<<
@@ -3653,7 +3986,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
     }
   }
 
-  /* "xTool/cython/example.pyx":223
+  /* "xTool/cython/example.pyx":230
  * 
  *         #
  *         if package_start_index > 0 and self.data_length - package_start_index > 0:             # <<<<<<<<<<<<<<
@@ -3671,7 +4004,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
   __pyx_L10_bool_binop_done:;
   if (__pyx_t_5) {
 
-    /* "xTool/cython/example.pyx":224
+    /* "xTool/cython/example.pyx":231
  *         #
  *         if package_start_index > 0 and self.data_length - package_start_index > 0:
  *             self.memcpy(             # <<<<<<<<<<<<<<
@@ -3680,7 +4013,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
     ((struct __pyx_vtabstruct_5xTool_6cython_7example_CythonDemo *)__pyx_v_self->__pyx_vtab)->memcpy(__pyx_v_self, __pyx_v_package_start_index, (__pyx_v_self->data_length - __pyx_v_package_start_index));
 
-    /* "xTool/cython/example.pyx":228
+    /* "xTool/cython/example.pyx":235
  *                 self.data_length -
  *                 package_start_index)
  *             self.data_length -= package_start_index             # <<<<<<<<<<<<<<
@@ -3689,7 +4022,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
     __pyx_v_self->data_length = (__pyx_v_self->data_length - __pyx_v_package_start_index);
 
-    /* "xTool/cython/example.pyx":223
+    /* "xTool/cython/example.pyx":230
  * 
  *         #
  *         if package_start_index > 0 and self.data_length - package_start_index > 0:             # <<<<<<<<<<<<<<
@@ -3698,7 +4031,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
  */
   }
 
-  /* "xTool/cython/example.pyx":230
+  /* "xTool/cython/example.pyx":237
  *             self.data_length -= package_start_index
  * 
  *         return packages             # <<<<<<<<<<<<<<
@@ -3710,7 +4043,7 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
   __pyx_r = __pyx_v_packages;
   goto __pyx_L0;
 
-  /* "xTool/cython/example.pyx":174
+  /* "xTool/cython/example.pyx":181
  *         self.data_length += append_data_length
  * 
  *     cpdef list read_package(self):             # <<<<<<<<<<<<<<
@@ -3734,20 +4067,20 @@ static PyObject *__pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(struc
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_21read_package(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5xTool_6cython_7example_10CythonDemo_20read_package[] = "\350\257\273\345\217\226\345\215\217\350\256\256\345\214\205 .";
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_21read_package(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_25read_package(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5xTool_6cython_7example_10CythonDemo_24read_package[] = "\350\257\273\345\217\226\345\215\217\350\256\256\345\214\205 .";
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_25read_package(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("read_package (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_20read_package(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_24read_package(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_20read_package(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_24read_package(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3756,7 +4089,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_20read_package(st
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("read_package", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5xTool_6cython_7example_10CythonDemo_read_package(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3773,7 +4106,7 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_20read_package(st
   return __pyx_r;
 }
 
-/* "xTool/cython/example.pyx":232
+/* "xTool/cython/example.pyx":239
  *         return packages
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3781,28 +4114,28 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_20read_package(st
  */
 
 /* Python wrapper */
-static void __pyx_pw_5xTool_6cython_7example_10CythonDemo_23__dealloc__(PyObject *__pyx_v_self); /*proto*/
-static void __pyx_pw_5xTool_6cython_7example_10CythonDemo_23__dealloc__(PyObject *__pyx_v_self) {
+static void __pyx_pw_5xTool_6cython_7example_10CythonDemo_27__dealloc__(PyObject *__pyx_v_self); /*proto*/
+static void __pyx_pw_5xTool_6cython_7example_10CythonDemo_27__dealloc__(PyObject *__pyx_v_self) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__ (wrapper)", 0);
-  __pyx_pf_5xTool_6cython_7example_10CythonDemo_22__dealloc__(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
+  __pyx_pf_5xTool_6cython_7example_10CythonDemo_26__dealloc__(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
 }
 
-static void __pyx_pf_5xTool_6cython_7example_10CythonDemo_22__dealloc__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
+static void __pyx_pf_5xTool_6cython_7example_10CythonDemo_26__dealloc__(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "xTool/cython/example.pyx":233
+  /* "xTool/cython/example.pyx":240
  * 
  *     def __dealloc__(self):
  *         PyMem_Free(< void*>self.buffer)             # <<<<<<<<<<<<<<
  */
   PyMem_Free(((void *)__pyx_v_self->buffer));
 
-  /* "xTool/cython/example.pyx":232
+  /* "xTool/cython/example.pyx":239
  *         return packages
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3915,19 +4248,19 @@ static int __pyx_pf_5xTool_6cython_7example_10CythonDemo_8object_a_4__del__(stru
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_25__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_25__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_29__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_29__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_24__reduce_cython__(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_28__reduce_cython__(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_24__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_28__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3972,19 +4305,19 @@ static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_24__reduce_cython
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_27__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_27__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_31__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_5xTool_6cython_7example_10CythonDemo_31__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_26__setstate_cython__(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_5xTool_6cython_7example_10CythonDemo_30__setstate_cython__(((struct __pyx_obj_5xTool_6cython_7example_CythonDemo *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_26__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5xTool_6cython_7example_10CythonDemo_30__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5xTool_6cython_7example_CythonDemo *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4037,6 +4370,7 @@ static PyObject *__pyx_tp_new_5xTool_6cython_7example_CythonDemo(PyTypeObject *t
   new((void*)&(p->enqueue_mtx)) std::recursive_mutex();
   new((void*)&(p->dequeue_mtx)) std::recursive_mutex();
   p->object_a = Py_None; Py_INCREF(Py_None);
+  p->buf = ((PyObject*)Py_None); Py_INCREF(Py_None);
   if (unlikely(__pyx_pw_5xTool_6cython_7example_10CythonDemo_3__cinit__(o, __pyx_empty_tuple, NULL) < 0)) goto bad;
   return o;
   bad:
@@ -4056,7 +4390,7 @@ static void __pyx_tp_dealloc_5xTool_6cython_7example_CythonDemo(PyObject *o) {
     PyObject *etype, *eval, *etb;
     PyErr_Fetch(&etype, &eval, &etb);
     __Pyx_SET_REFCNT(o, Py_REFCNT(o) + 1);
-    __pyx_pw_5xTool_6cython_7example_10CythonDemo_23__dealloc__(o);
+    __pyx_pw_5xTool_6cython_7example_10CythonDemo_27__dealloc__(o);
     __Pyx_SET_REFCNT(o, Py_REFCNT(o) - 1);
     PyErr_Restore(etype, eval, etb);
   }
@@ -4064,6 +4398,7 @@ static void __pyx_tp_dealloc_5xTool_6cython_7example_CythonDemo(PyObject *o) {
   __Pyx_call_destructor(p->enqueue_mtx);
   __Pyx_call_destructor(p->dequeue_mtx);
   Py_CLEAR(p->object_a);
+  Py_CLEAR(p->buf);
   (*Py_TYPE(o)->tp_free)(o);
 }
 
@@ -4100,16 +4435,18 @@ static int __pyx_setprop_5xTool_6cython_7example_10CythonDemo_object_a(PyObject 
 
 static PyMethodDef __pyx_methods_5xTool_6cython_7example_CythonDemo[] = {
   {"resize", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_5resize, METH_O, 0},
-  {"strcpy", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_7strcpy, METH_NOARGS, 0},
-  {"get_queue_size", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_9get_queue_size, METH_NOARGS, 0},
-  {"enqueue", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_11enqueue, METH_O, 0},
-  {"dequeue", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_13dequeue, METH_NOARGS, 0},
-  {"reset_buffer", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_15reset_buffer, METH_NOARGS, 0},
-  {"get_buffer_data_length", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_17get_buffer_data_length, METH_NOARGS, 0},
-  {"append_buffer", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_19append_buffer, METH_O, __pyx_doc_5xTool_6cython_7example_10CythonDemo_18append_buffer},
-  {"read_package", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_21read_package, METH_NOARGS, __pyx_doc_5xTool_6cython_7example_10CythonDemo_20read_package},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_25__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_27__setstate_cython__, METH_O, 0},
+  {"reset", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_7reset, METH_NOARGS, 0},
+  {"append_buffer_data", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_9append_buffer_data, METH_O, 0},
+  {"strcpy", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_11strcpy, METH_NOARGS, 0},
+  {"get_queue_size", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_13get_queue_size, METH_NOARGS, 0},
+  {"enqueue", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_15enqueue, METH_O, 0},
+  {"dequeue", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_17dequeue, METH_NOARGS, 0},
+  {"reset_buffer", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_19reset_buffer, METH_NOARGS, 0},
+  {"get_buffer_data_length", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_21get_buffer_data_length, METH_NOARGS, 0},
+  {"append_buffer", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_23append_buffer, METH_O, __pyx_doc_5xTool_6cython_7example_10CythonDemo_22append_buffer},
+  {"read_package", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_25read_package, METH_NOARGS, __pyx_doc_5xTool_6cython_7example_10CythonDemo_24read_package},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_29__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_5xTool_6cython_7example_10CythonDemo_31__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -4238,9 +4575,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_n_u_abc, __pyx_k_abc, sizeof(__pyx_k_abc), 0, 1, 0, 1},
   {&__pyx_n_s_append_buffer, __pyx_k_append_buffer, sizeof(__pyx_k_append_buffer), 0, 0, 1, 1},
+  {&__pyx_n_s_append_buffer_data, __pyx_k_append_buffer_data, sizeof(__pyx_k_append_buffer_data), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_dequeue, __pyx_k_dequeue, sizeof(__pyx_k_dequeue), 0, 0, 1, 1},
   {&__pyx_n_s_enqueue, __pyx_k_enqueue, sizeof(__pyx_k_enqueue), 0, 0, 1, 1},
+  {&__pyx_n_s_extend, __pyx_k_extend, sizeof(__pyx_k_extend), 0, 0, 1, 1},
   {&__pyx_kp_u_frame_header_length_not_match, __pyx_k_frame_header_length_not_match, sizeof(__pyx_k_frame_header_length_not_match), 0, 1, 0, 0},
   {&__pyx_kp_u_framer_head_magic_not_match, __pyx_k_framer_head_magic_not_match, sizeof(__pyx_k_framer_head_magic_not_match), 0, 1, 0, 0},
   {&__pyx_n_s_get_buffer_data_length, __pyx_k_get_buffer_data_length, sizeof(__pyx_k_get_buffer_data_length), 0, 0, 1, 1},
@@ -4254,6 +4593,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
+  {&__pyx_n_s_reset, __pyx_k_reset, sizeof(__pyx_k_reset), 0, 0, 1, 1},
   {&__pyx_n_s_reset_buffer, __pyx_k_reset_buffer, sizeof(__pyx_k_reset_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_resize, __pyx_k_resize, sizeof(__pyx_k_resize), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
@@ -4263,7 +4603,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 99, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -4274,25 +4614,25 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "xTool/cython/example.pyx":191
+  /* "xTool/cython/example.pyx":198
  *             endian_byte_to_ushort(self.buffer + package_start_index, < char*> & magic)
  *             if magic != FRMAE_HEAD_MAGIC_VALUE:
  *                 raise Exception("framer head magic not match")             # <<<<<<<<<<<<<<
  *             #
  *             endian_byte_to_uint(self.buffer + package_start_index + 2, < char*> & package_len)
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_u_framer_head_magic_not_match); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_u_framer_head_magic_not_match); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 198, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "xTool/cython/example.pyx":195
+  /* "xTool/cython/example.pyx":202
  *             endian_byte_to_uint(self.buffer + package_start_index + 2, < char*> & package_len)
  *             if package_len <= FRAME_HEAD_LEN:
  *                 raise Exception("frame header length not match")             # <<<<<<<<<<<<<<
  *             #
  *             if package_start_index + package_len > self.data_length:
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_frame_header_length_not_match); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_frame_header_length_not_match); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
@@ -4373,6 +4713,8 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_5xTool_6cython_7example_CythonDemo.enqueue = (int (*)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, int, int __pyx_skip_dispatch))__pyx_f_5xTool_6cython_7example_10CythonDemo_enqueue;
   __pyx_vtable_5xTool_6cython_7example_CythonDemo.dequeue = (int (*)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, int __pyx_skip_dispatch))__pyx_f_5xTool_6cython_7example_10CythonDemo_dequeue;
   __pyx_vtable_5xTool_6cython_7example_CythonDemo.resize = (void (*)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, size_t, int __pyx_skip_dispatch))__pyx_f_5xTool_6cython_7example_10CythonDemo_resize;
+  __pyx_vtable_5xTool_6cython_7example_CythonDemo.reset = (void (*)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, int __pyx_skip_dispatch))__pyx_f_5xTool_6cython_7example_10CythonDemo_reset;
+  __pyx_vtable_5xTool_6cython_7example_CythonDemo.append_buffer_data = (void (*)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5xTool_6cython_7example_10CythonDemo_append_buffer_data;
   __pyx_vtable_5xTool_6cython_7example_CythonDemo.malloc = (char *(*)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, size_t))__pyx_f_5xTool_6cython_7example_10CythonDemo_malloc;
   __pyx_vtable_5xTool_6cython_7example_CythonDemo._enqueue = (int (*)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *, int))__pyx_f_5xTool_6cython_7example_10CythonDemo__enqueue;
   __pyx_vtable_5xTool_6cython_7example_CythonDemo._dequeue = (int (*)(struct __pyx_obj_5xTool_6cython_7example_CythonDemo *))__pyx_f_5xTool_6cython_7example_10CythonDemo__dequeue;
@@ -4808,121 +5150,6 @@ invalid_keyword:
     return 0;
 }
 
-/* PyErrFetchRestore */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    tmp_type = tstate->curexc_type;
-    tmp_value = tstate->curexc_value;
-    tmp_tb = tstate->curexc_traceback;
-    tstate->curexc_type = type;
-    tstate->curexc_value = value;
-    tstate->curexc_traceback = tb;
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-}
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-    *type = tstate->curexc_type;
-    *value = tstate->curexc_value;
-    *tb = tstate->curexc_traceback;
-    tstate->curexc_type = 0;
-    tstate->curexc_value = 0;
-    tstate->curexc_traceback = 0;
-}
-#endif
-
-/* WriteUnraisableException */
-static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
-                                  CYTHON_UNUSED int lineno, CYTHON_UNUSED const char *filename,
-                                  int full_traceback, CYTHON_UNUSED int nogil) {
-    PyObject *old_exc, *old_val, *old_tb;
-    PyObject *ctx;
-    __Pyx_PyThreadState_declare
-#ifdef WITH_THREAD
-    PyGILState_STATE state;
-    if (nogil)
-        state = PyGILState_Ensure();
-#ifdef _MSC_VER
-    else state = (PyGILState_STATE)-1;
-#endif
-#endif
-    __Pyx_PyThreadState_assign
-    __Pyx_ErrFetch(&old_exc, &old_val, &old_tb);
-    if (full_traceback) {
-        Py_XINCREF(old_exc);
-        Py_XINCREF(old_val);
-        Py_XINCREF(old_tb);
-        __Pyx_ErrRestore(old_exc, old_val, old_tb);
-        PyErr_PrintEx(1);
-    }
-    #if PY_MAJOR_VERSION < 3
-    ctx = PyString_FromString(name);
-    #else
-    ctx = PyUnicode_FromString(name);
-    #endif
-    __Pyx_ErrRestore(old_exc, old_val, old_tb);
-    if (!ctx) {
-        PyErr_WriteUnraisable(Py_None);
-    } else {
-        PyErr_WriteUnraisable(ctx);
-        Py_DECREF(ctx);
-    }
-#ifdef WITH_THREAD
-    if (nogil)
-        PyGILState_Release(state);
-#endif
-}
-
-/* PyDictVersioning */
-#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
-}
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
-    PyObject **dictptr = NULL;
-    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
-    if (offset) {
-#if CYTHON_COMPILING_IN_CPYTHON
-        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
-#else
-        dictptr = _PyObject_GetDictPtr(obj);
-#endif
-    }
-    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
-}
-static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
-        return 0;
-    return obj_dict_version == __Pyx_get_object_dict_version(obj);
-}
-#endif
-
-/* PyCFunctionFastCall */
-#if CYTHON_FAST_PYCCALL
-static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, PyObject **args, Py_ssize_t nargs) {
-    PyCFunctionObject *func = (PyCFunctionObject*)func_obj;
-    PyCFunction meth = PyCFunction_GET_FUNCTION(func);
-    PyObject *self = PyCFunction_GET_SELF(func);
-    int flags = PyCFunction_GET_FLAGS(func);
-    assert(PyCFunction_Check(func));
-    assert(METH_FASTCALL == (flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_KEYWORDS | METH_STACKLESS)));
-    assert(nargs >= 0);
-    assert(nargs == 0 || args != NULL);
-    /* _PyCFunction_FastCallDict() must not be called with an exception set,
-       because it may clear it (directly or indirectly) and so the
-       caller loses its exception */
-    assert(!PyErr_Occurred());
-    if ((PY_VERSION_HEX < 0x030700A0) || unlikely(flags & METH_KEYWORDS)) {
-        return (*((__Pyx_PyCFunctionFastWithKeywords)(void*)meth)) (self, args, nargs, NULL);
-    } else {
-        return (*((__Pyx_PyCFunctionFast)(void*)meth)) (self, args, nargs);
-    }
-}
-#endif
-
 /* PyFunctionFastCall */
 #if CYTHON_FAST_PYCALL
 static PyObject* __Pyx_PyFunction_FastCallNoKw(PyCodeObject *co, PyObject **args, Py_ssize_t na,
@@ -5062,6 +5289,163 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg
 }
 #endif
 
+/* PyObjectCallMethO */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg) {
+    PyObject *self, *result;
+    PyCFunction cfunc;
+    cfunc = PyCFunction_GET_FUNCTION(func);
+    self = PyCFunction_GET_SELF(func);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = cfunc(self, arg);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
+/* PyObjectCallNoArg */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
+#if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(func)) {
+        return __Pyx_PyFunction_FastCall(func, NULL, 0);
+    }
+#endif
+#ifdef __Pyx_CyFunction_USED
+    if (likely(PyCFunction_Check(func) || __Pyx_CyFunction_Check(func)))
+#else
+    if (likely(PyCFunction_Check(func)))
+#endif
+    {
+        if (likely(PyCFunction_GET_FLAGS(func) & METH_NOARGS)) {
+            return __Pyx_PyObject_CallMethO(func, NULL);
+        }
+    }
+    return __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL);
+}
+#endif
+
+/* PyErrFetchRestore */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    tmp_type = tstate->curexc_type;
+    tmp_value = tstate->curexc_value;
+    tmp_tb = tstate->curexc_traceback;
+    tstate->curexc_type = type;
+    tstate->curexc_value = value;
+    tstate->curexc_traceback = tb;
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+}
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    *type = tstate->curexc_type;
+    *value = tstate->curexc_value;
+    *tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+}
+#endif
+
+/* WriteUnraisableException */
+static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
+                                  CYTHON_UNUSED int lineno, CYTHON_UNUSED const char *filename,
+                                  int full_traceback, CYTHON_UNUSED int nogil) {
+    PyObject *old_exc, *old_val, *old_tb;
+    PyObject *ctx;
+    __Pyx_PyThreadState_declare
+#ifdef WITH_THREAD
+    PyGILState_STATE state;
+    if (nogil)
+        state = PyGILState_Ensure();
+#ifdef _MSC_VER
+    else state = (PyGILState_STATE)-1;
+#endif
+#endif
+    __Pyx_PyThreadState_assign
+    __Pyx_ErrFetch(&old_exc, &old_val, &old_tb);
+    if (full_traceback) {
+        Py_XINCREF(old_exc);
+        Py_XINCREF(old_val);
+        Py_XINCREF(old_tb);
+        __Pyx_ErrRestore(old_exc, old_val, old_tb);
+        PyErr_PrintEx(1);
+    }
+    #if PY_MAJOR_VERSION < 3
+    ctx = PyString_FromString(name);
+    #else
+    ctx = PyUnicode_FromString(name);
+    #endif
+    __Pyx_ErrRestore(old_exc, old_val, old_tb);
+    if (!ctx) {
+        PyErr_WriteUnraisable(Py_None);
+    } else {
+        PyErr_WriteUnraisable(ctx);
+        Py_DECREF(ctx);
+    }
+#ifdef WITH_THREAD
+    if (nogil)
+        PyGILState_Release(state);
+#endif
+}
+
+/* PyDictVersioning */
+#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
+}
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
+    PyObject **dictptr = NULL;
+    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
+    if (offset) {
+#if CYTHON_COMPILING_IN_CPYTHON
+        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
+#else
+        dictptr = _PyObject_GetDictPtr(obj);
+#endif
+    }
+    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
+}
+static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
+        return 0;
+    return obj_dict_version == __Pyx_get_object_dict_version(obj);
+}
+#endif
+
+/* PyCFunctionFastCall */
+#if CYTHON_FAST_PYCCALL
+static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, PyObject **args, Py_ssize_t nargs) {
+    PyCFunctionObject *func = (PyCFunctionObject*)func_obj;
+    PyCFunction meth = PyCFunction_GET_FUNCTION(func);
+    PyObject *self = PyCFunction_GET_SELF(func);
+    int flags = PyCFunction_GET_FLAGS(func);
+    assert(PyCFunction_Check(func));
+    assert(METH_FASTCALL == (flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_KEYWORDS | METH_STACKLESS)));
+    assert(nargs >= 0);
+    assert(nargs == 0 || args != NULL);
+    /* _PyCFunction_FastCallDict() must not be called with an exception set,
+       because it may clear it (directly or indirectly) and so the
+       caller loses its exception */
+    assert(!PyErr_Occurred());
+    if ((PY_VERSION_HEX < 0x030700A0) || unlikely(flags & METH_KEYWORDS)) {
+        return (*((__Pyx_PyCFunctionFastWithKeywords)(void*)meth)) (self, args, nargs, NULL);
+    } else {
+        return (*((__Pyx_PyCFunctionFast)(void*)meth)) (self, args, nargs);
+    }
+}
+#endif
+
 /* PyObjectCall2Args */
 static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2) {
     PyObject *args, *result = NULL;
@@ -5090,26 +5474,6 @@ static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyOb
 done:
     return result;
 }
-
-/* PyObjectCallMethO */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg) {
-    PyObject *self, *result;
-    PyCFunction cfunc;
-    cfunc = PyCFunction_GET_FUNCTION(func);
-    self = PyCFunction_GET_SELF(func);
-    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
-        return NULL;
-    result = cfunc(self, arg);
-    Py_LeaveRecursiveCall();
-    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
-        PyErr_SetString(
-            PyExc_SystemError,
-            "NULL result without error in PyObject_Call");
-    }
-    return result;
-}
-#endif
 
 /* PyObjectCallOneArg */
 #if CYTHON_COMPILING_IN_CPYTHON
@@ -5151,27 +5515,26 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObjec
 }
 #endif
 
-/* PyObjectCallNoArg */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
-#if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(func)) {
-        return __Pyx_PyFunction_FastCall(func, NULL, 0);
+/* ArgTypeTest */
+static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact)
+{
+    if (unlikely(!type)) {
+        PyErr_SetString(PyExc_SystemError, "Missing type object");
+        return 0;
     }
-#endif
-#ifdef __Pyx_CyFunction_USED
-    if (likely(PyCFunction_Check(func) || __Pyx_CyFunction_Check(func)))
-#else
-    if (likely(PyCFunction_Check(func)))
-#endif
-    {
-        if (likely(PyCFunction_GET_FLAGS(func) & METH_NOARGS)) {
-            return __Pyx_PyObject_CallMethO(func, NULL);
-        }
+    else if (exact) {
+        #if PY_MAJOR_VERSION == 2
+        if ((type == &PyBaseString_Type) && likely(__Pyx_PyBaseString_CheckExact(obj))) return 1;
+        #endif
     }
-    return __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL);
+    else {
+        if (likely(__Pyx_TypeCheck(obj, type))) return 1;
+    }
+    PyErr_Format(PyExc_TypeError,
+        "Argument '%.200s' has incorrect type (expected %.200s, got %.200s)",
+        name, type->tp_name, Py_TYPE(obj)->tp_name);
+    return 0;
 }
-#endif
 
 /* decode_c_string */
 static CYTHON_INLINE PyObject* __Pyx_decode_c_string(
@@ -5204,27 +5567,6 @@ static CYTHON_INLINE PyObject* __Pyx_decode_c_string(
     } else {
         return PyUnicode_Decode(cstring, length, encoding, errors);
     }
-}
-
-/* ArgTypeTest */
-static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact)
-{
-    if (unlikely(!type)) {
-        PyErr_SetString(PyExc_SystemError, "Missing type object");
-        return 0;
-    }
-    else if (exact) {
-        #if PY_MAJOR_VERSION == 2
-        if ((type == &PyBaseString_Type) && likely(__Pyx_PyBaseString_CheckExact(obj))) return 1;
-        #endif
-    }
-    else {
-        if (likely(__Pyx_TypeCheck(obj, type))) return 1;
-    }
-    PyErr_Format(PyExc_TypeError,
-        "Argument '%.200s' has incorrect type (expected %.200s, got %.200s)",
-        name, type->tp_name, Py_TYPE(obj)->tp_name);
-    return 0;
 }
 
 /* RaiseException */

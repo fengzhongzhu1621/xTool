@@ -89,6 +89,7 @@ cdef ushort FRMAE_HEAD_MAGIC_VALUE = 1234
 cdef class CythonDemo:
     def __init__(self):
         memset(self.char_a, 0, 16)
+        self.buf = bytearray()
 
     def __cinit__(self):
         self.data_length = 0    # TODO 数据的真实大小，可能非常大超出int的范围
@@ -109,6 +110,12 @@ cdef class CythonDemo:
             raise MemoryError()
         self.buffer_size = length
         self.buffer = new_buffer
+
+    cpdef void reset(self):
+        self.buf = bytearray()
+
+    cpdef void append_buffer_data(self, bytes data):
+        self.buf.extend(data)
 
     cdef void memcpy(self, int offset, int length):
         cdef uint i = 0
