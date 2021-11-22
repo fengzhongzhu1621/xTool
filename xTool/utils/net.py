@@ -4,7 +4,6 @@ import importlib
 import socket
 import ipaddress
 import struct
-
 import netifaces
 
 from xTool.compat import (

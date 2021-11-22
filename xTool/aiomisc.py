@@ -25,13 +25,12 @@ import socket
 
 from xTool.utils.net import is_ipv6
 
-
 try:
     import uvloop
+
     event_loop_policy = uvloop.EventLoopPolicy()
 except ImportError:
     event_loop_policy = asyncio.DefaultEventLoopPolicy()
-
 
 log = logging.getLogger(__name__)
 
@@ -39,9 +38,9 @@ T = TypeVar('T')
 OptionsType = Iterable[Tuple[int, int, int]]
 F = TypeVar('F', bound=Callable[..., Any])
 
-
 try:
     import contextvars
+
 
     def context_partial(func: F, *args: Any, **kwargs: Any) -> Any:
         context = contextvars.copy_context()
@@ -50,9 +49,9 @@ try:
 except ImportError:
     context_partial = partial
 
-
 try:
     from trio import open_file as open_async, Path  # type: ignore
+
 
     def stat_async(path):
         return Path(path).stat()
@@ -62,11 +61,11 @@ except ImportError:
         from aiofiles import open as aio_open  # type: ignore
         from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
 
+
         async def open_async(file, mode="r", **kwargs):
             return aio_open(file, mode, **kwargs)
     except ImportError:
         pass
-
 
 if sys.version_info >= (3, 7):
     from asyncio import get_running_loop
@@ -74,11 +73,13 @@ if sys.version_info >= (3, 7):
 else:
     from asyncio import _get_running_loop
 
+
     def get_running_loop():
         loop = _get_running_loop()
         if loop is None:
             raise RuntimeError("no running event loop")
         return loop
+
 
     def create_task(coro):
         loop = get_running_loop()
@@ -86,7 +87,7 @@ else:
 
 
 def get_and_check_running_loop(
-    loop: Optional[asyncio.AbstractEventLoop] = None
+        loop: Optional[asyncio.AbstractEventLoop] = None
 ) -> asyncio.AbstractEventLoop:
     if loop is None:
         loop = asyncio.get_event_loop()
@@ -126,8 +127,8 @@ async def null_callback(*args):
 
 
 def create_default_event_loop(
-    pool_size=None, policy=event_loop_policy,
-    debug=False,
+        pool_size=None, policy=event_loop_policy,
+        debug=False,
 ):
     with suppress(RuntimeError):
         asyncio.get_event_loop().close()
@@ -146,8 +147,8 @@ def create_default_event_loop(
 
 
 def new_event_loop(
-    pool_size=None,
-    policy=event_loop_policy,
+        pool_size=None,
+        policy=event_loop_policy,
 ) -> asyncio.AbstractEventLoop:
     loop, _ = create_default_event_loop(pool_size, policy)
     return loop
@@ -215,6 +216,7 @@ def wrap_func(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
+
         return wrapper
     return func
 
@@ -298,7 +300,7 @@ def cancel_tasks(tasks: Iterable[asyncio.Future]) -> asyncio.Future:
     return waiter
 
 
-def set_exception(waiter, exc):
+def set_future_exception(waiter, exc):
     """将future标为执行完成，并设置Exception ."""
     if waiter is not None:
         # 判断waiter任务是否已经取消
@@ -307,11 +309,20 @@ def set_exception(waiter, exc):
             waiter.set_exception(exc)
 
 
-def set_result(waiter, value):
+def set_future_result(waiter, value):
     """设置future的返回结果 ."""
     if waiter is not None:
         if not waiter.cancelled():
             waiter.set_result(value)
+
+
+def set_future_finish(future, result, exc):
+    """设置future结束 ."""
+    if not future.done():
+        if exc is None:
+            future.set_result(result)
+        else:
+            future.set_exception(exc)
 
 
 async def wait_for_data(loop=None):
@@ -352,11 +363,14 @@ if __name__ == "__main__":
     async def noop2(*args, **kwargs):
         return asyncio.sleep(1)
 
+
     async def task():
         return await DeprecationWaiter(noop2())
 
+
     async def task2():
         return DeprecationWaiter(noop2())
+
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(task())
