@@ -58,10 +58,7 @@ class StreamReader:
             raise ValueError('Limit cannot be <= 0')
 
         self._limit = limit
-        if loop is None:
-            self._loop = events.get_event_loop()
-        else:
-            self._loop = loop
+        self._loop = loop if loop else events.get_event_loop()
         self._buffer = bytearray()
         self._eof = False    # Whether we're done.
         self._waiter = None  # A future used by _wait_for_data()

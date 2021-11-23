@@ -16,6 +16,9 @@ from xTool.misc import tob, OS_IS_WINDOWS
 from xTool.exceptions import PortInvalidError
 
 
+DEFAULT_BACKLOG = 1500
+
+
 def get_hostname(callable_path=None) -> str:
     """获得主机名 ."""
     if not callable_path:
@@ -90,25 +93,28 @@ def get_local_host_ip(ifname=b'eth1', ip: str = None, port: int = None) -> str:
     import platform
     import socket
     if not ifname and ip and port:
+        sock = None
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect((ip, port))
-            return s.getsockname()[0]
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.connect((ip, port))
+            return sock.getsockname()[0]
         finally:
-            s.close()
+            if sock:
+                sock.close()
     if platform.system() == 'Linux':
         import fcntl
         import struct
         ifname = tob(ifname)
+        sock = None
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             o_ip = socket.inet_ntoa(fcntl.ioctl(
-                s.fileno(),
+                sock.fileno(),
                 0x8915,
                 struct.pack('256s', ifname[:15])
             )[20:24])
         finally:
-            s.close()
+            sock.close()
     else:
         o_ip = socket.gethostbyname(socket.gethostname())
     return o_ip
@@ -188,47 +194,13 @@ def is_ipv6(ip: str) -> bool:
     return True
 
 
-def new_socket(ip: str, is_tcp: bool = True):
-    sock = None
-    if is_ipv4(ip):
-        sock = socket.socket(
-            socket.AF_INET,
-            socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
-    elif is_ipv6(ip):
-        sock = socket.socket(
-            socket.AF_INET6,
-            socket.SOCK_STREAM if is_tcp else socket.SOCK_DGRAM)
-    return sock
-
-
-def new_tcp_server_socket(ip: str, port: int, backlog=100, reuse_port=False):
-    sock = new_socket(ip, is_tcp=True)
-    # 用来控制是否开启Nagle算法，关闭Socket的缓冲,确保数据及时发送
-    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    # 一般来说，一个端口释放后会等待两分钟之后才能再被使用，SO_REUSEADDR是让端口释放后立即就可以被再次使用
-    # 用于对TCP套接字处于TIME_WAIT状态下的socket，才可以重复绑定使用
-    # server程序总是应该在调用bind()之前设置SO_REUSEADDR套接字选项。TCP，先调用close()的一方会进入TIME_WAIT状态
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    if reuse_port:
-        # 支持多个进程或者线程绑定到同一端口，提高服务器程序的吞吐性能
-        # 允许多个套接字 bind()/listen() 同一个TCP/UDP端口
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-    sock.bind((ip, port))
-    # backlog参数指定队列中最多可容纳的等待接受的传入连接数
-    # 表示的是服务器拒绝(超过限制数量的)连接之前，操作系统可以挂起的最大连接数量。
-    # 也可以看作是"排队的数量"
-    sock.listen(backlog)
-    sock.setblocking(False)
-    return sock
-
-
 def is_tcp_port_open(ip, port) -> bool:
     """判断端口是否占用 ."""
     sock = None
     try:
-        if not is_port_valid():
+        if not is_port_valid(port):
             raise PortInvalidError("端口%s无效" % ip)
-        sock = new_socket(ip, is_tcp=True)
+        sock = new_socket(ip, stream=True)
         # 出错时返回出错码,而不是抛出异常
         result = sock.connect_ex((ip, port))
         if result == 0:
@@ -244,12 +216,12 @@ def is_udp_port_open(ip, port) -> bool:
     """判断端口是否占用 ."""
     sock = None
     try:
-        if not is_port_valid():
+        if not is_port_valid(port):
             raise PortInvalidError("端口%s无效" % ip)
-        sock = new_socket(ip, is_tcp=False)
+        sock = new_socket(ip, stream=False)
         sock.bind((ip, port))
         return True
-    except Exception as exc_info:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         return False
     finally:
         if sock:
@@ -314,6 +286,60 @@ def get_unused_port() -> int:
     port = sock.getsockname()[-1]
     sock.close()
     return port
+
+
+def new_socket(ip: str, stream: bool = True) -> socket.socket:
+    sock = None
+    if is_ipv4(ip):
+        sock = socket.socket(
+            socket.AF_INET,
+            socket.SOCK_STREAM if stream else socket.SOCK_DGRAM)
+    elif is_ipv6(ip):
+        sock = socket.socket(
+            socket.AF_INET6,
+            socket.SOCK_STREAM if stream else socket.SOCK_DGRAM)
+    return sock
+
+
+def new_inet_socket(ip: str, port: int, backlog=100, reuse_port=False, stream=True) -> socket.socket:
+    sock = new_socket(ip, stream=stream)
+    if stream:
+        # 用来控制是否开启Nagle算法，关闭Socket的缓冲,确保数据及时发送
+        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    # 一般来说，一个端口释放后会等待两分钟之后才能再被使用，SO_REUSEADDR是让端口释放后立即就可以被再次使用
+    # 用于对TCP套接字处于TIME_WAIT状态下的socket，才可以重复绑定使用
+    # server程序总是应该在调用bind()之前设置SO_REUSEADDR套接字选项。TCP，先调用close()的一方会进入TIME_WAIT状态
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    if reuse_port:
+        # 支持多个进程或者线程绑定到同一端口，提高服务器程序的吞吐性能
+        # 允许多个套接字 bind()/listen() 同一个TCP/UDP端口
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    sock.bind((ip, port))
+    if stream:
+        # backlog参数指定队列中最多可容纳的等待接受的传入连接数
+        # 表示的是服务器拒绝(超过限制数量的)连接之前，操作系统可以挂起的最大连接数量。
+        # 也可以看作是"排队的数量"
+        sock.listen(backlog)
+    sock.setblocking(False)
+    return sock
+
+
+def new_tcp_socket(ip: str, port: int, backlog=DEFAULT_BACKLOG, reuse_port=False) -> socket.socket:
+    sock = new_inet_socket(ip, port, backlog=backlog, reuse_port=reuse_port, stream=True)
+    return sock
+
+
+def new_udp_socket(ip: str, port: int, backlog=DEFAULT_BACKLOG, reuse_port=False) -> socket.socket:
+    sock = new_inet_socket(ip, port, backlog=backlog, reuse_port=reuse_port, stream=False)
+    return sock
+
+
+def new_unix_socket(ip: str, backlog=DEFAULT_BACKLOG) -> socket.socket:
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.bind(ip)
+    sock.listen(backlog)
+    sock.setblocking(False)
+    return sock
 
 
 def new_socketpair():
