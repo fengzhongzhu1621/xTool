@@ -34,17 +34,17 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
 OptionsType = Iterable[Tuple[int, int, int]]
-F = TypeVar('F', bound=Callable[..., Any])
+F = TypeVar("F", bound=Callable[..., Any])
 
 try:
     import contextvars
 
-
     def context_partial(func: F, *args: Any, **kwargs: Any) -> Any:
         context = contextvars.copy_context()
         return partial(context.run, func, *args, **kwargs)
+
 
 except ImportError:
     context_partial = partial
@@ -52,18 +52,19 @@ except ImportError:
 try:
     from trio import open_file as open_async, Path  # type: ignore
 
-
     def stat_async(path):
         return Path(path).stat()
+
+
 except ImportError:
 
     try:
         from aiofiles import open as aio_open  # type: ignore
         from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
 
-
         async def open_async(file, mode="r", **kwargs):
             return aio_open(file, mode, **kwargs)
+
     except ImportError:
         pass
 
@@ -73,13 +74,11 @@ if sys.version_info >= (3, 7):
 else:
     from asyncio import _get_running_loop
 
-
     def get_running_loop():
         loop = _get_running_loop()
         if loop is None:
             raise RuntimeError("no running event loop")
         return loop
-
 
     def create_task(coro):
         loop = get_running_loop()
@@ -87,17 +86,20 @@ else:
 
 
 def get_and_check_running_loop(
-        loop: Optional[asyncio.AbstractEventLoop] = None
+    loop: Optional[asyncio.AbstractEventLoop] = None,
 ) -> asyncio.AbstractEventLoop:
     if loop is None:
         loop = asyncio.get_event_loop()
     if not loop.is_running():
-        warnings.warn("The object should be created from async function",
-                      DeprecationWarning, stacklevel=3)
+        warnings.warn(
+            "The object should be created from async function",
+            DeprecationWarning,
+            stacklevel=3,
+        )
         if loop.get_debug():
             log.warning(
-                "The object should be created from async function",
-                stack_info=True)
+                "The object should be created from async function", stack_info=True
+            )
     return loop
 
 
@@ -114,9 +116,7 @@ def load_uvlopo():
     try:
         import uvloop  # type: ignore
 
-        if not isinstance(
-                asyncio.get_event_loop_policy(),
-                uvloop.EventLoopPolicy):
+        if not isinstance(asyncio.get_event_loop_policy(), uvloop.EventLoopPolicy):
             asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     except ImportError:
         pass
@@ -127,8 +127,9 @@ async def null_callback(*args):
 
 
 def create_default_event_loop(
-        pool_size=None, policy=event_loop_policy,
-        debug=False,
+    pool_size=None,
+    policy=event_loop_policy,
+    debug=False,
 ):
     with suppress(RuntimeError):
         asyncio.get_event_loop().close()
@@ -147,8 +148,8 @@ def create_default_event_loop(
 
 
 def new_event_loop(
-        pool_size=None,
-        policy=event_loop_policy,
+    pool_size=None,
+    policy=event_loop_policy,
 ) -> asyncio.AbstractEventLoop:
     loop, _ = create_default_event_loop(pool_size, policy)
     return loop
@@ -171,7 +172,7 @@ async def noop2(*args, **kwargs):
 
 
 class DeprecationWaiter:
-    __slots__ = ('_awaitable', '_awaited')
+    __slots__ = ("_awaitable", "_awaited")
 
     def __init__(self, awaitable: Awaitable[Any]) -> None:
         self._awaitable = awaitable
@@ -213,6 +214,7 @@ def awaitable(func):
 def wrap_func(func):
     """将函数转换为协程，参考asyncio.coroutine ."""
     if not asyncio.iscoroutinefunction(func):
+
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
@@ -233,7 +235,7 @@ async def awaiter(future: asyncio.Future) -> T:
 
 
 def shield(func):
-    """ 保护一个 可等待对象 防止其被 取消
+    """保护一个 可等待对象 防止其被 取消
     Simple and useful decorator for wrap the coroutine to `asyncio.shield`.
 
     假如有个Task(叫做something)被shield保护，如下：
@@ -284,7 +286,8 @@ def cancel_tasks(tasks: Iterable[asyncio.Future]) -> asyncio.Future:
             task.set_exception(exc)
         else:
             log.warning(
-                "Skipping object %r because it's not a Task or Future", task,
+                "Skipping object %r because it's not a Task or Future",
+                task,
             )
 
     if not cancelled_tasks:
@@ -292,9 +295,7 @@ def cancel_tasks(tasks: Iterable[asyncio.Future]) -> asyncio.Future:
 
     # 创建等待任务取消的future
     waiter = asyncio.ensure_future(
-        asyncio.gather(
-            *cancelled_tasks, return_exceptions=True
-        ),
+        asyncio.gather(*cancelled_tasks, return_exceptions=True),
     )
 
     return waiter
@@ -350,27 +351,30 @@ def wakeup_waiter(waiter):
     return waiter
 
 
-async def open_connection(host: str, port: int, timeout: float, loop: asyncio.AbstractEventLoop):
+async def open_connection(
+    host: str, port: int, timeout: float, loop: asyncio.AbstractEventLoop
+):
     if is_ipv6(host):
         family = socket.AF_INET6
     else:
         family = socket.AF_UNSPEC
-    return await asyncio.wait_for(open_connection(host=host, port=port, loop=loop, family=family),
-                                  timeout, loop=loop)
+    return await asyncio.wait_for(
+        open_connection(host=host, port=port, loop=loop, family=family),
+        timeout,
+        loop=loop,
+    )
 
 
 if __name__ == "__main__":
+
     async def noop2(*args, **kwargs):
         return asyncio.sleep(1)
-
 
     async def task():
         return await DeprecationWaiter(noop2())
 
-
     async def task2():
         return DeprecationWaiter(noop2())
-
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(task())

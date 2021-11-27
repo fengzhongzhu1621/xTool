@@ -105,6 +105,7 @@ class SanicTestClient:
             def _collect_request(request):
                 if results[0] is None:
                     results[0] = request
+
             # 添加为第一个请求中间件
             self.app.request_middleware.appendleft(_collect_request)
 
@@ -112,16 +113,16 @@ class SanicTestClient:
         @self.app.exception(MethodNotSupported)
         async def error_handler(request, exception):
             if request.method in ["HEAD", "PATCH", "PUT", "DELETE"]:
-                return text(
-                    "", exception.status_code, headers=exception.headers
-                )
+                return text("", exception.status_code, headers=exception.headers)
             else:
                 # 默认异常处理
                 return self.app.error_handler.default(request, exception)
 
         if self.port:
             server_kwargs = dict(
-                host=host or self.host, port=self.port, **server_kwargs,
+                host=host or self.host,
+                port=self.port,
+                **server_kwargs,
             )
             host, port = host or self.host, self.port
         else:
@@ -133,9 +134,7 @@ class SanicTestClient:
             self.port = port
 
         # 获得访问路径
-        if uri.startswith(
-            ("http:", "https:", "ftp:", "ftps://", "//", "ws:", "wss:")
-        ):
+        if uri.startswith(("http:", "https:", "ftp:", "ftps://", "//", "ws:", "wss:")):
             url = uri
         else:
             uri = uri if uri.startswith("/") else f"/{uri}"
@@ -266,9 +265,7 @@ class SanicASGITestClient(httpx.AsyncClient):
         headers.setdefault("sec-websocket-key", "testserver==")
         headers.setdefault("sec-websocket-version", "13")
         if subprotocols is not None:
-            headers.setdefault(
-                "sec-websocket-protocol", ", ".join(subprotocols)
-            )
+            headers.setdefault("sec-websocket-protocol", ", ".join(subprotocols))
 
         scope = {
             "type": "websocket",
@@ -292,9 +289,7 @@ class SanicASGITestClient(httpx.AsyncClient):
         return None, {}
 
 
-class ReusableSanicConnectionPool(
-    httpx.dispatch.connection_pool.ConnectionPool
-):
+class ReusableSanicConnectionPool(httpx.dispatch.connection_pool.ConnectionPool):
     @property
     def cert(self):
         return self.ssl.cert
@@ -323,7 +318,7 @@ class ReusableSanicConnectionPool(
                 cert=self.cert,
                 verify=self.verify,
                 trust_env=self.trust_env,
-                http2=self.http2
+                http2=self.http2,
             )
             connection = httpx.dispatch.connection.HTTPConnection(
                 origin,
@@ -338,9 +333,7 @@ class ReusableSanicConnectionPool(
         # 判断HTTP连接是否复用
         if old_conn is not None:
             if old_conn != connection:
-                raise RuntimeError(
-                    "We got a new connection, wanted the same one!"
-                )
+                raise RuntimeError("We got a new connection, wanted the same one!")
         old_conn = connection
 
         return connection
@@ -389,9 +382,7 @@ class ReuseableSanicTestClient(SanicTestClient):
 
             self.app.request_middleware.appendleft(_collect_request)
 
-        if uri.startswith(
-            ("http:", "https:", "ftp:", "ftps://", "//", "ws:", "wss:")
-        ):
+        if uri.startswith(("http:", "https:", "ftp:", "ftps://", "//", "ws:", "wss:")):
             url = uri
         else:
             uri = uri if uri.startswith("/") else f"/{uri}"
@@ -416,11 +407,10 @@ class ReuseableSanicTestClient(SanicTestClient):
                 host=HOST,
                 debug=debug,
                 port=KEEP_ALIVE_TIMEOUT_REUSE_PORT,
-                **server_kwargs)
-
-            server.trigger_events(
-                self.app.listeners["before_server_start"], loop
+                **server_kwargs,
             )
+
+            server.trigger_events(self.app.listeners["before_server_start"], loop)
 
             try:
                 loop._stopping = False
@@ -447,9 +437,7 @@ class ReuseableSanicTestClient(SanicTestClient):
             try:
                 return results[-1]
             except Exception:
-                raise ValueError(
-                    f"Request object expected, got ({results})"
-                )
+                raise ValueError(f"Request object expected, got ({results})")
 
     def kill_server(self):
         try:
@@ -510,7 +498,7 @@ class DelayableHTTPConnection(httpx.dispatch.connection.HTTPConnection):
     async def send(self, request, timeout=None):
 
         if self.connection is None:
-            self.connection = (await self.connect(timeout=timeout))
+            self.connection = await self.connect(timeout=timeout)
 
         if self._request_delay:
             await asyncio.sleep(self._request_delay)
@@ -520,9 +508,7 @@ class DelayableHTTPConnection(httpx.dispatch.connection.HTTPConnection):
         return response
 
 
-class DelayableSanicConnectionPool(
-    httpx.dispatch.connection_pool.ConnectionPool
-):
+class DelayableSanicConnectionPool(httpx.dispatch.connection_pool.ConnectionPool):
     def __init__(self, request_delay=None, *args, **kwargs):
         self._request_delay = request_delay
         super().__init__(*args, **kwargs)
@@ -568,7 +554,7 @@ _LOOP_FACTORY = Callable[[], asyncio.AbstractEventLoop]
 
 
 def setup_test_loop(
-        loop_factory: _LOOP_FACTORY = asyncio.new_event_loop
+    loop_factory: _LOOP_FACTORY = asyncio.new_event_loop,
 ) -> asyncio.AbstractEventLoop:
     """Create and return an asyncio.BaseEventLoop
     instance.
@@ -578,7 +564,7 @@ def setup_test_loop(
     loop = loop_factory()
     try:
         module = loop.__class__.__module__
-        skip_watcher = 'uvloop' in module
+        skip_watcher = "uvloop" in module
     except AttributeError:  # pragma: no cover
         # Just in case
         skip_watcher = True
@@ -592,8 +578,7 @@ def setup_test_loop(
     return loop
 
 
-def teardown_test_loop(loop: asyncio.AbstractEventLoop,
-                       fast: bool = False) -> None:
+def teardown_test_loop(loop: asyncio.AbstractEventLoop, fast: bool = False) -> None:
     """Teardown and cleanup an event_loop created
     by setup_test_loop.
     """
@@ -610,8 +595,9 @@ def teardown_test_loop(loop: asyncio.AbstractEventLoop,
 
 
 @contextlib.contextmanager
-def loop_context(loop_factory: _LOOP_FACTORY = asyncio.new_event_loop,
-                 fast: bool = False) -> Iterator[asyncio.AbstractEventLoop]:
+def loop_context(
+    loop_factory: _LOOP_FACTORY = asyncio.new_event_loop, fast: bool = False
+) -> Iterator[asyncio.AbstractEventLoop]:
     """A contextmanager that creates an event_loop, for test purposes.
     Handles the creation and cleanup of a test loop.
     """
@@ -622,8 +608,10 @@ def loop_context(loop_factory: _LOOP_FACTORY = asyncio.new_event_loop,
 
 def pytest_async(func):
     """协程装饰器，用于测试协程方法 ."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(func(*args, **kwargs))
+
     return wrapper
