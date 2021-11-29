@@ -36,8 +36,10 @@ class AtforkTest(unittest.TestCase):
         self.calls = []
         self.orig_stderr = sys.stderr
 
-        self.assertFalse(atfork._fork_lock.locked(),
-                         "atfork._fork_lock not released by an earlier test!")
+        self.assertFalse(
+            atfork._fork_lock.locked(),
+            "atfork._fork_lock not released by an earlier test!",
+        )
 
         # Unregister calls registered by earlier tests.
         atfork._prepare_call_list = []
@@ -64,31 +66,31 @@ class AtforkTest(unittest.TestCase):
 
     def _raise_pre(self):
         self._pre()
-        raise RuntimeError('This as the first parent error expected.')
+        raise RuntimeError("This as the first parent error expected.")
 
     def _raise_parent(self):
         self._parent()
-        raise RuntimeError('This as the second parent error expected.')
+        raise RuntimeError("This as the second parent error expected.")
 
     def _raise_child(self):
         self._child()
-        raise RuntimeError('This child error is expected.')
+        raise RuntimeError("This child error is expected.")
 
     def _assert_expected_parent_stderr(self, error_msg):
-        self.assertTrue(('first parent error' in error_msg), error_msg)
-        self.assertTrue(('second parent error' in error_msg), error_msg)
+        self.assertTrue(("first parent error" in error_msg), error_msg)
+        self.assertTrue(("second parent error" in error_msg), error_msg)
         self.assertTrue(
-            (error_msg.index('first parent') <
-             error_msg.index('second parent')),
-            'first and second errors out of order in:\n%r' % error_msg)
-        self.assertEqual(2, error_msg.count('RuntimeError:'))
+            (error_msg.index("first parent") < error_msg.index("second parent")),
+            "first and second errors out of order in:\n%r" % error_msg,
+        )
+        self.assertEqual(2, error_msg.count("RuntimeError:"))
 
     def _assert_expected_child_stderr(self, error_msg):
-        self.assertTrue('child error is expected' in error_msg)
-        self.assertEqual(1, error_msg.count('RuntimeError:'), error_msg)
+        self.assertTrue("child error is expected" in error_msg)
+        self.assertEqual(1, error_msg.count("RuntimeError:"), error_msg)
 
     def test_monkeypatching(self):
-        if not hasattr(os, 'fork'):
+        if not hasattr(os, "fork"):
             return  # Nothing to test on this platform.
         self.assertTrue(callable(atfork._orig_os_fork))
         self.assertTrue(callable(atfork._orig_os_forkpty))
@@ -131,8 +133,9 @@ class AtforkTest(unittest.TestCase):
         if pid == 0:
             try:
                 try:
-                    self.assertEqual([self._pre, self._other,
-                                      self._child, self._other], self.calls)
+                    self.assertEqual(
+                        [self._pre, self._other, self._child, self._other], self.calls
+                    )
                     self.assertFalse(atfork._fork_lock.locked())
                     self._assert_expected_child_stderr(sys.stderr.getvalue())
                 except BaseException:
@@ -144,10 +147,11 @@ class AtforkTest(unittest.TestCase):
             finally:
                 os._exit(0)
         else:
-            self.assertEqual([self._pre, self._other,
-                              self._parent, self._other], self.calls)
+            self.assertEqual(
+                [self._pre, self._other, self._parent, self._other], self.calls
+            )
             self.assertFalse(atfork._fork_lock.locked())
-            self.assertEqual(0, os.waitpid(pid, 0)[1], 'error in child')
+            self.assertEqual(0, os.waitpid(pid, 0)[1], "error in child")
         self._assert_expected_parent_stderr(sys.stderr.getvalue())
 
     def test_os_fork_wrapper(self):
@@ -158,7 +162,7 @@ class AtforkTest(unittest.TestCase):
 
     def _test_fork_failure(self, orig_fork_attrname, fork_wrapper):
         def failing_fork():
-            raise OSError(0, 'testing a fork failure')
+            raise OSError(0, "testing a fork failure")
 
         atfork.atfork(self._pre, self._parent, self._child)
         orig_orig_fork = getattr(atfork, orig_fork_attrname)
@@ -172,15 +176,15 @@ class AtforkTest(unittest.TestCase):
             except OSError:
                 self.assertEqual([self._pre, self._parent], self.calls)
             else:
-                self.fail('Fork failed to fail!')
+                self.fail("Fork failed to fail!")
         finally:
             setattr(atfork, orig_fork_attrname, orig_orig_fork)
 
     def test_fork_wrapper_failure(self):
-        self._test_fork_failure('_orig_os_fork', atfork.os_fork_wrapper)
+        self._test_fork_failure("_orig_os_fork", atfork.os_fork_wrapper)
 
     def test_forkpty_wrapper_failure(self):
-        self._test_fork_failure('_orig_os_forkpty', atfork.os_forkpty_wrapper)
+        self._test_fork_failure("_orig_os_forkpty", atfork.os_forkpty_wrapper)
 
     def test_multiple_monkeypatch_safe(self):
         self.assertNotEqual(atfork._orig_os_fork, atfork.os_fork_wrapper)
@@ -193,5 +197,5 @@ class AtforkTest(unittest.TestCase):
         self.assertNotEqual(atfork._orig_os_forkpty, atfork.os_forkpty_wrapper)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

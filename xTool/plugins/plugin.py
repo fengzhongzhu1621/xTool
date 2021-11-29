@@ -44,8 +44,7 @@ class PluginStore:
         return self.plugins.get(plugin_type, {}).get(plugin_name)
 
     def add_plugin_instance(self, plugin_type, plugin_name, plugin_instance):
-        self.plugin_instances.setdefault(
-            plugin_type, {})[plugin_name] = plugin_instance
+        self.plugin_instances.setdefault(plugin_type, {})[plugin_name] = plugin_instance
 
     def get_plugin_instance(self, plugin_type, plugin_name):
         return self.plugin_instances.get(plugin_type, {}).get(plugin_name)
@@ -59,12 +58,16 @@ DefaultPluginStore = PluginStore()
 
 
 class Plugin:
-    def __init__(self,
-                 cls,
-                 plugin_type,
-                 plugin_name,
-                 version: str = "",
-                 can_init_instance: bool = True, *args, **kwargs):
+    def __init__(
+        self,
+        cls,
+        plugin_type,
+        plugin_name,
+        version: str = "",
+        can_init_instance: bool = True,
+        *args,
+        **kwargs
+    ):
         self._cls = cls
         self.name = plugin_name
         self.type = plugin_type
@@ -110,10 +113,14 @@ class PluginMeta(type):
         return new_class
 
 
-def register_plugin(plugin_type: PluginType,
-                    plugin_name: Union[str, Enum],
-                    version: str = "",
-                    can_init_instance: bool = True, *args, **kwargs):
+def register_plugin(
+    plugin_type: PluginType,
+    plugin_name: Union[str, Enum],
+    version: str = "",
+    can_init_instance: bool = True,
+    *args,
+    **kwargs
+):
     """将类/函数注册为一个插件 ."""
 
     def decorator(cls):
@@ -122,13 +129,8 @@ def register_plugin(plugin_type: PluginType,
             plugin_name = cls.__name__
         # 将类包装为一个插件
         plugin = Plugin(
-            cls,
-            plugin_type,
-            plugin_name,
-            version,
-            can_init_instance,
-            *args,
-            **kwargs)
+            cls, plugin_type, plugin_name, version, can_init_instance, *args, **kwargs
+        )
         # 将插件添加到仓库
         DefaultPluginStore.add_plugin(plugin_type, plugin_name, plugin)
         return cls
@@ -142,15 +144,13 @@ def get_plugin(plugin_type: int, plugin_name: str):
 
 
 def set_plugin_instance(plugin_type: int, plugin_name: str, plugin_instance: Plugin):
-    DefaultPluginStore.add_plugin_instance(
-        plugin_type, plugin_name, plugin_instance)
+    DefaultPluginStore.add_plugin_instance(plugin_type, plugin_name, plugin_instance)
 
 
 def get_plugin_instance(plugin_type: int, plugin_name: str):
     """懒加载的方式获得插件，如果没有则创建，是一个单例模式 ."""
     # 从缓存中获取插件实例
-    plugin_instance = DefaultPluginStore.get_plugin_instance(
-        plugin_type, plugin_name)
+    plugin_instance = DefaultPluginStore.get_plugin_instance(plugin_type, plugin_name)
     if not plugin_instance:
         # 从缓存中获取插件类
         plugin = get_plugin(plugin_type, plugin_name)
@@ -160,7 +160,8 @@ def get_plugin_instance(plugin_type: int, plugin_name: str):
         plugin_instance = plugin.create_instance()
         # 缓存插件实例
         DefaultPluginStore.add_plugin_instance(
-            plugin_type, plugin_name, plugin_instance)
+            plugin_type, plugin_name, plugin_instance
+        )
     return plugin_instance
 
 

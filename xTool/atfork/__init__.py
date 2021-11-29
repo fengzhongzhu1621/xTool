@@ -45,8 +45,8 @@ import sys
 import threading
 import traceback
 
-__all__ = ('monkeypatch_os_fork_functions', 'atfork')
-__version__ = '0.1.2'
+__all__ = ("monkeypatch_os_fork_functions", "atfork")
+__version__ = "0.1.2"
 
 
 def monkeypatch_os_fork_functions():
@@ -54,12 +54,12 @@ def monkeypatch_os_fork_functions():
     Replace os.fork* with wrappers that use ForkSafeLock to acquire
     all locks before forking and release them afterwards.
     """
-    builtin_function = type(''.join)
-    if hasattr(os, 'fork') and isinstance(os.fork, builtin_function):
+    builtin_function = type("".join)
+    if hasattr(os, "fork") and isinstance(os.fork, builtin_function):
         global _orig_os_fork
         _orig_os_fork = os.fork
         os.fork = os_fork_wrapper
-    if hasattr(os, 'forkpty') and isinstance(os.forkpty, builtin_function):
+    if hasattr(os, "forkpty") and isinstance(os.forkpty, builtin_function):
         global _orig_os_forkpty
         _orig_os_forkpty = os.forkpty
         os.forkpty = os_forkpty_wrapper
@@ -67,10 +67,10 @@ def monkeypatch_os_fork_functions():
 
 # This lock protects all of the lists below.
 _fork_lock = threading.Lock()
-_prepare_call_list = []              # 在fork子进程之前触发的函数
+_prepare_call_list = []  # 在fork子进程之前触发的函数
 _prepare_call_exceptions = []
-_parent_call_list = []               # 在fork子进程之后父进程触发的函数
-_child_call_list = []                # 在fork子进程之后子进程触发的函数
+_parent_call_list = []  # 在fork子进程之后父进程触发的函数
+_child_call_list = []  # 在fork子进程之后子进程触发的函数
 
 
 def atfork(prepare=None, parent=None, child=None):
@@ -143,8 +143,8 @@ def parent_after_fork_release():
     exceptions = _call_atfork_list(_parent_call_list)
     # 释放线程锁
     _fork_lock.release()
-    _print_exception_list(prepare_exceptions, 'before fork')
-    _print_exception_list(exceptions, 'after fork from parent')
+    _print_exception_list(prepare_exceptions, "before fork")
+    _print_exception_list(exceptions, "after fork from parent")
 
 
 def child_after_fork_release():
@@ -157,7 +157,7 @@ def child_after_fork_release():
     exceptions = _call_atfork_list(_child_call_list)
     # 释放线程锁
     _fork_lock.release()
-    _print_exception_list(exceptions, 'after fork from child')
+    _print_exception_list(exceptions, "after fork from child")
 
 
 def _print_exception_list(exceptions, message, output_file=None):
@@ -166,12 +166,11 @@ def _print_exception_list(exceptions, message, output_file=None):
     module preceeded by a message and separated by a blank line.
     """
     output_file = output_file or sys.stderr
-    message = 'Exception %s:\n' % message
+    message = "Exception %s:\n" % message
     for exc_type, exc_value, exc_traceback in exceptions:
         output_file.write(message)
-        traceback.print_exception(exc_type, exc_value, exc_traceback,
-                                  file=output_file)
-        output_file.write('\n')
+        traceback.print_exception(exc_type, exc_value, exc_traceback, file=output_file)
+        output_file.write("\n")
 
 
 def os_fork_wrapper():
@@ -204,6 +203,7 @@ def os_forkpty_wrapper():
         else:
             parent_after_fork_release()
     return pid, fd
+
 
 # TODO: Also replace os.fork1() on Solaris.
 

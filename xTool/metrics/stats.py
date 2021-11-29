@@ -20,7 +20,7 @@ from xTool.utils.dates import time_now
 log = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=Callable)  # pylint: disable=invalid-name
-ALLOWED_CHARACTERS = set(string.ascii_letters + string.digits + '_.-')
+ALLOWED_CHARACTERS = set(string.ascii_letters + string.digits + "_.-")
 STATS_NAME_DEFAULT_MAX_LENGTH = 250
 
 
@@ -55,12 +55,12 @@ class StatsClientBase(object):
         """
         if isinstance(delta, timedelta):
             # Convert timedelta to number of milliseconds.
-            delta = delta.total_seconds() * 1000.
-        self._send_stat(stat, '%0.6f|ms' % delta, rate)
+            delta = delta.total_seconds() * 1000.0
+        self._send_stat(stat, "%0.6f|ms" % delta, rate)
 
     def incr(self, stat, count=1, rate=1):
         """Increment a stat by `count`. 区间计数 ."""
-        self._send_stat(stat, '%s|c' % count, rate)
+        self._send_stat(stat, "%s|c" % count, rate)
 
     def decr(self, stat, count=1, rate=1):
         """Decrement a stat by `count`. 区间计数 ."""
@@ -76,17 +76,17 @@ class StatsClientBase(object):
             # 重置为负数
             with self.pipeline() as pipe:
                 # 重置为初始值0
-                pipe._send_stat(stat, '0|g', 1)
+                pipe._send_stat(stat, "0|g", 1)
                 # 初始化值为一个负数
-                pipe._send_stat(stat, '%s|g' % value, 1)
+                pipe._send_stat(stat, "%s|g" % value, 1)
         else:
             # 需要对前面的值进行加法操作
-            prefix = '+' if delta and value >= 0 else ''
-            self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
+            prefix = "+" if delta and value >= 0 else ""
+            self._send_stat(stat, "%s%s|g" % (prefix, value), rate)
 
     def set(self, stat, value, rate=1):
         """Set a set value. 记录flush期间，不重复的值 ."""
-        self._send_stat(stat, '%s|s' % value, rate)
+        self._send_stat(stat, "%s|s" % value, rate)
 
     def _send_stat(self, stat, value, rate):
         """发送指标 ."""
@@ -97,12 +97,12 @@ class StatsClientBase(object):
         if rate < 1:
             if random.random() > rate:
                 return
-            value = '%s|@%s' % (value, rate)
+            value = "%s|@%s" % (value, rate)
         # metrics名称添加前缀
         if self._prefix:
-            stat = '%s.%s' % (self._prefix, stat)
+            stat = "%s.%s" % (self._prefix, stat)
 
-        return '%s:%s' % (stat, value)
+        return "%s:%s" % (stat, value)
 
     def _after(self, data):
         if data:
@@ -110,7 +110,6 @@ class StatsClientBase(object):
 
 
 class PipelineBase(StatsClientBase):
-
     def __init__(self, client):
         super().__init__()
         self._client = client
@@ -144,16 +143,18 @@ class PipelineBase(StatsClientBase):
 
 
 class StatsClient(StatsClientBase):
-    """A client for statsd. （线程安全） """
+    """A client for statsd. （线程安全）"""
 
-    def __init__(self, host='localhost', port=8125, prefix=None,
-                 maxudpsize=512, ipv6=False):
+    def __init__(
+        self, host="localhost", port=8125, prefix=None, maxudpsize=512, ipv6=False
+    ):
         """Create a new client."""
         super().__init__()
         # 解析主机地址
         fam = socket.AF_INET6 if ipv6 else socket.AF_INET
-        family, _, _, _, addr = socket.getaddrinfo(
-            host, port, fam, socket.SOCK_DGRAM)[0]
+        family, _, _, _, addr = socket.getaddrinfo(host, port, fam, socket.SOCK_DGRAM)[
+            0
+        ]
         self._addr = addr
         # 创建socket
         self._sock = socket.socket(family, socket.SOCK_DGRAM)
@@ -165,13 +166,13 @@ class StatsClient(StatsClientBase):
     def _send(self, data):
         """Send data to statsd."""
         try:
-            self._sock.sendto(data.encode('ascii'), self._addr)
+            self._sock.sendto(data.encode("ascii"), self._addr)
         except (socket.error, RuntimeError):
             # No time for love, Dr. Jones!
             pass
 
     def close(self):
-        if self._sock and hasattr(self._sock, 'close'):
+        if self._sock and hasattr(self._sock, "close"):
             self._sock.close()
         self._sock = None
 
@@ -207,7 +208,7 @@ class Pipeline(PipelineBase):
 
 class StreamPipeline(PipelineBase):
     def _send(self):
-        self._client._after('\n'.join(self._stats))
+        self._client._after("\n".join(self._stats))
         # 清空队列
         self._stats.clear()
 
@@ -221,7 +222,7 @@ class StreamClientBase(StatsClientBase):
         raise NotImplementedError()
 
     def close(self):
-        if self._sock and hasattr(self._sock, 'close'):
+        if self._sock and hasattr(self._sock, "close"):
             self._sock.close()
         self._sock = None
 
@@ -239,14 +240,15 @@ class StreamClientBase(StatsClientBase):
         self._do_send(data)
 
     def _do_send(self, data):
-        self._sock.sendall(data.encode('ascii') + b'\n')
+        self._sock.sendall(data.encode("ascii") + b"\n")
 
 
 class TCPStatsClient(StreamClientBase):
     """TCP version of StatsClient."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None,
-                 timeout=None, ipv6=False):
+    def __init__(
+        self, host="localhost", port=8125, prefix=None, timeout=None, ipv6=False
+    ):
         """Create a new client."""
         super().__init__()
         self._host = host
@@ -259,7 +261,8 @@ class TCPStatsClient(StreamClientBase):
     def connect(self):
         fam = socket.AF_INET6 if self._ipv6 else socket.AF_INET
         family, _, _, _, addr = socket.getaddrinfo(
-            self._host, self._port, fam, socket.SOCK_STREAM)[0]
+            self._host, self._port, fam, socket.SOCK_STREAM
+        )[0]
         self._sock = socket.socket(family, socket.SOCK_STREAM)
         self._sock.settimeout(self._timeout)
         self._sock.connect(addr)
@@ -323,7 +326,7 @@ class StatsdTimer(object):
     def stop(self, send=True):
         """结束计时，并发送指标 ."""
         if self._start_time is None:
-            raise RuntimeError('Timer has not started.')
+            raise RuntimeError("Timer has not started.")
         # 计算耗时（ms）
         dt = time_now() - self._start_time
         self.ms = 1000.0 * dt  # Convert to milliseconds.
@@ -334,9 +337,9 @@ class StatsdTimer(object):
 
     def send(self):
         if self.ms is None:
-            raise RuntimeError('No data recorded.')
+            raise RuntimeError("No data recorded.")
         if self._sent:
-            raise RuntimeError('Already sent data.')
+            raise RuntimeError("Already sent data.")
         # 标记指标已经发送
         self._sent = True
         # 发送指标
@@ -373,12 +376,7 @@ class StatsLogger(Protocol):
         """Decrement stat"""
 
     @classmethod
-    def gauge(
-            cls,
-            stat: str,
-            value: float,
-            rate: int = 1,
-            delta: bool = False) -> None:
+    def gauge(cls, stat: str, value: float, rate: int = 1, delta: bool = False) -> None:
         """Gauge stat"""
 
     @classmethod
@@ -391,10 +389,7 @@ class StatsLogger(Protocol):
 
 
 class StatsNameConfig:
-    def __init__(
-            self,
-            name="default",
-            max_length=STATS_NAME_DEFAULT_MAX_LENGTH):
+    def __init__(self, name="default", max_length=STATS_NAME_DEFAULT_MAX_LENGTH):
         self.name = name
         self.max_length = max_length
 
@@ -405,15 +400,14 @@ class StatsAllowNameValidatorConfig:
         self.allow_list = allow_list if allow_list else []
 
 
-@register_plugin(plugin_type=PluginType.STATS_NAME_HANDLER,
-                 plugin_name="default")
+@register_plugin(plugin_type=PluginType.STATS_NAME_HANDLER, plugin_name="default")
 class DefaultStatNameHandler:
     def handler(self, stat_name, max_length) -> str:
         """A function that validate the statsd stat name, apply changes to the stat name
         if necessary and return the transformed stat name.
         """
         if not isinstance(stat_name, str):
-            raise InvalidStatsNameException('The stat_name has to be a string')
+            raise InvalidStatsNameException("The stat_name has to be a string")
         if len(stat_name) > max_length:
             raise InvalidStatsNameException(
                 textwrap.dedent(
@@ -431,8 +425,10 @@ class DefaultStatNameHandler:
                 The stat name ({stat_name}) has to be composed with characters in
                 {allowed_characters}.
                 """.format(
-                        stat_name=stat_name,
-                        allowed_characters=ALLOWED_CHARACTERS)))
+                        stat_name=stat_name, allowed_characters=ALLOWED_CHARACTERS
+                    )
+                )
+            )
         return stat_name
 
 
@@ -458,27 +454,28 @@ def validate_stat(fn: T) -> T:
                     name = "default"
                     max_length = STATS_NAME_DEFAULT_MAX_LENGTH
                 handler_stat_name_func = get_current_handler_stat_name_func(
-                    name).handler
+                    name
+                ).handler
                 stat = handler_stat_name_func(stat, max_length)
             return fn(_self, stat, *args, **kwargs)
         except InvalidStatsNameException:
-            log.error('Invalid stat name: %s.', stat, exc_info=True)
+            log.error("Invalid stat name: %s.", stat, exc_info=True)
             return None
 
     return cast(T, wrapper)
 
 
 class AllowListValidatorProtocol(Protocol):
-    def set_allow_list(
-            self, allow_list: Optional[Union[Sequence[str], str]]) -> None:
+    def set_allow_list(self, allow_list: Optional[Union[Sequence[str], str]]) -> None:
         ...
 
     def test(self, stat: str) -> bool:
         ...
 
 
-@register_plugin(plugin_type=PluginType.STATS_NAME_ALLOW_VALIDATOR,
-                 plugin_name="default")
+@register_plugin(
+    plugin_type=PluginType.STATS_NAME_ALLOW_VALIDATOR, plugin_name="default"
+)
 class DefaultAllowListValidator:
     """Class to filter unwanted stats"""
 
@@ -486,13 +483,13 @@ class DefaultAllowListValidator:
         self.allow_list = None
         self.set_allow_list(allow_list)
 
-    def set_allow_list(
-            self, allow_list: Optional[Union[Sequence[str], str]]) -> None:
+    def set_allow_list(self, allow_list: Optional[Union[Sequence[str], str]]) -> None:
         if allow_list:
             # pylint: disable=consider-using-generator
             if isinstance(allow_list, str):
-                self.allow_list = tuple([item.strip().lower()
-                                         for item in allow_list.split(',')])
+                self.allow_list = tuple(
+                    [item.strip().lower() for item in allow_list.split(",")]
+                )
         else:
             self.allow_list = None
 
@@ -505,33 +502,36 @@ class DefaultAllowListValidator:
 
 
 def get_current_allow_list_validator(
-        name: Optional[str] = None) -> AllowListValidatorProtocol:
+    name: Optional[str] = None,
+) -> AllowListValidatorProtocol:
     name = name if name else "default"
     return get_plugin_instance(PluginType.STATS_NAME_ALLOW_VALIDATOR, name)
 
 
 class StatsParamConfig:
     def __init__(
-            self,
-            statsd_host="localhost",
-            statsd_port=8125,
-            statsd_prefix=None,
-            constant_tags=None):
+        self,
+        statsd_host="localhost",
+        statsd_port=8125,
+        statsd_prefix=None,
+        constant_tags=None,
+    ):
         self.statsd_host = statsd_host
         self.statsd_port = statsd_port
         self.statsd_prefix = statsd_prefix
-        if constant_tags is None or constant_tags == '':
+        if constant_tags is None or constant_tags == "":
             self.constant_tags = []
         else:
-            self.constant_tags = [key_value for key_value in constant_tags.split(',')]
+            self.constant_tags = [key_value for key_value in constant_tags.split(",")]
 
 
 class BaseStatsdLogger:
     def __init__(
-            self,
-            statsd_client=None,
-            stats_name_config: Optional[StatsNameConfig] = None,
-            allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None):
+        self,
+        statsd_client=None,
+        stats_name_config: Optional[StatsNameConfig] = None,
+        allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None,
+    ):
         self.statsd = statsd_client
         self.stats_name_config = None
         self.allow_name_validator_config = None
@@ -551,7 +551,8 @@ class BaseStatsdLogger:
             allow_validator_name = None
             allow_list = None
         self.allow_list_validator = get_current_allow_list_validator(
-            allow_validator_name)
+            allow_validator_name
+        )
         self.allow_list_validator.set_allow_list(allow_list)
 
 
@@ -590,18 +591,20 @@ class SafeStatsdLogger(BaseStatsdLogger):
     """Statsd Logger"""
 
     def __init__(
-            self,
-            statsd_client=None,
-            stats_name_config: Optional[StatsNameConfig] = None,
-            allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None):
+        self,
+        statsd_client=None,
+        stats_name_config: Optional[StatsNameConfig] = None,
+        allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None,
+    ):
         super().__init__(statsd_client, stats_name_config, allow_name_validator_config)
 
     def create_client(self, statsd_config: StatsParamConfig):
         from statsd import StatsClient
+
         statsd = StatsClient(
             host=statsd_config.statsd_host,
             port=statsd_config.statsd_port,
-            prefix=statsd_config.statsd_prefix
+            prefix=statsd_config.statsd_prefix,
         )
         self.statsd = statsd
 
@@ -660,22 +663,23 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
     """DogStatsd Logger"""
 
     def __init__(
-            self,
-            dog_statsd_client=None,
-            stats_name_config: Optional[StatsNameConfig] = None,
-            allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None):
+        self,
+        dog_statsd_client=None,
+        stats_name_config: Optional[StatsNameConfig] = None,
+        allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None,
+    ):
         super().__init__(
-            dog_statsd_client,
-            stats_name_config,
-            allow_name_validator_config)
+            dog_statsd_client, stats_name_config, allow_name_validator_config
+        )
 
     def create_client(self, statsd_config: StatsParamConfig):
         from datadog import DogStatsd  # noqa
+
         statsd = DogStatsd(
             host=statsd_config.statsd_host,
             port=statsd_config.statsd_port,
             namespace=statsd_config.statsd_prefix,
-            constant_tags=statsd_config.statsd_prefix
+            constant_tags=statsd_config.statsd_prefix,
         )
         self.statsd = statsd
 
@@ -685,7 +689,8 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
         if self.allow_list_validator.test(stat):
             tags = tags or []
             return self.statsd_client.increment(
-                metric=stat, value=count, tags=tags, sample_rate=rate)
+                metric=stat, value=count, tags=tags, sample_rate=rate
+            )
         return None
 
     @validate_stat
@@ -694,16 +699,20 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
         if self.allow_list_validator.test(stat):
             tags = tags or []
             return self.statsd_client.decrement(
-                metric=stat, value=count, tags=tags, sample_rate=rate)
+                metric=stat, value=count, tags=tags, sample_rate=rate
+            )
         return None
 
     @validate_stat
-    def gauge(self, stat, value, rate=1, delta=False, tags=None):  # pylint: disable=unused-argument
+    def gauge(
+        self, stat, value, rate=1, delta=False, tags=None
+    ):  # pylint: disable=unused-argument
         """Gauge stat"""
         if self.allow_list_validator.test(stat):
             tags = tags or []
             return self.statsd_client.gauge(
-                metric=stat, value=value, tags=tags, sample_rate=rate)
+                metric=stat, value=value, tags=tags, sample_rate=rate
+            )
         return None
 
     @validate_stat
@@ -719,12 +728,7 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
         """Timer metric that can be cancelled"""
         if stat and self.allow_list_validator.test(stat):
             tags = tags or []
-            return Timer(
-                self.statsd_client.timed(
-                    stat,
-                    *args,
-                    tags=tags,
-                    **kwargs))
+            return Timer(self.statsd_client.timed(stat, *args, tags=tags, **kwargs))
         return Timer()
 
     @classmethod
@@ -732,8 +736,7 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
         """Stats set"""
 
 
-def get_stats_logger(
-        name: Optional[str] = None) -> StatsLogger:
+def get_stats_logger(name: Optional[str] = None) -> StatsLogger:
     """获得默认的statsd client ."""
     name = name if name else "default"
     return get_plugin_instance(PluginType.STATS_LOGGER, name)

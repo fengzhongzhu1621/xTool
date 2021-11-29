@@ -84,6 +84,7 @@ class RequestTimeout(HttpStatusException):
     the connection. The socket connection has actually been lost - the Web
     server has 'timed out' on that particular socket connection.
     """
+
     pass
 
 
@@ -166,9 +167,7 @@ class Unauthorized(HttpStatusException):
             values = ['{!s}="{!s}"'.format(k, v) for k, v in kwargs.items()]
             challenge = ", ".join(values)
 
-            self.headers = {
-                "WWW-Authenticate": f"{scheme} {challenge}".rstrip()
-            }
+            self.headers = {"WWW-Authenticate": f"{scheme} {challenge}".rstrip()}
 
 
 def abort(status_code, message=None):
@@ -185,7 +184,8 @@ def abort(status_code, message=None):
         # These are stored as bytes in the STATUS_CODES dict
         message = message.decode("utf8")
     http_status_exception = _http_status_exceptions.get(
-        status_code, HttpStatusException)
+        status_code, HttpStatusException
+    )
     raise http_status_exception(message=message, status_code=status_code)
 
 
@@ -194,16 +194,19 @@ class AirflowException(Exception):
     Base class for all Airflow's errors.
     Each custom exception should be derived from this class
     """
+
     status_code = 500
 
 
 class AirflowBadRequest(AirflowException):
     """Raise when the application or server cannot handle the request"""
+
     status_code = 400
 
 
 class AirflowNotFoundException(AirflowException):
     """Raise when the requested object/resource is not available in the system"""
+
     status_code = 404
 
 
@@ -240,16 +243,19 @@ class XToolException(AirflowException):
     Base class for all Airflow's errors.
     Each custom exception should be derived from this class
     """
+
     status_code = 500
 
 
 class XToolBadRequest(XToolException):
     """Raise when the application or server cannot handle the request"""
+
     status_code = 400
 
 
 class XToolNotFoundException(XToolException):
     """Raise when the requested object/resource is not available in the system"""
+
     status_code = 404
 
 
@@ -283,36 +289,43 @@ class XToolPluginException(XToolException, AirflowPluginException):
 
 class DagNotFound(XToolNotFoundException):
     """Raise when a DAG is not available in the system"""
+
     pass
 
 
 class DagRunNotFound(XToolNotFoundException):
     """Raise when a DAG Run is not available in the system"""
+
     pass
 
 
 class DagRunAlreadyExists(XToolBadRequest):
     """Raise when creating a DAG run for DAG which already has DAG run entry"""
+
     pass
 
 
 class DagFileExists(XToolBadRequest):
     """Raise when a DAG ID is still in DagBag i.e., DAG file is in DAG folder"""
+
     pass
 
 
 class TaskNotFound(XToolNotFoundException):
     """Raise when a Task is not available in the system"""
+
     pass
 
 
 class TaskInstanceNotFound(XToolNotFoundException):
     """Raise when a Task Instance is not available in the system"""
+
     pass
 
 
 class PoolNotFound(XToolNotFoundException):
     """Raise when a Pool is not available in the system"""
+
     pass
 
 
@@ -342,6 +355,7 @@ class ErrorType(IntEnum):
 @unique
 class ErrorCode(IntEnum):
     """错误码类型 ."""
+
     # 成功
     ERR_OK = 0
     ERR_UNKNOWN = -1
