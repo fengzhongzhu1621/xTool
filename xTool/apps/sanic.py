@@ -34,22 +34,21 @@ from xTool.servers.server import (
     serve_multiple,
 )
 from xTool.static import register as static_register
-from xTool.tests.testing import SanicASGITestClient, SanicTestClient
 from xTool.views import CompositionView
 from xTool.servers.websocket import ConnectionClosed, WebSocketProtocol
 
 
 class Sanic:
     def __init__(
-        self,
-        name=None,
-        router=None,
-        error_handler=None,
-        load_env=True,
-        request_class=None,
-        strict_slashes=False,
-        log_config=None,
-        configure_logging=True,
+            self,
+            name=None,
+            router=None,
+            error_handler=None,
+            load_env=True,
+            request_class=None,
+            strict_slashes=False,
+            log_config=None,
+            configure_logging=True,
     ):
 
         # Get name from previous stack frame
@@ -166,14 +165,14 @@ class Sanic:
 
     # Decorator
     def route(
-        self,
-        uri,
-        methods=frozenset({"GET"}),
-        host=None,
-        strict_slashes=None,
-        stream=False,
-        version=None,
-        name=None,
+            self,
+            uri,
+            methods=frozenset({"GET"}),
+            host=None,
+            strict_slashes=None,
+            stream=False,
+            version=None,
+            name=None,
     ):
         """Decorate a function to be registered as a route
 
@@ -235,7 +234,7 @@ class Sanic:
 
     # Shorthand method decorators
     def get(
-        self, uri, host=None, strict_slashes=None, version=None, name=None
+            self, uri, host=None, strict_slashes=None, version=None, name=None
     ):
         """
         Add an API URL under the **GET** *HTTP* method
@@ -258,13 +257,13 @@ class Sanic:
         )
 
     def post(
-        self,
-        uri,
-        host=None,
-        strict_slashes=None,
-        stream=False,
-        version=None,
-        name=None,
+            self,
+            uri,
+            host=None,
+            strict_slashes=None,
+            stream=False,
+            version=None,
+            name=None,
     ):
         """
         Add an API URL under the **POST** *HTTP* method
@@ -288,13 +287,13 @@ class Sanic:
         )
 
     def put(
-        self,
-        uri,
-        host=None,
-        strict_slashes=None,
-        stream=False,
-        version=None,
-        name=None,
+            self,
+            uri,
+            host=None,
+            strict_slashes=None,
+            stream=False,
+            version=None,
+            name=None,
     ):
         """
         Add an API URL under the **PUT** *HTTP* method
@@ -318,7 +317,7 @@ class Sanic:
         )
 
     def head(
-        self, uri, host=None, strict_slashes=None, version=None, name=None
+            self, uri, host=None, strict_slashes=None, version=None, name=None
     ):
         return self.route(
             uri,
@@ -330,7 +329,7 @@ class Sanic:
         )
 
     def options(
-        self, uri, host=None, strict_slashes=None, version=None, name=None
+            self, uri, host=None, strict_slashes=None, version=None, name=None
     ):
         """
         Add an API URL under the **OPTIONS** *HTTP* method
@@ -353,13 +352,13 @@ class Sanic:
         )
 
     def patch(
-        self,
-        uri,
-        host=None,
-        strict_slashes=None,
-        stream=False,
-        version=None,
-        name=None,
+            self,
+            uri,
+            host=None,
+            strict_slashes=None,
+            stream=False,
+            version=None,
+            name=None,
     ):
         """
         Add an API URL under the **PATCH** *HTTP* method
@@ -383,7 +382,7 @@ class Sanic:
         )
 
     def delete(
-        self, uri, host=None, strict_slashes=None, version=None, name=None
+            self, uri, host=None, strict_slashes=None, version=None, name=None
     ):
         """
         Add an API URL under the **DELETE** *HTTP* method
@@ -406,15 +405,15 @@ class Sanic:
         )
 
     def add_route(
-        self,
-        handler,
-        uri,
-        methods=frozenset({"GET"}),
-        host=None,
-        strict_slashes=None,
-        version=None,
-        name=None,
-        stream=False,
+            self,
+            handler,
+            uri,
+            methods=frozenset({"GET"}),
+            host=None,
+            strict_slashes=None,
+            version=None,
+            name=None,
+            stream=False,
     ):
         """A helper method to register class instance or
         functions as a handler to the application url
@@ -466,7 +465,7 @@ class Sanic:
 
     # Decorator
     def websocket(
-        self, uri, host=None, strict_slashes=None, subprotocols=None, name=None
+            self, uri, host=None, strict_slashes=None, subprotocols=None, name=None
     ):
         """
         Decorate a function to be registered as a websocket route
@@ -504,8 +503,8 @@ class Sanic:
                     request.endpoint = handler.__name__
                 else:
                     request.endpoint = (
-                        getattr(handler, "__blueprintname__", "")
-                        + handler.__name__
+                            getattr(handler, "__blueprintname__", "")
+                            + handler.__name__
                     )
 
                     pass
@@ -548,13 +547,13 @@ class Sanic:
         return response
 
     def add_websocket_route(
-        self,
-        handler,
-        uri,
-        host=None,
-        strict_slashes=None,
-        subprotocols=None,
-        name=None,
+            self,
+            handler,
+            uri,
+            host=None,
+            strict_slashes=None,
+            subprotocols=None,
+            name=None,
     ):
         """
         A helper method to register a function as a websocket route.
@@ -607,6 +606,7 @@ class Sanic:
         :param exceptions: exceptions
         :return: decorated function
         """
+
         # handler表示异常处理器，将指定的异常和异常处理器绑定
         def response(handler):
             for exception in exceptions:
@@ -644,7 +644,7 @@ class Sanic:
         return middleware
 
     def register_named_middleware(
-        self, middleware, route_names, attach_to="request"
+            self, middleware, route_names, attach_to="request"
     ):
         if attach_to == "request":
             for _rn in route_names:
@@ -680,17 +680,17 @@ class Sanic:
 
     # Static Files
     def static(
-        self,
-        uri,
-        file_or_directory,
-        pattern=r"/?.+",
-        use_modified_since=True,
-        use_content_range=False,
-        stream_large_files=False,
-        name="static",
-        host=None,
-        strict_slashes=None,
-        content_type=None,
+            self,
+            uri,
+            file_or_directory,
+            pattern=r"/?.+",
+            use_modified_since=True,
+            use_content_range=False,
+            stream_large_files=False,
+            name="static",
+            host=None,
+            strict_slashes=None,
+            content_type=None,
     ):
         """
         Register a root to serve files from. The input can either be a
@@ -744,8 +744,8 @@ class Sanic:
             return
         if blueprint.name in self.blueprints:
             assert self.blueprints[blueprint.name] is blueprint, (
-                'A blueprint with the name "%s" is already registered.  '
-                "Blueprint names must be unique." % (blueprint.name,)
+                    'A blueprint with the name "%s" is already registered.  '
+                    "Blueprint names must be unique." % (blueprint.name,)
             )
         else:
             self.blueprints[blueprint.name] = blueprint
@@ -1032,7 +1032,7 @@ class Sanic:
 
         # pass the response to the correct callback
         if write_callback is None or isinstance(
-            response, StreamingHTTPResponse
+                response, StreamingHTTPResponse
         ):
             if stream_callback:
                 await stream_callback(response)
@@ -1045,35 +1045,23 @@ class Sanic:
             write_callback(response)
 
     # -------------------------------------------------------------------- #
-    # Testing
-    # -------------------------------------------------------------------- #
-
-    @property
-    def test_client(self):
-        return SanicTestClient(self)
-
-    @property
-    def asgi_client(self):
-        return SanicASGITestClient(self)
-
-    # -------------------------------------------------------------------- #
     # Execution
     # -------------------------------------------------------------------- #
 
     def run(
-        self,
-        host: Optional[str] = None,
-        port: Optional[int] = None,
-        debug: bool = False,
-        ssl: Union[dict, SSLContext, None] = None,
-        sock: Optional[socket] = None,
-        workers: int = 1,
-        protocol: Type[Protocol] = None,
-        backlog: int = 100,
-        stop_event: Any = None,
-        register_sys_signals: bool = True,
-        access_log: Optional[bool] = None,
-        **kwargs: Any,
+            self,
+            host: Optional[str] = None,
+            port: Optional[int] = None,
+            debug: bool = False,
+            ssl: Union[dict, SSLContext, None] = None,
+            sock: Optional[socket] = None,
+            workers: int = 1,
+            protocol: Type[Protocol] = None,
+            backlog: int = 100,
+            stop_event: Any = None,
+            register_sys_signals: bool = True,
+            access_log: Optional[bool] = None,
+            **kwargs: Any,
     ) -> None:
         """Run the HTTP Server and listen until keyboard interrupt or term
         signal. On termination, drain connections before closing.
@@ -1169,8 +1157,8 @@ class Sanic:
                     raise NotImplementedError
 
                 if (
-                    auto_reload
-                    and os.environ.get("SANIC_SERVER_RUNNING") != "true"
+                        auto_reload
+                        and os.environ.get("SANIC_SERVER_RUNNING") != "true"
                 ):
                     reloader_helpers.watchdog(2)
                 else:
@@ -1194,18 +1182,18 @@ class Sanic:
             get_event_loop().stop()
 
     async def create_server(
-        self,
-        host: Optional[str] = None,
-        port: Optional[int] = None,
-        debug: bool = False,
-        ssl: Union[dict, SSLContext, None] = None,
-        sock: Optional[socket] = None,
-        protocol: Type[Protocol] = None,
-        backlog: int = 100,
-        stop_event: Any = None,
-        access_log: Optional[bool] = None,
-        return_asyncio_server=False,
-        asyncio_server_kwargs=None,
+            self,
+            host: Optional[str] = None,
+            port: Optional[int] = None,
+            debug: bool = False,
+            ssl: Union[dict, SSLContext, None] = None,
+            sock: Optional[socket] = None,
+            protocol: Type[Protocol] = None,
+            backlog: int = 100,
+            stop_event: Any = None,
+            access_log: Optional[bool] = None,
+            return_asyncio_server=False,
+            asyncio_server_kwargs=None,
     ) -> Optional[AsyncioServer]:
         """
         Asynchronous version of :func:`run`.
@@ -1319,7 +1307,7 @@ class Sanic:
         return None
 
     async def _run_response_middleware(
-        self, request, response, request_name=None
+            self, request, response, request_name=None
     ):
         named_middleware = self.named_response_middleware.get(
             request_name, deque()
@@ -1336,20 +1324,20 @@ class Sanic:
         return response
 
     def _helper(
-        self,
-        host=None,
-        port=None,
-        debug=False,
-        ssl=None,
-        sock=None,
-        workers=1,
-        loop=None,
-        protocol=HttpProtocol,
-        backlog=100,
-        stop_event=None,
-        register_sys_signals=True,
-        run_async=False,
-        auto_reload=False,
+            self,
+            host=None,
+            port=None,
+            debug=False,
+            ssl=None,
+            sock=None,
+            workers=1,
+            loop=None,
+            protocol=HttpProtocol,
+            backlog=100,
+            stop_event=None,
+            register_sys_signals=True,
+            run_async=False,
+            auto_reload=False,
     ):
         """Helper function used by `run` and `create_server`."""
         if isinstance(ssl, dict):
@@ -1396,10 +1384,10 @@ class Sanic:
         # -------------------------------------------- #
 
         for event_name, settings_name, reverse in (
-            ("before_server_start", "before_start", False),
-            ("after_server_start", "after_start", False),
-            ("before_server_stop", "before_stop", True),
-            ("after_server_stop", "after_stop", True),
+                ("before_server_start", "before_start", False),
+                ("after_server_start", "after_start", False),
+                ("before_server_stop", "before_stop", True),
+                ("after_server_stop", "after_stop", True),
         ):
             # 获得指定类型的监听器
             listeners = self.listeners[event_name].copy()
@@ -1413,8 +1401,8 @@ class Sanic:
             logger.setLevel(logging.DEBUG)
 
         if (
-            self.config.LOGO
-            and os.environ.get("SANIC_SERVER_RUNNING") != "true"
+                self.config.LOGO
+                and os.environ.get("SANIC_SERVER_RUNNING") != "true"
         ):
             logger.debug(self.config.LOGO)
 

@@ -63,29 +63,3 @@ def test_multiprocessing_with_blueprint(app):
 # able to be pickled (local functions cannot be pickled).
 def handler(request):
     return text("Hello")
-
-
-# Multiprocessing on Windows requires app to be able to be pickled
-@pytest.mark.parametrize("protocol", [3, 4])
-def test_pickle_app(app, protocol):
-    app.route("/")(handler)
-    p_app = pickle.dumps(app, protocol=protocol)
-    del app
-    up_p_app = pickle.loads(p_app)
-    assert up_p_app
-    request, response = up_p_app.test_client.get("/")
-    assert response.text == "Hello"
-
-
-@pytest.mark.parametrize("protocol", [3, 4])
-def test_pickle_app_with_bp(app, protocol):
-    bp = Blueprint("test_text")
-    bp.route("/")(handler)
-    app.blueprint(bp)
-    p_app = pickle.dumps(app, protocol=protocol)
-    del app
-    up_p_app = pickle.loads(p_app)
-    assert up_p_app
-    request, response = up_p_app.test_client.get("/")
-    assert up_p_app.is_request_stream is False
-    assert response.text == "Hello"
