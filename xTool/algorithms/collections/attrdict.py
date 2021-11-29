@@ -10,9 +10,9 @@ except ImportError:
     pass
 from typing import Any
 
-
 try:
     import typing  # noqa
+
     _ObjectDictBase = typing.Dict[str, typing.Any]
 except ImportError:
     _ObjectDictBase = dict
@@ -72,6 +72,7 @@ class FancyDict(dict):
             raise AttributeError(k)
 
     def __setattr__(self, key, value):
+        # 忽略内置属性
         if key.startswith("__") and key.endswith("__"):
             super().__setattr__(key, value)
         else:
@@ -119,6 +120,16 @@ class CaseInsensitiveDict(dict):
 
 class ConstantDict(dict):
     """常量字典，不允许修改value值 ."""
+
     def __setitem__(self, key: Any, value: Any):
         raise TypeError("modifying %s object values is not allowed"
                         % self.__class__.__name__)
+
+
+def get_filter_obj(filter_data, filter_keys):
+    """根据key过滤字典对象 ."""
+    filter_obj = FancyDict()
+    _filter_data = filter_data or {}
+    for key in filter_keys:
+        filter_obj[key] = _filter_data.get(key)
+    return filter_obj
