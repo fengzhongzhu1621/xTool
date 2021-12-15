@@ -2,8 +2,7 @@
 
 import logging
 
-from xTool.plugins.plugin import PluginType
-from xTool.plugins.plugin import register_plugin
+from xTool.plugin import PluginType, register_plugin
 from .chain import BeforeFilter, AfterFilter
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from xTool.plugins.plugin import (
+from xTool.plugin import (
     PluginType,
     register_plugin,
     get_plugin_instance)

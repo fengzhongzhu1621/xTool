@@ -311,10 +311,10 @@ def bytes_to_ip(ip_bytes):
 
 
 def get_unused_port() -> int:
-    sock = socket.socket()
-    sock.bind(("", 0))
-    port = sock.getsockname()[-1]
-    sock.close()
+    """获得本地未使用的端口号 ."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("", 0))
+        port = sock.getsockname()[-1]
     return port
 
 

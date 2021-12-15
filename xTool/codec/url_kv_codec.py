@@ -3,7 +3,7 @@
 from typing import Dict
 from urllib.parse import quote, unquote
 
-from xTool.plugins.plugin import register_plugin, PluginType
+from xTool.plugin import register_plugin, PluginType
 from .base import CodecType
 
 

@@ -6,14 +6,10 @@ import sys
 import warnings
 import codecs
 import re
-from distutils.command.build_ext import build_ext
 from distutils.errors import CCompilerError
 from distutils.errors import DistutilsExecError
 from distutils.errors import DistutilsPlatformError
 from setuptools.command.test import test as TestCommand
-
-from setuptools import setup
-from setuptools.extension import Extension
 
 extension_support = True  # Assume we are building C extensions.
 
@@ -43,7 +39,10 @@ if cython_installed:
     src_ext = '.pyx'
 else:
     src_ext = '.c'
-    def cythonize(obj): return obj
+
+
+    def cythonize(obj):
+        return obj
 
 
 def add_pywin32_to_install_requires():
@@ -128,9 +127,7 @@ class _PeeweeBuildExt(build_ext):
 
 
 class PyTest(TestCommand):
-    """
-    Provide a Test runner to be used from setup.py to run unit tests
-    """
+    """python setup.py test support pytest"""
 
     user_options = [("pytest-args=", "a", "Arguments to pass to pytest")]
 

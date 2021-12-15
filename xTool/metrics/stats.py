@@ -12,7 +12,7 @@ from datetime import timedelta
 from typing import Callable, Optional, TypeVar, cast, Sequence, Union
 from xTool.type_hint import Protocol
 from xTool.exceptions import InvalidStatsNameException
-from xTool.plugins.plugin import PluginType, register_plugin, get_plugin_instance
+from xTool.plugin import PluginType, register_plugin, get_plugin_instance
 from xTool.utils.timer import Timer
 from xTool.decorators.utils import safe_wraps
 from xTool.utils.dates import time_now

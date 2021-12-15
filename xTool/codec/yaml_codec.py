@@ -3,7 +3,7 @@
 from typing import Union, Dict, Hashable, Any, List
 
 import yaml
-from xTool.plugins.plugin import register_plugin, PluginType
+from xTool.plugin import register_plugin, PluginType
 from .base import CodecType
 
 

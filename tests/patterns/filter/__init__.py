@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from xTool.plugins.plugin import register_plugin
+from xTool.plugin import register_plugin, PluginType
 from xTool.patterns.filter.chain import Method, BeforeFilter, AfterFilter
-from xTool.plugins.plugin import PluginType
 
 
 class BusinessMethod(Method):
