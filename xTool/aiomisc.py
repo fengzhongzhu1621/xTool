@@ -25,12 +25,19 @@ import socket
 
 from xTool.utils.net import is_ipv6
 
-try:
-    import uvloop
+UVLOOP_INSTALLED = False
 
+try:
+    import uvloop  # type: ignore # noqa
+
+    UVLOOP_INSTALLED = True
     event_loop_policy = uvloop.EventLoopPolicy()
 except ImportError:
     event_loop_policy = asyncio.DefaultEventLoopPolicy()
+
+
+except ImportError:
+    pass
 
 log = logging.getLogger(__name__)
 
@@ -40,6 +47,7 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 try:
     import contextvars
+
 
     def context_partial(func: F, *args: Any, **kwargs: Any) -> Any:
         context = contextvars.copy_context()
@@ -52,6 +60,7 @@ except ImportError:
 try:
     from trio import open_file as open_async, Path  # type: ignore
 
+
     def stat_async(path):
         return Path(path).stat()
 
@@ -61,6 +70,7 @@ except ImportError:
     try:
         from aiofiles import open as aio_open  # type: ignore
         from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
+
 
         async def open_async(file, mode="r", **kwargs):
             return aio_open(file, mode, **kwargs)
@@ -74,11 +84,13 @@ if sys.version_info >= (3, 7):
 else:
     from asyncio import _get_running_loop
 
+
     def get_running_loop():
         loop = _get_running_loop()
         if loop is None:
             raise RuntimeError("no running event loop")
         return loop
+
 
     def create_task(coro):
         loop = get_running_loop()
@@ -214,7 +226,6 @@ def awaitable(func):
 def wrap_func(func):
     """将函数转换为协程，参考asyncio.coroutine ."""
     if not asyncio.iscoroutinefunction(func):
-
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
@@ -366,15 +377,17 @@ async def open_connection(
 
 
 if __name__ == "__main__":
-
     async def noop2(*args, **kwargs):
         return asyncio.sleep(1)
+
 
     async def task():
         return await DeprecationWaiter(noop2())
 
+
     async def task2():
         return DeprecationWaiter(noop2())
+
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(task())
