@@ -10,7 +10,8 @@ import psutil
 import asyncio
 import signal
 import logging
-
+from typing import Protocol
+from typing import Union
 from xTool.misc import USE_WINDOWS
 
 
@@ -211,11 +212,22 @@ def reap_process_group(pid, log, sig=signal.SIGTERM,
                     "Process %s (%s) could not be killed. Giving up.", p, p.pid)
 
 
-def ctrlc_workaround_for_windows(app):
-    async def stay_active(app):
+class AppProtocol(Protocol):
+
+    def stop(self):
+        ...
+
+    def add_task(self, task) -> None:
+        ...
+
+
+def ctrlc_workaround_for_windows(app: AppProtocol):
+    """在windows下重启进程 ."""
+    async def stay_active(app: AppProtocol):
         """Asyncio wakeups to allow receiving SIGINT in Python"""
         while not die:
             # If someone else stopped the app, just exit
+            # 判断程序是否终止
             if app.is_stopping:
                 return
             # Windows Python blocks signal handlers while the event loop is
