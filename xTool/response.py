@@ -12,7 +12,7 @@ from xTool.headers import format_http1, format_http1_response
 from xTool.header import remove_entity_headers
 from xTool.algorithms.collections.header import Header
 from xTool.status import has_message_body
-from xTool.compat import open_async
+from xTool.aiomisc import open_async
 
 
 try:

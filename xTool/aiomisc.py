@@ -376,6 +376,27 @@ async def open_connection(
     )
 
 
+try:
+    import trio  # type: ignore
+
+
+    def stat_async(path):
+        return trio.Path(path).stat()
+
+
+    open_async = trio.open_file
+    CancelledErrors = tuple([asyncio.CancelledError, trio.Cancelled])
+except ImportError:
+    from aiofiles import open as aio_open  # type: ignore
+    from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
+
+
+    async def open_async(file, mode="r", **kwargs):
+        return aio_open(file, mode, **kwargs)
+
+
+    CancelledErrors = tuple([asyncio.CancelledError])
+
 if __name__ == "__main__":
     async def noop2(*args, **kwargs):
         return asyncio.sleep(1)

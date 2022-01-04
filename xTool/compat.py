@@ -7,7 +7,6 @@ import itertools
 import logging
 import socket
 
-
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] >= 3
 
@@ -18,12 +17,13 @@ PY_36 = sys.version_info >= (3, 6)
 PY_37 = sys.version_info >= (3, 7)
 PY_38 = sys.version_info >= (3, 8)
 
-
 IS_HPUX = sys.platform.startswith('hp-ux')
 # Specifies whether the current runtime is HP-UX.
 IS_LINUX = sys.platform.startswith('linux')
 # Specifies whether the current runtime is HP-UX.
 IS_UNIX = hasattr(socket, 'AF_UNIX')
+
+
 # Specifies whether the current runtime is *NIX.
 
 
@@ -60,13 +60,11 @@ except NameError:
     def callable(object):
         return hasattr(object, '__call__')
 
-
 if PY3:
     try:
         from queue import SimpleQueue
     except ImportError:
         from queue import Queue as SimpleQueue  # type: ignore
-
 
 # Python 3.x (and backports) use a modified iterator syntax
 # This will allow 2.x to behave with 3.x iterators
@@ -86,7 +84,6 @@ if not hasattr(__builtins__, 'any'):
                 return True
         return False
 
-
 # Random numbers for rotation temp file names, using secrets module if available (Python 3.6).
 # Otherwise use `random.SystemRandom` if available, then fall back on
 # `random.Random`.
@@ -97,8 +94,8 @@ except ImportError:
     import random
 
     if hasattr(
-            random,
-            "SystemRandom"):  # May not be present in all Python editions
+        random,
+        "SystemRandom"):  # May not be present in all Python editions
         # Should be safe to reuse `SystemRandom` - not software state dependant
         randbits = random.SystemRandom().getrandbits
     else:
@@ -107,13 +104,13 @@ except ImportError:
 
 b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode('latin1'))
 
-
 if PY3:
     from inspect import getfullargspec as getargspec
     from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
     from urllib.parse import unquote
     import builtins
     import functools
+
     try:
         from collections.abc import Callable
     except ImportError:
@@ -132,7 +129,7 @@ if PY3:
     bytes_type = bytes
     buffer_type = memoryview
     string_types = (str,)
-    integer_types = (int, )
+    integer_types = (int,)
     basestring = str
     long = int
     unicode_type = str
@@ -142,10 +139,22 @@ if PY3:
     implements_to_string = _identity
     xrange = range
 
-    def iterkeys(d): return iter(d.keys())
-    def itervalues(d): return iter(d.values())
-    def iteritems(d): return iter(d.items())
-    def callable_(c): return isinstance(c, Callable)
+
+    def iterkeys(d):
+        return iter(d.keys())
+
+
+    def itervalues(d):
+        return iter(d.values())
+
+
+    def iteritems(d):
+        return iter(d.items())
+
+
+    def callable_(c):
+        return isinstance(c, Callable)
+
 
     def reraise(tp, value, tb=None):
         """
@@ -154,13 +163,14 @@ if PY3:
 
             try:
                 1/0
-            except Exception as err:  # pylint: disable=broad-except
-                error = err.with_traceback(sys.exc_info()[2]
+            except Exception as err: # pylint: disable=broad-except
+                error = err.with_traceback(sys.exc_info()[2]
                 raise error
         """
         if value.__traceback__ is not tb:
             raise value.with_traceback(tb)
         raise value
+
 
     def raise_exc_info(exc_info):
         try:
@@ -193,9 +203,20 @@ else:
     basestring_type = basestring  # noqa
     izip_longest = itertools.izip_longest
     callable_ = callable
-    def iterkeys(d): return d.iterkeys()
-    def itervalues(d): return d.itervalues()
-    def iteritems(d): return d.iteritems()
+
+
+    def iterkeys(d):
+        return d.iterkeys()
+
+
+    def itervalues(d):
+        return d.itervalues()
+
+
+    def iteritems(d):
+        return d.iteritems()
+
+
     from cStringIO import StringIO
 
     exec('def reraise(tp, value, tb=None):\n raise tp, value, tb')
@@ -204,17 +225,20 @@ else:
 def raise_exc_info(exc_info):
     raise exc_info[0], exc_info[1], exc_info[2]
 """)
+
+
     def print_(s):
         sys.stdout.write(s)
         sys.stdout.write('\n')
+
 
     def implements_to_string(cls):
         cls.__unicode__ = cls.__str__
         cls.__str__ = lambda x: x.__unicode__().encode('utf-8')
         return cls
 
-    FileNotFoundError = EnvironmentError
 
+    FileNotFoundError = EnvironmentError
 
 try:
     from sys import is_finalizing
@@ -227,7 +251,10 @@ except ImportError:
         def is_finalizing():
             # Not referencing any globals here
             return L != []
+
         return is_finalizing
+
+
     is_finalizing = _get_emulated_is_finalizing()
 
 
@@ -249,16 +276,8 @@ def with_metaclass(meta, *bases):
             if this_bases is None:
                 return type.__new__(cls, name, (), d)
             return meta(name, bases, d)
+
     return metaclass('temporary_class', None, {})
-
-
-try:
-    from trio import open_file as open_async, Path  # type: ignore
-
-    def stat_async(path):
-        return Path(path).stat()
-except ImportError:
-    pass
 
 
 def flatten_list_bytes(list_of_data):
