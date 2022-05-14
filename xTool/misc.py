@@ -5,6 +5,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from typing import List
 import os
 import io
 import re
@@ -527,3 +528,8 @@ def flatten(items):
             yield from flatten(x)
         else:
             yield x
+
+
+def unique_list(data: List):
+    """将列表去重，保持原有顺序 . """
+    return list(collections.OrderedDict.fromkeys(data))

@@ -186,3 +186,17 @@ def test_use_times_generator():
     assert actual == 2
     actual = auto_id_generator("c")
     assert actual == 1
+
+
+def test_unique_list():
+    actual = misc.unique_list(["2", "2", "1"])
+    expect = ["2", "1"]
+    assert actual == expect
+
+    actual = misc.unique_list(["1", "1", "2"])
+    expect = ["1", "2"]
+    assert actual == expect
+
+    actual = misc.unique_list([2, 2, 1])
+    expect = [2, 1]
+    assert actual == expect
