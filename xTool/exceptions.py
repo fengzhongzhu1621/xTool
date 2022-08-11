@@ -2,7 +2,7 @@
 
 from enum import Enum, unique, IntEnum
 
-from .status import STATUS_CODES
+from xTool.status import STATUS_CODES
 
 _http_status_exceptions = {}
 

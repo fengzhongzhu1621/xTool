@@ -18,16 +18,12 @@ websockets
 ujson
 PyYAML>=5.1
 trio
-cython
 ipaddress
 beautifulsoup4
 aiohttp
 async_timeout
-pytest
-pytest-sanic
 netifaces
 typing_extensions
-httpx==0.11.1
 statsd==3.3.0
 rapidjson
 python-snappy
