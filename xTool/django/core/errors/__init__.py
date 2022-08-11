@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _lazy
 
 class HttpError(Exception):
     status_code = 500
-    code = 0
+    code = -1
     message = _lazy("系统异常，请联系管理员")
     message_template = _lazy("系统异常，请联系管理员")
 
