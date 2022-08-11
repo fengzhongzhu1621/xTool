@@ -32,6 +32,5 @@ statsd==3.3.0
 rapidjson
 python-snappy
 tzlocal
-monkeypatch
 speaklater
 curlify
