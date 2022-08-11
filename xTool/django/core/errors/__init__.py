@@ -18,5 +18,5 @@ class HttpError(Exception):
             except Exception:  # noqa
                 pass
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.message)
