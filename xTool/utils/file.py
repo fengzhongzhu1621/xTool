@@ -84,9 +84,7 @@ def list_py_file_paths(
     ignore_filename='.ignore',
     file_ext='.py',
     safe_mode=False,
-    safe_filters=(
-        b'xTool',
-        b'XTool')):
+    safe_filters=(b'xTool', b'XTool')):
     """递归遍历目录，返回匹配规则的文件列表
     Traverse a directory and look for Python files.
 

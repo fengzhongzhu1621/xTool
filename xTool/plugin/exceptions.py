@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from x_rpc.exceptions import XRPCException
+from xTool.exceptions import XToolException
 
 
-class PluginException(XRPCException):
+class PluginException(XToolException):
     pass
 
 
