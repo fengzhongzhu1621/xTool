@@ -31,6 +31,7 @@ class TriggerRule(object):
     DUMMY = 'dummy'
 
     _ALL_TRIGGER_RULES = {}
+
     @classmethod
     def is_valid(cls, trigger_rule):
         return trigger_rule in cls.all_triggers()
@@ -40,7 +41,7 @@ class TriggerRule(object):
         if not cls._ALL_TRIGGER_RULES:
             cls._ALL_TRIGGER_RULES = {
                 getattr(cls, attr)
-                for attr in dir(cls)
-                if not attr.startswith("_") and not callable(getattr(cls, attr))
+                for attr in dir(cls) if not attr.startswith("_")
+                and not callable(getattr(cls, attr))
             }
         return cls._ALL_TRIGGER_RULES
