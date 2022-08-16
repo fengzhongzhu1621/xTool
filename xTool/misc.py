@@ -20,13 +20,17 @@ import warnings
 import itertools
 import hashlib
 import collections
+import decimal
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    np = None
+
 import psutil
 from asyncio.constants import DEBUG_STACK_DEPTH
 
 from xTool.compat import basestring
-
 
 # Determine platform being used.
 system = platform.system()
@@ -53,9 +57,7 @@ else:
     izip_longest = itertools.izip_longest
 zip_longest = izip_longest
 
-
 sentinel = object()  # type: Any
-
 
 CHAR = set(chr(i) for i in range(0, 128))
 CTL = set(chr(i) for i in range(0, 32)) | {chr(127), }
@@ -151,15 +153,35 @@ class NumpyJsonEncoder(json.JSONEncoder):
             return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
         elif isinstance(obj, date):
             return obj.strftime('%Y-%m-%d')
-        elif type(obj) in (np.int_, np.intc, np.intp, np.int8, np.int16,
-                           np.int32, np.int64, np.uint8, np.uint16,
-                           np.uint32, np.uint64):
-            return int(obj)
-        elif type(obj) in (np.bool_,):
-            return bool(obj)
-        elif type(obj) in (np.float_, np.float16, np.float32, np.float64,
-                           np.complex_, np.complex64, np.complex128):
-            return float(obj)
+        elif isinstance(obj, datetime.time):
+            return obj.strftime('%H:%M:%S')
+        elif isinstance(obj, decimal.Decimal):
+            return str(obj)
+        elif isinstance(obj, set):
+            return list(obj)
+        if np:
+            if type(obj) in (np.int_,
+                             np.intc,
+                             np.intp,
+                             np.int8,
+                             np.int16,
+                             np.int32,
+                             np.int64,
+                             np.uint8,
+                             np.uint16,
+                             np.uint32,
+                             np.uint64):
+                return int(obj)
+            elif type(obj) in (np.bool_,):
+                return bool(obj)
+            elif type(obj) in (np.float_,
+                               np.float16,
+                               np.float32,
+                               np.float64,
+                               np.complex_,
+                               np.complex64,
+                               np.complex128):
+                return float(obj)
 
         # Let the base class default method raise the TypeError
         return json.JSONEncoder.default(self, obj)
@@ -458,7 +480,8 @@ def is_iterable(obj):
 
 
 if hasattr(sys, "_getframe"):
-    def get_current_frame(): return sys._getframe(3)
+    def get_current_frame():
+        return sys._getframe(3)
 else:  # pragma: no cover
 
     def get_current_frame():
