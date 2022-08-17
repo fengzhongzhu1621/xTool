@@ -27,7 +27,7 @@ def register(
                 with metric._lock:
                     metric._metrics = {}
             metric._metric_init()
-            # 执行函数
+            # 对metric进行后续处理
             func(_self, metric)
             return metric
 
