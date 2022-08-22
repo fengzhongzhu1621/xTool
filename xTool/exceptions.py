@@ -23,6 +23,7 @@ def add_status_code(code, quiet=None):
 
 
 class HttpStatusException(Exception):
+
     def __init__(self, message, status_code=None, quiet=None):
         super().__init__(message)
 
@@ -46,6 +47,7 @@ class InvalidUsage(HttpStatusException):
 
 @add_status_code(405)
 class MethodNotSupported(HttpStatusException):
+
     def __init__(self, message, _, allowed_methods):
         super().__init__(message)
         self.headers = {"Allow": ", ".join(allowed_methods)}
@@ -69,6 +71,7 @@ class URLBuildError(ServerError):
 
 
 class FileNotFound(NotFound):
+
     def __init__(self, message, path, relative_url):
         super().__init__(message)
         self.path = path
@@ -99,6 +102,7 @@ class HeaderNotFound(InvalidUsage):
 
 @add_status_code(416)
 class ContentRangeError(HttpStatusException):
+
     def __init__(self, message, content_range):
         super().__init__(message)
         self.headers = {"Content-Range": f"bytes */{content_range.total}"}
@@ -119,6 +123,7 @@ class InvalidRangeType(ContentRangeError):
 
 
 class PyFileError(Exception):
+
     def __init__(self, file):
         super().__init__("could not execute config file %s", file)
 
@@ -167,7 +172,9 @@ class Unauthorized(HttpStatusException):
             values = ['{!s}="{!s}"'.format(k, v) for k, v in kwargs.items()]
             challenge = ", ".join(values)
 
-            self.headers = {"WWW-Authenticate": f"{scheme} {challenge}".rstrip()}
+            self.headers = {
+                "WWW-Authenticate": f"{scheme} {challenge}".rstrip()
+            }
 
 
 def abort(status_code, message=None):
@@ -184,8 +191,7 @@ def abort(status_code, message=None):
         # These are stored as bytes in the STATUS_CODES dict
         message = message.decode("utf8")
     http_status_exception = _http_status_exceptions.get(
-        status_code, HttpStatusException
-    )
+        status_code, HttpStatusException)
     raise http_status_exception(message=message, status_code=status_code)
 
 
@@ -245,6 +251,21 @@ class XToolException(AirflowException):
     """
 
     status_code = 500
+    code = -1
+    message = "系统异常，请联系管理员"
+    message_template = "系统异常，请联系管理员"
+
+    def __init__(self, data=None, extra=None, **kwargs) -> None:
+        self.data = data
+        self.extra = extra if extra else {}
+        if kwargs:
+            try:
+                self.message = self.message_template.format(**kwargs)
+            except Exception:  # noqa
+                pass
+
+    def __str__(self) -> str:
+        return str(self.message)
 
 
 class XToolBadRequest(XToolException):
@@ -368,13 +389,16 @@ class ErrMessage(Enum):
 
 
 class BaseErrorException(Exception):
-    def __init__(self, exception_type: ErrorType, code: ErrorCode, message: str):
+
+    def __init__(self, exception_type: ErrorType, code: ErrorCode,
+                 message: str):
         self.type = exception_type
         self.code = code
         self.message = str(message)
 
 
 class SDKError(BaseErrorException):
+
     def __init__(self, code: ErrorCode, message: str):
         super().__init__(ErrorType.SDKError, code, message)
 
