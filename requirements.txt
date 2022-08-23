@@ -30,3 +30,4 @@ python-snappy
 tzlocal
 speaklater
 curlify
+django
