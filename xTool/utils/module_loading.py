@@ -17,7 +17,6 @@ from six import iteritems
 from xTool.exceptions import XToolException
 from xTool.utils.log.logging_mixin import LoggingMixin
 
-
 log = LoggingMixin().log
 
 
@@ -75,8 +74,8 @@ def create_object_from_plugin_module(name, *args, **kwargs):
     class_name = items[1]
     if plugin_module_name in globals():
         # 根据插件中的类名创建对象
-        return globals()[plugin_module_name].__dict__[
-            class_name](*args, **kwargs)
+        return globals()[plugin_module_name].__dict__[class_name](*args,
+                                                                  **kwargs)
     else:
         raise XToolException("Executor {0} not supported.".format(name))
 
@@ -108,10 +107,8 @@ def load_backend_module_from_conf(section, key, default_backend, conf=None):
     try:
         module = import_module(backend)
     except ImportError as err:
-        log.critical(
-            "Cannot import %s for %s %s due to: %s",
-            backend, section, key, err
-        )
+        log.critical("Cannot import %s for %s %s due to: %s", backend, section,
+                     key, err)
         raise XToolException(err)
 
     return module
@@ -138,10 +135,10 @@ def import_string(dotted_path):
     try:
         # 返回模块中的类
         return getattr(module, class_name)
-    except AttributeError as err:
-        raise ImportError('Module "{}" does not define a "{}" attribute/class'.format(
-            module_path, class_name)
-        )
+    except AttributeError:
+        raise ImportError(
+            'Module "{}" does not define a "{}" attribute/class'.format(
+                module_path, class_name))
 
 
 def import_string_from_package(module_name, package=None):
