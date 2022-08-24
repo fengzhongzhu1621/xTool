@@ -31,3 +31,14 @@ tzlocal
 speaklater
 curlify
 django
+djangorestframework
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-otlp-proto-http
+opentelemetry-instrumentation-django
+opentelemetry-instrumentation-elasticsearch
+opentelemetry-instrumentation-dbapi
+opentelemetry-instrumentation-redis
+opentelemetry-instrumentation-requests
+opentelemetry-instrumentation-celery
+opentelemetry-instrumentation-logging
