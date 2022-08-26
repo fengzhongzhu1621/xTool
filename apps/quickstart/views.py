@@ -1,6 +1,11 @@
 from django.contrib.auth.models import User, Group
 
-from apps.quickstart.serializers import UserSerializer, GroupSerializer
+from apps.quickstart.serializers import (
+    UserSerializer,
+    GroupSerializer,
+    UserSerializer2,
+)
+from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
 
@@ -21,3 +26,13 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer2
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer2

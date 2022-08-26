@@ -11,4 +11,6 @@ router.register(r'groups', views.GroupViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path('users2/', views.UserList.as_view()),
+    path('users2/<int:pk>/', views.UserDetail.as_view()),
 ]
