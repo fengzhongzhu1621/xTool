@@ -2,7 +2,7 @@
 
 from xTool.patterns.filter.chain import FilterChain
 from xTool.plugin import get_plugin_instance, PluginType
-from tests.patterns.filter import BusinessMethod, BusinessAfterFilter, BusinessBeforeFilter
+from . import BusinessMethod, BusinessAfterFilter, BusinessBeforeFilter
 
 
 class Context:

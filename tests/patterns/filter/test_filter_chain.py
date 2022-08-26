@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from xTool.patterns.filter.chain import FilterChain
-from tests.patterns.filter import BusinessMethod, BusinessAfterFilter, BusinessBeforeFilter
+from . import BusinessMethod, BusinessAfterFilter, BusinessBeforeFilter
 
 
 class Context:
