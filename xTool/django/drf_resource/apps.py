@@ -3,7 +3,7 @@
 from django.apps import AppConfig
 
 
-class DrfResourceAppConifg(AppConfig):
+class DrfResourceAppConfig(AppConfig):
     # 指向此应用程序的完整的 Python 格式的路径
     # 每个 AppConfig 子类都必须包含此项。
     # 它必须在整个 Django 项目中唯一。
