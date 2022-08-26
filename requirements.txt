@@ -30,6 +30,7 @@ python-snappy
 tzlocal
 speaklater
 curlify
+pymysql
 django
 djangorestframework
 opentelemetry-api
@@ -42,3 +43,4 @@ opentelemetry-instrumentation-redis
 opentelemetry-instrumentation-requests
 opentelemetry-instrumentation-celery
 opentelemetry-instrumentation-logging
+pygments
