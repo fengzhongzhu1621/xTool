@@ -1,7 +1,23 @@
-from django.urls import path
+from django.urls import path, include
 
 from apps.snippets import views
+from rest_framework import renderers
+from rest_framework.routers import DefaultRouter
 from rest_framework.urlpatterns import format_suffix_patterns
+
+snippet_list = views.SnippetViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+snippet_detail = views.SnippetViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+snippet_highlight = views.SnippetViewSet.as_view({
+    'get': 'highlight'
+}, renderer_classes=[renderers.StaticHTMLRenderer])
 
 urlpatterns = [
     path('snippets1/', views.snippet_list_1, name='snippet-list-1'),
@@ -18,8 +34,20 @@ urlpatterns = [
 
     path('snippets5/', views.SnippetList5.as_view(), name='snippet-list-5'),
     path('snippets5/<int:pk>/', views.SnippetDetail5.as_view(), name='snippet-detail-5'),
+    path('snippets5/<int:pk>/highlight/', views.SnippetHighlight.as_view()),
 
-    path('snippets/<int:pk>/highlight/', views.SnippetHighlight.as_view()),
+    path('snippets6/', snippet_list, name='snippet-list'),
+    path('snippets6/<int:pk>/', snippet_detail, name='snippet-detail'),
+    path('snippets6/<int:pk>/highlight/', snippet_highlight, name='snippet-highlight'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
+
+# Create a router and register our viewsets with it.
+router = DefaultRouter()
+router.register(r'snippets', views.SnippetViewSet, basename="snippets")
+
+# The API URLs are now determined automatically by the router.
+urlpatterns += [
+    path('snippets7', include(router.urls)),
+]
