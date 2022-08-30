@@ -1,20 +1,35 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod, ABCMeta
 from typing import Dict, List, Union, Optional
 
-from django.utils.translation import ugettext as _
 from django.db import models
+from django.utils.translation import gettext as _
 from opentelemetry import trace
+
 from rest_framework.exceptions import APIException
+from xTool.plugin import (
+    PluginType,
+    register_plugin)
 
 tracer = trace.get_tracer(__name__)
 logger = logging.getLogger(__name__)
 
 
-class Resource(metaclass=ABCMeta):
+class ResourceMeta(ABCMeta):
+    def __new__(cls, name, bases, attrs):
+        super_new = super().__new__
+        parents = [b for b in bases if isinstance(b, ResourceMeta)]
+        if not parents:
+            return super_new(cls, name, bases, attrs)
+        new_class = super_new(cls, name, bases, attrs)
+        # 自动注册资源类
+        register_plugin(PluginType.drf_resource, new_class.__name__)(new_class)
+        return new_class
+
+
+class Resource(metaclass=ResourceMeta):
     RequestSerializer = None
     ResponseSerializer = None
 
@@ -82,12 +97,12 @@ class Resource(metaclass=ABCMeta):
 
     @abstractmethod
     def perform_request(
-            self, validated_request_data: Optional[Dict]) -> Union[List, Dict]:
+        self, validated_request_data: Optional[Dict]) -> Union[List, Dict]:
         """执行请求操作 ."""
         ...
 
     def validate_response_data(
-            self, response_data: Union[List, Dict]) -> Union[List, Dict]:
+        self, response_data: Union[List, Dict]) -> Union[List, Dict]:
         """验证请求返回的数据 ."""
         if not self.ResponseSerializer:
             return response_data

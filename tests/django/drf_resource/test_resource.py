@@ -3,11 +3,14 @@
 from typing import Dict, List, Optional
 
 import pytest
+
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
+from xTool.django.drf_resource import api
 from xTool.django.drf_resource.base import Resource
 
 
+# @register_plugin(PluginType.drf_resource, "MockResource")
 class MockResource(Resource):
 
     def perform_request(self,
@@ -18,7 +21,6 @@ class MockResource(Resource):
 
 
 class MockResourceWithRequestSerializer(MockResource):
-
     class RequestSerializer(serializers.Serializer):
         name = serializers.CharField(label="name", required=True)
 
@@ -44,3 +46,9 @@ class TestResource:
             MockResourceWithRequestSerializer().request()
         actual = MockResourceWithRequestSerializer().request({"name": 'a'})
         assert actual == {"name": 'a'}
+
+    def test_api(self):
+        actual = api.MockResource.request()
+        assert actual == ['hello world']
+        actual = api.MockResource()
+        assert actual == ['hello world']

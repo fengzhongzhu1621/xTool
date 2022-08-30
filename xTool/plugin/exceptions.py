@@ -9,3 +9,7 @@ class PluginException(XToolException):
 
 class PluginTypeNotFound(PluginException):
     pass
+
+
+class PluginHaveInstalled(PluginException):
+    pass
