@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'apps.core.drf_resource',
     'apps.quickstart',
     'apps.snippets',
 ]

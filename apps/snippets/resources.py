@@ -1,8 +1,8 @@
 from typing import Optional, Union, List, Dict
 
+from apps.core.drf_resource import Resource
 from apps.snippets.models import Snippet
 from rest_framework.viewsets import GenericViewSet
-from xTool.django.drf_resource import Resource
 
 
 class SnippetHighlight(Resource, GenericViewSet):

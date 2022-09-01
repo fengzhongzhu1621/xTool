@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from django.utils.translation import ugettext_lazy as _lazy
-from xTool.django.core.errors import HttpError
+from django.utils.translation import gettext_lazy as _lazy
+
+from apps.core.errors import HttpError
 
 
 class HttpErrorExample(HttpError):

@@ -3,17 +3,17 @@
 from typing import Dict, List, Optional
 
 import pytest
+from apps.core.drf_resource import api
+from apps.core.drf_resource.base import Resource
 
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
-from xTool.django.drf_resource import api
-from xTool.django.drf_resource.base import Resource
 
 
 # @register_plugin(PluginType.drf_resource, "MockResource")
 class MockResource(Resource):
     plugin_type = "test"
-    
+
     def perform_request(self,
                         validated_request_data: Optional[Dict] = None) -> List:
         if validated_request_data:

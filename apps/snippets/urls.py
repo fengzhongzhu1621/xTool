@@ -44,16 +44,14 @@ urlpatterns = [
 urlpatterns = format_suffix_patterns(urlpatterns)
 
 # Create a router and register our viewsets with it.
-router = DefaultRouter()
-router.register('snippets7', views.SnippetViewSet, basename="snippets7")
-
-# The API URLs are now determined automatically by the router.
-urlpatterns += [
-    path('', include(router.urls)),
-]
+# router = DefaultRouter()
+# router.register('snippets7', views.SnippetViewSet, basename="snippets7")
+# urlpatterns += [
+#     path('', include(router.urls)),
+# ]
 
 resource_router = DefaultRouter()
-router.register('snippets8', views.SnippetRouterViewSet, basename="snippets8")
+resource_router.register('snippets8', views.SnippetRouterViewSet, basename="resource_router_snippets8")
 urlpatterns += [
     path('', include(resource_router.urls)),
 ]
