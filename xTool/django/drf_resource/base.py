@@ -10,7 +10,6 @@ from opentelemetry import trace
 
 from rest_framework.exceptions import APIException
 from xTool.plugin import (
-    PluginType,
     register_plugin)
 
 tracer = trace.get_tracer(__name__)
@@ -24,8 +23,12 @@ class ResourceMeta(ABCMeta):
         if not parents:
             return super_new(cls, name, bases, attrs)
         new_class = super_new(cls, name, bases, attrs)
+        class_name = new_class.__name__
         # 自动注册资源类
-        register_plugin(PluginType.drf_resource, new_class.__name__)(new_class)
+        plugin_type = getattr(new_class, "plugin_type")
+        if not plugin_type:
+            raise Exception("plugin_type not set in class %s" % class_name)
+        register_plugin(plugin_type, class_name)(new_class)
         return new_class
 
 

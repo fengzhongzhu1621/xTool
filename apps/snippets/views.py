@@ -16,6 +16,7 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from xTool.django.drf_resource import api, ResourceViewSet, ResourceRoute
 
 
 @csrf_exempt
@@ -229,3 +230,9 @@ class SnippetViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class SnippetRouterViewSet(ResourceViewSet):
+    resource_routes = [
+        ResourceRoute(method="GET", endpoint="", resource_class=api)
+    ]

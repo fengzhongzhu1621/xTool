@@ -12,7 +12,8 @@ from xTool.django.drf_resource.base import Resource
 
 # @register_plugin(PluginType.drf_resource, "MockResource")
 class MockResource(Resource):
-
+    plugin_type = "test"
+    
     def perform_request(self,
                         validated_request_data: Optional[Dict] = None) -> List:
         if validated_request_data:
@@ -47,8 +48,9 @@ class TestResource:
         actual = MockResourceWithRequestSerializer().request({"name": 'a'})
         assert actual == {"name": 'a'}
 
-    def test_api(self):
-        actual = api.MockResource.request()
-        assert actual == ['hello world']
-        actual = api.MockResource()
-        assert actual == ['hello world']
+
+def test_api():
+    actual = api.test.MockResource.request()
+    assert actual == ['hello world']
+    actual = api.test.MockResource()
+    assert actual == ['hello world']

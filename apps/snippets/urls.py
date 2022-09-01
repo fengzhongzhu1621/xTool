@@ -52,7 +52,7 @@ urlpatterns += [
     path('', include(router.urls)),
 ]
 
-resource_router = ResourceRouter()
+resource_router = DefaultRouter()
 router.register('snippets8', views.SnippetRouterViewSet, basename="snippets8")
 urlpatterns += [
     path('', include(resource_router.urls)),

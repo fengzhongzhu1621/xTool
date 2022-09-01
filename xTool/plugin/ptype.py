@@ -1,6 +1,3 @@
-from xTool.algorithms.collections.attrdict import FancyDict
-
-
 class _PluginType(dict):
     def __getattr__(self, key):
         try:
