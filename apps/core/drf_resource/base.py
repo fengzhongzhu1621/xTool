@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 class ResourceMeta(ABCMeta):
+    """自动注册资源类 ."""
+
     def __new__(cls, name, bases, attrs):
         super_new = super().__new__
         parents = [b for b in bases if isinstance(b, ResourceMeta)]
@@ -86,6 +88,7 @@ class Resource(metaclass=ResourceMeta):
         else:
             request_serializer_obj = self.RequestSerializer(
                 data=request_data, many=self.many_request_data)
+            # 验证输入参数
             if not request_serializer_obj.is_valid():
                 errors = request_serializer_obj.errors
                 resource_name = self.get_resource_name()

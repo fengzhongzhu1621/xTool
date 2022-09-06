@@ -36,14 +36,15 @@ class TestSnippetSerializer:
             # You must call `.is_valid()` before accessing `.validated_data`
             serializer.validated_data
 
-    def test_validated_datak(self):
+    def test_validated_data(self):
         snippet = Snippet(code='print("hello, world")\n')
         snippet.save()
         serializer = SnippetSerializer(snippet)
         # 将json转换为字符串
         content = JSONRenderer().render(serializer.data)
         assert content == (b'{"id":1,"title":"","code":"print(\\"hello, world\\")\\n","linenos":false,'
-                           b'"language":"python","style":"friendly"}')  # 将字符串转换为json对象
+                           b'"language":"python","style":"friendly"}')
+        # 将字符串转换为json对象
         stream = io.BytesIO(content)
         data = JSONParser().parse(stream)
         assert data == {
@@ -55,6 +56,12 @@ class TestSnippetSerializer:
             'title': ''
         }
         # 验证数据
+        # In particular, if a `data=` argument is passed then:
+        # .is_valid() - Available.
+        # .initial_data - Available.
+        # .validated_data - Only available after calling `is_valid()`
+        # .errors - Only available after calling `is_valid()`
+        # .data - Only available after calling `is_valid()`
         serializer = SnippetSerializer(data=data)
         assert serializer.initial_data == data
         serializer.is_valid()
@@ -73,7 +80,11 @@ class TestSnippetSerializer2:
         serializer = SnippetSerializer2()
         actual = repr(serializer)
         expect = ('SnippetSerializer2():\n'
+                  "    url = HyperlinkedIdentityField(view_name='snippet-detail')\n"
                   "    id = IntegerField(label='ID', read_only=True)\n"
+                  "    highlight = HyperlinkedIdentityField(format='html', "
+                  "view_name='snippet-highlight')\n"
+                  "    owner = ReadOnlyField(source='owner.username')\n"
                   '    title = CharField(allow_blank=True, max_length=100, required=False)\n'
                   "    code = CharField(style={'base_template': 'textarea.html'})\n"
                   '    linenos = BooleanField(required=False)\n'
