@@ -36,6 +36,12 @@ class SerializerRequiredIsFalseAndAllowNoneIsFalse(serializers.Serializer):
     field = serializers.CharField(required=False, allow_null=False)
 
 
+class SerializerRequiredIsFalseDefault(serializers.Serializer):
+    field_1 = serializers.ListField(required=False, default=[])
+    field_2 = serializers.ListField(required=False, default=[], allow_null=True)
+    field_3 = serializers.ListField(required=False, default=[])
+
+
 class TestSerializer:
 
     def test_field(self):
@@ -162,3 +168,13 @@ class TestSerializer:
         serializer = serializer_cls(data=data)
         assert serializer.is_valid() is is_valid
         assert serializer.data == output
+
+    def test_default(self):
+        serializer = SerializerRequiredIsFalseDefault(data={})
+        assert serializer.is_valid() is True
+        assert serializer.data == {'field_1': [], 'field_2': [], 'field_3': []}
+
+        serializer = SerializerRequiredIsFalseDefault(data={"field_2": None})
+        assert serializer.is_valid() is True
+        assert serializer.data == {'field_1': [], 'field_2': None, 'field_3': []}
+
