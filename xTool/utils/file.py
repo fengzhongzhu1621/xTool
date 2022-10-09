@@ -112,7 +112,7 @@ def list_py_file_paths(
                     # If we have new patterns create a copy so we don't change
                     # the previous list (which would affect other subdirs)
                     patterns = patterns + \
-                        [p for p in f.read().split('\n') if p]
+                               [p for p in f.read().split('\n') if p]
 
             # If we can ignore any subdirs entirely we should - fewer paths
             # to walk is better. We have to modify the ``dirs`` array in
@@ -138,7 +138,7 @@ def list_py_file_paths(
                     mod_name, file_extension = os.path.splitext(
                         os.path.split(file_path)[-1])
                     if file_extension != file_ext and not zipfile.is_zipfile(
-                            file_path):
+                        file_path):
                         continue
                     # 验证忽略规则
                     if any([re.findall(p, file_path) for p in patterns]):
@@ -162,3 +162,24 @@ def list_py_file_paths(
                     log = LoggingMixin().log
                     log.exception("Error while examining %s", f)
     return file_paths
+
+
+class DiskWalk:
+    """API for getting directory walking collections"""
+
+    def __init__(self, path: str):
+        self.path = path
+
+    def enumerate_file_paths(self):
+        """Returns the path to all the files in a directory as a list"""
+        for dir_path, _, filenames in os.walk(self.path):
+            for file in filenames:
+                full_path = os.path.join(dir_path, file)
+                yield full_path
+
+    def enumerate_dir_paths(self):
+        """Returns all the directories in a directory as a list"""
+        for dir_path, dir_names, _ in os.walk(self.path):
+            for dirname in dir_names:
+                full_path = os.path.join(dir_path, dirname)
+                yield full_path
