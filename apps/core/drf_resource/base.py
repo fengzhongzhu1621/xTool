@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import logging
 from abc import abstractmethod, ABCMeta
 from typing import Dict, List, Union, Optional
 
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext as _
-from opentelemetry import trace
+from xTool.apps.core.drf_resource.logger import tracer, logger
 
 from rest_framework.exceptions import APIException
 from xTool.plugin import (
     register_plugin)
-
-tracer = trace.get_tracer(__name__)
-logger = logging.getLogger(__name__)
 
 
 class ResourceMeta(ABCMeta):
@@ -30,13 +27,14 @@ class ResourceMeta(ABCMeta):
         plugin_type = getattr(new_class, "plugin_type")
         if not plugin_type:
             raise Exception("plugin_type not set in class %s" % class_name)
+        # 注册为一个插件
         register_plugin(plugin_type, class_name)(new_class)
         return new_class
 
 
 class Resource(metaclass=ResourceMeta):
-    RequestSerializer = None
-    ResponseSerializer = None
+    RequestSerializer = None  # 请求序列化器
+    ResponseSerializer = None  # 响应序列化器
 
     many_request_data = False
     many_response_data = False
@@ -47,87 +45,112 @@ class Resource(metaclass=ResourceMeta):
 
     @classmethod
     def get_resource_name(cls):
+        """获得资源名称 ."""
         return cls.__name__
 
+    @property
+    def request_serializer(self):
+        return self._request_serializer_obj
+
+    @property
+    def response_serializer(self):
+        return self._response_serializer_obj
+
     def __call__(self, request_data: Optional[Dict] = None):
-        # thread safe
-        tmp_resource = self.__class__()
-        return tmp_resource.request(request_data)
+        start_time = timezone.now()
+        try:
+            logger.info()
+            tmp_resource = self.__class__()
+            response_data = tmp_resource.request(request_data)
+        except Exception as exc_info:
+            logger.exception(exc_info)
+            response_data = str(exc_info)
+            raise exc_info
+        finally:
+            end_time = timezone.now()
+            logger.info("Resource => %s, StartTime => %s, EndTime => %s, RequestData => %s, ResponseData = %s",
+                        self.get_resource_name(),
+                        start_time,
+                        end_time,
+                        request_data,
+                        response_data,
+                        )
 
-    def request(self,
-                request_data: Optional[Dict] = None) -> Union[List, Dict]:
-        """执行完整的请求 ."""
-        span_name = f"drf_resource/{self.get_resource_name()}"
-        with tracer.start_as_current_span(span_name):
-            # 验证请求参数
-            validated_request_data = self.validate_request_data(request_data)
-            # 执行请求操作
-            response_data = self.perform_request(validated_request_data)
-            # 验证响应结果
-            validated_response_data = self.validate_response_data(
-                response_data)
-            return validated_response_data
-
-    def validate_request_data(self,
-                              request_data: Optional[Dict]) -> Optional[Dict]:
-        """验证请求参数 ."""
-        if not self.RequestSerializer:
-            # 不进行参数验证
-            return request_data
-        # In particular, if a `data=` argument is passed then:
-        # .is_valid() - Available.
-        # .initial_data - Available.
-        # .validated_data - Only available after calling `is_valid()`
-        # .errors - Only available after calling `is_valid()`
-        # .data - Only available after calling `is_valid()`
-        if isinstance(request_data, (models.Model, models.QuerySet)):
-            request_serializer_obj = self.RequestSerializer(
-                request_data, many=self.many_request_data)
-            # 返回传出的原始数据
-            result = request_serializer_obj.data
-        else:
-            request_serializer_obj = self.RequestSerializer(
-                data=request_data, many=self.many_request_data)
-            # 验证输入参数
-            if not request_serializer_obj.is_valid():
-                errors = request_serializer_obj.errors
-                resource_name = self.get_resource_name()
-                err_message = _(f"Resource[{resource_name}] 请求参数格式错误：{errors}")
-                logger.error(err_message)
-                raise APIException(err_message)
-            # 返回经过验证后的传入数据
-            result = request_serializer_obj.validated_data
-
-        self._request_serializer_obj = request_serializer_obj
-        return result
-
-    @abstractmethod
-    def perform_request(
-        self, validated_request_data: Optional[Dict]) -> Union[List, Dict]:
-        """执行请求操作 ."""
-        ...
-
-    def validate_response_data(
-        self, response_data: Union[List, Dict]) -> Union[List, Dict]:
-        """验证请求返回的数据 ."""
-        if not self.ResponseSerializer:
             return response_data
 
-        # model类型的数据需要特殊处理
-        if isinstance(response_data, (models.Model, models.QuerySet)):
-            response_serializer_obj = self.ResponseSerializer(
-                response_data, many=self.many_response_data)
-            result = response_serializer_obj.data
-        else:
-            response_serializer_obj = self.ResponseSerializer(
-                data=response_data, many=self.many_response_data)
+        def request(self, request_data: Optional[Dict] = None) -> Union[List, Dict]:
+            """执行入口 ."""
+            span_name = f"drf_resource/{self.get_resource_name()}"
+            with tracer.start_as_current_span(span_name):
+                # 验证请求参数
+                validated_request_data = self.validate_request_data(request_data)
+                # 执行请求操作
+                response_data = self.perform_request(validated_request_data)
+                # 验证响应结果
+                validated_response_data = self.validate_response_data(
+                    response_data)
+                return validated_response_data
+
+        def validate_request_data(self, request_data: Optional[Dict]) -> Optional[Dict]:
+            """验证请求参数 ."""
+            if not self.RequestSerializer:
+                # 不进行参数验证
+                return request_data
+            # In particular, if a `data=` argument is passed then:
+            # .is_valid() - Available.
+            # .initial_data - Available.
+            # .validated_data - Only available after calling `is_valid()`
+            # .errors - Only available after calling `is_valid()`
+            # .data - Only available after calling `is_valid()`
+            if isinstance(request_data, (models.Model, models.QuerySet)):
+                request_serializer_obj = self.RequestSerializer(
+                    request_data, many=self.many_request_data)
+                # 返回传出的原始数据
+                result = request_serializer_obj.data
+            else:
+                request_serializer_obj = self.RequestSerializer(
+                    data=request_data, many=self.many_request_data)
+                # 验证输入参数
+                if not request_serializer_obj.is_valid():
+                    errors = request_serializer_obj.errors
+                    resource_name = self.get_resource_name()
+                    err_message = _(f"Resource[{resource_name}] 请求参数格式错误：{errors}")
+                    logger.error(err_message)
+                    raise APIException(err_message)
+                # 返回经过验证后的传入数据
+                result = request_serializer_obj.validated_data
+
+            self._request_serializer_obj = request_serializer_obj
+            return result
+
+        @abstractmethod
+        def perform_request(
+            self, validated_request_data: Optional[Dict]) -> Union[List, Dict]:
+            """执行请求操作 ."""
+            ...
+
+        def validate_response_data(
+            self, response_data: Union[List, Dict]) -> Union[List, Dict]:
+            """验证请求返回的数据 ."""
+            if not self.ResponseSerializer:
+                # 没有响应序列化器则直接返回结果
+                return response_data
+
+            # model类型的数据需要特殊处理
+            if isinstance(response_data, (models.Model, models.QuerySet)):
+                response_serializer_obj = self.ResponseSerializer(
+                    response_data, many=self.many_response_data)
+                result = response_serializer_obj.data
+            else:
+                response_serializer_obj = self.ResponseSerializer(
+                    data=response_data, many=self.many_response_data)
+                self._response_serializer_obj = response_serializer_obj
+                if not response_serializer_obj.is_valid():
+                    errors = response_serializer_obj.errors
+                    resource_name = self.get_resource_name()
+                    err_message = _(f"Resource[{resource_name}] 返回参数格式错误：{errors}")
+                    logger.error(err_message)
+                    raise APIException(err_message)
+                result = response_serializer_obj.validated_data
             self._response_serializer_obj = response_serializer_obj
-            if not response_serializer_obj.is_valid():
-                errors = response_serializer_obj.errors
-                resource_name = self.get_resource_name()
-                err_message = _(f"Resource[{resource_name}] 返回参数格式错误：{errors}")
-                logger.error(err_message)
-                raise APIException(err_message)
-            result = response_serializer_obj.validated_data
-        self._response_serializer_obj = response_serializer_obj
-        return result
+            return result

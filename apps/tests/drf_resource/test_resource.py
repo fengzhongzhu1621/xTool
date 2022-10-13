@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import pytest
 from typing import Dict, List, Optional
 
-import pytest
 from apps.core.drf_resource import api
 from apps.core.drf_resource.base import Resource
-
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
@@ -14,8 +13,7 @@ from rest_framework.exceptions import APIException
 class MockResource(Resource):
     plugin_type = "test"
 
-    def perform_request(self,
-                        validated_request_data: Optional[Dict] = None) -> List:
+    def perform_request(self, validated_request_data: Optional[Dict] = None) -> List:
         if validated_request_data:
             return validated_request_data
         return ["hello world"]
