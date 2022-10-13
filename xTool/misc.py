@@ -444,13 +444,33 @@ SNAKE_CASE_STEP1 = re.compile('(.)_*([A-Z][a-z]+)')
 SNAKE_CASE_STEP2 = re.compile('([a-z0-9])_*([A-Z])')
 
 
-def camel_to_snake(s):
+def camel_to_snake(camel_str: str) -> str:
     """将驼峰命名转换为下划线方式的小写命名 ."""
-    first = SNAKE_CASE_STEP1.sub(r'\1_\2', s)
+    first = SNAKE_CASE_STEP1.sub(r'\1_\2', camel_str)
     return SNAKE_CASE_STEP2.sub(r'\1_\2', first).lower()
 
 
-def snake_to_camel(name, title_case=False):
+def camel_to_snake_2(camel_str: str) -> str:
+    """将驼峰命名转换为下划线方式的小写命名 ."""
+    buf = io.StringIO()
+    str_len = len(camel_str)
+
+    for i, cur_letter in enumerate(camel_str):
+        if i and cur_letter == cur_letter.upper():
+            prev_letter = camel_str[i - 1]
+            next_letter = camel_str[i + 1] if i < str_len - 1 else "A"
+            if cur_letter.isalpha():
+                if prev_letter != prev_letter.upper() or next_letter != next_letter.upper():
+                    buf.write("_")
+        buf.write(cur_letter)
+
+    result = buf.getvalue()
+    buf.close()
+
+    return result.lower()
+
+
+def snake_to_camel(name: str, title_case=False) -> str:
     """将下划线命名改为驼峰命名 ."""
     items = name.split("_")
     first_item = items[0].title() if title_case else items[0]
