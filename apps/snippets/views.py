@@ -4,7 +4,6 @@ from django.http import Http404
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from apps.core.drf_resource import api, ResourceViewSet, ResourceRoute
 from apps.snippets.models import Snippet
 from apps.snippets.serializers import SnippetSerializer, SnippetSerializer2
 from rest_framework import generics
@@ -230,9 +229,3 @@ class SnippetViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-
-class SnippetRouterViewSet(ResourceViewSet):
-    resource_routes = [
-        ResourceRoute(method="GET", endpoint="", resource_class=api)
-    ]

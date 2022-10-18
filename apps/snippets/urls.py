@@ -44,14 +44,8 @@ urlpatterns = [
 urlpatterns = format_suffix_patterns(urlpatterns)
 
 # Create a router and register our viewsets with it.
-# router = DefaultRouter()
-# router.register('snippets7', views.SnippetViewSet, basename="snippets7")
-# urlpatterns += [
-#     path('', include(router.urls)),
-# ]
-
-resource_router = DefaultRouter()
-resource_router.register('snippets8', views.SnippetRouterViewSet, basename="resource_router_snippets8")
+router = DefaultRouter()
+router.register('snippets7', views.SnippetViewSet, basename="snippets7")
 urlpatterns += [
-    path('', include(resource_router.urls)),
+    path('', include(router.urls)),
 ]

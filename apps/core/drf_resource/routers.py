@@ -1,17 +1,15 @@
-from rest_framework.routers import DefaultRouter
+# -*- coding: utf-8 -*-
+
+from dataclasses import dataclass
+
+from .base import Resource
 
 
-class ResourceRouter(DefaultRouter):
-    def register(self, prefix, viewset, basename=None):
-        resource_routes = viewset.resource_routes
-        for resource_route in resource_routes:
-            method = resource_route.method
-            method = resource_route.method
-            method = resource_route.method
-        if basename is None:
-            basename = self.get_default_basename(viewset)
-        self.registry.append((prefix, viewset, basename))
+@dataclass
+class ResourceRoute:
+    method: str
+    resource_class: Resource
+    endpoint: str
 
-        # invalidate the urls cache
-        if hasattr(self, '_urls'):
-            del self._urls
+    def __post_init__(self):
+        self.method = self.method.lower()

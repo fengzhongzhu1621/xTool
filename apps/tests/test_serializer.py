@@ -40,6 +40,9 @@ class SerializerRequiredIsFalseDefault(serializers.Serializer):
     field_1 = serializers.ListField(required=False, default=[])
     field_2 = serializers.ListField(required=False, default=[], allow_null=True)
     field_3 = serializers.ListField(required=False, default=[])
+    # field_4 = serializers.IntegerField(required=True, default=0)  # 不能同时设置
+    field_5 = serializers.IntegerField(required=False, default=0)
+    # field_6 = serializers.IntegerField(required=False, default=0, allow_blank=True)  # 不能设置allow_blank
 
 
 class TestSerializer:
@@ -172,9 +175,8 @@ class TestSerializer:
     def test_default(self):
         serializer = SerializerRequiredIsFalseDefault(data={})
         assert serializer.is_valid() is True
-        assert serializer.data == {'field_1': [], 'field_2': [], 'field_3': []}
+        assert serializer.data == {'field_1': [], 'field_2': [], 'field_3': [], 'field_4': 0}
 
         serializer = SerializerRequiredIsFalseDefault(data={"field_2": None})
         assert serializer.is_valid() is True
-        assert serializer.data == {'field_1': [], 'field_2': None, 'field_3': []}
-
+        assert serializer.data == {'field_1': [], 'field_2': None, 'field_3': [], 'field_4': 0}

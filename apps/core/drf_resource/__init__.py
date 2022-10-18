@@ -2,4 +2,4 @@
 
 from .base import Resource
 from .instance import api
-from .viewsets import ResourceRoute, ResourceViewSet
+from .models import ModelResource, Action
