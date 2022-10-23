@@ -180,3 +180,38 @@ class TestSerializer:
         serializer = SerializerRequiredIsFalseDefault(data={"field_2": None})
         assert serializer.is_valid() is True
         assert serializer.data == {'field_1': [], 'field_2': None, 'field_3': [], 'field_4': 0}
+
+    def test_list_field(self):
+        class RequestSerializer(serializers.Serializer):
+            field_1 = serializers.ListField()
+
+        serializer = RequestSerializer(data={})
+        assert serializer.is_valid() is False
+        assert serializer.data == {}
+        serializer = RequestSerializer(data={"field_1": []})
+        assert serializer.is_valid() is True
+        assert serializer.data == {"field_1": []}
+
+        class RequestSerializer2(serializers.Serializer):
+            field_1 = serializers.ListField(allow_empty=False)
+
+        serializer = RequestSerializer2(data={"field_1": []})
+        assert serializer.is_valid() is False
+
+        class RequestSerializer3(serializers.Serializer):
+            field_1 = serializers.ListField(default=[])
+
+        serializer = RequestSerializer3(data={})
+        assert serializer.is_valid() is True
+        assert serializer.data == {"field_1": []}
+        serializer = RequestSerializer3(data={"field_1": []})
+        assert serializer.is_valid() is True
+
+        class RequestSerializer4(serializers.Serializer):
+            field_1 = serializers.ListField(default=[], allow_empty=False)
+
+        serializer = RequestSerializer4(data={})
+        assert serializer.is_valid() is True
+        assert serializer.data == {"field_1": []}
+        serializer = RequestSerializer4(data={"field_1": []})
+        assert serializer.is_valid() is False
