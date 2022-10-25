@@ -2,4 +2,4 @@
 
 from .base import Resource
 from .instance import api
-from .models import ModelResource, Action
+from .models import ModelResource

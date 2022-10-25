@@ -2,7 +2,7 @@
 
 import pytest
 
-from apps.core.drf_resource import ModelResource, Action
+from apps.core.drf_resource import ModelResource
 from apps.snippets.models import Snippet
 from apps.snippets.serializers import SnippetSerializer
 
@@ -19,7 +19,8 @@ class SnippetViewSet(ModelResource):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
 
-    action = Action.LIST
+    action = "list"
+    method = "get"
 
 
 class TestSnippetViewSet:
