@@ -23,6 +23,9 @@ MAPPING = {
 
 
 class ModelResource(Resource, ModelViewSet):
+    def validate_request_data(self, request_data: Optional[Dict]) -> Optional[Dict]:
+        return request_data
+
     def perform_request(self, validated_request_data: Optional[Dict], *args, **kwargs) -> Union[List, Dict, None]:
         init_kwargs = {}
         request_handler_kwargs = {}
