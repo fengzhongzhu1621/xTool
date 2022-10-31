@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from abc import abstractmethod, ABCMeta
-from typing import Dict, List, Union, Optional
-
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from typing import Dict, List, Union, Optional
 
 from apps.core.drf_resource.logger import tracer, logger
 from rest_framework.exceptions import APIException
@@ -80,7 +79,7 @@ class Resource(metaclass=ResourceMeta):
 
             return response_data
 
-    def request(self, request_data: Optional[Dict] = None, **kwargs) -> Union[List, Dict]:
+    def request(self, request_data: Optional[Dict] = None, *args, **kwargs) -> Union[List, Dict]:
         """执行入口 ."""
         request_data = request_data or kwargs
         span_name = f"drf_resource/{self.get_resource_name()}"
@@ -88,7 +87,7 @@ class Resource(metaclass=ResourceMeta):
             # 验证请求参数
             validated_request_data = self.validate_request_data(request_data)
             # 执行请求操作
-            response_data = self.perform_request(validated_request_data)
+            response_data = self.perform_request(validated_request_data, *args, **kwargs)
             # 验证响应结果
             validated_response_data = self.validate_response_data(
                 response_data)
@@ -130,7 +129,7 @@ class Resource(metaclass=ResourceMeta):
 
     @abstractmethod
     def perform_request(
-        self, validated_request_data: Optional[Dict]) -> Union[List, Dict, None]:
+        self, validated_request_data: Optional[Dict], *args, **kwargs) -> Union[List, Dict, None]:
         """执行请求操作 ."""
         ...
 

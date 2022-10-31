@@ -4,6 +4,7 @@ from django.http import Http404
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from apps.core.drf_resource import ModelResource
 from apps.snippets.models import Snippet
 from apps.snippets.serializers import SnippetSerializer, SnippetSerializer2
 from rest_framework import generics
@@ -219,6 +220,19 @@ class SnippetViewSet(viewsets.ModelViewSet):
 
     Additionally we also provide an extra `highlight` action.
     """
+    queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+
+    @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+    def highlight(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class SnippetViewSetResource(ModelResource):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
 
