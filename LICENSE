@@ -244,6 +244,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     (MIT License) statsd 3.3.0 (https://github.com/jsocol/pystatsd)
     (MIT License) aiocron 1.6 (https://github.com/gawel/aiocron)
     (MIT License) bk-iam-saas 1.5.13 (https://github.com/TencentBlueKing/bk-iam-saas)
+    (MIT License) cachetools-5.2.0 (https://github.com/tkem/cachetools)
 
 ========================================================================
 BSD 2-Clause licenses
