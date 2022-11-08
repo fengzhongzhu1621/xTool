@@ -133,3 +133,16 @@ def get_filter_obj(filter_data, filter_keys):
     for key in filter_keys:
         filter_obj[key] = _filter_data.get(key)
     return filter_obj
+
+
+class DefaultSize:
+    __slots__ = ()
+
+    def __getitem__(self, _):
+        return 1
+
+    def __setitem__(self, _, value):
+        assert value == 1
+
+    def pop(self, _):
+        return 1
