@@ -2,9 +2,9 @@ class CacheTestMixin:
     Cache = None
 
     def test_defaults(self):
-        cache = self.Cache(max_size=1)
+        cache = self.Cache(maxsize=1)
         self.assertEqual(0, len(cache))  # 已缓冲的数量
-        self.assertEqual(1, cache.max_size)
+        self.assertEqual(1, cache.maxsize)
         self.assertEqual(0, cache.curr_size)
         self.assertEqual(1, cache.get_sizeof(None))
         self.assertEqual(1, cache.get_sizeof(""))
@@ -12,7 +12,7 @@ class CacheTestMixin:
         self.assertTrue(repr(cache).startswith(cache.__class__.__name__))
 
     def test_insert(self):
-        cache = self.Cache(max_size=2)
+        cache = self.Cache(maxsize=2)
 
         cache.update({1: 1, 2: 2})  # 调用__setitem__
         self.assertEqual(2, len(cache))
@@ -30,7 +30,7 @@ class CacheTestMixin:
         self.assertTrue(1 in cache or 2 in cache or 3 in cache)
 
     def test_update(self):
-        cache = self.Cache(max_size=2)
+        cache = self.Cache(maxsize=2)
 
         cache.update({1: 1, 2: 2})
         self.assertEqual(2, len(cache))
@@ -48,7 +48,7 @@ class CacheTestMixin:
         self.assertEqual("b", cache[2])
 
     def test_delete(self):
-        cache = self.Cache(max_size=2)
+        cache = self.Cache(maxsize=2)
 
         cache.update({1: 1, 2: 2})
         self.assertEqual(2, len(cache))
@@ -73,7 +73,7 @@ class CacheTestMixin:
         self.assertNotIn(2, cache)
 
     def test_pop(self):
-        cache = self.Cache(max_size=2)
+        cache = self.Cache(maxsize=2)
 
         cache.update({1: 1, 2: 2})
         self.assertEqual(2, cache.pop(2))
@@ -93,7 +93,7 @@ class CacheTestMixin:
         self.assertEqual(None, cache.pop(0, None))
 
     def test_popitem(self):
-        cache = self.Cache(max_size=2)
+        cache = self.Cache(maxsize=2)
 
         cache.update({1: 1, 2: 2})
         self.assertIn(cache.pop(1), {1: 1, 2: 2})
@@ -109,7 +109,7 @@ class CacheTestMixin:
         # exception context as implementation detail
         exception = None
         try:
-            self.Cache(max_size=2).popitem()
+            self.Cache(maxsize=2).popitem()
         except Exception as e:
             exception = e
         self.assertIsNone(exception.__cause__)
@@ -121,10 +121,10 @@ class CacheTestMixin:
                 self[key] = key
                 return key
 
-        cache = DefaultCache(max_size=2)
+        cache = DefaultCache(maxsize=2)
 
         self.assertEqual(0, cache.curr_size)
-        self.assertEqual(2, cache.max_size)
+        self.assertEqual(2, cache.maxsize)
         self.assertEqual(0, len(cache))
         self.assertEqual(1, cache[1])
         self.assertEqual(2, cache[2])
@@ -183,10 +183,10 @@ class CacheTestMixin:
                     pass  # not stored
                 return key
 
-        cache = DefaultCache(max_size=2, get_sizeof=lambda x: x)
+        cache = DefaultCache(maxsize=2, get_sizeof=lambda x: x)
 
         self.assertEqual(0, cache.curr_size)
-        self.assertEqual(2, cache.max_size)
+        self.assertEqual(2, cache.maxsize)
 
         self.assertEqual(1, cache[1])
         self.assertEqual(1, len(cache))
@@ -209,7 +209,7 @@ class CacheTestMixin:
 
     def _test_get_sizeof(self, cache):
         self.assertEqual(0, cache.curr_size)
-        self.assertEqual(3, cache.max_size)
+        self.assertEqual(3, cache.maxsize)
         self.assertEqual(1, cache.get_sizeof(1))
         self.assertEqual(2, cache.get_sizeof(2))
         self.assertEqual(3, cache.get_sizeof(3))
@@ -252,19 +252,19 @@ class CacheTestMixin:
         self.assertEqual(3, cache[3])
 
     def test_get_sizeof_param(self):
-        self._test_get_sizeof(self.Cache(max_size=3, get_sizeof=lambda x: x))
+        self._test_get_sizeof(self.Cache(maxsize=3, get_sizeof=lambda x: x))
 
     def test_get_sizeof_subclass(self):
         class Cache(self.Cache):
             def get_sizeof(self, value):
                 return value
 
-        self._test_get_sizeof(Cache(max_size=3))
+        self._test_get_sizeof(Cache(maxsize=3))
 
     def test_pickle(self):
         import pickle
 
-        source = self.Cache(max_size=2)
+        source = self.Cache(maxsize=2)
         source.update({1: 1, 2: 2})
 
         cache = pickle.loads(pickle.dumps(source))
@@ -286,13 +286,13 @@ class CacheTestMixin:
 
         self.assertEqual(cache, pickle.loads(pickle.dumps(cache)))
 
-    def test_pickle_max_size(self):
+    def test_pickle_maxsize(self):
         import pickle
         import sys
 
         # test empty cache, single element, large cache (recursion limit)
         for n in [0, 1, sys.getrecursionlimit() * 2]:
-            source = self.Cache(max_size=n)
+            source = self.Cache(maxsize=n)
             source.update((i, i) for i in range(n))
             cache = pickle.loads(pickle.dumps(source))
             self.assertEqual(n, len(cache))

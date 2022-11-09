@@ -6,8 +6,8 @@ from .cache import Cache
 class FIFOCache(Cache):
     """First In First Out (FIFO) cache implementation."""
 
-    def __init__(self, max_size, get_sizeof=None):
-        super().__init__(max_size, get_sizeof)
+    def __init__(self, maxsize, get_sizeof=None):
+        super().__init__(maxsize, get_sizeof)
         self.__order = collections.OrderedDict()
 
     def __setitem__(self, key, value, cache_setitem=Cache.__setitem__):

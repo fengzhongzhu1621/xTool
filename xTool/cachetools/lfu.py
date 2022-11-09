@@ -6,8 +6,8 @@ from .cache import Cache
 class LFUCache(Cache):
     """Least Frequently Used (LFU) cache implementation."""
 
-    def __init__(self, max_size, get_sizeof=None):
-        Cache.__init__(self, max_size, get_sizeof)
+    def __init__(self, maxsize, get_sizeof=None):
+        Cache.__init__(self, maxsize, get_sizeof)
         self.__counter = collections.Counter()
 
     def __getitem__(self, key, cache_getitem=Cache.__getitem__):
