@@ -13,9 +13,9 @@ class Cache(MutableMapping):
 
     __size = DefaultSize()
 
-    def __init__(self, maxsize: int, get_sizeof: Optional[Callable] = None) -> None:
+    def __init__(self, max_size: int, get_sizeof: Optional[Callable] = None) -> None:
         """
-        :param maxsize: 缓冲value的字符数
+        :param max_size: 缓冲value的字符数
         :param get_sizeof: 计算value的字符数的函数
         """
         if get_sizeof:
@@ -28,13 +28,13 @@ class Cache(MutableMapping):
         # 所有缓冲的value的字符数总和
         self.__curr_size = 0
         # 所有缓冲value的最大字符数
-        self.__maxsize = maxsize
+        self.__max_size = max_size
 
     def __repr__(self):
-        return "%s(%s, maxsize=%r, curr_size=%r)" % (
+        return "%s(%s, max_size=%r, curr_size=%r)" % (
             self.__class__.__name__,
             repr(self.__data),
-            self.__maxsize,
+            self.__max_size,
             self.__curr_size,
         )
 
@@ -46,14 +46,14 @@ class Cache(MutableMapping):
             return self.__missing__(key)
 
     def __setitem__(self, key, value):
-        maxsize = self.__maxsize
+        max_size = self.__max_size
         # 计算cache value的字符数
         size = self.get_sizeof(value)
-        if size > maxsize:
+        if size > max_size:
             raise ValueError("value too large")
         if key not in self.__data or self.__size[key] < size:
             # 如果是新增的数据 或 需要更新的数据比原来要大
-            while self.__curr_size + size > maxsize:
+            while self.__curr_size + size > max_size:
                 # 如果缓冲区满，则删除字典中的最后一对键和值，预留足够的空间给需要缓冲的最新数据
                 self.popitem()
         # 计算新增的value的字符数
@@ -109,9 +109,9 @@ class Cache(MutableMapping):
         return value
 
     @property
-    def maxsize(self):
+    def max_size(self):
         """The maximum size of the cache."""
-        return self.__maxsize
+        return self.__max_size
 
     @property
     def curr_size(self):
@@ -122,3 +122,6 @@ class Cache(MutableMapping):
     def get_sizeof(_):
         """Return the size of a cache element's value."""
         return 1
+
+    def get_size(self):
+        return self.__size
