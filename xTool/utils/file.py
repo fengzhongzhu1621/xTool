@@ -184,9 +184,9 @@ class DiskWalk:
                 yield full_path
 
 
-def extract_zip(input_zip):
+def get_unzipped_files(package):
     """
-    解压文件，获取文件列表
+    解压zip文件，获取文件列表
     """
-    input_zip = zipfile.ZipFile(input_zip)
+    input_zip = zipfile.ZipFile(package)
     return {name: StringIO(input_zip.read(name)) for name in input_zip.namelist()}
