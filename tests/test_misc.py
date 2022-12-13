@@ -207,3 +207,9 @@ def test_strip():
     actual = misc.strip({" a ": [" b ", " c "], " d ": " e ", 1: " f ", 2: 3})
     expect = {1: 'f', 2: 3, 'a': ['b', 'c'], 'd': 'e'}
     assert actual == expect
+
+
+def test_get_unique_list():
+    actual = misc.get_unique_list(("a", "c", "b", "b", "c", "a"))
+    expect = ['a', 'c', 'b']
+    assert actual == expect

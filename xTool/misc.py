@@ -20,7 +20,7 @@ import sys
 import traceback
 import warnings
 from datetime import datetime, date
-from typing import List
+from typing import List, Iterable
 
 try:
     import numpy as np
@@ -591,3 +591,8 @@ def strip(obj):
 
 def convert_textarea_to_list(ips):
     return ips.replace("\r\n", "\n").split("\n")
+
+
+def get_unique_list(value: Iterable) -> list:
+    """list去重，并保持原有数据顺序 ."""
+    return list(collections.OrderedDict.fromkeys(value))
