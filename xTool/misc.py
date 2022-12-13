@@ -5,6 +5,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import base64
 import collections
 import decimal
 import hashlib
@@ -21,7 +22,8 @@ import sys
 import traceback
 import warnings
 from datetime import datetime, date
-from typing import List, Iterable
+from io import StringIO
+from typing import List, Iterable, Union, Dict
 
 try:
     import numpy as np
@@ -104,7 +106,7 @@ def get_cur_info(number=1):
         返回(调用函数名, 行号)
     """
     frame = sys._getframe(number)
-    return (frame.f_code.co_name, frame.f_lineno)
+    return frame.f_code.co_name, frame.f_lineno
 
 
 def run_command(command):
@@ -190,8 +192,8 @@ class NumpyJsonEncoder(json.JSONEncoder):
 
 def is_memory_available(limit=80):
     """检查内存空间是否可用 """
-    virtualMemory = psutil.virtual_memory()
-    percent = virtualMemory.percent
+    virtual_memory = psutil.virtual_memory()
+    percent = virtual_memory.percent
     if percent > limit:
         return False
     return True
@@ -199,8 +201,8 @@ def is_memory_available(limit=80):
 
 def is_disk_available(dirname, limit=80):
     """检查磁盘空间是否可用 """
-    diskUsage = psutil.disk_usage(dirname)
-    percent = diskUsage.percent
+    disk_usage = psutil.disk_usage(dirname)
+    percent = disk_usage.percent
     if percent > limit:
         return False
     return True
@@ -670,3 +672,117 @@ def get_new_filename(file, new_file_name=None):
 
 def tree():
     return collections.defaultdict(tree)
+
+
+def convert_img_to_base64(image, format="PNG"):
+    img_buffer = StringIO()
+    image.save(img_buffer, format=format, quality=95)
+    base64_value = base64.b64encode(img_buffer.getvalue())
+    return "data:image/{format};base64,{value}".format(format=format.lower(), value=base64_value)
+
+
+def safe_int(int_str, dft=0):
+    try:
+        int_val = int(int_str)
+    except Exception:  # noqa
+        try:
+            int_val = int(float(int_str))
+        except Exception:  # noqa
+            int_val = dft
+    return int_val
+
+
+def safe_float(value):
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return float("nan")
+
+
+def proxy(obj):
+    class Proxy:
+        def __getattribute__(self, item):
+            return getattr(obj, item)
+
+    return Proxy()
+
+
+# create a new context for this task
+ctx = decimal.Context()
+
+# 20 digits should be enough for everyone :D
+ctx.prec = 20
+
+
+def float_to_str(f):
+    """
+    Convert the given float to a string,
+    without resorting to scientific notation
+    """
+    d1 = ctx.create_decimal(repr(f))
+    return format(d1, "f")
+
+
+def to_dict(obj):
+    if isinstance(obj, dict):
+        data = {}
+        for (k, v) in list(obj.items()):
+            data[k] = to_dict(v)
+        return data
+    elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+        return [to_dict(v) for v in obj]
+    elif hasattr(obj, "__dict__"):
+        data = {}
+        for key in dir(obj):
+            value = getattr(obj, key)
+            if not key.startswith("_") and not callable(value):
+                data[key] = to_dict(value)
+        return data
+    else:
+        return obj
+
+
+def camel_to_underscore(camel_str):
+    assert isinstance(camel_str, str)
+
+    buf = StringIO()
+    str_len = len(camel_str)
+
+    for i in range(str_len):
+        cur_letter = camel_str[i]
+        if i and cur_letter == cur_letter.upper():
+            prev_letter = camel_str[i - 1]
+            next_letter = camel_str[i + 1] if i < str_len - 1 else "A"
+            if cur_letter.isalpha():
+                if prev_letter != prev_letter.upper() or next_letter != next_letter.upper():
+                    buf.write("_")
+        buf.write(cur_letter)
+
+    result = buf.getvalue()
+    buf.close()
+
+    return result.lower()
+
+
+def camel_obj_key_to_underscore(obj: Union[List, Dict, str]) -> Union[List, Dict, str]:
+    """将指定对象的key转换为下划线格式 ."""
+    if isinstance(obj, str):
+        return camel_to_snake_2(obj)
+    if isinstance(obj, dict):
+        new_obj = {}
+        for key, value in obj.items():
+            if isinstance(value, (list, dict)):
+                value = camel_obj_key_to_underscore(value)
+            if isinstance(key, str):
+                new_obj[camel_to_snake_2(key)] = value
+            else:
+                new_obj[key] = value
+        return new_obj
+    new_obj = []
+    if isinstance(obj, list):
+        for value in obj:
+            if isinstance(value, dict):
+                value = camel_obj_key_to_underscore(value)
+            new_obj.append(value)
+            return new_obj
+    return obj

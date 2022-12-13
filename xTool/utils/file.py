@@ -4,17 +4,16 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import errno
-import shutil
-from tempfile import mkdtemp, NamedTemporaryFile
-
-from contextlib import contextmanager
-
 import os
 import re
+import shutil
 import zipfile
+from contextlib import contextmanager
+from io import StringIO
+from tempfile import mkdtemp, NamedTemporaryFile
 
-from xTool.utils.log.logging_mixin import LoggingMixin
 from xTool.exceptions import XToolConfigException
+from xTool.utils.log.logging_mixin import LoggingMixin
 
 
 @contextmanager
@@ -183,3 +182,11 @@ class DiskWalk:
             for dirname in dir_names:
                 full_path = os.path.join(dir_path, dirname)
                 yield full_path
+
+
+def extract_zip(input_zip):
+    """
+    解压文件，获取文件列表
+    """
+    input_zip = zipfile.ZipFile(input_zip)
+    return {name: StringIO(input_zip.read(name)) for name in input_zip.namelist()}
