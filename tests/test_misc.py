@@ -213,3 +213,13 @@ def test_get_unique_list():
     actual = misc.get_unique_list(("a", "c", "b", "b", "c", "a"))
     expect = ['a', 'c', 'b']
     assert actual == expect
+
+
+def test_count_md5():
+    actual = misc.count_md5(["a", "b", "c"])
+    expect = "89e0f7adc031c6238d095023a933c7a0"
+    assert actual == expect
+
+    actual = misc.count_md5({"a": ["b", "c"]})
+    expect = "c13d30900c448ecdbde696f3ab350276"
+    assert actual == expect

@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 import collections
 import decimal
 import hashlib
+import inspect
 import io
 import itertools
 import json
@@ -482,9 +483,65 @@ def snake_to_camel(name: str, title_case=False) -> str:
 
 
 def md5(src):
+    if not src:
+        return None
     m = hashlib.md5()
     m.update(tob(src))
     return m.hexdigest()
+
+
+def file_md5sum(file):
+    file.seek(0, 0)
+
+    m = hashlib.md5()
+    for chunk in file.chunks():
+        m.update(chunk)
+
+    file.seek(0, 0)
+    return m.hexdigest()
+
+
+def count_md5(content, dict_sort=True, list_sort=True):
+    if dict_sort and isinstance(content, dict):
+        content = [(str(k), count_md5(content[k], dict_sort, list_sort)) for k in sorted(content.keys())]
+        return count_md5(content, dict_sort, list_sort)
+    elif isinstance(content, (list, tuple)):
+        content = (
+            sorted([count_md5(k, dict_sort, list_sort=True) for k in content])
+            if list_sort
+            else [count_md5(k, dict_sort, list_sort) for k in content]
+        )
+        return md5(str(content))
+    elif callable(content):
+        return make_callable_hash(content)
+    return md5(str(content))
+
+
+def make_callable_hash(content):
+    """
+    计算callable的hash
+    """
+    if inspect.isclass(content):
+        h = []
+        for attr in [i for i in sorted(dir(content)) if not i.startswith("__")]:
+            v = getattr(content, attr)
+            h.append(count_md5(v))
+
+        return md5("".join(h))
+    try:
+        return md5(content.__name__)
+    except AttributeError:
+        try:
+            return md5(content.func.__name__)
+        except AttributeError:
+            return md5(str(content))
+
+
+def get_md5(content):
+    if isinstance(content, list):
+        return [count_md5(c) for c in content]
+    else:
+        return count_md5(content)
 
 
 def humanize(num, suffix="B"):
@@ -596,3 +653,20 @@ def convert_textarea_to_list(ips):
 def get_unique_list(value: Iterable) -> list:
     """list去重，并保持原有数据顺序 ."""
     return list(collections.OrderedDict.fromkeys(value))
+
+
+def get_new_filename(file, new_file_name=None):
+    new_file_name = new_file_name or file_md5sum(file)
+    old_file_name = file.name
+    # 获得文件后缀名
+    ext = ""
+    if "." in old_file_name:
+        ext = old_file_name.split(".")[-1]
+
+    if ext:
+        new_file_name = "{}.{}".format(new_file_name, ext)
+    return new_file_name
+
+
+def tree():
+    return collections.defaultdict(tree)
