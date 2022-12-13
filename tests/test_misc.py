@@ -18,7 +18,7 @@ def test_get_encodings():
 def test_exception_to_string():
     try:
         1 / 0
-    except Exception:
+    except Exception:  # noqa
         value = misc.exception_to_string()
         assert "ZeroDivisionError" in value
 
@@ -129,6 +129,7 @@ def test_properties():
 
         def meth(self):
             return self.var + 2
+
     foo = Foo()
     actual = misc.properties(foo)
     expect = {'var': 1, 'prop': 2, 'meth': foo.meth}
@@ -199,4 +200,10 @@ def test_unique_list():
 
     actual = misc.unique_list([2, 2, 1])
     expect = [2, 1]
+    assert actual == expect
+
+
+def test_strip():
+    actual = misc.strip({" a ": [" b ", " c "], " d ": " e ", 1: " f ", 2: 3})
+    expect = {1: 'f', 2: 3, 'a': ['b', 'c'], 'd': 'e'}
     assert actual == expect

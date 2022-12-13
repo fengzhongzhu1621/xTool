@@ -5,22 +5,22 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from typing import List
-import os
-import io
-import re
-import sys
-from datetime import datetime, date
-import json
-import platform
-import traceback
-import subprocess
-import random
-import warnings
-import itertools
-import hashlib
 import collections
 import decimal
+import hashlib
+import io
+import itertools
+import json
+import os
+import platform
+import random
+import re
+import subprocess
+import sys
+import traceback
+import warnings
+from datetime import datetime, date
+from typing import List
 
 try:
     import numpy as np
@@ -576,3 +576,18 @@ def flatten(items):
 def unique_list(data: List):
     """将列表去重，保持原有顺序 . """
     return list(collections.OrderedDict.fromkeys(data))
+
+
+def strip(obj):
+    if isinstance(obj, dict):
+        return {strip(key): strip(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [strip(item) for item in obj]
+    elif isinstance(obj, str):
+        return obj.strip()
+    else:
+        return obj
+
+
+def convert_textarea_to_list(ips):
+    return ips.replace("\r\n", "\n").split("\n")
