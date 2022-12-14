@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 class CacheTypeItem:
     """缓存类型 ."""
 
