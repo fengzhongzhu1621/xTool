@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import sys
-import operator
 import atexit
 import itertools
 import logging
+import operator
 import socket
+import sys
+
+import six
 
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] >= 3
@@ -105,9 +107,6 @@ except ImportError:
 b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode('latin1'))
 
 if PY3:
-    from inspect import getfullargspec as getargspec
-    from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
-    from urllib.parse import unquote
     import builtins
     import functools
 
@@ -115,8 +114,6 @@ if PY3:
         from collections.abc import Callable
     except ImportError:
         from collections import Callable
-    from io import StringIO
-    import http.cookies as Cookie
 
     reduce = functools.reduce
     zip = builtins.zip
@@ -179,12 +176,8 @@ if PY3:
             exc_info = None
 
 else:
-    from inspect import getargspec
-    from urllib import urlencode, unquote
-    from urlparse import urlparse, urlunparse, parse_qsl
     import __builtin__
     import itertools
-    import Cookie
 
     builtins = __builtin__
     reduce = __builtin__.reduce
@@ -216,8 +209,6 @@ else:
     def iteritems(d):
         return d.iteritems()
 
-
-    from cStringIO import StringIO
 
     exec('def reraise(tp, value, tb=None):\n raise tp, value, tb')
 
@@ -289,3 +280,15 @@ def flatten_list_bytes(list_of_data):
             bytes(data) if isinstance(data, memoryview) else data
             for data in list_of_data)
     return b''.join(list_of_data)
+
+
+def qualname(x):
+    if six.PY34:
+        return x.__qualname__
+
+    # not perfect - but it is ok for cache key
+    if hasattr(x, 'im_class'):
+        return '.'.join(
+            (x.im_class.__name__, x.__name__))
+    else:
+        return x.__name__
