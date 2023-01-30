@@ -47,3 +47,4 @@ opentelemetry-instrumentation-celery
 opentelemetry-instrumentation-logging
 pygments
 cachetools
+wirerope
