@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
+import codecs
 import os
 import platform
+import re
 import sys
 import warnings
-import codecs
-import re
 from distutils.errors import CCompilerError
 from distutils.errors import DistutilsExecError
 from distutils.errors import DistutilsPlatformError
+
 from setuptools.command.test import test as TestCommand
 
 extension_support = True  # Assume we are building C extensions.
@@ -150,6 +151,15 @@ def open_local(paths, mode="r", encoding="utf8"):
     return codecs.open(path, mode, encoding)
 
 
+def get_version(module_name):
+    with open(f'{module_name}/__version__.py') as f:
+        empty, version = f.read().split('__version__ = ')
+    assert empty == ''
+    version = version.strip().strip("'")
+    assert version.startswith('0.')
+    return version
+
+
 def read_version_file(package):
     with open_local([package, "__version__.py"], encoding="latin1") as fp:
         try:
@@ -177,6 +187,14 @@ def read_readme_rst():
         long_description = rm.read()
     return long_description
 
+
+def get_readme():
+    try:
+        with open('README.rst') as f:
+            return f.read().strip()
+    except IOError:
+        return ''
+    
 
 def load_requirements(fname):
     """ load requirements from a pip requirements file
