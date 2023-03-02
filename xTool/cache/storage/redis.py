@@ -22,7 +22,7 @@ __all__ = ["RedisCache", "SentinelRedisCache"]
 class BaseRedisCache(abc.ABC):
 
     def __init__(self, connection_conf: Dict, redis_class=None, refresh_connect_max: int = 3) -> None:
-        self.redis_cconnection_confonf = connection_conf
+        self.connection_conf = connection_conf
         self.redis_class = redis_class if redis_class else redis.Redis
         self._instance = None
         # 记录刷新时间
@@ -35,7 +35,7 @@ class BaseRedisCache(abc.ABC):
     @classmethod
     def instance(cls, backend: CacheBackendType, connection_conf: Dict, **kwargs):
         """获得redis客户端实例 ."""
-        cls_instance = "_%s_instance" % backend
+        cls_instance = "_%s_instance" % backend.value
         if not hasattr(cls, cls_instance):
             # 使用自定义配置创建redis连接
             ins = cls(connection_conf, **kwargs)

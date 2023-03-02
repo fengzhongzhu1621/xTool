@@ -21,6 +21,6 @@ class Cache:
             # 根据类型动态创建不同的类实例
             type_ = cls.CacheTypes[cache_instance_type]
             return type_.instance(backend, **kwargs)
-        except Exception:
-            logger.exception("fail to use %s [%s]", backend, " ".join(sys.argv))
+        except Exception as exc_info:
+            logger.exception("fail to use %s [%s] %s", backend, " ".join(sys.argv), exc_info)
             raise

@@ -11,3 +11,4 @@ pytest-mock
 mock
 #pytest-sanic==1.7.1
 httpx==0.11.1
+fakeredis
