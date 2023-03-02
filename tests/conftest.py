@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import random
 import re
 import string
 import sys
 import uuid
-import logging
+
+import fakeredis
 import pytest
-from xTool.tests.fixtures import timer
+
+from xTool.cache import Cache
+from xTool.cache.constants import CacheInstanceType, CacheBackendType
 
 # pytest_plugins = ['xTool.tests.pytest_plugin']
 
@@ -19,12 +23,10 @@ logging.basicConfig(
     format=logging_format, level=logging.INFO
 )
 
-
 random.seed("Pack my box with five dozen liquor jugs.")
 
 if sys.platform in ["win32", "cygwin"]:
     collect_ignore = ["test_worker.py"]
-
 
 TYPE_TO_GENERATOR_MAP = {
     "string": lambda: "".join(
@@ -40,7 +42,6 @@ TYPE_TO_GENERATOR_MAP = {
 
 
 class RouteStringGenerator:
-
     ROUTE_COUNT_PER_DEPTH = 100
     HTTP_METHODS = ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTION"]
     ROUTE_PARAM_TYPES = ["string", "int", "number", "alpha", "uuid"]
@@ -107,3 +108,16 @@ def app(request):
 def aiomisc_unused_port():
     from xTool.utils.net import get_unused_port
     return get_unused_port()
+
+
+@pytest.fixture
+def cache():
+    connection_conf = {
+        "host": "localhost",
+        "port": "6379",
+        "db": 0,
+        "password": "",
+    }
+    cache = Cache(CacheBackendType.CELERY, CacheInstanceType.RedisCache, redis_class=fakeredis.FakeStrictRedis,
+                  connection_conf=connection_conf)
+    return cache
