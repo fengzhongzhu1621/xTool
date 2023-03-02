@@ -49,3 +49,5 @@ opentelemetry-instrumentation-logging
 pygments
 cachetools
 wirerope
+kafka-python
+arrow
