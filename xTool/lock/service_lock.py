@@ -20,10 +20,10 @@ def share_lock(cache: object, ttl: int = 600, identify: Optional[str] = None, ha
                 key = typed_key if typed else hash_key
                 cache_key = md5(str(key(*args, **kwargs)))
             else:
+                # 注意：可能存在多个模块下有重名的函数
                 cache_key = f"{key_prefix}:{func.__module__}:{func.__name__}"
             cache_key = str(cache_key)
             func._cache_key = cache_key
-            # 注意：可能存在多个模块下有重名的函数
             token = str(time.time())
             lock_success = cache.set(cache_key, token, ex=ttl, nx=True)
             # 在ttl时间范围内加锁失败，则终止任务执行，保证任务的唯一性
