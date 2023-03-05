@@ -15,7 +15,7 @@ gunicorn
 websockets
 httpx
 websockets
-ujson
+ujson==4.1.0
 PyYAML>=5.1
 trio
 ipaddress
@@ -31,11 +31,19 @@ tzlocal
 speaklater
 curlify
 pymysql
-django
+django==3.2.12
 djangorestframework
 markdown
 django-filter
-hiredis
+# hiredis
+redis==3.5.3
+redis-py-cluster==2.1.0
+
+# celery
+celery==4.4.7
+django-celery-beat==2.2.0
+django-celery-results==2.0.1
+
 opentelemetry-api
 opentelemetry-sdk
 opentelemetry-exporter-otlp-proto-http
@@ -52,3 +60,6 @@ wirerope
 kafka-python
 arrow
 async-timeout>=4.0.2
+bamboo-pipeline==3.24.2
+django_celery_results
+mysqlclient

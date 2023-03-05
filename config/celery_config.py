@@ -2,9 +2,8 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
-from django.conf import settings
-
 from celery import Celery, platforms
+from django.conf import settings
 
 platforms.C_FORCE_ROOT = True
 
@@ -26,3 +25,8 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 @app.task(bind=True)
 def debug_task(self):
     print("Request: {!r}".format(self.request))
+
+
+@app.task
+def add(a: int, b: int, c: int = 3) -> int:
+    return a + b + c

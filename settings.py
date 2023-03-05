@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+
+from config.celery_config import app  # noqa
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +41,15 @@ INSTALLED_APPS = [
     "apps.core.drf_resource",
     "apps.quickstart",
     "apps.snippets",
+    # bamboo-pipeline
+    "pipeline",
+    "pipeline.django_signal_valve",
+    "pipeline.log",
+    "pipeline.engine",
+    "pipeline.component_framework",
+    "pipeline.variable_framework",
+    "pipeline.eri",
+
 ]
 
 MIDDLEWARE = [
@@ -70,16 +81,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "apps.wsgi.application"
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -121,6 +122,68 @@ STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    # 'PAGE_SIZE': 10
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.PageNumberPagination',
+    "PAGE_SIZE": 10,
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.SessionAuthentication",),
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
+    "NON_FIELD_ERRORS_KEY": "params_error",
+    "DEFAULT_PARSER_CLASSES": ("rest_framework.parsers.JSONParser",),
+    # 版本管理
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
+    "DEFAULT_VERSION": "v1",
+    "ALLOWED_VERSIONS": ["v1"],
+    "VERSION_PARAM": "version",
 }
+
+# CELERY 开关
+# worker: python manage.py celery worker -l info
+# beat: python manage.py celery beat -l info
+IS_USE_CELERY = True
+
+# celery settings
+if IS_USE_CELERY:
+    # CELERY 并发数
+    CELERYD_CONCURRENCY = os.getenv("BK_CELERYD_CONCURRENCY", 3)  # noqa
+    # CELERY 任务的文件路径，即包含有 @task 装饰器的函数文件
+    CELERY_IMPORTS = []
+    INSTALLED_APPS = locals().get("INSTALLED_APPS", [])
+    INSTALLED_APPS += (
+        "django_celery_beat",
+        "django_celery_results",
+    )
+    CELERY_ENABLE_UTC = True
+    CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+    BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
+# 本地开发数据库设置
+# SQL: CREATE DATABASE `xTool` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci; # noqa: E501
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "xTool",
+        "USER": "root",
+        "PASSWORD": "",
+        "HOST": "localhost",
+        "PORT": "3306",
+        "TEST": {"name": "test_xTool", "CHARSET": "utf8mb4"}
+    },
+}
+
+try:
+    from .config.local_settings import *  # noqa
+except ImportError:
+    pass
