@@ -51,3 +51,4 @@ cachetools
 wirerope
 kafka-python
 arrow
+async-timeout>=4.0.2
