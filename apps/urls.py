@@ -20,9 +20,10 @@ from apps import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('pipeline_admin/', include('pipeline.contrib.engine_admin.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('', views.api_root),
-    
+
     path('quickstart/', include('apps.quickstart.urls')),
     path('snippets/', include('apps.snippets.urls')),
 ]

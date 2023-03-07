@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "apps.core.drf_resource",
-    "apps.quickstart",
-    "apps.snippets",
     # bamboo-pipeline
     "pipeline",
     "pipeline.django_signal_valve",
@@ -49,6 +47,11 @@ INSTALLED_APPS = [
     "pipeline.component_framework",
     "pipeline.variable_framework",
     "pipeline.eri",
+    "pipeline.contrib.engine_admin",
+    # 业务逻辑
+    "apps.quickstart",
+    "apps.snippets",
+    "apps.custom_plugins"
 
 ]
 
@@ -114,7 +117,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "/static/"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -182,6 +187,9 @@ DATABASES = {
         "TEST": {"name": "test_xTool", "CHARSET": "utf8mb4"}
     },
 }
+
+# pipeline
+LOG_PERSISTENT_DAYS = 30  # 设置引擎日志的有效期
 
 try:
     from .config.local_settings import *  # noqa

@@ -11,6 +11,13 @@ def uniqid4():
     return str(uuid.uuid4())
 
 
+def unique_id(prefix: str) -> str:
+    if len(prefix) != 1:
+        raise ValueError("prefix length must be 1")
+
+    return "{}{}".format(prefix, uuid.uuid4().hex)
+
+
 class SequenceManager:
     """全局唯一ID生成器 ."""
 

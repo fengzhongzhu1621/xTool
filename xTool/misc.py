@@ -786,3 +786,14 @@ def camel_obj_key_to_underscore(obj: Union[List, Dict, str]) -> Union[List, Dict
             new_obj.append(value)
             return new_obj
     return obj
+
+
+def retry_once(action: callable):
+    """重试一次 ."""
+    try:
+        action()
+    except Exception:  # noqa
+        try:
+            action()
+        except Exception as exc_info:  # noqa
+            raise exc_info
