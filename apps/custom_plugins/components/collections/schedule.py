@@ -14,6 +14,7 @@ class ScheduleService(Service):
     interval：轮询间隔生成器，周期性轮询方式下该字段必须为 AbstractIntervalGenerator 的子类。
 
     """
+
     __need_schedule__ = True
     interval = StaticIntervalGenerator(2)
 
@@ -51,14 +52,14 @@ class ScheduleService(Service):
         :return: True：当次轮询成功，若轮询已完成则节点会进入 FINISHED 状态，否则仍然处于 RUNNING 状态，等待进入下次轮询。
                  False：当次轮询失败，节点会进入 FAILED 状态。
         """
-        poll_url = data.get_one_of_outputs('poll_url')
+        poll_url = data.get_one_of_outputs("poll_url")
         status = self._poll_status(poll_url)
 
         if status == 0:
             # 轮询已完成, 可调用 finish_schedule() 方法，则节点会进入 FINISHED 状态
             self.finish_schedule()
         elif status < 0:
-            data.outputs.ex_data = 'task failed with code: %s' % status
+            data.outputs.ex_data = "task failed with code: %s" % status
             return False
         else:
             # 不符合条件，则仍然处于 RUNNING 状态，等待进入下次轮询。
@@ -67,6 +68,6 @@ class ScheduleService(Service):
 
 
 class ScheduleComponent(Component):
-    name = 'ScheduleComponent'
-    code = 'schedule_component'
+    name = "ScheduleComponent"
+    code = "schedule_component"
     bound_service = ScheduleService

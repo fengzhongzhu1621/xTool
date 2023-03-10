@@ -8,7 +8,7 @@ from bamboo_engine.builder import (
     ServiceActivity,
     EmptyEndEvent,
     ParallelGateway,
-    ConvergeGateway
+    ConvergeGateway,
 )
 
 from pipeline.eri.runtime import BambooDjangoRuntime
@@ -21,9 +21,9 @@ logging.basicConfig(level=logging.DEBUG)
 def test_parallel_gateway():
     start = EmptyStartEvent()
     pg = ParallelGateway()
-    act_1 = ServiceActivity(component_code='pipe_example_component', name='act_1')
-    act_2 = ServiceActivity(component_code='pipe_example_component', name='act_2')
-    act_3 = ServiceActivity(component_code='pipe_example_component', name='act_3')
+    act_1 = ServiceActivity(component_code="pipe_example_component", name="act_1")
+    act_2 = ServiceActivity(component_code="pipe_example_component", name="act_2")
+    act_3 = ServiceActivity(component_code="pipe_example_component", name="act_3")
     cg = ConvergeGateway()
     end = EmptyEndEvent()
 

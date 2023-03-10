@@ -63,3 +63,5 @@ async-timeout>=4.0.2
 bamboo-pipeline==3.24.2
 django_celery_results
 mysqlclient
+
+uhashring

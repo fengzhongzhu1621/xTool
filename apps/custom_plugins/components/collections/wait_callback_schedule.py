@@ -20,16 +20,16 @@ class WaitCallbackService(Service):
 
     def schedule(self, data, parent_data, callback_data=None):
         """检测第三方系统回调时传入的数据，来判断本次执行是否成功 ."""
-        status = callback_data['status']
+        status = callback_data["status"]
 
         if status < 0:
-            data.outputs.ex_data = 'task failed with code: %s' % status
+            data.outputs.ex_data = "task failed with code: %s" % status
             return False
 
         self.finish_schedule()
 
 
 class WaitCallbackComponent(Component):
-    name = 'WaitCallbackComponent'
-    code = 'wait_callback_component'
+    name = "WaitCallbackComponent"
+    code = "wait_callback_component"
     bound_service = WaitCallbackService

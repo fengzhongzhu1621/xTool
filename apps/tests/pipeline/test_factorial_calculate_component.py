@@ -1,7 +1,13 @@
 import pytest
 from bamboo_engine import api
 from bamboo_engine import builder
-from bamboo_engine.builder import EmptyStartEvent, ServiceActivity, EmptyEndEvent, Data, NodeOutput
+from bamboo_engine.builder import (
+    EmptyStartEvent,
+    ServiceActivity,
+    EmptyEndEvent,
+    Data,
+    NodeOutput,
+)
 from bamboo_engine.builder import Var
 
 from pipeline.eri.runtime import BambooDjangoRuntime
@@ -14,11 +20,11 @@ class TestFactorialCalculateComponent:
         # 使用 builder 构造出流程描述结构
         start = EmptyStartEvent()
 
-        act_1 = ServiceActivity(component_code='fac_cal_comp')
-        act_1.component.inputs.n = Var(type=Var.SPLICE, value='${input_a}')
+        act_1 = ServiceActivity(component_code="fac_cal_comp")
+        act_1.component.inputs.n = Var(type=Var.SPLICE, value="${input_a}")
 
-        act_2 = ServiceActivity(component_code='fac_cal_comp')
-        act_2.component.inputs.n = Var(type=Var.SPLICE, value='${act_1_output}')
+        act_2 = ServiceActivity(component_code="fac_cal_comp")
+        act_2.component.inputs.n = Var(type=Var.SPLICE, value="${act_1_output}")
 
         end = EmptyEndEvent()
 
@@ -26,9 +32,10 @@ class TestFactorialCalculateComponent:
 
         # 设置全局变量
         pipeline_data = Data()
-        pipeline_data.inputs['${input_a}'] = Var(type=Var.PLAIN, value=3)
-        pipeline_data.inputs['${act_1_output}'] = NodeOutput(type=Var.SPLICE, source_act=act_1.id,
-                                                             source_key='factorial_of_n')
+        pipeline_data.inputs["${input_a}"] = Var(type=Var.PLAIN, value=3)
+        pipeline_data.inputs["${act_1_output}"] = NodeOutput(
+            type=Var.SPLICE, source_act=act_1.id, source_key="factorial_of_n"
+        )
 
         pipeline = builder.build_tree(start, data=pipeline_data)
         options = {

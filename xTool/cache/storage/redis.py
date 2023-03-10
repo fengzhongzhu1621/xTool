@@ -10,18 +10,19 @@ from typing import Dict
 import ujson as json
 from redis.exceptions import ConnectionError
 from redis.sentinel import Sentinel
+from xTool.cache.constants import TASK_DELAY_QUEUE, TASK_STORAGE_QUEUE, CacheBackendType
 
 import redis
-from xTool.cache.constants import TASK_DELAY_QUEUE, TASK_STORAGE_QUEUE, CacheBackendType
 
 logger = logging.getLogger("cache")
 
-__all__ = ["RedisCache", "SentinelRedisCache"]
+__all__ = ["BaseRedisCache", "RedisCache", "SentinelRedisCache"]
 
 
 class BaseRedisCache(abc.ABC):
-
-    def __init__(self, connection_conf: Dict, redis_class=None, refresh_connect_max: int = 3) -> None:
+    def __init__(
+        self, connection_conf: Dict, redis_class=None, refresh_connect_max: int = 3
+    ) -> None:
         self.connection_conf = connection_conf
         self.redis_class = redis_class if redis_class else redis.Redis
         self._instance = None
@@ -111,15 +112,25 @@ class BaseRedisCache(abc.ABC):
 class RedisCache(BaseRedisCache):
     """ """
 
-    def __init__(self, connection_conf, redis_class=None, refresh_connect_max: int = 3, decode_responses=True,
-                 encoding="utf-8"):
+    def __init__(
+        self,
+        connection_conf,
+        redis_class=None,
+        refresh_connect_max: int = 3,
+        decode_responses=True,
+        encoding="utf-8",
+    ):
         if decode_responses:
             # 插入默认参数
             new_connection_conf = deepcopy(connection_conf)
             new_connection_conf.update({"decode_responses": True, "encoding": encoding})
         else:
             new_connection_conf = connection_conf
-        super().__init__(new_connection_conf, redis_class=redis_class, refresh_connect_max=refresh_connect_max)
+        super().__init__(
+            new_connection_conf,
+            redis_class=redis_class,
+            refresh_connect_max=refresh_connect_max,
+        )
 
     def create_instance(self):
         return self.redis_class(**self.connection_conf)
@@ -130,29 +141,40 @@ class RedisCache(BaseRedisCache):
 
 
 class SentinelRedisCache(BaseRedisCache):
-
-    def __init__(self,
-                 connection_conf,
-                 redis_class=None,
-                 refresh_connect_max=None,
-                 decode_responses=True,
-                 socket_timeout: int = 60,
-                 master_name="mymaster",
-                 sentinel_password="",
-                 redis_password="",
-                 encoding="utf-8"):
+    def __init__(
+        self,
+        connection_conf,
+        redis_class=None,
+        refresh_connect_max=None,
+        decode_responses=True,
+        socket_timeout: int = 60,
+        master_name="mymaster",
+        sentinel_password="",
+        redis_password="",
+        encoding="utf-8",
+    ):
         new_connection_conf = copy.deepcopy(connection_conf)
         self.sentinel_host = new_connection_conf.pop("host")
         self.sentinel_port = new_connection_conf.pop("port")
-        self.socket_timeout = int(new_connection_conf.pop("socket_timeout", socket_timeout))
+        self.socket_timeout = int(
+            new_connection_conf.pop("socket_timeout", socket_timeout)
+        )
         self.master_name = new_connection_conf.pop("master_name", master_name)
         self.cache_mode = new_connection_conf.pop("cache_mode", "master")
-        self.sentinel_password = new_connection_conf.pop("sentinel_password", "") or sentinel_password
-        self.redis_password = new_connection_conf.pop("redis_password", "") or redis_password
+        self.sentinel_password = (
+            new_connection_conf.pop("sentinel_password", "") or sentinel_password
+        )
+        self.redis_password = (
+            new_connection_conf.pop("redis_password", "") or redis_password
+        )
         # 插入默认参数
         if decode_responses:
             new_connection_conf.update({"decode_responses": True, "encoding": encoding})
-        super().__init__(new_connection_conf, redis_class=redis_class, refresh_connect_max=refresh_connect_max)
+        super().__init__(
+            new_connection_conf,
+            redis_class=redis_class,
+            refresh_connect_max=refresh_connect_max,
+        )
 
     def create_instance(self):
         sentinel_kwargs = {
@@ -175,7 +197,9 @@ class SentinelRedisCache(BaseRedisCache):
         redis_instance_config["password"] = self.redis_password
 
         # 获得主服务器
-        instance = redis_sentinel.master_for(self.master_name, redis_class=self.redis_class, **redis_instance_config)
+        instance = redis_sentinel.master_for(
+            self.master_name, redis_class=self.redis_class, **redis_instance_config
+        )
         # 关闭与其它哨兵的连接
         list(map(self.close_instance, redis_sentinel.sentinels))
 

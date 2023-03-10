@@ -19,7 +19,11 @@ class TestCache:
             "db": 0,
             "password": "",
         }
-        cache = Cache(CacheBackendType.CELERY, CacheInstanceType.RedisCache, redis_class=fakeredis.FakeStrictRedis,
-                      connection_conf=connection_conf)
-        cache.set('foo', 'bar')
+        cache = Cache(
+            CacheBackendType.CELERY,
+            CacheInstanceType.RedisCache,
+            redis_class=fakeredis.FakeStrictRedis,
+            connection_conf=connection_conf,
+        )
+        cache.set("foo", "bar")
         assert cache.get("foo") == "bar"

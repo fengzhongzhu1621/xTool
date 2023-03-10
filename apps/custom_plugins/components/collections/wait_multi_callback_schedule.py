@@ -15,10 +15,10 @@ class WaitCallbackService(Service):
 
     def schedule(self, data, parent_data, callback_data=None):
 
-        status = callback_data['status']
+        status = callback_data["status"]
 
         if status < 0:
-            data.outputs.ex_data = 'task failed with code: %s' % status
+            data.outputs.ex_data = "task failed with code: %s" % status
             return False
         elif status < 1:
             return True
@@ -27,6 +27,6 @@ class WaitCallbackService(Service):
 
 
 class WaitMultiCallbackComponent(Component):
-    name = 'WaitMultiCallbackComponent'
-    code = 'wait_multi_callback_component'
+    name = "WaitMultiCallbackComponent"
+    code = "wait_multi_callback_component"
     bound_service = WaitCallbackService

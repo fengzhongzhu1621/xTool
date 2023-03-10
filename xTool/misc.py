@@ -38,9 +38,9 @@ from xTool.compat import basestring
 # Determine platform being used.
 system = platform.system()
 USE_MAC = USE_WINDOWS = USE_LINUX = USE_CYGWIN = USE_X11 = False
-if system == 'Darwin':
+if system == "Darwin":
     USE_MAC = True
-elif system == 'Windows' or system == 'Microsoft':
+elif system == "Windows" or system == "Microsoft":
     USE_WINDOWS = True
 elif system == "Linux":
     USE_LINUX = True
@@ -63,24 +63,46 @@ zip_longest = izip_longest
 sentinel = object()  # type: Any
 
 CHAR = set(chr(i) for i in range(0, 128))
-CTL = set(chr(i) for i in range(0, 32)) | {chr(127), }
-SEPARATORS = {'(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']',
-              '?', '=', '{', '}', ' ', chr(9)}
+CTL = set(chr(i) for i in range(0, 32)) | {
+    chr(127),
+}
+SEPARATORS = {
+    "(",
+    ")",
+    "<",
+    ">",
+    "@",
+    ",",
+    ";",
+    ":",
+    "\\",
+    '"',
+    "/",
+    "[",
+    "]",
+    "?",
+    "=",
+    "{",
+    "}",
+    " ",
+    chr(9),
+}
 # 按位异或
 TOKEN = CHAR ^ CTL ^ SEPARATORS
 
 
 def get_encodings():
-    yield 'utf8'
+    yield "utf8"
     from locale import getpreferredencoding
+
     prefenc = getpreferredencoding()
     if prefenc:
         yield prefenc
 
         prefenc = {
-            'latin1': 'latin9',
-            'iso-8859-1': 'iso8859-15',
-            'cp1252': '1252',
+            "latin1": "latin9",
+            "iso-8859-1": "iso8859-15",
+            "cp1252": "1252",
         }.get(prefenc.lower())
         if prefenc:
             yield prefenc
@@ -91,19 +113,19 @@ def exception_to_string():
     return "".join(traceback.format_exception(*exc))
 
 
-def tob(s, enc='utf-8'):
+def tob(s, enc="utf-8"):
     """将字符串转换为utf8/bytes编码 ."""
     return s.encode(enc) if not isinstance(s, bytes) else s
 
 
-def tou(s, enc='utf-8'):
+def tou(s, enc="utf-8"):
     """将字符串转换为unicode编码 ."""
     return s.decode(enc) if isinstance(s, bytes) else s
 
 
 def get_cur_info(number=1):
     """
-        返回(调用函数名, 行号)
+    返回(调用函数名, 行号)
     """
     frame = sys._getframe(number)
     return frame.f_code.co_name, frame.f_lineno
@@ -111,12 +133,13 @@ def get_cur_info(number=1):
 
 def run_command(command):
     print(command)
-    proc = subprocess.Popen(command,
-                            shell=True,
-                            close_fds=False if USE_WINDOWS else False,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE
-                            )
+    proc = subprocess.Popen(
+        command,
+        shell=True,
+        close_fds=False if USE_WINDOWS else False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
     (stdoutdata, stderrdata) = proc.communicate()
     if stdoutdata:
         print(stdoutdata)
@@ -126,12 +149,13 @@ def run_command(command):
 
 
 def get_run_command_result(command):
-    proc = subprocess.Popen(command,
-                            shell=True,
-                            close_fds=False if USE_WINDOWS else False,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE
-                            )
+    proc = subprocess.Popen(
+        command,
+        shell=True,
+        close_fds=False if USE_WINDOWS else False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
     stdout_data, stderr_data = proc.communicate()
     return proc.returncode, stdout_data, stderr_data
 
@@ -149,41 +173,44 @@ def json_ser(obj):
 
 
 class NumpyJsonEncoder(json.JSONEncoder):
-
     def default(self, obj):
         # convert dates and numpy objects in a json serializable format
         if isinstance(obj, datetime):
-            return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
+            return obj.strftime("%Y-%m-%dT%H:%M:%SZ")
         elif isinstance(obj, date):
-            return obj.strftime('%Y-%m-%d')
+            return obj.strftime("%Y-%m-%d")
         elif isinstance(obj, datetime.time):
-            return obj.strftime('%H:%M:%S')
+            return obj.strftime("%H:%M:%S")
         elif isinstance(obj, decimal.Decimal):
             return str(obj)
         elif isinstance(obj, set):
             return list(obj)
         if np:
-            if type(obj) in (np.int_,
-                             np.intc,
-                             np.intp,
-                             np.int8,
-                             np.int16,
-                             np.int32,
-                             np.int64,
-                             np.uint8,
-                             np.uint16,
-                             np.uint32,
-                             np.uint64):
+            if type(obj) in (
+                np.int_,
+                np.intc,
+                np.intp,
+                np.int8,
+                np.int16,
+                np.int32,
+                np.int64,
+                np.uint8,
+                np.uint16,
+                np.uint32,
+                np.uint64,
+            ):
                 return int(obj)
             elif type(obj) in (np.bool_,):
                 return bool(obj)
-            elif type(obj) in (np.float_,
-                               np.float16,
-                               np.float32,
-                               np.float64,
-                               np.complex_,
-                               np.complex64,
-                               np.complex128):
+            elif type(obj) in (
+                np.float_,
+                np.float16,
+                np.float32,
+                np.float64,
+                np.complex_,
+                np.complex64,
+                np.complex128,
+            ):
                 return float(obj)
 
         # Let the base class default method raise the TypeError
@@ -191,7 +218,7 @@ class NumpyJsonEncoder(json.JSONEncoder):
 
 
 def is_memory_available(limit=80):
-    """检查内存空间是否可用 """
+    """检查内存空间是否可用"""
     virtual_memory = psutil.virtual_memory()
     percent = virtual_memory.percent
     if percent > limit:
@@ -200,7 +227,7 @@ def is_memory_available(limit=80):
 
 
 def is_disk_available(dirname, limit=80):
-    """检查磁盘空间是否可用 """
+    """检查磁盘空间是否可用"""
     disk_usage = psutil.disk_usage(dirname)
     percent = disk_usage.percent
     if percent > limit:
@@ -215,15 +242,16 @@ def grouper(n, iterable, padvalue=None):
 
 def chunks(items, chunk_len):
     """Yield successive n-sized chunks from l."""
-    return (items[i:i + chunk_len] for i in xrange(0, len(items), chunk_len))
+    return (items[i : i + chunk_len] for i in xrange(0, len(items), chunk_len))
 
 
 def chunked(it, chunk_len):
     marker = object()
-    for group in (list(g) for g in izip_longest(*[iter(it)] * chunk_len,
-                                                fillvalue=marker)):
+    for group in (
+        list(g) for g in izip_longest(*[iter(it)] * chunk_len, fillvalue=marker)
+    ):
         if group[-1] is marker:
-            del group[group.index(marker):]
+            del group[group.index(marker) :]
         yield group
 
 
@@ -236,23 +264,23 @@ def chunk_list(iterable, size):
         item = list(itertools.islice(iterable, size))
 
 
-def get_random_string(length=32,
-
-                      allowed_chars='abcdefghijklmnopqrstuvwxyz'
-                                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+def get_random_string(
+    length=32,
+    allowed_chars="abcdefghijklmnopqrstuvwxyz" "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+):
     """
     Returns a securely generated random string.
 
     The default length of 12 with the a-z, A-Z, 0-9 character set returns
     a 71-bit value. log_2((26+26+10)^12) =~ 71 bits
     """
-    return ''.join([random.choice(allowed_chars) for i in range(length)])
+    return "".join([random.choice(allowed_chars) for i in range(length)])
 
 
 def print_bin(data):
     """以比较整齐的格式打印二进制数据，用于设计二进制数据的调试过程
 
-        `code source <http://code.oa.com/v2/weima/detail/70493>`_
+    `code source <http://code.oa.com/v2/weima/detail/70493>`_
     """
     assert isinstance(data, basestring)
 
@@ -295,9 +323,9 @@ def strict_bool(s):
     """
     Variant of bool() that only accepts two possible string values.
     """
-    if s == 'True':
+    if s == "True":
         return True
-    elif s == 'False':
+    elif s == "False":
         return False
     else:
         raise ValueError(s)
@@ -340,9 +368,9 @@ def properties(obj):
     Note how the entry for prop is not a bound method (i.e. the getter) but a the return value of
     that getter.
     """
-    return dict((attr, getattr(obj, attr))
-                for attr in dir(obj)
-                if not attr.startswith('__'))
+    return dict(
+        (attr, getattr(obj, attr)) for attr in dir(obj) if not attr.startswith("__")
+    )
 
 
 def get_first_duplicate(items):
@@ -365,14 +393,13 @@ def many_to_one(input_dict):
         {'ab': 1, ('c', 'd'): 2} -> {'a': 1, 'b': 1, 'c': 2, 'd': 2}
 
     """
-    return dict((key, val)
-                for keys, val in input_dict.items()
-                for key in keys)
+    return dict((key, val) for keys, val in input_dict.items() for key in keys)
 
 
 def open_url(url):
     """根据URL打开浏览器 ."""
     from webbrowser import open as wbopen
+
     wbopen(url)
 
 
@@ -412,7 +439,7 @@ def __deprecated__(s):
 
 
 # Helper functions that are used in various parts of the codebase.
-MODEL_BASE = '_metaclass_helper_'
+MODEL_BASE = "_metaclass_helper_"
 
 
 def with_metaclass(meta, base=object):
@@ -431,7 +458,7 @@ def merge_dict(source, overrides):
 def quote(path, quote_chars):
     if len(path) == 1:
         return path[0].join(quote_chars)
-    return '.'.join([part.join(quote_chars) for part in path])
+    return ".".join([part.join(quote_chars) for part in path])
 
 
 def ensure_tuple(value):
@@ -443,14 +470,14 @@ def ensure_tuple(value):
 # First regex handles acronym followed by word or initial lower-word followed
 # by a capitalized word. e.g. APIResponse -> API_Response / fooBar -> foo_Bar.
 # Second regex handles the normal case of two title-cased words.
-SNAKE_CASE_STEP1 = re.compile('(.)_*([A-Z][a-z]+)')
-SNAKE_CASE_STEP2 = re.compile('([a-z0-9])_*([A-Z])')
+SNAKE_CASE_STEP1 = re.compile("(.)_*([A-Z][a-z]+)")
+SNAKE_CASE_STEP2 = re.compile("([a-z0-9])_*([A-Z])")
 
 
 def camel_to_snake(camel_str: str) -> str:
     """将驼峰命名转换为下划线方式的小写命名 ."""
-    first = SNAKE_CASE_STEP1.sub(r'\1_\2', camel_str)
-    return SNAKE_CASE_STEP2.sub(r'\1_\2', first).lower()
+    first = SNAKE_CASE_STEP1.sub(r"\1_\2", camel_str)
+    return SNAKE_CASE_STEP2.sub(r"\1_\2", first).lower()
 
 
 def camel_to_snake_2(camel_str: str) -> str:
@@ -463,7 +490,10 @@ def camel_to_snake_2(camel_str: str) -> str:
             prev_letter = camel_str[i - 1]
             next_letter = camel_str[i + 1] if i < str_len - 1 else "A"
             if cur_letter.isalpha():
-                if prev_letter != prev_letter.upper() or next_letter != next_letter.upper():
+                if (
+                    prev_letter != prev_letter.upper()
+                    or next_letter != next_letter.upper()
+                ):
                     buf.write("_")
         buf.write(cur_letter)
 
@@ -480,7 +510,7 @@ def snake_to_camel(name: str, title_case=False) -> str:
     if len(items) == 1:
         return first_item
     other_items = [item.title() for item in items[1:]]
-    camel_name = "{}{}".format(first_item, ''.join(other_items))
+    camel_name = "{}{}".format(first_item, "".join(other_items))
     return camel_name
 
 
@@ -505,7 +535,10 @@ def file_md5sum(file):
 
 def count_md5(content, dict_sort=True, list_sort=True):
     if dict_sort and isinstance(content, dict):
-        content = [(str(k), count_md5(content[k], dict_sort, list_sort)) for k in sorted(content.keys())]
+        content = [
+            (str(k), count_md5(content[k], dict_sort, list_sort))
+            for k in sorted(content.keys())
+        ]
         return count_md5(content, dict_sort, list_sort)
     elif isinstance(content, (list, tuple)):
         content = (
@@ -559,8 +592,11 @@ def is_iterable(obj):
 
 
 if hasattr(sys, "_getframe"):
+
     def get_current_frame():
         return sys._getframe(3)
+
+
 else:  # pragma: no cover
 
     def get_current_frame():
@@ -592,9 +628,9 @@ def extract_stack(f=None, limit=None):
         # Limit the amount of work to a reasonable amount, as extract_stack()
         # can be called for each coroutine and future in debug mode.
         limit = DEBUG_STACK_DEPTH
-    stack = traceback.StackSummary.extract(traceback.walk_stack(f),
-                                           limit=limit,
-                                           lookup_lines=False)
+    stack = traceback.StackSummary.extract(
+        traceback.walk_stack(f), limit=limit, lookup_lines=False
+    )
     stack.reverse()
     return stack
 
@@ -614,7 +650,7 @@ class UseTimesGenerator:
         else:
             # 下一值自增
             old_value = self.cache[obj]
-            value = (old_value + 1) & 0xffffffff
+            value = (old_value + 1) & 0xFFFFFFFF
         self.cache[obj] = value
         return value
 
@@ -633,7 +669,7 @@ def flatten(items):
 
 
 def unique_list(data: List):
-    """将列表去重，保持原有顺序 . """
+    """将列表去重，保持原有顺序 ."""
     return list(collections.OrderedDict.fromkeys(data))
 
 
@@ -678,7 +714,9 @@ def convert_img_to_base64(image, format="PNG"):
     img_buffer = StringIO()
     image.save(img_buffer, format=format, quality=95)
     base64_value = base64.b64encode(img_buffer.getvalue())
-    return "data:image/{format};base64,{value}".format(format=format.lower(), value=base64_value)
+    return "data:image/{format};base64,{value}".format(
+        format=format.lower(), value=base64_value
+    )
 
 
 def safe_int(int_str, dft=0):
@@ -754,7 +792,10 @@ def camel_to_underscore(camel_str):
             prev_letter = camel_str[i - 1]
             next_letter = camel_str[i + 1] if i < str_len - 1 else "A"
             if cur_letter.isalpha():
-                if prev_letter != prev_letter.upper() or next_letter != next_letter.upper():
+                if (
+                    prev_letter != prev_letter.upper()
+                    or next_letter != next_letter.upper()
+                ):
                     buf.write("_")
         buf.write(cur_letter)
 
