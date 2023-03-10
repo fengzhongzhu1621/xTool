@@ -31,7 +31,7 @@ tzlocal
 speaklater
 curlify
 pymysql
-django==3.2.12
+django==3.2.18
 djangorestframework
 markdown
 django-filter
