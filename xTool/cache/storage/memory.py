@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+from typing import Any
 
 
 class InstanceCache:
@@ -11,27 +12,29 @@ class InstanceCache:
             cls._instance = cls()
         return cls._instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__cache = {}
 
-    def clear(self):
+    def clear(self) -> None:
         self.__cache = {}
 
-    def set(self, key, value, seconds=0, use_round=False):
+    def set(
+        self, key: str, value: Any, timeout: int = 0, use_round: bool = False
+    ) -> None:
         """
         :param key:
         :param value:
-        :param seconds: 秒
+        :param timeout: 单位是秒
         :param use_round: 时间是否需要向上取整，取整用于缓存时间同步
         :return:
         """
         if not use_round:
-            timeout = time.time() + seconds
+            timeout = time.time() + timeout
         else:
-            timeout = (time.time() + seconds) // seconds * seconds
+            timeout = (time.time() + timeout) // timeout * timeout
         self.__cache[key] = (value, timeout)
 
-    def __get_raw(self, key):
+    def __get_raw(self, key: str) -> Any:
         value = self.__cache.get(key)
         if not value:
             return None
@@ -40,15 +43,15 @@ class InstanceCache:
             return None
         return value
 
-    def exists(self, key):
+    def exists(self, key: str) -> bool:
         value = self.__get_raw(key)
         return value is not None
 
-    def get(self, key):
+    def get(self, key: str) -> Any:
         value = self.__get_raw(key)
         return value and value[0]
 
-    def delete(self, key):
+    def delete(self, key: str) -> None:
         try:
             del self.__cache[key]
         except KeyError:

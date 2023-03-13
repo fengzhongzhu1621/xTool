@@ -9,7 +9,7 @@ from xTool.cache.constants import CacheInstanceType, CacheBackendType
 class TestCache:
     def test_instance(self):
         cache = Cache("dummy", CacheInstanceType.InstanceCache)
-        cache.set("a", 1, seconds=10)
+        cache.set("a", 1, timeout=10)
         assert cache.get("a") == 1
 
     def test_redis(self):
