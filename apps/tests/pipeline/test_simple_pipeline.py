@@ -2,17 +2,16 @@ import logging
 import time
 
 import pytest
+
 from bamboo_engine import api
 from bamboo_engine.builder import *
-
 from pipeline.eri.runtime import BambooDjangoRuntime
 
-# pytestmark = pytest.mark.django_db
+pytestmark = pytest.mark.django_db
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-@pytest.mark.django_db()
 def test_run_pipeline():
     # 使用 builder 构造出流程描述结构
     start = EmptyStartEvent()
@@ -92,3 +91,65 @@ def test_run_pipeline():
     # 获得流程执行结果
     result = api.get_pipeline_states(runtime=runtime, root_id=pipeline["id"])
     assert result.data
+    """
+    {
+        'pd590cd86b071407c979799a40d11f0fe': {
+            'archived_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 756919),
+            'children': {'e048141f07851405680607c9c9d922c3a': {
+                'archived_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 680624),
+                'children': {},
+                'created_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 673556),
+                'error_ignorable': False,
+                'error_ignored': False,
+                'id': 'e048141f07851405680607c9c9d922c3a',
+                'loop': 1,
+                'parent_id': 'pd590cd86b071407c979799a40d11f0fe',
+                'retry': 0,
+                'root_id:': 'pd590cd86b071407c979799a40d11f0fe',
+                'skip': False,
+                'started_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 672706),
+                'state': 'FINISHED',
+                'version': 'v4421fb7f699446d79e7a65f25183c7f7'},
+                         'e4252083ae1e34f048daf0b6cdefc666f': {
+                             'archived_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 749612),
+                             'children': {},
+                             'created_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 734954),
+                             'error_ignorable': False,
+                             'error_ignored': False,
+                             'id': 'e4252083ae1e34f048daf0b6cdefc666f',
+                             'loop': 1,
+                             'parent_id': 'pd590cd86b071407c979799a40d11f0fe',
+                             'retry': 0,
+                             'root_id:': 'pd590cd86b071407c979799a40d11f0fe',
+                             'skip': False,
+                             'started_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 734566),
+                             'state': 'FINISHED',
+                             'version': 'v02e34ab5f7e744c993bcada7afa96ffe'},
+                         'e4a4f975a615344589345d6c9de0a2287': {
+                             'archived_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 709687),
+                             'children': {},
+                             'created_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 696731),
+                             'error_ignorable': False,
+                             'error_ignored': False,
+                             'id': 'e4a4f975a615344589345d6c9de0a2287',
+                             'loop': 1,
+                             'parent_id': 'pd590cd86b071407c979799a40d11f0fe',
+                             'retry': 0,
+                             'root_id:': 'pd590cd86b071407c979799a40d11f0fe',
+                             'skip': False,
+                             'started_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 696013),
+                             'state': 'FINISHED',
+                             'version': 'v799168664abf4b37b0883fae6ab49ce2'}},
+            'created_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 608447),
+            'error_ignorable': False,
+            'error_ignored': False,
+            'id': 'pd590cd86b071407c979799a40d11f0fe',
+            'loop': 1,
+            'parent_id': 'pd590cd86b071407c979799a40d11f0fe',
+            'retry': 0,
+            'root_id:': 'pd590cd86b071407c979799a40d11f0fe',
+            'skip': False,
+            'started_time': datetime.datetime(2023, 3, 13, 13, 56, 43, 605775),
+            'state': 'FINISHED',
+            'version': 'vba0a6e9e32ad43a2a41c347639bc4d9f'}}
+    """
