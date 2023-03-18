@@ -147,6 +147,7 @@ REST_FRAMEWORK = {
 # CELERY 开关
 # worker: python manage.py celery worker -l info
 # beat: python manage.py celery beat -l info
+# python manage.py celery worker -O fair -l info -c 1 -Q celery,default,er_schedule,er_execute
 IS_USE_CELERY = True
 
 # celery settings

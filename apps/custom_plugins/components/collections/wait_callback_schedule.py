@@ -16,6 +16,7 @@ class WaitCallbackService(Service):
         （如果在 execute() 方法中返回了 False，那么当前节点会进入 FAILED 状态，不会进入之后的等待回调阶段）
         """
         self._external_api_call()
+        data.outputs.output_a = "output_a_value"
         return True
 
     def schedule(self, data, parent_data, callback_data=None):
@@ -26,6 +27,7 @@ class WaitCallbackService(Service):
             data.outputs.ex_data = "task failed with code: %s" % status
             return False
 
+        data.outputs.status = status
         self.finish_schedule()
 
 

@@ -11,6 +11,8 @@ class WaitCallbackService(Service):
 
     def execute(self, data, parent_data):
         self._external_api_call()
+        data.outputs.output_a = "output_a_value"
+
         return True
 
     def schedule(self, data, parent_data, callback_data=None):
@@ -21,7 +23,10 @@ class WaitCallbackService(Service):
             data.outputs.ex_data = "task failed with code: %s" % status
             return False
         elif status < 1:
+            data.outputs.status = status
             return True
+
+        data.outputs.status = status
 
         self.finish_schedule()
 
