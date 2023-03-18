@@ -180,7 +180,7 @@ if IS_USE_CELERY:
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "xTool",
+        "NAME": "test_xTool",
         "USER": "root",
         "PASSWORD": "",
         "HOST": "localhost",
@@ -193,6 +193,6 @@ DATABASES = {
 LOG_PERSISTENT_DAYS = 30  # 设置引擎日志的有效期
 
 try:
-    from .config.local_settings import *  # noqa
+    from config.local_settings import *  # noqa
 except ImportError:
     pass
