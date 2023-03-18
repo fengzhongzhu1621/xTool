@@ -27,6 +27,7 @@ True 或 None：执行成功，节点会进入 FINISHED 状态，继续执行下
 * schedule()执行成功，调用 finish_schedule(), 返回None，继续执行下一个节点；成功后再次执行，
 成功后再次执行，则当前节点的进程不是休眠状态，不能执行
 * schedule()执行失败，返回False， 流程终止，再次调用会判断节点的状态，不为RUNNING则停止执行
+* schedule()执行异常，返回False， 流程终止，再次调用会判断节点的状态，不为RUNNING则停止执行
 * schedule()需要重试，第一次执行返回True， 流程暂停；可以再次执行，直到失败或执行finish_schedule()
 """
 

@@ -14,7 +14,6 @@ logging.basicConfig(level=logging.DEBUG)
 def test_schedule_component():
     # 使用 builder 构造出流程描述结构
     start = EmptyStartEvent()
-    # 这里先使用 bamboo-pipeline 自带的示例组件，我们会在后续的章节中学习如何自定义组件
     act = ServiceActivity(component_code="schedule_component")
     end = EmptyEndEvent()
 
