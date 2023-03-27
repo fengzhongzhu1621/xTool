@@ -35,7 +35,7 @@ djangorestframework
 markdown
 django-filter
 # hiredis
-redis==3.5.3
+redis==4.3.6
 redis-py-cluster==2.1.0
 
 # celery
