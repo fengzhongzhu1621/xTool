@@ -40,6 +40,7 @@ class TestFactorialCalculateComponent:
         pipeline = builder.build_tree(start, data=pipeline_data)
         options = {
             "celery_disabled": True,
+            "root_pipeline_data": {"a": 1}, # 可以从service.execute()中的parent_data获取到
         }
         api.run_pipeline(runtime=BambooDjangoRuntime(), pipeline=pipeline, **options)
 

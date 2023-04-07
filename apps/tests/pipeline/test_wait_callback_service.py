@@ -44,6 +44,7 @@ def test_wait_callback_schedule_component__schedule_failure():
     # 第二次执行时，会标记DBSchedule过期，不会重复执行
     result = api.callback(runtime, act.id, version=version, data={"status": 1})
     assert result.result is True
+    assert result.__dict__== {'result': True, 'message': 'success', 'exc': None, 'data': None, 'exc_trace': None}
 
 
 def test_wait_callback_schedule_component__schedule_success():

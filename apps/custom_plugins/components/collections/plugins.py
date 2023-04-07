@@ -6,6 +6,10 @@ from pipeline.core.flow.activity import Service
 
 class FactorialCalculateService(Service):
 
+    def __init__(self, component_code=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.component_code = component_code
+
     # data 是当前节点的数据对象，这个数据对象存储了用户传递给当前节点的参数的值以及当前节点输出的值
     # parent_data 则是该节点所属流程对象的数据对象，通常会将一些全局使用的常量存储在该对象中，如当前流程的执行者、流程的开始时间等。
     def execute(self, data, parent_data):
