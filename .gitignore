@@ -68,7 +68,7 @@ coverage.xml
 
 # Django stuff:
 # *.log
-local_settings.py
+# local_settings.py
 
 # Flask stuff:
 instance/
@@ -96,7 +96,7 @@ celerybeat-schedule
 *.sage.py
 
 # dotenv
-.env
+# .env
 
 # virtualenv
 .venv*
