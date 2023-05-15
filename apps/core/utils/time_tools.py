@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
@@ -20,10 +21,12 @@ def strftime_localtime(value, datetime_format="%Y-%m-%d %H:%M:%S%z"):
 
 
 def from_iso_format(start_time: str) -> datetime:
-    """将iso8601格式的字符串转换为当前时区的时间对象 ."""
+    """将iso8601格式的字符串转换为当前时区的时间对象（无时区） ."""
     start_time_obj = parse_datetime(start_time)
-    # 转换为当前时区的时间
+    # 获得当前时区
     current_timezone = timezone.get_current_timezone()
+    # 转换为当前时区的时间
     start_at_current_timezone = start_time_obj.astimezone(current_timezone)
+    # 去掉时区
     start_at_current_timezone_naive = timezone.make_naive(start_at_current_timezone)
     return start_at_current_timezone_naive
