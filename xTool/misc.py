@@ -277,48 +277,6 @@ def get_random_string(
     return "".join([random.choice(allowed_chars) for i in range(length)])
 
 
-def print_bin(data):
-    """以比较整齐的格式打印二进制数据，用于设计二进制数据的调试过程
-
-    `code source <http://code.oa.com/v2/weima/detail/70493>`_
-    """
-    assert isinstance(data, basestring)
-
-    dump_list = []
-    slice_str = ""
-    addr = 0
-
-    for byte in data:
-        if addr % 16 == 0:
-            dump_list.append(" ")
-
-            for char in slice_str:
-                if 32 <= ord(char) <= 126:
-                    dump_list.append(char)
-                else:
-                    dump_list.append(".")
-
-            dump_list.append("\n%04x: " % addr)
-            slice_str = ""
-
-        dump_list.append("%02x " % ord(byte))
-        slice_str += byte
-        addr += 1
-
-    remainder = addr % 16
-
-    if remainder != 0:
-        dump_list.append("   " * (16 - remainder) + " ")
-
-    for char in slice_str:
-        if 32 <= ord(char) <= 126:
-            dump_list.append(char)
-        else:
-            dump_list.append(".")
-
-    print("".join(dump_list))
-
-
 def strict_bool(s):
     """
     Variant of bool() that only accepts two possible string values.
