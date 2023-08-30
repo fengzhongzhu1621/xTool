@@ -45,6 +45,10 @@ class ScheduleService(Service):
         """
         使用在 execute() 中设置到输出中的 poll_url 来轮询第三方系统的状态，并根据其返回值来决定该次轮询的结果
 
+        返回存在3种情况
+        1. self.finish_schedule()，结束当前节点，继续下一个节点，类似 break
+        2. return False 流程暂停，进入 FAILED 状态
+        3. return True 等待进入当前节点下一次schedule()，类似continue
 
         :param data: 当前节点的数据对象，这个数据对象存储了用户传递给当前节点的参数的值以及当前节点输出的值。
         :param parent_data: 该节点所属流程对象的数据对象。
