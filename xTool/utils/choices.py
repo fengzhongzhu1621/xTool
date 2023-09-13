@@ -2,7 +2,13 @@
 
 import enum
 
-__all__ = ['Choices', 'IntegerChoices', 'TextChoices']
+__all__ = [
+    "Choices",
+    "IntegerChoices",
+    "TextChoices",
+    "register_choices",
+    "list_registered_choices",
+]
 
 
 class ChoicesMeta(enum.EnumMeta):
@@ -13,14 +19,14 @@ class ChoicesMeta(enum.EnumMeta):
         for key in classdict._member_names:
             value = classdict[key]
             if (
-                isinstance(value, (list, tuple)) and
-                len(value) > 1 and
-                isinstance(value[-1], str)
+                isinstance(value, (list, tuple))
+                and len(value) > 1
+                and isinstance(value[-1], str)
             ):
                 *value, label = value
                 value = tuple(value)
             else:
-                label = key.replace('_', ' ').title()
+                label = key.replace("_", " ").title()
             labels.append(label)
             # Use dict.__setitem__() to suppress defenses against double
             # assignment in enum's classdict.
@@ -42,12 +48,12 @@ class ChoicesMeta(enum.EnumMeta):
 
     @property
     def names(cls):
-        empty = ['__empty__'] if hasattr(cls, '__empty__') else []
+        empty = ["__empty__"] if hasattr(cls, "__empty__") else []
         return empty + [member.name for member in cls]
 
     @property
     def choices(cls):
-        empty = [(None, cls.__empty__)] if hasattr(cls, '__empty__') else []
+        empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
         return empty + [(member.value, member.label) for member in cls]
 
     @property
@@ -72,6 +78,7 @@ class Choices(enum.Enum, metaclass=ChoicesMeta):
 
 class IntegerChoices(int, Choices):
     """Class for creating enumerated integer choices."""
+
     pass
 
 
@@ -80,3 +87,32 @@ class TextChoices(str, Choices):
 
     def _generate_next_value_(name, start, count, last_values):
         return name
+
+
+# 存放已注册的枚举类
+_default = {}
+
+
+def register_choices(name):
+    """
+    注册choices类型的配置
+    """
+
+    def decorator(cls):
+        nonlocal name
+        # 如果装饰的为类，则取类名
+        if not name:
+            name = cls.__name__
+        # 将列表转换为Enum类型
+        if isinstance(cls, list):
+            cls = enum.Enum(name, names=cls)
+
+        _default[name] = cls
+        return cls
+
+    return decorator
+
+
+def list_registered_choices():
+    """获得已经注册的所有choicesEnum ."""
+    return _default

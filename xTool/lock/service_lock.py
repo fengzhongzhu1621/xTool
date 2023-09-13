@@ -8,10 +8,20 @@ from xTool.cachetools import hash_key, typed_key
 from xTool.misc import md5
 
 
-def share_lock(cache: object, ttl: int = 600, identify: Optional[str] = None, hash_param: bool = False,
-               typed: bool = False, key_prefix="share_lock"):
-    def wrapper(func):
+class ShareLockError:
 
+    pass
+
+
+def share_lock(
+    cache: object,
+    ttl: int = 600,
+    identify: Optional[str] = None,
+    hash_param: bool = False,
+    typed: bool = False,
+    key_prefix="share_lock",
+):
+    def wrapper(func):
         @functools.wraps(func)
         def _inner(*args, **kwargs):
             if identify:
@@ -28,7 +38,7 @@ def share_lock(cache: object, ttl: int = 600, identify: Optional[str] = None, ha
             lock_success = cache.set(cache_key, token, ex=ttl, nx=True)
             # 在ttl时间范围内加锁失败，则终止任务执行，保证任务的唯一性
             if not lock_success:
-                return
+                return ShareLockError()
 
             try:
                 return func(*args, **kwargs)

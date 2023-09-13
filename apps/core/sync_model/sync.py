@@ -1,21 +1,23 @@
-import logging
 from typing import Type, List, Optional, Dict, Set
 
 from django.db import transaction
 from django.db.models import Model
 
 from apps.core.sync_model.models import get_model_value
+from xTool.log import logger
 from xTool.misc import chunks
-
-logger = logging.getLogger(__name__)
 
 
 def get_unique_field_map(models: List, sync_unique_field: str) -> Dict:
     return {getattr(model, sync_unique_field): model for model in models}
 
 
-def create_models(resource: Type[Model], unique_value_created_set: Set, new_unique_field_map: Dict,
-                  chunk_created_size: int) -> None:
+def create_models(
+    resource: Type[Model],
+    unique_value_created_set: Set,
+    new_unique_field_map: Dict,
+    chunk_created_size: int,
+) -> None:
     if not unique_value_created_set:
         return
     resource_models_created = []
@@ -28,17 +30,29 @@ def create_models(resource: Type[Model], unique_value_created_set: Set, new_uniq
         logger.error(exc_info)
 
 
-def delete_models(resource: Type[Model], unique_value_deleted: Set, old_unique_field_map: Dict,
-                  chunk_deleted_size: int) -> None:
+def delete_models(
+    resource: Type[Model],
+    unique_value_deleted: Set,
+    old_unique_field_map: Dict,
+    chunk_deleted_size: int,
+) -> None:
     if not unique_value_deleted:
         return
-    delete_ids = [old_unique_field_map[unique_value].id for unique_value in unique_value_deleted]
+    delete_ids = [
+        old_unique_field_map[unique_value].id for unique_value in unique_value_deleted
+    ]
     for ids in chunks(delete_ids, chunk_deleted_size):
         resource.objects.filter(id__in=ids).delete()
 
 
-def update_models(unique_value_updated: Set, new_unique_field_map: Dict, old_unique_field_map: Dict, sync_fields: List,
-                  datetime_fields: Set, chunk_updated_size: int) -> None:
+def update_models(
+    unique_value_updated: Set,
+    new_unique_field_map: Dict,
+    old_unique_field_map: Dict,
+    sync_fields: List,
+    datetime_fields: Set,
+    chunk_updated_size: int,
+) -> None:
     if not unique_value_updated:
         return
     unique_value_updated = list(unique_value_updated)
@@ -49,10 +63,12 @@ def update_models(unique_value_updated: Set, new_unique_field_map: Dict, old_uni
                 old_resource_model = old_unique_field_map[unique_value]
                 new_resource_model = new_unique_field_map[unique_value]
                 old_compare_data = [
-                    get_model_value(old_resource_model, field, datetime_fields) for field in sync_fields
+                    get_model_value(old_resource_model, field, datetime_fields)
+                    for field in sync_fields
                 ]
                 new_compare_data = [
-                    get_model_value(new_resource_model, field, datetime_fields) for field in sync_fields
+                    get_model_value(new_resource_model, field, datetime_fields)
+                    for field in sync_fields
                 ]
                 # 补齐自增ID
                 new_resource_model.id = old_resource_model.id
@@ -70,7 +86,7 @@ def sync_data_to_model(
     datetime_fields: List = None,
     chunk_created_size: int = 50,
     chunk_updated_size: int = 200,
-    chunk_deleted_size: int = 1000
+    chunk_deleted_size: int = 1000,
 ):
     """同步数据到指定的数据表 ."""
     if datetime_fields:
@@ -92,13 +108,23 @@ def sync_data_to_model(
 
     # 新增记录
     unique_value_created_set = new_unique_field_value_set - old_unique_field_value_set
-    create_models(resource, unique_value_created_set, new_unique_field_map, chunk_created_size)
+    create_models(
+        resource, unique_value_created_set, new_unique_field_map, chunk_created_size
+    )
 
     # 删除记录
     unique_value_deleted = old_unique_field_value_set - new_unique_field_value_set
-    delete_models(resource, unique_value_deleted, old_unique_field_map, chunk_deleted_size)
+    delete_models(
+        resource, unique_value_deleted, old_unique_field_map, chunk_deleted_size
+    )
 
     # 更新记录
     unique_value_updated = new_unique_field_value_set & old_unique_field_value_set
-    update_models(unique_value_updated, new_unique_field_map, old_unique_field_map, sync_fields,
-                  datetime_fields, chunk_updated_size)
+    update_models(
+        unique_value_updated,
+        new_unique_field_map,
+        old_unique_field_map,
+        sync_fields,
+        datetime_fields,
+        chunk_updated_size,
+    )

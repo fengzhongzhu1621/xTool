@@ -193,6 +193,10 @@ DATABASES = {
 # pipeline
 LOG_PERSISTENT_DAYS = 30  # 设置引擎日志的有效期
 
+# 平台错误码前缀
+PLATFORM_CODE = 00
+
+
 try:
     from config.local_settings import *  # noqa
 except ImportError:

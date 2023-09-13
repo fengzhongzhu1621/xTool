@@ -1,5 +1,7 @@
 import inspect
+import time
 from functools import wraps
+
 from xTool.log import logger
 
 
@@ -17,7 +19,9 @@ def log(f):
             except IndexError:
                 pass
 
-        params.extend([f"args{index}={value}" for index, value in enumerate(args[len(params) :])])
+        params.extend(
+            [f"args{index}={value}" for index, value in enumerate(args[len(params) :])]
+        )
 
         d = kwargs.copy()
         # arg_spec.kwonlyargs = ["d", "e"]
@@ -33,19 +37,28 @@ def log(f):
 
         params.extend([f"(kwargs){t}={value}" for t, value in d.items()])
 
-        # 执行函数前打印函数的执行参数
-        logger.info("%s(%s)", f.__name__, ', '.join(params))
+        # 执行函数，并记录耗时
+        begin_time = time.time()
+        try:
+            logger.info(f"[{f.__name__}] execute begin: {', '.join(params)}")
+            result = f(*args, **kwargs)
+        finally:
+            end_time = time.time()
+            cost = end_time - begin_time
+            logger.info(
+                f"[{f.__name__}] execute end: {', '.join(params)}, cost is {cost}"
+            )
 
-        return f(*args, **kwargs)
+        return result
 
     return wrapper
 
 
 if __name__ == "__main__":
+
     @log
     def run_task(a, b=2, *c, d, e=3, **f) -> str:
         print(f"a={a}, b={b}, c={c}, d={d}, e={e}, f={f}")
-
 
     def test_run_task():
         run_task(1, 2, 3, 4, 5, d=6, attr1="v1", attr2="v2")

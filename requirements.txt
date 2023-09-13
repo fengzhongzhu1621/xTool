@@ -64,3 +64,6 @@ django_celery_results
 mysqlclient
 
 uhashring
+
+
+bk-iam==1.3.4
