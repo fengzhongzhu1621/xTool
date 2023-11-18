@@ -8,7 +8,7 @@ from xTool.cachetools import hash_key, typed_key
 from xTool.misc import md5
 
 
-class ShareLockError:
+class ShareLockError(Exception):
 
     pass
 

@@ -33,8 +33,6 @@ except ImportError:
 import psutil
 from asyncio.constants import DEBUG_STACK_DEPTH
 
-from xTool.compat import basestring
-
 # Determine platform being used.
 system = platform.system()
 USE_MAC = USE_WINDOWS = USE_LINUX = USE_CYGWIN = USE_X11 = False
@@ -162,18 +160,6 @@ def get_run_command_result(command):
     )
     stdout_data, stderr_data = proc.communicate()
     return proc.returncode, stdout_data, stderr_data
-
-
-def json_ser(obj):
-    """json serializer that deals with dates.
-
-    usage: json.dumps(object, default=utils.json.json_ser)
-    """
-    if isinstance(obj, (datetime, date)):
-        # Return a string representing the date and time in ISO 8601 format,
-        # YYYY-MM-DDTHH:MM:SS.mmmmmm or, if microsecond is 0,
-        # YYYY-MM-DDTHH:MM:SS
-        return obj.isoformat()
 
 
 class NumpyJsonEncoder(json.JSONEncoder):
@@ -409,14 +395,6 @@ def with_metaclass(meta, base=object):
     return meta(MODEL_BASE, (base,), {})
 
 
-def merge_dict(source, overrides):
-    """字典合并，返回新的字典 ."""
-    merged = source.copy()
-    if overrides:
-        merged.update(overrides)
-    return merged
-
-
 def quote(path, quote_chars):
     if len(path) == 1:
         return path[0].join(quote_chars)
@@ -610,7 +588,7 @@ class UseTimesGenerator:
             value = 1
             self.cache[obj] = 1
         else:
-            # 下一值自增
+            # 下一个值自增
             old_value = self.cache[obj]
             value = (old_value + 1) & 0xFFFFFFFF
         self.cache[obj] = value
@@ -653,19 +631,6 @@ def convert_textarea_to_list(ips):
 def get_unique_list(value: Iterable) -> list:
     """list去重，并保持原有数据顺序 ."""
     return list(collections.OrderedDict.fromkeys(value))
-
-
-def get_new_filename(file, new_file_name=None):
-    new_file_name = new_file_name or file_md5sum(file)
-    old_file_name = file.name
-    # 获得文件后缀名
-    ext = ""
-    if "." in old_file_name:
-        ext = old_file_name.split(".")[-1]
-
-    if ext:
-        new_file_name = "{}.{}".format(new_file_name, ext)
-    return new_file_name
 
 
 def tree():
