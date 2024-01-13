@@ -23,26 +23,33 @@ aiohttp
 async_timeout
 netifaces
 typing_extensions
-statsd==3.3.0
+statsd
 rapidjson
 python-snappy
 tzlocal
 speaklater
 curlify
 pymysql
-django==3.2.12
-djangorestframework
 markdown
-django-filter
 # hiredis
 redis==3.5.3
 redis-py-cluster==2.1.0
+pygments
+cachetools
+wirerope
+kafka-python
+arrow
+async-timeout>=4.0.2
+uhashring
+bk-iam
+pydantic
+pydantic[dotenv]
 
-# celery
+# django
 celery==4.4.7
 django-celery-beat==2.2.0
 django-celery-results==2.0.1
-
+django-filter
 opentelemetry-api
 opentelemetry-sdk
 opentelemetry-exporter-otlp-proto-http
@@ -53,17 +60,8 @@ opentelemetry-instrumentation-redis
 opentelemetry-instrumentation-requests
 opentelemetry-instrumentation-celery
 opentelemetry-instrumentation-logging
-pygments
-cachetools
-wirerope
-kafka-python
-arrow
-async-timeout>=4.0.2
-bamboo-pipeline==3.24.2
-django_celery_results
+django==3.2.12
+djangorestframework
 mysqlclient
-
-uhashring
-
-
-bk-iam==1.3.4
+django_celery_results
+bamboo-pipeline

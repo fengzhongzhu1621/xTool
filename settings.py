@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "pipeline.log",
     "pipeline.engine",
     "pipeline.component_framework",
-    "pipeline.variable_framework",
+    # "pipeline.variable_framework",
     "pipeline.eri",
     "pipeline.contrib.engine_admin",
     # 业务逻辑
