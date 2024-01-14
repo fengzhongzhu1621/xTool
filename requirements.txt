@@ -43,7 +43,6 @@ async-timeout>=4.0.2
 uhashring
 bk-iam
 pydantic
-pydantic[dotenv]
 
 # django
 celery==4.4.7
