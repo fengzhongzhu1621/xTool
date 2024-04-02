@@ -5,12 +5,14 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import imp
 import os
 import sys
+import warnings
 from importlib import import_module
 from inspect import ismodule
-import imp
-import warnings
+from types import ModuleType
+from typing import Callable
 
 from six import iteritems
 
@@ -36,11 +38,11 @@ def make_module(name, objects):
     Examples:
         make_module('airflow.operators.' + p.name, p.operators + p.sensors))
     """
-    log.debug('Creating module %s', name)
+    log.debug("Creating module %s", name)
     # 创建模块
     module = imp.new_module(name)
     # 给模块设置_name属性 （插件名），即p.name
-    module._name = name.split('.')[-1]
+    module._name = name.split(".")[-1]
     # 给模块设置_object属性（插件中所有的类名）
     module._objects = objects
     # 给模块设置属性 （类名 => 类）
@@ -63,19 +65,19 @@ def create_object_from_plugin_module(name, *args, **kwargs):
     Args:
         name: plugin_module.class_name
     """
-    items = name.split('.')
+    items = name.split(".")
     if len(items) != 2:
         raise XToolException(
             "Executor {0} not supported: "
-            "please specify in format plugin_module.executor".format(name))
+            "please specify in format plugin_module.executor".format(name)
+        )
     # items[0]：表示插件名
     # items[1]：表示插件中的类名
     plugin_module_name = items[0]
     class_name = items[1]
     if plugin_module_name in globals():
         # 根据插件中的类名创建对象
-        return globals()[plugin_module_name].__dict__[class_name](*args,
-                                                                  **kwargs)
+        return globals()[plugin_module_name].__dict__[class_name](*args, **kwargs)
     else:
         raise XToolException("Executor {0} not supported.".format(name))
 
@@ -107,14 +109,15 @@ def load_backend_module_from_conf(section, key, default_backend, conf=None):
     try:
         module = import_module(backend)
     except ImportError as err:
-        log.critical("Cannot import %s for %s %s due to: %s", backend, section,
-                     key, err)
+        log.critical(
+            "Cannot import %s for %s %s due to: %s", backend, section, key, err
+        )
         raise XToolException(err)
 
     return module
 
 
-def import_string(dotted_path):
+def import_string(dotted_path: str) -> Callable:
     """根据点分割的字符串，加载类
     Import a dotted module path and return the attribute/class designated by the
     last name in the path. Raise ImportError if the import failed.
@@ -125,12 +128,11 @@ def import_string(dotted_path):
         返回加载的模块中的对象
     """
     try:
-        module_path, class_name = dotted_path.rsplit('.', 1)
+        module_path, class_name = dotted_path.rsplit(".", 1)
     except ValueError:
-        raise ImportError(
-            "{} doesn't look like a module path".format(dotted_path))
+        raise ImportError("{} doesn't look like a module path".format(dotted_path))
 
-    module = import_module(module_path)
+    module: ModuleType = import_module(module_path)
 
     try:
         # 返回模块中的类
@@ -138,7 +140,9 @@ def import_string(dotted_path):
     except AttributeError:
         raise ImportError(
             'Module "{}" does not define a "{}" attribute/class'.format(
-                module_path, class_name))
+                module_path, class_name
+            )
+        )
 
 
 def import_string_from_package(module_name, package=None):
@@ -189,8 +193,7 @@ class XToolImporter(object):
         :type module_attributes: string
         """
         self._parent_module = parent_module
-        self._attribute_modules = self._build_attribute_modules(
-            module_attributes)
+        self._attribute_modules = self._build_attribute_modules(module_attributes)
         self._loaded_modules = {}
 
         # Wrap the module so we can take over __getattr__.
@@ -242,7 +245,8 @@ class XToolImporter(object):
             # 在父模块的目录下所有的文件中查找指定的module
             f, filename, description = imp.find_module(module, [folder])
             self._loaded_modules[module] = imp.load_module(
-                module, f, filename, description)
+                module, f, filename, description
+            )
 
             # This functionality is deprecated
             warnings.warn(
@@ -250,8 +254,10 @@ class XToolImporter(object):
                 "deprecated. Please import from "
                 "'{m}.[operator_module]' instead. Support for direct "
                 "imports will be dropped entirely in future version.".format(
-                    i=attribute, m=self._parent_module.__name__),
-                DeprecationWarning)
+                    i=attribute, m=self._parent_module.__name__
+                ),
+                DeprecationWarning,
+            )
 
         loaded_module = self._loaded_modules[module]
 

@@ -32,7 +32,6 @@ class TreeToJson(Transformer):
 
 
 def test_parse_simple():
-
     lark_obj = Lark(
         """
 start: WORD "," WORD "!"
@@ -186,6 +185,7 @@ def test_parse_json():
         ],
     )
     assert parser == expect
+
     # 可以看到 value 被内联，true 被正常识别，字符串 (string) 和数字 (number) 都有使用了别名
     expect = """
 dict
