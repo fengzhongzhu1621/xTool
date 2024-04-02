@@ -1,5 +1,6 @@
 import abc
-from typing import Callable
+from functools import wraps
+from typing import Callable, Dict
 
 from pydantic import (
     BaseModel,
@@ -9,64 +10,6 @@ from pydantic import (
 
 from xTool.exceptions import XToolException
 from xTool.utils.module_loading import import_string
-
-
-class FunctionsManager:
-    __hub = {}  # type: ignore
-
-    @classmethod
-    def register_invocation_cls(cls, invocation_cls):
-        func_name = invocation_cls.Meta.func_name
-        existed_invocation_cls = cls.__hub.get(func_name)
-        if existed_invocation_cls:
-            raise RuntimeError(
-                "func register error, {}'s func_name {} conflict with {}".format(
-                    existed_invocation_cls, func_name, invocation_cls
-                )
-            )
-
-        cls.__hub[func_name] = invocation_cls
-
-    @classmethod
-    def register_funcs(cls, func_dict):
-        for func_name, func_path in func_dict.items():
-            if not isinstance(func_name, str):
-                raise ValueError(f"func_name {func_name} should be string")
-            if func_name in cls.__hub:
-                raise ValueError(
-                    "func register error, {}'s func_name {} conflict with {}".format(
-                        func_path, func_name, cls.__hub[func_name]
-                    )
-                )
-            cls.__hub[func_name] = func_path
-
-    @classmethod
-    def clear(cls):
-        cls.__hub = {}
-
-    @classmethod
-    def all_funcs(cls):
-        funcs = {}
-        for version, invocation_cls in cls.__hub.items():
-            funcs[version] = invocation_cls
-        return funcs
-
-    @classmethod
-    def get_func(cls, func_name) -> Callable:
-        func_obj = cls.__hub.get(func_name)
-        if not func_obj:
-            raise ValueError("func object {} not found".format(func_name))
-
-        if isinstance(func_obj, InvocationMeta):
-            return func_obj()
-
-        func = import_string(func_obj)
-        return func
-
-    @classmethod
-    def func_call(cls, func_name, *args, **kwargs):
-        func = cls.get_func(func_name)
-        return func(*args, **kwargs)
 
 
 class InvocationMeta(type):
@@ -99,6 +42,79 @@ class InvocationMeta(type):
         FunctionsManager.register_invocation_cls(new_cls)
 
         return new_cls
+
+
+class FunctionsManager:
+    """函数管理器 ."""
+    # 存放注册的可执行对象
+    __hub = {}  # type: ignore
+
+    @classmethod
+    def register_invocation_cls(cls, invocation_cls: InvocationMeta, name=None) -> None:
+        if not name:
+            func_name = invocation_cls.Meta.func_name
+        else:
+            func_name = name
+        if not isinstance(func_name, str):
+            raise ValueError(f"func_name {func_name} should be string")
+        existed_invocation_cls = cls.__hub.get(func_name)
+        if existed_invocation_cls:
+            raise RuntimeError(
+                "func register error, {}'s func_name {} conflict with {}".format(
+                    existed_invocation_cls, func_name, invocation_cls
+                )
+            )
+
+        # 存放类的实例
+        cls.__hub[func_name] = invocation_cls()
+
+    @classmethod
+    def register_funcs(cls, func_dict) -> None:
+        for func_name, func_obj in func_dict.items():
+            if not isinstance(func_name, str):
+                raise ValueError(f"func_name {func_name} should be string")
+            if func_name in cls.__hub:
+                raise ValueError(
+                    "func register error, {}'s func_name {} conflict with {}".format(
+                        func_obj, func_name, cls.__hub[func_name]
+                    )
+                )
+            if isinstance(func_obj, str):
+                func = import_string(func_obj)
+            elif isinstance(func_obj, Callable):
+                func = func_obj
+            else:
+                raise ValueError(
+                    "func register error, {} is not be callable".format(
+                        func_obj, func_name
+                    )
+                )
+
+            cls.__hub[func_name] = func
+
+    @classmethod
+    def clear(cls) -> None:
+        """清空注册信息 ."""
+        cls.__hub = {}
+
+    @classmethod
+    def all_funcs(cls) -> Dict:
+        """获得所有的注册信息. """
+        return cls.__hub
+
+    @classmethod
+    def get_func(cls, func_name: str) -> Callable:
+        """获得注册的函数 ."""
+        func_obj = cls.__hub.get(func_name)
+        if not func_obj:
+            raise ValueError("func object {} not found".format(func_name))
+        return func_obj
+
+    @classmethod
+    def func_call(cls, func_name: str, *args, **kwargs):
+        """根据函数名执行注册的函数 ."""
+        func = cls.get_func(func_name)
+        return func(*args, **kwargs)
 
 
 class BaseInvocation(metaclass=InvocationMeta):
@@ -140,4 +156,31 @@ class BaseInvocation(metaclass=InvocationMeta):
 
     @abc.abstractmethod
     def invoke(self, *args, **kwargs):
+        """自定义业务逻辑 ."""
         raise NotImplementedError()
+
+
+def register_class(name: str):
+    def _register_class(cls: BaseInvocation):
+        FunctionsManager.register_invocation_cls(cls, name=name)
+
+        @wraps(cls)
+        def wrapper():
+            return cls()
+
+        return wrapper
+
+    return _register_class
+
+
+def register_func(name: str):
+    def _register_func(func: Callable):
+        FunctionsManager.register_funcs({name: func})
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return _register_func
