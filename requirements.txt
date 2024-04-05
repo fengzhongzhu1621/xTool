@@ -62,5 +62,5 @@ opentelemetry-instrumentation-celery
 opentelemetry-instrumentation-logging
 bamboo-pipeline
 bk-iam
-# 机器学习
 theano
+lark
