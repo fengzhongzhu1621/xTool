@@ -6,7 +6,6 @@ import threading
 import typing
 from collections import deque
 
-
 T = typing.TypeVar("T")
 R = typing.TypeVar("R")
 
@@ -14,16 +13,37 @@ GenType = typing.Generator[T, R, None]
 FuncType = typing.Callable[[], GenType]
 
 
+def is_iter_empty(i):
+    try:
+        _ = next(i)
+        return False
+    except StopIteration:
+        return True
+
+
 class IteratorWrapper(typing.AsyncIterator):
     """将迭代器在线程中运行，并在遍历迭代器前加一个缓冲队列 ."""
+
     __slots__ = (
-        "__close_event", "__closed", "__gen_func", "__gen_task", "__queue",
-        "__queue_maxsize", "__read_event", "__write_event", "executor", "loop",
+        "__close_event",
+        "__closed",
+        "__gen_func",
+        "__gen_task",
+        "__queue",
+        "__queue_maxsize",
+        "__read_event",
+        "__write_event",
+        "executor",
+        "loop",
     )
     """Run iterables on dedicated thread pool ."""
+
     def __init__(
-        self, gen_func: FuncType, loop=None,
-        max_size=0, executor=None,
+        self,
+        gen_func: FuncType,
+        loop=None,
+        max_size=0,
+        executor=None,
     ):
 
         self.loop = loop or asyncio.get_event_loop()
@@ -33,7 +53,7 @@ class IteratorWrapper(typing.AsyncIterator):
         self.__close_event = asyncio.Event()
         self.__queue = deque()  # 加一个缓冲队列，存放迭代器的值
         self.__queue_maxsize = max_size
-        self.__gen_task = None      # type: asyncio.Task
+        self.__gen_task = None  # type: asyncio.Task
         self.__gen_func = gen_func  # type: typing.Callable
         self.__write_event = threading.Event()
         self.__read_event = asyncio.Event()
@@ -48,10 +68,12 @@ class IteratorWrapper(typing.AsyncIterator):
 
     def _set_read_event(self):
         """设置信号 ."""
+
         def setter():
             if self.__read_event.is_set():
                 return
             self.__read_event.set()
+
         self.loop.call_soon_threadsafe(setter)
 
     def _in_thread(self) -> None:
@@ -108,7 +130,9 @@ class IteratorWrapper(typing.AsyncIterator):
 
         await self.__close_event.wait()
         await asyncio.gather(
-            self.__gen_task, loop=self.loop, return_exceptions=True,
+            self.__gen_task,
+            loop=self.loop,
+            return_exceptions=True,
         )
         del self.__queue
 
