@@ -22,7 +22,11 @@ import sys
 import traceback
 import warnings
 from datetime import datetime, date
-from io import StringIO
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import BytesIO as StringIO
 from typing import List, Iterable, Union, Dict
 
 try:
@@ -232,7 +236,7 @@ def grouper(n, iterable, padvalue=None):
 
 def chunks(items, chunk_len):
     """Yield successive n-sized chunks from l."""
-    return (items[i : i + chunk_len] for i in xrange(0, len(items), chunk_len))
+    return (items[i: i + chunk_len] for i in xrange(0, len(items), chunk_len))
 
 
 def chunked(it, chunk_len):
@@ -241,7 +245,7 @@ def chunked(it, chunk_len):
         list(g) for g in izip_longest(*[iter(it)] * chunk_len, fillvalue=marker)
     ):
         if group[-1] is marker:
-            del group[group.index(marker) :]
+            del group[group.index(marker):]
         yield group
 
 
