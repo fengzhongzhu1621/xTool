@@ -791,3 +791,8 @@ def isascii(s: str) -> bool:
             return True
         except (UnicodeDecodeError, UnicodeEncodeError):
             return False
+
+
+class fzset(frozenset):
+    def __repr__(self):
+        return "{%s}" % ", ".join(map(repr, self))
