@@ -25,7 +25,18 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import BytesIO as StringIO
-from typing import List, Iterable, Union, Dict, Optional, Callable, Any, Sequence
+from typing import (
+    List,
+    Iterable,
+    Union,
+    Dict,
+    Optional,
+    Callable,
+    Any,
+    Sequence,
+    AbstractSet,
+    Iterator,
+)
 from .type_hint import T
 
 try:
@@ -803,3 +814,31 @@ def isascii(s: str) -> bool:
 class fzset(frozenset):
     def __repr__(self):
         return "{%s}" % ", ".join(map(repr, self))
+
+
+class OrderedSet(AbstractSet[T]):
+    """A minimal OrderedSet implementation, using a dictionary.
+
+    (relies on the dictionary being ordered)
+    """
+
+    def __init__(self, items: Iterable[T] = ()):
+        self.d = dict.fromkeys(items)
+
+    def __contains__(self, item: Any) -> bool:
+        return item in self.d
+
+    def add(self, item: T):
+        self.d[item] = None
+
+    def __iter__(self) -> Iterator[T]:
+        return iter(self.d)
+
+    def remove(self, item: T):
+        del self.d[item]
+
+    def __bool__(self):
+        return bool(self.d)
+
+    def __len__(self) -> int:
+        return len(self.d)
