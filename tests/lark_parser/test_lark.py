@@ -46,6 +46,31 @@ json_parser_2 = Lark(
     start="value",
 )
 
+json_parser_3 = Lark(
+    r"""
+    value: dict
+         | list
+         | string
+         | SIGNED_NUMBER  -> number
+         | "true"  -> true
+         | "false" -> false
+         | "null"  -> null
+
+    list: "[" [value ("," value)*] "]"
+
+    dict: "{" [pair ("," pair)*] "}"
+    pair: string ":" value
+
+    string: ESCAPED_STRING
+
+    %import common.ESCAPED_STRING
+    %import common.SIGNED_NUMBER
+    %import common.WS
+    %ignore WS
+    """,
+    start="value",
+)
+
 
 class MyTransformer(Transformer):
     def list(self, items):
@@ -154,7 +179,7 @@ value
     assert parser.pretty() == expect
 
 
-def test_parse_json():
+def test_parse_json_2():
     # 箭头 (->) 表示别名 alias。别名是规则特定部分的名称。 在本例中命名匹配的 true/false/null，不会丢失信息。 同时也命名 SIGNED_NUMBER 方便后续处理。
     # value 前的问号 (?value) 告诉树生成器在只有一个成员的情况下将该分支内联 (inline)。 在本例中，value 只可能有一个成员，所以总会被内联。
     # 将 terminal ESCAPED_STRING 变为 rule，会在树中表示为分支。 与 alias 等价，但 string 也可以用在语法的其它地方。
@@ -218,3 +243,24 @@ dict
     transform_tree = TreeToJson().transform(parser)
     expect = {"key": ["item0", "item1", 3.14, True]}
     assert transform_tree == expect
+
+
+def test_parse_json_3():
+    """测试 value 不内连 ."""
+    text = '{"key": ["item0", "item1", 3.14, true]}'
+    parser = json_parser_3.parse(text)
+    expect = ("""
+    value
+      dict
+        pair
+          string    "key"
+          value
+            list
+              value
+                string      "item0"
+              value
+                string      "item1"
+              number        3.14
+              true
+    """).lstrip()
+    assert parser.pretty() == expect
