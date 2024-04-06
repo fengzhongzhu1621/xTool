@@ -25,7 +25,8 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import BytesIO as StringIO
-from typing import List, Iterable, Union, Dict, Optional, Callable, Any
+from typing import List, Iterable, Union, Dict, Optional, Callable, Any, Sequence
+from .type_hint import T
 
 try:
     import numpy as np
@@ -42,6 +43,13 @@ if PY3:
 else:
     izip_longest = itertools.izip_longest
 zip_longest = izip_longest
+
+if sys.version_info >= (3, 11):
+    import re._parser as sre_parse  # noqa
+    import re._constants as sre_constants  # noqa
+else:
+    import sre_parse  # noqa
+    import sre_constants  # noqa
 
 
 def get_encodings():
@@ -738,3 +746,16 @@ def classify(
         except KeyError:
             d[k] = [v]
     return d
+
+
+def dedup_list(l: Sequence[T]) -> List[T]:
+    """序列去重且保留原始的顺序
+
+    Given a list (l) will removing duplicates from the list,
+    preserving the original order of the list. Assumes that
+    the list entries are hashable."""
+    dedup = set()
+    # This returns None, but that's expected
+    return [x for x in l if not (x in dedup or dedup.add(x))]  # type: ignore[func-returns-value]
+    # 2x faster (ordered in PyPy and CPython 3.6+, guaranteed to be ordered in Python 3.7+)
+    # return list(dict.fromkeys(l))
