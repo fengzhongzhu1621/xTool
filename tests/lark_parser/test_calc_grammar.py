@@ -9,7 +9,9 @@ This example shows how to write a basic calculator with variables.
 
 import operator
 
-from lark import Lark, Transformer, v_args
+import pytest
+
+from lark import Lark, Transformer, v_args, UnexpectedToken
 
 calc_grammar = """
     // 求和
@@ -71,3 +73,14 @@ def test_calc():
     assert calc("a = 1+2") == 3
     assert calc("1+a*-3") == -8.0
     assert calc("2*(3+4)") == 14.0
+
+    with pytest.raises(UnexpectedToken):
+        calc("2**4")
+
+    transform_tree = CalculateTree().transform(
+        Lark(calc_grammar, parser="lalr").parse("2*(3+4)")
+    )
+    assert transform_tree == 14.0
+
+    with pytest.raises(UnexpectedToken):
+        CalculateTree().transform(Lark(calc_grammar, parser="lalr").parse("2**4"))
