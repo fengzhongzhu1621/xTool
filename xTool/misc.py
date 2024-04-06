@@ -227,7 +227,7 @@ def get_random_string(
     The default length of 12 with the a-z, A-Z, 0-9 character set returns
     a 71-bit value. log_2((26+26+10)^12) =~ 71 bits
     """
-    return "".join([random.choice(allowed_chars) for i in range(length)])
+    return "".join([random.choice(allowed_chars) for _ in range(length)])
 
 
 def strict_bool(s):
@@ -748,7 +748,7 @@ def classify(
     return d
 
 
-def dedup_list(l: Sequence[T]) -> List[T]:
+def dedup_list(s: Sequence[T]) -> List[T]:
     """序列去重且保留原始的顺序
 
     Given a list (l) will removing duplicates from the list,
@@ -756,7 +756,7 @@ def dedup_list(l: Sequence[T]) -> List[T]:
     the list entries are hashable."""
     dedup = set()
     # This returns None, but that's expected
-    return [x for x in l if not (x in dedup or dedup.add(x))]  # type: ignore[func-returns-value]
+    return [x for x in s if not (x in dedup or dedup.add(x))]  # type: ignore[func-returns-value]
     # 2x faster (ordered in PyPy and CPython 3.6+, guaranteed to be ordered in Python 3.7+)
     # return list(dict.fromkeys(l))
 
@@ -777,5 +777,17 @@ def combine_alternatives(lists):
     """
     if not lists:
         return [[]]
-    assert all(l for l in lists), lists
+    assert all(s for s in lists), lists
     return list(itertools.product(*lists))
+
+
+def isascii(s: str) -> bool:
+    """str.isascii only exists in python3.7+"""
+    if sys.version_info >= (3, 7):
+        return s.isascii()
+    else:
+        try:
+            s.encode("ascii")
+            return True
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            return False
