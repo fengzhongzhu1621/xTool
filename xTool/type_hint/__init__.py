@@ -50,6 +50,7 @@ if PY3:
         PathLike = Union[str, pathlib.PurePath]
 
 T = TypeVar("T")
+S = TypeVar("S")
 OptionsType = Iterable[Tuple[int, int, int]]
 F = TypeVar("F", bound=Callable[..., Any])
 IP_ADDRESS = Tuple[str, int]
