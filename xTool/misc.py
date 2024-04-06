@@ -759,3 +759,23 @@ def dedup_list(l: Sequence[T]) -> List[T]:
     return [x for x in l if not (x in dedup or dedup.add(x))]  # type: ignore[func-returns-value]
     # 2x faster (ordered in PyPy and CPython 3.6+, guaranteed to be ordered in Python 3.7+)
     # return list(dict.fromkeys(l))
+
+
+def combine_alternatives(lists):
+    """
+    Accepts a list of alternatives, and enumerates all their possible concatenations.
+
+    Examples:
+        >>> combine_alternatives([range(2), [4,5]])
+        [[0, 4], [0, 5], [1, 4], [1, 5]]
+
+        >>> combine_alternatives(["abc", "xy", '$'])
+        [['a', 'x', '$'], ['a', 'y', '$'], ['b', 'x', '$'], ['b', 'y', '$'], ['c', 'x', '$'], ['c', 'y', '$']]
+
+        >>> combine_alternatives([])
+        [[]]
+    """
+    if not lists:
+        return [[]]
+    assert all(l for l in lists), lists
+    return list(itertools.product(*lists))
