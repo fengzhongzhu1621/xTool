@@ -748,6 +748,13 @@ def classify(
     return d
 
 
+def classify_bool(seq: Iterable, pred: Callable) -> Any:
+    """分类 bool 类型"""
+    false_elems = []
+    true_elems = [elem for elem in seq if pred(elem) or false_elems.append(elem)]  # type: ignore[func-returns-value]
+    return true_elems, false_elems
+
+
 def dedup_list(s: Sequence[T]) -> List[T]:
     """序列去重且保留原始的顺序
 
