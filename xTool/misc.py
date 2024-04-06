@@ -236,7 +236,7 @@ def grouper(n, iterable, padvalue=None):
 
 def chunks(items, chunk_len):
     """Yield successive n-sized chunks from l."""
-    return (items[i: i + chunk_len] for i in xrange(0, len(items), chunk_len))
+    return (items[i : i + chunk_len] for i in xrange(0, len(items), chunk_len))
 
 
 def chunked(it, chunk_len):
@@ -245,7 +245,7 @@ def chunked(it, chunk_len):
         list(g) for g in izip_longest(*[iter(it)] * chunk_len, fillvalue=marker)
     ):
         if group[-1] is marker:
-            del group[group.index(marker):]
+            del group[group.index(marker) :]
         yield group
 
 
@@ -447,6 +447,10 @@ def camel_to_snake_2(camel_str: str) -> str:
     return result.lower()
 
 
+def camel_to_snake_2(camel_str: str):
+    return re.sub(r"(?<!^)(?=[A-Z])", "_", camel_str).lower()
+
+
 def snake_to_camel(name: str, title_case=False) -> str:
     """将下划线命名改为驼峰命名 ."""
     items = name.split("_")
@@ -539,7 +543,6 @@ if hasattr(sys, "_getframe"):
 
     def get_current_frame():
         return sys._getframe(3)
-
 
 else:  # pragma: no cover
 
@@ -695,7 +698,7 @@ def float_to_str(f):
 def to_dict(obj):
     if isinstance(obj, dict):
         data = {}
-        for (k, v) in list(obj.items()):
+        for k, v in list(obj.items()):
             data[k] = to_dict(v)
         return data
     elif hasattr(obj, "__iter__") and not isinstance(obj, str):
