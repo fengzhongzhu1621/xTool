@@ -12,21 +12,22 @@ import operator
 from lark import Lark, Transformer, v_args
 
 calc_grammar = """
+    // 求和
     ?start: sum
-          | NAME "=" sum    -> assign_var
+          | NAME "=" sum    -> assign_var // 赋值
 
     ?sum: product
-        | sum "+" product   -> add
-        | sum "-" product   -> sub
+        | sum "+" product   -> add // 加法
+        | sum "-" product   -> sub // 减法
 
     ?product: atom
-        | product "*" atom  -> mul
-        | product "/" atom  -> div
+        | product "*" atom  -> mul // 乘法
+        | product "/" atom  -> div // 除法
 
-    ?atom: NUMBER           -> number
-         | "-" atom         -> neg
-         | NAME             -> var
-         | "(" sum ")"
+    ?atom: NUMBER           -> number // 正数
+         | "-" atom         -> neg // 数值取反
+         | NAME             -> var // 支持变量
+         | "(" sum ")"     // 支持括号
 
     // 第一个字符下划或大小写字母，其余字符是大小写字母
     %import common.CNAME -> NAME
