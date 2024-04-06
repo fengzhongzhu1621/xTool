@@ -248,6 +248,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     (MIT License) bamboo-pipeline 3.24.2 (https://github.com/TencentBlueKing/bamboo-engine)
     (MIT License) bk-iam 1.3.4 (https://github.com/TencentBlueKing/bk-iam)
     (MIT License) bkflow-feel 1.2.0 (https://github.com/TencentBlueKing/bkflow-feel)
+    (MIT License) lark 1.1.9 (https://github.com/lark-parser/lark)
 
 ========================================================================
 BSD 2-Clause licenses
