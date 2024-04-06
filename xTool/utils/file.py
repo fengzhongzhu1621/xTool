@@ -17,7 +17,7 @@ from xTool.utils.log.logging_mixin import LoggingMixin
 
 
 @contextmanager
-def TemporaryDirectory(suffix='', prefix=None, dir=None):
+def TemporaryDirectory(suffix="", prefix=None, dir=None):
     """创建临时目录 .
 
     with TemporaryDirectory(prefix='xtool_tmp') as tmp_dir:
@@ -35,13 +35,21 @@ def TemporaryDirectory(suffix='', prefix=None, dir=None):
                 raise e
 
 
-def write_temp_file(content, mode='w+b', buffering=-1, encoding=None,
-                    newline=None, suffix=None, prefix=None,
-                    dir=None, delete=True):
+def write_temp_file(
+    content,
+    mode="w+b",
+    buffering=-1,
+    encoding=None,
+    newline=None,
+    suffix=None,
+    prefix=None,
+    dir=None,
+    delete=True,
+):
     """写临时文件 ."""
-    with NamedTemporaryFile(mode, buffering, encoding,
-                            newline, suffix, prefix,
-                            dir, delete) as writer:
+    with NamedTemporaryFile(
+        mode, buffering, encoding, newline, suffix, prefix, dir, delete
+    ) as writer:
         writer.write(content)
         return writer.name
 
@@ -56,8 +64,8 @@ def mkdirs(path, mode):
     :param mode: The mode to give to the directory e.g. 0o755, ignores umask
     :type mode: int
     """
+    o_umask = os.umask(0)
     try:
-        o_umask = os.umask(0)
         os.makedirs(path, mode)
     except OSError:
         if not os.path.isdir(path):
@@ -74,16 +82,18 @@ def mkdir_p(path):
             pass
         else:
             raise XToolConfigException(
-                'Error creating {}: {}'.format(path, exc.strerror))
+                "Error creating {}: {}".format(path, exc.strerror)
+            )
 
 
 def list_py_file_paths(
     directory,
     followlinks=True,
-    ignore_filename='.ignore',
-    file_ext='.py',
+    ignore_filename=".ignore",
+    file_ext=".py",
     safe_mode=False,
-    safe_filters=(b'xTool', b'XTool')):
+    safe_filters=(b"xTool", b"XTool"),
+):
     """递归遍历目录，返回匹配规则的文件列表
     Traverse a directory and look for Python files.
 
@@ -107,11 +117,10 @@ def list_py_file_paths(
             # 获得需要忽略的文件
             ignore_file = os.path.join(root, ignore_filename)
             if os.path.isfile(ignore_file):
-                with open(ignore_file, 'r') as f:
+                with open(ignore_file, "r") as f:
                     # If we have new patterns create a copy so we don't change
                     # the previous list (which would affect other subdirs)
-                    patterns = patterns + \
-                               [p for p in f.read().split('\n') if p]
+                    patterns = patterns + [p for p in f.read().split("\n") if p]
 
             # If we can ignore any subdirs entirely we should - fewer paths
             # to walk is better. We have to modify the ``dirs`` array in
@@ -135,9 +144,9 @@ def list_py_file_paths(
                         continue
                     # 验证文件后缀
                     mod_name, file_extension = os.path.splitext(
-                        os.path.split(file_path)[-1])
-                    if file_extension != file_ext and not zipfile.is_zipfile(
-                        file_path):
+                        os.path.split(file_path)[-1]
+                    )
+                    if file_extension != file_ext and not zipfile.is_zipfile(file_path):
                         continue
                     # 验证忽略规则
                     if any([re.findall(p, file_path) for p in patterns]):
@@ -148,10 +157,11 @@ def list_py_file_paths(
                     # Airflow DAG definition.
                     might_contain_dag = True
                     if safe_mode and not zipfile.is_zipfile(file_path):
-                        with open(file_path, 'rb') as f:
+                        with open(file_path, "rb") as f:
                             content = f.read()
                             might_contain_dag = all(
-                                [s in content for s in safe_filters])
+                                [s in content for s in safe_filters]
+                            )
 
                     if not might_contain_dag:
                         continue
@@ -190,3 +200,23 @@ def get_unzipped_files(package):
     """
     input_zip = zipfile.ZipFile(package)
     return {name: StringIO(input_zip.read(name)) for name in input_zip.namelist()}
+
+
+try:
+    # atomicwrites doesn't have type bindings
+    import atomicwrites  # type: ignore[import]
+
+    _has_atomicwrites = True
+except ImportError:
+    _has_atomicwrites = False
+
+
+class FS:
+    exists = staticmethod(os.path.exists)
+
+    @staticmethod
+    def open(name, mode="r", **kwargs):
+        if _has_atomicwrites and "w" in mode:
+            return atomicwrites.atomic_write(name, mode=mode, overwrite=True, **kwargs)
+        else:
+            return open(name, mode, **kwargs)
