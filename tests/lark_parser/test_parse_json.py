@@ -249,7 +249,8 @@ def test_parse_json_3():
     """测试 value 不内连 ."""
     text = '{"key": ["item0", "item1", 3.14, true]}'
     parser = json_parser_3.parse(text)
-    expect = ("""
+    expect = (
+        """
     value
       dict
         pair
@@ -262,5 +263,6 @@ def test_parse_json_3():
                 string      "item1"
               number        3.14
               true
-    """).lstrip()
+    """
+    ).lstrip()
     assert parser.pretty() == expect
