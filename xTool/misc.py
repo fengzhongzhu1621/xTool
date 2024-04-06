@@ -27,7 +27,7 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import BytesIO as StringIO
-from typing import List, Iterable, Union, Dict
+from typing import List, Iterable, Union, Dict, Optional, Callable, Any
 
 try:
     import numpy as np
@@ -772,3 +772,18 @@ def retry_once(action: callable):
             action()
         except Exception as exc_info:  # noqa
             raise exc_info
+
+
+def classify(
+    seq: Iterable, key: Optional[Callable] = None, value: Optional[Callable] = None
+) -> Dict:
+    """将迭代器按规则分类 ."""
+    d: Dict[Any, Any] = {}
+    for item in seq:
+        k = key(item) if (key is not None) else item
+        v = value(item) if (value is not None) else item
+        try:
+            d[k].append(v)
+        except KeyError:
+            d[k] = [v]
+    return d
