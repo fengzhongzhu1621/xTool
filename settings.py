@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
-from pathlib import Path
 
 import environ
 
@@ -19,13 +18,19 @@ import environ
 # 配置优先级 环境变量 -> .env文件 -> settings.py
 environ.Env.read_env()
 
-from config.celery_config import app  # noqa
-
 ENVIRONMENT = os.getenv("BKPAAS_ENVIRONMENT", "dev")
 DJANGO_CONF_MODULE = "config.{env}".format(env=ENVIRONMENT)
+try:
+    _module = __import__(DJANGO_CONF_MODULE, globals(), locals(), ["*"])
+except ImportError as e:
+    raise ImportError("Could not import config '{}' (Is it on sys.path?): {}".format(DJANGO_CONF_MODULE, e))
+
+for _setting in dir(_module):
+    if _setting == _setting.upper():
+        locals()[_setting] = getattr(_module, _setting)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -206,6 +211,6 @@ LOG_PERSISTENT_DAYS = 30  # 设置引擎日志的有效期
 PLATFORM_CODE = 00
 
 try:
-    from config.local_settings import *  # noqa
+    from config.celery_config import app  # noqa
 except ImportError:
     pass

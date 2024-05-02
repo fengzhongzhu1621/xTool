@@ -40,7 +40,8 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("swagger/", schema_view.with_ui(cache_timeout=0), name="schema-swagger-ui"),
     path("i18n/", include("django.conf.urls.i18n")),
-    path("", views.api_root),
+    path("api_root", views.api_root),
     path("quickstart/", include("apps.quickstart.urls")),
     path("snippets/", include("apps.snippets.urls")),
+    path("", include("apps.entry.urls")),
 ]
