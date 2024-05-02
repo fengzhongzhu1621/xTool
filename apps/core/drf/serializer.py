@@ -1,4 +1,5 @@
-import ujson as json
+import orjson as json
+
 from apps.core.exceptions import ParamValidationError
 from rest_framework import serializers
 from rest_framework.settings import api_settings
@@ -31,27 +32,19 @@ def format_serializer_errors(errors, fields, params, prefix="", return_all_error
             ):
                 for index, sub_errors in enumerate(field_errors):
                     if sub_errors:
-                        sub_format = format_serializer_errors(
-                            sub_errors, field.child.fields, params, prefix=prefix
-                        )
+                        sub_format = format_serializer_errors(sub_errors, field.child.fields, params, prefix=prefix)
                         if not return_all_errors:
                             return f"{label}: {sub_format}"
                         temp_message = f"{prefix}第{index + 1}项:"
                         sub_message.append(
-                            temp_message + sub_format[0]
-                            if isinstance(sub_format, tuple)
-                            else sub_format
+                            temp_message + sub_format[0] if isinstance(sub_format, tuple) else sub_format
                         )
             else:
                 if isinstance(field_errors, dict):
                     if hasattr(field, "child"):
-                        sub_format = format_serializer_errors(
-                            field_errors, field.child.fields, params, prefix=prefix
-                        )
+                        sub_format = format_serializer_errors(field_errors, field.child.fields, params, prefix=prefix)
                     else:
-                        sub_format = format_serializer_errors(
-                            field_errors, field.fields, params, prefix=prefix
-                        )
+                        sub_format = format_serializer_errors(field_errors, field.fields, params, prefix=prefix)
                     if not return_all_errors:
                         return f"{label}: {sub_format}"
                     sub_message.append(sub_format)
@@ -59,19 +52,14 @@ def format_serializer_errors(errors, fields, params, prefix="", return_all_error
                     for index, error in enumerate(field_errors):
                         error = error.format(**{key: params.get(key, "")})
                         if len(field_errors) > 1:
-                            sub_message.append(
-                                "{index}.{error}".format(index=index + 1, error=error)
-                            )
+                            sub_message.append("{index}.{error}".format(index=index + 1, error=error))
                         else:
                             sub_message.append("{error}".format(error=error))
                         if not return_all_errors:
                             sub_message = ",".join(sub_message)
                             return f"{label}: {sub_message}"
         cn_message[str(label)] = ",".join(
-            [
-                str(message[1]) if isinstance(message, tuple) else str(message)
-                for message in sub_message
-            ]
+            [str(message[1]) if isinstance(message, tuple) else str(message) for message in sub_message]
         )
         message[key] = sub_message
 
@@ -86,9 +74,7 @@ def custom_params_valid(serializer, params, instance=None, many=False, partial=F
     try:
         _serializer.is_valid(raise_exception=True)
     except serializers.ValidationError:
-        msg_tuple = format_serializer_errors(
-            _serializer.errors, _serializer.fields, params
-        )
+        msg_tuple = format_serializer_errors(_serializer.errors, _serializer.fields, params)
         raise ParamValidationError(msg_tuple)
     if many:
         return list(_serializer.validated_data)

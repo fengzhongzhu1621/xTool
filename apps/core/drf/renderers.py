@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from apps.core.request import get_or_create_local_request_id
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.status import is_success
-
-from apps.core.request import get_or_create_local_request_id
 
 
 class APIRenderer(JSONRenderer):
@@ -29,18 +28,14 @@ class APIRenderer(JSONRenderer):
             "data": None,
             "message": None,
             "request_id": req_id,
-            "trace_id": getattr(
-                renderer_context.get("request", object()), "otel_trace_id", None
-            ),
+            "trace_id": getattr(renderer_context.get("request", object()), "otel_trace_id", None),
         }
 
         if is_success(response.status_code):
             response.status_code = status.HTTP_200_OK
             res_data["data"] = data
             res_data["code"] = self.SUCCESS_CODE
-            return super(APIRenderer, self).render(
-                res_data, accepted_media_type, renderer_context
-            )
+            return super().render(res_data, accepted_media_type, renderer_context)
 
         code = response.status_code
         message = response.data
@@ -57,9 +52,7 @@ class APIRenderer(JSONRenderer):
         else:
             res_data["errors"] = errors
 
-        return super(APIRenderer, self).render(
-            res_data, accepted_media_type, renderer_context
-        )
+        return super().render(res_data, accepted_media_type, renderer_context)
 
     @staticmethod
     def pretty_dict(dict_data):

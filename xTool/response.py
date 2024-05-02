@@ -1,27 +1,25 @@
 # -*- coding: utf-8 -*-
 
 import warnings
-
 from functools import partial
 from mimetypes import guess_type
 from os import path
 from urllib.parse import quote_plus
 
-from xTool.cookies.cookies import CookieJar
-from xTool.headers import format_http1, format_http1_response
-from xTool.header import remove_entity_headers
-from xTool.algorithms.collections.header import Header
-from xTool.status import has_message_body
 from xTool.aiomisc import open_async
-
+from xTool.algorithms.collections.header import Header
+from xTool.cookies.cookies import CookieJar
+from xTool.header import remove_entity_headers
+from xTool.headers import format_http1, format_http1_response
+from xTool.status import has_message_body
 
 try:
-    from ujson import dumps as json_dumps
+    from orjson import dumps as json_dumps
 except ImportError:
     from json import dumps
 
     # This is done in order to ensure that the JSON response is
-    # kept consistent across both ujson and inbuilt json usage.
+    # kept consistent across both orjson and inbuilt json usage.
     json_dumps = partial(dumps, separators=(",", ":"))
 
 
@@ -50,7 +48,7 @@ class BaseHTTPResponse:
         body=b"",
     ):
         """.. deprecated:: 20.3:
-           This function is not public API and will be removed."""
+        This function is not public API and will be removed."""
 
         # self.headers get priority over content_type
         if self.content_type and "Content-Type" not in self.headers:
@@ -109,9 +107,7 @@ class StreamingHTTPResponse(BaseHTTPResponse):
             await self.protocol.push_data(data)
         await self.protocol.drain()
 
-    async def stream(
-        self, version="1.1", keep_alive=False, keep_alive_timeout=None
-    ):
+    async def stream(self, version="1.1", keep_alive=False, keep_alive_timeout=None):
         """Streams headers, runs the `streaming_fn` callback that writes
         content to the response body, then finalizes the response body.
         """
@@ -130,9 +126,7 @@ class StreamingHTTPResponse(BaseHTTPResponse):
         # no need to await drain here after this write, because it is the
         # very last thing we write and nothing needs to wait for it.
 
-    def get_headers(
-        self, version="1.1", keep_alive=False, keep_alive_timeout=None
-    ):
+    def get_headers(self, version="1.1", keep_alive=False, keep_alive_timeout=None):
         if self.chunked and version == "1.1":
             self.headers["Transfer-Encoding"] = "chunked"
             self.headers.pop("Content-Length", None)
@@ -161,9 +155,7 @@ class HTTPResponse(BaseHTTPResponse):
         body = b""
         if has_message_body(self.status):
             body = self.body
-            self.headers["Content-Length"] = self.headers.get(
-                "Content-Length", len(self.body)
-            )
+            self.headers["Content-Length"] = self.headers.get("Content-Length", len(self.body))
 
         return self.get_headers(version, keep_alive, keep_alive_timeout, body)
 
@@ -210,9 +202,7 @@ def json(
     )
 
 
-def text(
-    body, status=200, headers=None, content_type="text/plain; charset=utf-8"
-):
+def text(body, status=200, headers=None, content_type="text/plain; charset=utf-8"):
     """
     Returns response object with body in text format.
 
@@ -238,14 +228,10 @@ def text(
             pass
     except TypeError:
         body = f"{body}"  # no-op if body is already str
-    return HTTPResponse(
-        body, status=status, headers=headers, content_type=content_type
-    )
+    return HTTPResponse(body, status=status, headers=headers, content_type=content_type)
 
 
-def raw(
-    body, status=200, headers=None, content_type="application/octet-stream"
-):
+def raw(body, status=200, headers=None, content_type="application/octet-stream"):
     """
     Returns response object without encoding the body.
 
@@ -300,18 +286,14 @@ async def file(
     """
     headers = headers or {}
     if filename:
-        headers.setdefault(
-            "Content-Disposition", f'attachment; filename="{filename}"'
-        )
+        headers.setdefault("Content-Disposition", f'attachment; filename="{filename}"')
     filename = filename or path.split(location)[-1]
 
     async with await open_async(location, mode="rb") as f:
         if _range:
             await f.seek(_range.start)
             out_stream = await f.read(_range.size)
-            headers[
-                "Content-Range"
-            ] = f"bytes {_range.start}-{_range.end}/{_range.total}"
+            headers["Content-Range"] = f"bytes {_range.start}-{_range.end}/{_range.total}"
             status = 206
         else:
             out_stream = await f.read()
@@ -348,9 +330,7 @@ async def file_stream(
     """
     headers = headers or {}
     if filename:
-        headers.setdefault(
-            "Content-Disposition", f'attachment; filename="{filename}"'
-        )
+        headers.setdefault("Content-Disposition", f'attachment; filename="{filename}"')
     filename = filename or path.split(location)[-1]
     mime_type = mime_type or guess_type(filename)[0] or "text/plain"
     if _range:
@@ -423,9 +403,7 @@ def stream(
     )
 
 
-def redirect(
-    to, headers=None, status=302, content_type="text/html; charset=utf-8"
-):
+def redirect(to, headers=None, status=302, content_type="text/html; charset=utf-8"):
     """Abort execution and cause a 302 redirect (by default).
 
     :param to: path or fully qualified URL to redirect to
@@ -442,6 +420,4 @@ def redirect(
     # According to RFC 7231, a relative URI is now permitted.
     headers["Location"] = safe_to
 
-    return HTTPResponse(
-        status=status, headers=headers, content_type=content_type
-    )
+    return HTTPResponse(status=status, headers=headers, content_type=content_type)

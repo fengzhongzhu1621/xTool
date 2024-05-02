@@ -19,4 +19,7 @@ python-dotenv==0.20.0
 fakeredis==1.7.4
 mockredispy==2.9.3
 xmlrunner==1.7.7
+pytest-helpers-namespace==2021.12.29
+mockafka-py
+et-xmlfile
 mypy

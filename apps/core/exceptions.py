@@ -1,19 +1,19 @@
 import json
 import logging
-from enum import Enum
 from json.decoder import JSONDecodeError
 
+from blueapps.core.exceptions import BlueException
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_lazy as _lazy
+
+from apps.core.constants import ErrorCode
 from iam.contrib.http import HTTP_AUTH_FORBIDDEN_CODE
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
-from apps.core.constants import ErrorCode
 from xTool.log import logger
 
 
@@ -48,15 +48,9 @@ def custom_exception_handler(exc, context):
             exc_message = str(exc.message)
 
     # 如果是权限异常，返回403
-    error_code = (
-        exc.code
-        if isinstance(exc, AppException)
-        else status.HTTP_500_INTERNAL_SERVER_ERROR
-    )
+    error_code = exc.code if isinstance(exc, AppException) else status.HTTP_500_INTERNAL_SERVER_ERROR
     status_code = (
-        status.HTTP_403_FORBIDDEN
-        if isinstance(exc, PermissionDeniedError)
-        else status.HTTP_500_INTERNAL_SERVER_ERROR
+        status.HTTP_403_FORBIDDEN if isinstance(exc, PermissionDeniedError) else status.HTTP_500_INTERNAL_SERVER_ERROR
     )
 
     # 由前端处理无权限调整
@@ -64,10 +58,8 @@ def custom_exception_handler(exc, context):
         error_code = exc_data.get("code", error_code)
         if error_code == ErrorCode.IAM_NOT_PERMISSION.value:
             exc_data = {
-                "apply_url": exc_data.get("apply_url")
-                or exc_data.get("data", {}).get("apply_url"),
-                "permission": exc_data.get("permission")
-                or exc_data.get("data", {}).get("permission"),
+                "apply_url": exc_data.get("apply_url") or exc_data.get("data", {}).get("apply_url"),
+                "permission": exc_data.get("permission") or exc_data.get("data", {}).get("permission"),
             }
             status_code = status.HTTP_403_FORBIDDEN
 
@@ -82,12 +74,65 @@ def custom_exception_handler(exc, context):
     return Response(data, status=status_code)
 
 
-class AppException(Exception):
+class ApiError(BlueException):
+    pass
 
+
+class ValidationError(BlueException):
+    MESSAGE = _lazy("参数验证失败")
+    ERROR_CODE = "001"
+
+    def __init__(self, *args, data=None, **kwargs):
+        if args:
+            custom_message = args[0]
+            if isinstance(custom_message, tuple):
+                super().__init__(custom_message[1], data=custom_message[0], **kwargs)
+            else:
+                super().__init__(custom_message, **kwargs)
+        else:
+            super().__init__(**kwargs)
+
+
+class ApiResultError(ApiError):
+    MESSAGE = _("远程服务请求结果异常")
+    ERROR_CODE = "002"
+
+
+class ComponentCallError(BlueException):
+    MESSAGE = _("组件调用异常")
+    ERROR_CODE = "003"
+
+
+class LocalError(BlueException):
+    MESSAGE = _("组件调用异常")
+    ERROR_CODE = "004"
+
+
+class LanguageDoseNotSupported(BlueException):
+    MESSAGE = _("语言不支持")
+    ERROR_CODE = "005"
+
+
+class InstanceNotFound(BlueException):
+    MESSAGE = _("资源实例获取失败")
+    ERROR_CODE = "006"
+
+
+class PermissionError(BlueException):
+    MESSAGE = _("权限不足")
+    ERROR_CODE = "403"
+
+
+class ApiRequestError(ApiError):
+    MESSAGE = _("服务不稳定，请检查组件健康状况")
+    ERROR_CODE = "015"
+
+
+class AppException(Exception):
     PLATFORM_CODE = getattr(settings, "PLATFORM_CODE", "00")
     MODULE_CODE = "00"
     ERROR_CODE = "500"
-    MESSAGE = _("APP异常")
+    MESSAGE = _lazy("APP异常")
     STATUS_CODE = 500
     LOG_LEVEL = logging.ERROR
 
@@ -106,7 +151,7 @@ class AppException(Exception):
         if kwargs.get("code"):
             self.code = kwargs["code"]
 
-        self.message = force_text(message) if message else force_text(self.MESSAGE)
+        self.message = force_str(message) if message else force_str(self.MESSAGE)
 
         self.data = data
 
@@ -116,7 +161,7 @@ class ClientException(AppException):
     客户端请求异常
     """
 
-    MESSAGE = _("客户端请求异常")
+    MESSAGE = _lazy("客户端请求异常")
     ERROR_CODE = "400"
     STATUS_CODE = 400
 
@@ -126,7 +171,7 @@ class ParamValidationError(ClientException):
     客户端异常：参数验证失败
     """
 
-    MESSAGE = _("参数验证失败")
+    MESSAGE = _lazy("参数验证失败")
     ERROR_CODE = "400"
     STATUS_CODE = 400
 

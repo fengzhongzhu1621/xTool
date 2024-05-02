@@ -21,9 +21,9 @@ from xTool.log.log import error_logger, logger
 
 
 try:
-    from ujson import loads as json_loads  # type: ignore
+    from orjson import loads as json_loads  # type: ignore
 except ImportError:
-    from json import loads as json_loads  # type: ignore
+    from orjson import loads as json_loads  # type: ignore
 
 DEFAULT_HTTP_CONTENT_TYPE = "application/octet-stream"
 EXPECT_HEADER = "EXPECT"
@@ -52,7 +52,7 @@ class StreamBuffer:
         self._queue = asyncio.Queue(buffer_size)
 
     async def read(self):
-        """ Stop reading when gets None """
+        """Stop reading when gets None"""
         payload = await self._queue.get()
         self._queue.task_done()
         return payload
@@ -203,21 +203,15 @@ class Request:
         if self.parsed_form is None:
             self.parsed_form = RequestParameters()
             self.parsed_files = RequestParameters()
-            content_type = self.headers.get(
-                "Content-Type", DEFAULT_HTTP_CONTENT_TYPE
-            )
+            content_type = self.headers.get("Content-Type", DEFAULT_HTTP_CONTENT_TYPE)
             content_type, parameters = parse_content_header(content_type)
             try:
                 if content_type == "application/x-www-form-urlencoded":
-                    self.parsed_form = RequestParameters(
-                        parse_qs(self.body.decode("utf-8"))
-                    )
+                    self.parsed_form = RequestParameters(parse_qs(self.body.decode("utf-8")))
                 elif content_type == "multipart/form-data":
                     # TODO: Stream this instead of reading to/from memory
                     boundary = parameters["boundary"].encode("utf-8")
-                    self.parsed_form, self.parsed_files = parse_multipart_form(
-                        self.body, boundary
-                    )
+                    self.parsed_form, self.parsed_files = parse_multipart_form(self.body, boundary)
             except Exception:
                 error_logger.exception("Failed when parsing form")
 
@@ -264,13 +258,9 @@ class Request:
         :type errors: str
         :return: RequestParameters
         """
-        if not self.parsed_args[
-            (keep_blank_values, strict_parsing, encoding, errors)
-        ]:
+        if not self.parsed_args[(keep_blank_values, strict_parsing, encoding, errors)]:
             if self.query_string:
-                self.parsed_args[
-                    (keep_blank_values, strict_parsing, encoding, errors)
-                ] = RequestParameters(
+                self.parsed_args[(keep_blank_values, strict_parsing, encoding, errors)] = RequestParameters(
                     parse_qs(
                         qs=self.query_string,
                         keep_blank_values=keep_blank_values,
@@ -280,9 +270,7 @@ class Request:
                     )
                 )
 
-        return self.parsed_args[
-            (keep_blank_values, strict_parsing, encoding, errors)
-        ]
+        return self.parsed_args[(keep_blank_values, strict_parsing, encoding, errors)]
 
     args = property(get_args)
 
@@ -320,22 +308,16 @@ class Request:
         :type errors: str
         :return: list
         """
-        if not self.parsed_not_grouped_args[
-            (keep_blank_values, strict_parsing, encoding, errors)
-        ]:
+        if not self.parsed_not_grouped_args[(keep_blank_values, strict_parsing, encoding, errors)]:
             if self.query_string:
-                self.parsed_not_grouped_args[
-                    (keep_blank_values, strict_parsing, encoding, errors)
-                ] = parse_qsl(
+                self.parsed_not_grouped_args[(keep_blank_values, strict_parsing, encoding, errors)] = parse_qsl(
                     qs=self.query_string,
                     keep_blank_values=keep_blank_values,
                     strict_parsing=strict_parsing,
                     encoding=encoding,
                     errors=errors,
                 )
-        return self.parsed_not_grouped_args[
-            (keep_blank_values, strict_parsing, encoding, errors)
-        ]
+        return self.parsed_not_grouped_args[(keep_blank_values, strict_parsing, encoding, errors)]
 
     query_args = property(get_query_args)
 
@@ -346,9 +328,7 @@ class Request:
             if cookie is not None:
                 cookies = SimpleCookie()
                 cookies.load(cookie)
-                self._cookies = {
-                    name: cookie.value for name, cookie in cookies.items()
-                }
+                self._cookies = {name: cookie.value for name, cookie in cookies.items()}
             else:
                 self._cookies = {}
         return self._cookies
@@ -405,9 +385,7 @@ class Request:
     def forwarded(self):
         if self.parsed_forwarded is None:
             self.parsed_forwarded = (
-                parse_forwarded(self.headers, self.app.config)
-                or parse_xforwarded(self.headers, self.app.config)
-                or {}
+                parse_forwarded(self.headers, self.app.config) or parse_xforwarded(self.headers, self.app.config) or {}
             )
         return self.parsed_forwarded
 
@@ -422,13 +400,8 @@ class Request:
         :rtype: int
         """
         if self.forwarded:
-            return self.forwarded.get("port") or (
-                80 if self.scheme in ("http", "ws") else 443
-            )
-        return (
-            parse_host(self.host)[1]
-            or self.transport.get_extra_info("sockname")[1]
-        )
+            return self.forwarded.get("port") or (80 if self.scheme in ("http", "ws") else 443)
+        return parse_host(self.host)[1] or self.transport.get_extra_info("sockname")[1]
 
     @property
     def remote_addr(self):
@@ -457,10 +430,7 @@ class Request:
         if forwarded_proto:
             return forwarded_proto
 
-        if (
-            self.app.websocket_enabled
-            and self.headers.get("upgrade") == "websocket"
-        ):
+        if self.app.websocket_enabled and self.headers.get("upgrade") == "websocket":
             scheme = "ws"
         else:
             scheme = "http"
@@ -500,9 +470,7 @@ class Request:
 
     @property
     def url(self):
-        return urlunparse(
-            (self.scheme, self.host, self.path, None, self.query_string, None)
-        )
+        return urlunparse((self.scheme, self.host, self.path, None, self.query_string, None))
 
     def url_for(self, view_name, **kwargs):
         """
@@ -525,16 +493,12 @@ class Request:
         host = self.server_name
         port = self.server_port
 
-        if (scheme.lower() in ("http", "ws") and port == 80) or (
-            scheme.lower() in ("https", "wss") and port == 443
-        ):
+        if (scheme.lower() in ("http", "ws") and port == 80) or (scheme.lower() in ("https", "wss") and port == 443):
             netloc = host
         else:
             netloc = f"{host}:{port}"
 
-        return self.app.url_for(
-            view_name, _external=True, _scheme=scheme, _server=netloc, **kwargs
-        )
+        return self.app.url_for(view_name, _external=True, _scheme=scheme, _server=netloc, **kwargs)
 
 
 File = namedtuple("File", ["type", "body", "name"])
@@ -568,9 +532,7 @@ def parse_multipart_form(body, boundary):
 
             colon_index = form_line.index(":")
             form_header_field = form_line[0:colon_index].lower()
-            form_header_value, form_parameters = parse_content_header(
-                form_line[colon_index + 2:]
-            )
+            form_header_value, form_parameters = parse_content_header(form_line[colon_index + 2 :])
 
             if form_header_field == "content-disposition":
                 field_name = form_parameters.get("name")
@@ -578,9 +540,7 @@ def parse_multipart_form(body, boundary):
 
                 # non-ASCII filenames in RFC2231, "filename*" format
                 if file_name is None and form_parameters.get("filename*"):
-                    encoding, _, value = email.utils.decode_rfc2231(
-                        form_parameters["filename*"]
-                    )
+                    encoding, _, value = email.utils.decode_rfc2231(form_parameters["filename*"])
                     file_name = unquote(value, encoding=encoding)
             elif form_header_field == "content-type":
                 content_type = form_header_value
@@ -595,17 +555,12 @@ def parse_multipart_form(body, boundary):
                 else:
                     fields[field_name] = [value]
             else:
-                form_file = File(
-                    type=content_type, name=file_name, body=post_data
-                )
+                form_file = File(type=content_type, name=file_name, body=post_data)
                 if field_name in files:
                     files[field_name].append(form_file)
                 else:
                     files[field_name] = [form_file]
         else:
-            logger.debug(
-                "Form-data field does not have a 'name' parameter "
-                "in the Content-Disposition header"
-            )
+            logger.debug("Form-data field does not have a 'name' parameter " "in the Content-Disposition header")
 
     return fields, files

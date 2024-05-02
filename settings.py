@@ -9,10 +9,20 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+
 import os
 from pathlib import Path
 
+import environ
+
+# 读取环境变量文件
+# 配置优先级 环境变量 -> .env文件 -> settings.py
+environ.Env.read_env()
+
 from config.celery_config import app  # noqa
+
+ENVIRONMENT = os.getenv("BKPAAS_ENVIRONMENT", "dev")
+DJANGO_CONF_MODULE = "config.{env}".format(env=ENVIRONMENT)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,14 +50,14 @@ INSTALLED_APPS = [
     "rest_framework",
     "apps.core.drf_resource",
     # bamboo-pipeline
-    "pipeline",
-    "pipeline.django_signal_valve",
-    "pipeline.log",
-    "pipeline.engine",
-    "pipeline.component_framework",
+    # "pipeline",
+    # "pipeline.django_signal_valve",
+    # "pipeline.log",
+    # "pipeline.engine",
+    # "pipeline.component_framework",
     # "pipeline.variable_framework",
-    "pipeline.eri",
-    "pipeline.contrib.engine_admin",
+    # "pipeline.eri",
+    # "pipeline.contrib.engine_admin",
     # 业务逻辑
     "apps.quickstart",
     "apps.snippets",
@@ -64,6 +74,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# urls的入口目录
 ROOT_URLCONF = "apps.urls"
 
 TEMPLATES = [
@@ -130,9 +141,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.SessionAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.SessionAuthentication",),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
     "NON_FIELD_ERRORS_KEY": "params_error",
@@ -195,7 +204,6 @@ LOG_PERSISTENT_DAYS = 30  # 设置引擎日志的有效期
 
 # 平台错误码前缀
 PLATFORM_CODE = 00
-
 
 try:
     from config.local_settings import *  # noqa

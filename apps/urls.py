@@ -13,15 +13,33 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
 
 from apps import views
+from core.permissions import SwaggerPermission
+
+info = openapi.Info(
+    title="{{ cookiecutter.app_id }}",
+    default_version="v1",
+    description="{{ cookiecutter.app_id }}",
+)
+schema_view = get_schema_view(
+    info,
+    public=True,
+    permission_classes=(SwaggerPermission,),
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("account/", include("blueapps.account.urls")),
     path("pipeline_admin/", include("pipeline.contrib.engine_admin.urls")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("swagger/", schema_view.with_ui(cache_timeout=0), name="schema-swagger-ui"),
+    path("i18n/", include("django.conf.urls.i18n")),
     path("", views.api_root),
     path("quickstart/", include("apps.quickstart.urls")),
     path("snippets/", include("apps.snippets.urls")),
