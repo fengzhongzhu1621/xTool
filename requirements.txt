@@ -64,3 +64,6 @@ bamboo-pipeline
 bk-iam
 theano
 lark
+pydot
+graphviz
+pydotplus

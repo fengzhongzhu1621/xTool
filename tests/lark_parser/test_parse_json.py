@@ -183,7 +183,6 @@ def test_parse_json_2():
     # 箭头 (->) 表示别名 alias。别名是规则特定部分的名称。 在本例中命名匹配的 true/false/null，不会丢失信息。 同时也命名 SIGNED_NUMBER 方便后续处理。
     # value 前的问号 (?value) 告诉树生成器在只有一个成员的情况下将该分支内联 (inline)。 在本例中，value 只可能有一个成员，所以总会被内联。
     # 将 terminal ESCAPED_STRING 变为 rule，会在树中表示为分支。 与 alias 等价，但 string 也可以用在语法的其它地方。
-
     text = '{"key": ["item0", "item1", 3.14, true]}'
     parser = json_parser_2.parse(text)
     expect = Tree(

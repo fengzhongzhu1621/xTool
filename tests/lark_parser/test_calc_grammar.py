@@ -12,6 +12,7 @@ import operator
 import pytest
 
 from lark import Lark, Transformer, v_args, UnexpectedToken
+from xTool.feel.pydot import make_pretty, make_png
 
 calc_grammar = """
     // 求和
@@ -26,6 +27,7 @@ calc_grammar = """
         | product "*" atom  -> mul // 乘法
         | product "/" atom  -> div // 除法
 
+    // 基本元素
     ?atom: NUMBER           -> number // 正数
          | "-" atom         -> neg // 数值取反
          | NAME             -> var // 支持变量
@@ -66,7 +68,8 @@ class CalculateTree(Transformer):
     neg = operator.neg
 
 
-calc = Lark(calc_grammar, parser="lalr", transformer=CalculateTree()).parse
+lark = Lark(calc_grammar, parser="lalr", transformer=CalculateTree())
+calc = lark.parse
 
 
 def test_calc():
@@ -84,3 +87,7 @@ def test_calc():
 
     with pytest.raises(UnexpectedToken):
         CalculateTree().transform(Lark(calc_grammar, parser="lalr").parse("2**4"))
+
+    parser = Lark(calc_grammar, parser="lalr")
+    make_pretty(parser, "2*(3+4)")
+    make_png(parser, "2*(3+4)", "test_calc_grammar.png")
