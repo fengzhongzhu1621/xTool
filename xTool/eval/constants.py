@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-class OP(object):
+class OP:
     """
     NOTE: don't want to use Enum
     """

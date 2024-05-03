@@ -3,6 +3,9 @@ import os
 import platform
 import sys
 
+from xTool.algorithms.collections import ConstantDict
+from .queue import *  # noqa
+from .regex import *  # noqa
 
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] >= 3
@@ -55,3 +58,22 @@ SEPARATORS = {
 }
 # 按位异或
 TOKEN = CHAR ^ CTL ^ SEPARATORS
+
+LEN_SHORT = 32
+LEN_NORMAL = 64
+LEN_MIDDLE = 128
+LEN_LONG = 255
+LEN_X_LONG = 1000
+LEN_XX_LONG = 10000
+LEN_XXX_LONG = 20000
+
+EMPTY_INT = 0
+EMPTY_STRING = ""
+EMPTY_LIST = []
+EMPTY_DICT = ConstantDict({})
+EMPTY_VARIABLE = {"inputs": [], "outputs": []}
+DEFAULT_BK_BIZ_ID = -1
+EMPTY = "EMPTY"
+
+TABLE = "TABLE"
+BASE_MODEL = "BASE-MODEL"
