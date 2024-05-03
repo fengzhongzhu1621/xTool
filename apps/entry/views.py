@@ -9,4 +9,5 @@ class ViewSet(ResourceViewSet):
         ResourceRoute("GET", resource.entry.home),
         ResourceRoute("GET", resource.entry.healthz, endpoint="healthz"),
         ResourceRoute("GET", resource.entry.ping, endpoint="ping"),
+        ResourceRoute("GET", resource.entry.logout, endpoint="logout"),
     ]
