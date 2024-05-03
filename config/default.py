@@ -34,6 +34,7 @@ INSTALLED_APPS += (
     "apps.quickstart",
     "apps.snippets",
     "apps.custom_plugins",
+    "apps.credential",
 )
 
 MIDDLEWARE += (

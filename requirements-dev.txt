@@ -23,3 +23,4 @@ pytest-helpers-namespace==2021.12.29
 mockafka-py
 et-xmlfile
 mypy
+black

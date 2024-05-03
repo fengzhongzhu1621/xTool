@@ -7,19 +7,6 @@ from django.utils.translation import gettext_lazy as _lazy
 from iam.contrib.http import HTTP_AUTH_FORBIDDEN_CODE
 
 
-class TimeEnum(Enum):
-    """
-    时间枚举
-    """
-
-    ONE_SECOND: int = 1
-    ONE_MINUTE_SECOND: int = ONE_SECOND * 60
-    FIVE_MINUTE_SECOND: int = ONE_MINUTE_SECOND * 5
-    ONE_HOUR_SECOND: int = ONE_MINUTE_SECOND * 60
-    ONE_DAY_SECOND: int = ONE_HOUR_SECOND * 24
-    ONE_YEAR_SECOND: int = ONE_DAY_SECOND * 365
-
-
 class NoticeWay(TextChoices):
     SMS = "sms", _lazy("短信")
     EMAIL = "email", _lazy("邮件")
@@ -30,5 +17,4 @@ class NoticeWay(TextChoices):
 
 
 class ErrorCode(Enum):
-
     IAM_NOT_PERMISSION = HTTP_AUTH_FORBIDDEN_CODE
