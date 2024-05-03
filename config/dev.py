@@ -3,6 +3,9 @@ from blueapps.conf.validators import EnvValidator
 
 from config import RUN_VER
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
 # 环境变量检测
 EnvValidator(RUN_VER).validate()
 # pylint: disable=wildcard-import
@@ -47,16 +50,26 @@ REDIS_CELERY_CONF = {
     "password": "",
 }
 
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": APP_CODE,  # 数据库名
+        "NAME": "db_test_xtool",  # 数据库名
         "USER": "root",
         "PASSWORD": "",
         "HOST": "localhost",
         "PORT": "3306",
+        "TEST": {
+            "name": "db_test_xtool",
+            "CHARSET": "utf8mb4",
+        },
     },
 }
+
+# 用于替换默认的队列
+BROKER_URL = os.getenv("BK_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
 # 多人开发时，无法共享的本地配置可以放到新建的 local_settings.py 文件中
 # 并且把 local_settings.py 加入版本管理忽略文件中

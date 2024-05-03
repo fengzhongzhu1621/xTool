@@ -3,10 +3,16 @@
 
 import os
 
-from xTool.utils import get_env_or_raise
-from .celery_config import app as celery_app  # noqa
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
+from blueapps.core.celery import celery_app  # noqa
 
-__all__ = ["celery_app"]
+from xTool.utils import get_env_or_raise
+
+__all__ = ["celery_app", "RUN_VER", "APP_CODE", "SECRET_KEY", "BK_URL", "BASE_DIR"]
+
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
 
 APP_CODE = get_env_or_raise("BKPAAS_APP_ID", "xxx")
 SECRET_KEY = get_env_or_raise("BKPAAS_APP_SECRET", "xxx")

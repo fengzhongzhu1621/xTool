@@ -20,7 +20,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
 from apps import views
-from core.permissions import SwaggerPermission
+from apps.core.permissions import SwaggerPermission
 
 info = openapi.Info(
     title="{{ cookiecutter.app_id }}",
@@ -36,7 +36,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("account/", include("blueapps.account.urls")),
-    path("pipeline_admin/", include("pipeline.contrib.engine_admin.urls")),
+    # path("pipeline_admin/", include("pipeline.contrib.engine_admin.urls")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("swagger/", schema_view.with_ui(cache_timeout=0), name="schema-swagger-ui"),
     path("i18n/", include("django.conf.urls.i18n")),
