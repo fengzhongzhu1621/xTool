@@ -5,7 +5,10 @@ import os
 
 from bk_resource import Resource
 from blueapps.account.conf import ConfFixture
+from blueapps.utils.request_provider import get_local_request
 from django.conf import settings
+from django.contrib import auth
+from rest_framework.response import Response
 
 from apps.entry.handler import HealthzHandler
 
@@ -48,3 +51,11 @@ class PingResource(EntryBaseResource):
 
     def perform_request(self, validated_request_data):
         return "pong"
+
+
+class LogoutResource(EntryBaseResource):
+    def perform_request(self, validated_request_data):
+        auth.logout(get_local_request())
+        response = Response()
+        response.delete_cookie(settings.AUTH_BACKEND_TYPE, domain=settings.AUTH_BACKEND_DOMAIN)
+        return response
