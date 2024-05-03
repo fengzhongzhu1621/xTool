@@ -125,6 +125,9 @@ class ConstantDict(dict):
         raise TypeError("modifying %s object values is not allowed"
                         % self.__class__.__name__)
 
+    def update(self, **kwargs):
+        raise TypeError("'%s' object does not support item assignment" % self.__class__.__name__)
+
 
 def get_filter_obj(filter_data, filter_keys):
     """根据key过滤字典对象 ."""

@@ -29,6 +29,7 @@ INSTALLED_APPS += (
     # "pipeline.eri",
     # "pipeline.contrib.engine_admin",
     # 业务逻辑
+    "apps.backend",
     "apps.entry",
     "apps.quickstart",
     "apps.snippets",
