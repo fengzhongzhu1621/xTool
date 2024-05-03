@@ -22,13 +22,14 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta
 import datetime as dt
+from datetime import datetime, timedelta
 
+import arrow
 import six
-from xTool.utils import timezone
 from croniter import croniter
 
+from xTool.utils import timezone
 
 # Use timer that's not susceptible to time of day adjustments.
 try:
@@ -37,7 +38,6 @@ try:
 except ImportError:
     # fall back to using time
     from time import time as time_now
-
 
 # 调度缩写
 cron_presets = {
@@ -50,10 +50,10 @@ cron_presets = {
 
 
 def date_range(
-        start_date,
-        end_date=None,
-        num=None,
-        delta=None):
+    start_date,
+    end_date=None,
+    num=None,
+    delta=None):
     """
     Get a set of dates as a list based on a start, end and delta, delta
     can be something that can be added to ``datetime.datetime``
@@ -174,8 +174,8 @@ def round_time(dt, delta, start_date=datetime.min):
             # Check if start_date + (lower + 1)*delta or
             # start_date + lower*delta is closer to dt and return the solution
             if (
-                    (start_date + (lower + 1) * delta) - dt <=
-                    dt - (start_date + lower * delta)):
+                (start_date + (lower + 1) * delta) - dt <=
+                dt - (start_date + lower * delta)):
                 return start_date + (lower + 1) * delta
             else:
                 return start_date + lower * delta
@@ -294,3 +294,7 @@ def ds_format(ds, input_format, output_format):
     '2015-01-05'
     """
     return datetime.strptime(ds, input_format).strftime(output_format)
+
+
+def now() -> arrow.Arrow:
+    return arrow.now()

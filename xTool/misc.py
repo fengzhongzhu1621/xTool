@@ -14,9 +14,7 @@ import io
 import itertools
 import json
 import random
-import re
 import subprocess
-import sys
 import traceback
 import warnings
 from datetime import datetime, date
@@ -26,6 +24,7 @@ try:
 except ImportError:
     from io import BytesIO as StringIO
 from typing import (
+    Tuple,
     List,
     Iterable,
     Union,
@@ -206,7 +205,7 @@ def grouper(n, iterable, padvalue=None):
 
 def chunks(items, chunk_len):
     """Yield successive n-sized chunks from l."""
-    return (items[i : i + chunk_len] for i in xrange(0, len(items), chunk_len))
+    return (items[i: i + chunk_len] for i in xrange(0, len(items), chunk_len))
 
 
 def chunked(it, chunk_len):
@@ -215,7 +214,7 @@ def chunked(it, chunk_len):
         list(g) for g in izip_longest(*[iter(it)] * chunk_len, fillvalue=marker)
     ):
         if group[-1] is marker:
-            del group[group.index(marker) :]
+            del group[group.index(marker):]
         yield group
 
 
@@ -601,6 +600,31 @@ def strip(obj):
         return obj
 
 
+def strip_sep(value: str, sep: str = ",") -> str:
+    """去掉分隔符 ."""
+    if not value:
+        return ""
+    return value.strip().strip(sep)
+
+
+def split_username(value: [str, List], sep: str = ",") -> List:
+    """分割用户名 ."""
+    if not value:
+        return []
+    # 转换为数组格式
+    if isinstance(value, str):
+        value = strip_sep(value, sep).split(sep)
+    # 数组中的每个用户按 ( 分割
+    if isinstance(value, (tuple, list)):
+        result = [strip_sep(username, "(")[0] for username in value if username]
+    else:
+        result = []
+    # 去掉空字符
+    result = [username for username in result if username]
+
+    return result
+
+
 def convert_textarea_to_list(ips):
     return ips.replace("\r\n", "\n").split("\n")
 
@@ -842,3 +866,10 @@ class OrderedSet(AbstractSet[T]):
 
     def __len__(self) -> int:
         return len(self.d)
+
+
+def sorted_join(items: [Tuple, List], sep: str = ",") -> str:
+    if not items:
+        return ""
+    result = sorted(list(set(items)))
+    return sep.join(result)

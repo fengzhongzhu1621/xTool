@@ -273,6 +273,9 @@ COMPONENT_PATH = []
 # pipeline
 LOG_PERSISTENT_DAYS = 30  # 设置引擎日志的有效期
 
+# 唯一随机串生成重试次数
+RANDOM_STR_GENERATE_REPEAT_TIMES = 3
+
 # remove disabled apps
 if locals().get("DISABLED_APPS"):
     INSTALLED_APPS = locals().get("INSTALLED_APPS", [])
