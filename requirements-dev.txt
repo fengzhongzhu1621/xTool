@@ -24,3 +24,4 @@ mockafka-py
 et-xmlfile
 mypy
 black
+hypothesis

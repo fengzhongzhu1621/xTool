@@ -48,6 +48,7 @@ excelrd
 ipy
 openpyxl
 mysqlclient
+jsondiff
 
 djangorestframework==3.14.0
 drf-yasg

@@ -14,3 +14,20 @@ exclude = '''
   | dist
 )/
 '''
+
+[build-system]
+
+[project]
+
+[project.urls]
+
+[project.scripts]
+
+[tool.setuptools.packages.find]
+exclude = ["tests*"]
+
+[tool.setuptools.dynamic]
+dependencies = {file=["requirements.txt"]}
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = {file=["requirements-dev.txt"]}
