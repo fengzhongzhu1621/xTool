@@ -4,7 +4,13 @@ import fakeredis
 
 from xTool.cache import Cache
 from xTool.cache.constants import CacheInstanceType, CacheBackendType
-from xTool.unique.uuid import SequenceManager
+from xTool.unique.uuid import SequenceManager, uniqid
+
+
+def test_uniqid():
+    actual = uniqid()
+    # print(actual) # f5cf1a03a7ff368f9179419c344cfcd4
+    assert len(actual) == 32
 
 
 class TestSequenceManager:

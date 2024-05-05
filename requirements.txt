@@ -93,3 +93,6 @@ orjson
 
 #bamboo-pipeline==3.29.2
 bk-iam
+
+
+shortuuid
