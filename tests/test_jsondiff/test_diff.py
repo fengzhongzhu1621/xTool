@@ -1,7 +1,5 @@
 import io
 import os.path
-import os.path
-import os.path
 import sys
 import unittest
 
