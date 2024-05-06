@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import threading
+from typing import Callable
 
 
 class defaultlocal(threading.local):
@@ -18,3 +19,14 @@ class defaultlocal(threading.local):
     def __init__(self, **kwargs):
         super(defaultlocal, self).__init__()
         self.__dict__.update(kwargs)
+
+
+def go(func: Callable) -> Callable:
+    """将函数转换为异步执行 ."""
+
+    def wrapper(*args, **kwargs):
+        t = threading.Thread(target=func, args=args, kwargs=kwargs)
+        t.start()
+        return t
+
+    return wrapper

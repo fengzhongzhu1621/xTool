@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from asyncio import open_connection
-import sys
-from math import ceil
-from functools import wraps
 import asyncio
+import logging
+import socket
+import sys
+import warnings
 from asyncio import events
+from asyncio import open_connection
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import suppress
+from functools import partial
+from functools import wraps
+from multiprocessing import cpu_count
 from typing import (  # noqa
     Awaitable,
     Any,
@@ -15,13 +21,8 @@ from typing import (  # noqa
     TypeVar,
     Callable,
 )
-import warnings
-from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import cpu_count
-from contextlib import suppress
-from functools import partial
-import logging
-import socket
+
+from math import ceil
 
 from xTool.utils.net import is_ipv6
 
@@ -48,11 +49,9 @@ F = TypeVar("F", bound=Callable[..., Any])
 try:
     import contextvars
 
-
     def context_partial(func: F, *args: Any, **kwargs: Any) -> Any:
         context = contextvars.copy_context()
         return partial(context.run, func, *args, **kwargs)
-
 
 except ImportError:
     context_partial = partial
@@ -60,17 +59,14 @@ except ImportError:
 try:
     from trio import open_file as open_async, Path  # type: ignore
 
-
     def stat_async(path):
         return Path(path).stat()
-
 
 except ImportError:
 
     try:
         from aiofiles import open as aio_open  # type: ignore
         from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
-
 
         async def open_async(file, mode="r", **kwargs):
             return aio_open(file, mode, **kwargs)
@@ -84,13 +80,11 @@ if sys.version_info >= (3, 7):
 else:
     from asyncio import _get_running_loop
 
-
     def get_running_loop():
         loop = _get_running_loop()
         if loop is None:
             raise RuntimeError("no running event loop")
         return loop
-
 
     def create_task(coro):
         loop = get_running_loop()
@@ -109,9 +103,7 @@ def get_and_check_running_loop(
             stacklevel=3,
         )
         if loop.get_debug():
-            log.warning(
-                "The object should be created from async function", stack_info=True
-            )
+            log.warning("The object should be created from async function", stack_info=True)
     return loop
 
 
@@ -226,6 +218,7 @@ def awaitable(func):
 def wrap_func(func):
     """将函数转换为协程，参考asyncio.coroutine ."""
     if not asyncio.iscoroutinefunction(func):
+
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
@@ -362,9 +355,7 @@ def wakeup_waiter(waiter):
     return waiter
 
 
-async def open_connection(
-    host: str, port: int, timeout: float, loop: asyncio.AbstractEventLoop
-):
+async def open_connection(host: str, port: int, timeout: float, loop: asyncio.AbstractEventLoop):
     if is_ipv6(host):
         family = socket.AF_INET6
     else:
@@ -379,10 +370,8 @@ async def open_connection(
 try:
     import trio  # type: ignore
 
-
     def stat_async(path):
         return trio.Path(path).stat()
-
 
     open_async = trio.open_file
     CancelledErrors = tuple([asyncio.CancelledError, trio.Cancelled])
@@ -390,25 +379,22 @@ except ImportError:
     from aiofiles import open as aio_open  # type: ignore
     from aiofiles.os import stat as stat_async  # type: ignore  # noqa: F401
 
-
     async def open_async(file, mode="r", **kwargs):
         return aio_open(file, mode, **kwargs)
 
-
     CancelledErrors = tuple([asyncio.CancelledError])
 
+
 if __name__ == "__main__":
+
     async def noop2(*args, **kwargs):
         return asyncio.sleep(1)
-
 
     async def task():
         return await DeprecationWaiter(noop2())
 
-
     async def task2():
         return DeprecationWaiter(noop2())
-
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(task())
