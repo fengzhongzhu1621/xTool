@@ -98,3 +98,5 @@ bk-iam
 shortuuid
 pypinyin
 python-magic
+xpinyin
+
