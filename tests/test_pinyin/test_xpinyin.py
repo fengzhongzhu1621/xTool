@@ -28,7 +28,7 @@ def test_get_initials():
     assert actual == expect
 
     actual = p.get_initials("上海", " ")
-    expect = ""
+    expect = "S H"
     assert actual == expect
 
     actual = p.get_initials("上海", splitter="-", with_retroflex=True)
