@@ -3,20 +3,18 @@
 import asyncio
 import multiprocessing
 import os
-
 from functools import partial
 from signal import SIG_IGN, SIGINT, SIGTERM, Signals
 from signal import signal as signal_func
 from socket import SO_REUSEADDR, SOL_SOCKET, socket
 
-from xTool.log.log import logger
-from xTool.utils.processes import ctrlc_workaround_for_windows
-from xTool.misc import OS_IS_WINDOWS
 from xTool.aiomisc import load_uvlopo
+from xTool.log.log import logger
+from xTool.misc import OS_IS_WINDOWS
 from xTool.servers.protocols.http_protocol import HttpProtocol
-from xTool.servers.trigger import trigger_events
 from xTool.servers.signal import Signal
-
+from xTool.servers.trigger import trigger_events
+from xTool.utils.processes import ctrlc_workaround_for_windows
 
 load_uvlopo()
 
@@ -46,8 +44,6 @@ class AsyncioServer:
         before_stop,
         after_stop,
     ):
-        # Note, Sanic already called "before_server_start" events
-        # before this helper was even created. So we don't need it here.
         self.loop = loop
         self.serve_coro = serve_coro
         self._after_start = after_start
@@ -94,20 +90,14 @@ class AsyncioServer:
             try:
                 return self.server.start_serving()
             except AttributeError:
-                raise NotImplementedError(
-                    "server.start_serving not available in this version "
-                    "of asyncio or uvloop."
-                )
+                raise NotImplementedError("server.start_serving not available in this version " "of asyncio or uvloop.")
 
     def serve_forever(self):
         if self.server:
             try:
                 return self.server.serve_forever()
             except AttributeError:
-                raise NotImplementedError(
-                    "server.serve_forever not available in this version "
-                    "of asyncio or uvloop."
-                )
+                raise NotImplementedError("server.serve_forever not available in this version " "of asyncio or uvloop.")
 
     def __await__(self):
         """Starts the asyncio server, returns AsyncServerCoro"""
@@ -186,9 +176,7 @@ def serve(
         app=app,
         state=state,
     )
-    asyncio_server_kwargs = (
-        asyncio_server_kwargs if asyncio_server_kwargs else {}
-    )
+    asyncio_server_kwargs = asyncio_server_kwargs if asyncio_server_kwargs else {}
     # 创建一个http server coroutine
     server_coroutine = loop.create_server(
         server,

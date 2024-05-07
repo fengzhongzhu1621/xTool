@@ -19,9 +19,7 @@ logging_format = """module: %(module)s; \
 function: %(funcName)s(); \
 message: %(message)s"""
 
-logging.basicConfig(
-    format=logging_format, level=logging.INFO
-)
+logging.basicConfig(format=logging_format, level=logging.INFO)
 
 random.seed("Pack my box with five dozen liquor jugs.")
 
@@ -29,14 +27,10 @@ if sys.platform in ["win32", "cygwin"]:
     collect_ignore = ["test_worker.py"]
 
 TYPE_TO_GENERATOR_MAP = {
-    "string": lambda: "".join(
-        [random.choice(string.ascii_letters + string.digits) for _ in range(4)]
-    ),
+    "string": lambda: "".join([random.choice(string.ascii_letters + string.digits) for _ in range(4)]),
     "int": lambda: random.choice(range(1000000)),
     "number": lambda: random.random(),
-    "alpha": lambda: "".join(
-        [random.choice(string.ascii_letters) for _ in range(4)]
-    ),
+    "alpha": lambda: "".join([random.choice(string.ascii_letters) for _ in range(4)]),
     "uuid": lambda: str(uuid.uuid1()),
 }
 
@@ -50,12 +44,7 @@ class RouteStringGenerator:
         routes = []
         for depth in range(1, max_route_depth + 1):
             for _ in range(self.ROUTE_COUNT_PER_DEPTH):
-                route = "/".join(
-                    [
-                        TYPE_TO_GENERATOR_MAP.get("string")()
-                        for _ in range(depth)
-                    ]
-                )
+                route = "/".join([TYPE_TO_GENERATOR_MAP.get("string")() for _ in range(depth)])
                 route = route.replace(".", "", -1)
                 route_detail = (random.choice(self.HTTP_METHODS), route)
 
@@ -99,14 +88,9 @@ def url_param_generator():
 
 
 @pytest.fixture
-def app(request):
-    from xTool.apps.sanic import Sanic
-    return Sanic(request.node.name)
-
-
-@pytest.fixture
 def aiomisc_unused_port():
     from xTool.utils.net import get_unused_port
+
     return get_unused_port()
 
 
@@ -118,6 +102,10 @@ def cache():
         "db": 0,
         "password": "",
     }
-    cache = Cache(CacheBackendType.CELERY, CacheInstanceType.RedisCache, redis_class=fakeredis.FakeStrictRedis,
-                  connection_conf=connection_conf)
+    cache = Cache(
+        CacheBackendType.CELERY,
+        CacheInstanceType.RedisCache,
+        redis_class=fakeredis.FakeStrictRedis,
+        connection_conf=connection_conf,
+    )
     return cache

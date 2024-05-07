@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import sys
-import gc
-import contextlib
-from socket import socket
-from json import JSONDecodeError
-from functools import wraps
 import asyncio
+import contextlib
+import gc
+import sys
+from functools import wraps
+from json import JSONDecodeError
+from socket import socket
 from typing import (  # noqa
     TYPE_CHECKING,
     Any,
@@ -19,13 +19,13 @@ from typing import (  # noqa
 )
 
 import httpx
+import jsondiff
+import ujson as json
 import websockets
 
 from xTool.exceptions import MethodNotSupported
-from xTool.response import text
 from xTool.log.log import logger
-from xTool.servers.asgi import ASGIApp
-from xTool.servers import server
+from xTool.response import text
 
 ASGI_HOST = "mockserver"
 HOST = "127.0.0.1"
@@ -35,6 +35,58 @@ old_conn = None
 CONFIG_FOR_TESTS = {"KEEP_ALIVE_TIMEOUT": 2, "KEEP_ALIVE": True}
 # test_keep_alive_timeout_reuse doesn't work with random port
 KEEP_ALIVE_TIMEOUT_REUSE_PORT = 42101
+
+
+def format_serializer_data(serializer_data):
+    return json.loads(json.dumps(serializer_data))
+
+
+def assert_equal(actual, expect):
+    actual = format_serializer_data(actual)
+    assert actual == expect
+
+
+def assert_dict_contains(data: dict, expect: dict, key: str = None):
+    """测试字典部分相等 ."""
+    if not expect:
+        try:
+            assert data == expect
+        except (AssertionError, AttributeError):
+            jsondiff.diff(data, expect, syntax="explicit", dump=True)
+            raise
+    for key, value in expect.items():
+        if isinstance(value, dict):
+            assert_dict_contains(data.get(key), value, key)
+        elif isinstance(value, list):
+            assert_list_contains(data.get(key), value, key)
+        else:
+            try:
+                assert data.get(key) == value
+            except (AssertionError, AttributeError):
+                jsondiff.diff(data, value, syntax="explicit", dump=True)
+                raise
+
+
+def assert_list_contains(data: list, expect: list, index: str = None):
+    """测试数组是部分相等 ."""
+    if not expect:
+        try:
+            assert data == expect
+        except (AssertionError, AttributeError):
+            jsondiff.diff(data, expect, syntax="explicit", dump=True)
+            raise
+    assert len(data) == len(expect)
+    for index, value in enumerate(expect):
+        if isinstance(value, dict):
+            assert_dict_contains(data[index], value)
+        elif isinstance(value, list):
+            assert_list_contains(data[index], value, index)
+        else:
+            try:
+                assert data[index] == value
+            except AssertionError:
+                jsondiff.diff(data, value, syntax="explicit", dump=True)
+                raise
 
 
 class SanicTestClient:
@@ -59,9 +111,7 @@ class SanicTestClient:
             async with self.get_new_session() as session:
 
                 try:
-                    response = await getattr(session, method.lower())(
-                        url, *args, **kwargs
-                    )
+                    response = await getattr(session, method.lower())(url, *args, **kwargs)
                 except NameError:
                     raise Exception(response.status_code)
 
@@ -85,15 +135,15 @@ class SanicTestClient:
                 return response
 
     def _endpoint(
-            self,
-            method="get",
-            uri="/",
-            gather_request=True,
-            debug=False,
-            server_kwargs={"auto_reload": False},
-            host=None,
-            *request_args,
-            **request_kwargs,
+        self,
+        method="get",
+        uri="/",
+        gather_request=True,
+        debug=False,
+        server_kwargs={"auto_reload": False},
+        host=None,
+        *request_args,
+        **request_kwargs,
     ):
         results = [None, None]
         exceptions = []
@@ -148,9 +198,7 @@ class SanicTestClient:
         async def _collect_response(sanic, loop):
             try:
                 # 模拟客户端请求
-                response = await self._local_request(
-                    method, url, *request_args, **request_kwargs
-                )
+                response = await self._local_request(method, url, *request_args, **request_kwargs)
                 # 记录上一次请求的响应
                 results[-1] = response
             except Exception as e:
@@ -173,9 +221,7 @@ class SanicTestClient:
                 request, response = results
                 return request, response
             except BaseException:  # noqa
-                raise ValueError(
-                    f"Request and response object expected, got ({results})"
-                )
+                raise ValueError(f"Request and response object expected, got ({results})")
         else:
             try:
                 return results[-1]
@@ -207,22 +253,11 @@ class SanicTestClient:
         return self._endpoint("websocket", *args, **kwargs)
 
 
-class TestASGIApp(ASGIApp):
-    async def __call__(self):
-        await super().__call__()
-        return self.request
-
-
-async def app_call_with_return(self, scope, receive, send):
-    asgi_app = await TestASGIApp.create(self, scope, receive, send)
-    return await asgi_app()
-
-
 _LOOP_FACTORY = Callable[[], asyncio.AbstractEventLoop]
 
 
 def setup_test_loop(
-        loop_factory: _LOOP_FACTORY = asyncio.new_event_loop,
+    loop_factory: _LOOP_FACTORY = asyncio.new_event_loop,
 ) -> asyncio.AbstractEventLoop:
     """Create and return an asyncio.BaseEventLoop
     instance.
@@ -264,7 +299,7 @@ def teardown_test_loop(loop: asyncio.AbstractEventLoop, fast: bool = False) -> N
 
 @contextlib.contextmanager
 def loop_context(
-        loop_factory: _LOOP_FACTORY = asyncio.new_event_loop, fast: bool = False
+    loop_factory: _LOOP_FACTORY = asyncio.new_event_loop, fast: bool = False
 ) -> Iterator[asyncio.AbstractEventLoop]:
     """A contextmanager that creates an event_loop, for test purposes.
     Handles the creation and cleanup of a test loop.
