@@ -1,5 +1,5 @@
 import abc
-from typing import Any
+from typing import Any, Union
 
 import orjson as json
 from django.core.cache import cache
@@ -36,8 +36,9 @@ class CacheKey(abc.ABC):
 
         return
 
-    def set(self, value: Any, timeout: TimeEnum) -> None:
-        cache.set(self.key, json.dumps(value), timeout.value)
+    def set(self, value: Any, timeout: Union[int, TimeEnum]) -> None:
+        timeout = timeout.value if isinstance(timeout, TimeEnum) else timeout
+        cache.set(self.key, json.dumps(value), timeout)
 
 
 class CacheKeyTemplate(CacheKey):

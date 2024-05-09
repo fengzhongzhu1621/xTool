@@ -14,6 +14,8 @@ from django.db.models.lookups import Exact
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from apps.core.constants import LEN_NORMAL
+
 
 def get_non_request_username():
     provider = getattr(settings, "BLUEAPPS", {}).get("NON_REQUEST_USERNAME_PROVIDER")
@@ -301,10 +303,7 @@ class OptionBase(SoftDeleteModel):
 
     TYPE_OPTION_DICT = {TYPE_STRING: str, TYPE_DATETIME: str}
 
-    value_type = models.CharField(
-        _("option对应类型"),
-        max_length=64,
-    )
+    value_type = models.CharField(_("option对应类型"), max_length=LEN_NORMAL)
     value = models.TextField(_("option配置内容"))
 
     class Meta:
@@ -322,13 +321,14 @@ class OptionBase(SoftDeleteModel):
         query_dict = {cls.QUERY_NAME: query_id}
         option_dict = {}
 
-        for option_list in cls.objects.filter(**query_dict):
-            option_dict.update(option_list.to_json())
+        for instance in cls.objects.filter(**query_dict):
+            option_dict.update(instance.to_json())
 
         return option_dict
 
     @classmethod
     def _parse_value(cls, value: Any) -> Tuple[Any, str]:
+        """计算值的类型 ."""
         if value is None:
             val, val_type = ("", cls.TYPE_NONE)
         elif isinstance(value, (bool, list, dict)):
@@ -402,9 +402,9 @@ class OptionBase(SoftDeleteModel):
         }
         """
         try:
+            # 先匹配特殊逻辑
             value_type = self.TYPE_OPTION_DICT[self.value_type]
             real_value = value_type(self.value) if self.value_type != "string" else str(self.value)
-
         except KeyError:
             # 如果找不到对应的配置，表示不是简单的基本功能，需要依赖函数实现
             trans_method = getattr(self, "_trans_{}".format(self.value_type))

@@ -35,6 +35,7 @@ INSTALLED_APPS += (
     "apps.snippets",
     "apps.custom_plugins",
     "apps.credential",
+    "apps.global_conf",
 )
 
 MIDDLEWARE += (
