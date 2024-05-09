@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db import transaction
 
 from apps.backend.data.base_backend import BaseDataBackend

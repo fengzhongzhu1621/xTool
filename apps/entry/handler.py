@@ -2,9 +2,7 @@
 
 
 class HealthzHandler:
-    """
-    HealthzHandler
-    """
+    """用于拨测 ."""
 
     @classmethod
     def healthz(cls) -> dict:

@@ -91,8 +91,6 @@ class Credential(SoftDeleteModel):
 
 
 class CredentialResourceManager(SoftDeleteModelManager):
-    """凭证资源Manger类 ."""
-
     pass
 
 

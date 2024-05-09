@@ -7,8 +7,6 @@ from xTool.constants import LEN_MIDDLE, LEN_SHORT
 
 
 class DataManager(models.Manager):
-    """排除过期数据"""
-
     def get_queryset(self):
         return QuerySet(self.model).exclude(expire_at__lte=timezone.now())
 
