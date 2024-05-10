@@ -29,7 +29,22 @@ class Migration(migrations.Migration):
                     models.CharField(blank=True, default="", max_length=32, null=True, verbose_name="修改者"),
                 ),
                 ("is_deleted", models.BooleanField(default=False, verbose_name="是否删除")),
-                ("value_type", models.CharField(max_length=64, verbose_name="option对应类型")),
+                (
+                    "value_type",
+                    models.CharField(
+                        max_length=64,
+                        verbose_name="option对应类型",
+                        choices=[
+                            ("bool", "bool"),
+                            ("string", "string"),
+                            ("list", "list"),
+                            ("dict", "dict"),
+                            ("int", "int"),
+                            ("datetime", "datetime"),
+                            ("null", "null"),
+                        ],
+                    ),
+                ),
                 ("value", models.TextField(verbose_name="option配置内容")),
                 ("name", models.CharField(max_length=255, unique=True, verbose_name="配置key")),
                 ("description", models.TextField(blank=True, default="", null=True, verbose_name="描述")),

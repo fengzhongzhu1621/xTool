@@ -11,7 +11,19 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS += (
+INSTALLED_APPS = (
+    "bkoauth",
+    # 框架自定义命令
+    "blueapps.contrib.bk_commands",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.sites",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # account app
+    "blueapps.account",
     "rest_framework",
     "bk_resource",
     "drf_yasg",
@@ -38,14 +50,33 @@ INSTALLED_APPS += (
     "apps.global_conf",
 )
 
-MIDDLEWARE += (
-    "apigw_manager.apigw.authentication.ApiGatewayJWTGenericMiddleware",  # JWT 认证
-    "apigw_manager.apigw.authentication.ApiGatewayJWTAppMiddleware",  # JWT 透传的应用信息
-    "apigw_manager.apigw.authentication.ApiGatewayJWTUserMiddleware",  # JWT 透传的用户信息
+MIDDLEWARE = (
+    # request instance provider
+    "blueapps.middleware.request_provider.RequestProvider",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    # 蓝鲸静态资源服务
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # Auth middleware
+    # "blueapps.account.middlewares.RioLoginRequiredMiddleware",
+    # "blueapps.account.middlewares.WeixinLoginRequiredMiddleware",
+    # "blueapps.account.middlewares.LoginRequiredMiddleware",
+    # exception middleware
+    "blueapps.core.exceptions.middleware.AppExceptionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    # "apigw_manager.apigw.authentication.ApiGatewayJWTGenericMiddleware",  # JWT 认证
+    # "apigw_manager.apigw.authentication.ApiGatewayJWTAppMiddleware",  # JWT 透传的应用信息
+    # "apigw_manager.apigw.authentication.ApiGatewayJWTUserMiddleware",  # JWT 透传的用户信息
     "corsheaders.middleware.CorsMiddleware",
+    "core.middleware.csrf.CSRFExemptMiddleware",
 )
 
-AUTHENTICATION_BACKENDS += ("apigw_manager.apigw.authentication.UserModelBackend",)
+AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
+# AUTHENTICATION_BACKENDS += ("apigw_manager.apigw.authentication.UserModelBackend",)
 
 TEMPLATES = [
     {

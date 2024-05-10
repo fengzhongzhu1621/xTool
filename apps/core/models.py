@@ -10,6 +10,7 @@ from blueapps.utils.request_provider import get_local_request
 from django.conf import settings
 from django.core import exceptions
 from django.db import models
+from django.db.models import TextChoices
 from django.db.models.lookups import Exact
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -287,6 +288,17 @@ class MultiStrSplitCharField(models.CharField, MultiStrSplitFieldMixin):
         return super().write_to_db(value)
 
 
+class OptionType(TextChoices):
+    # 选项类型
+    TYPE_BOOL = "bool", "bool"
+    TYPE_STRING = "string", "string"
+    TYPE_LIST = "list", "list"
+    TYPE_DICT = "dict", "dict"
+    TYPE_INT = "int", "int"
+    TYPE_DATETIME = "datetime", "datetime"
+    TYPE_NONE = "null", "null"
+
+
 class OptionBase(SoftDeleteModel):
     """各种选项配置的基类，供结果表选项，结果表字段选项，数据源选项继承"""
 
@@ -303,7 +315,7 @@ class OptionBase(SoftDeleteModel):
 
     TYPE_OPTION_DICT = {TYPE_STRING: str, TYPE_DATETIME: str}
 
-    value_type = models.CharField(_("option对应类型"), max_length=LEN_NORMAL)
+    value_type = models.CharField(_("option对应类型"), choices=OptionType.choices, max_length=LEN_NORMAL)
     value = models.TextField(_("option配置内容"))
 
     class Meta:

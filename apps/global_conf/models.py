@@ -78,3 +78,6 @@ class GlobalConfig(OptionBase):
         verbose_name = _lazy("全局配置信息")
         verbose_name_plural = _lazy("全局配置信息")
         db_table = "global_setting"
+
+    def __str__(self):
+        return self.name
