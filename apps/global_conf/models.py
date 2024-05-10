@@ -18,6 +18,9 @@ GLOBAL_CONFIG_CACHE_TTL = getattr(settings, "GLOBAL_CONFIG_CACHE_TTL", TimeEnum.
 class GlobalConfigCacheKey(CacheKey):
     key_template = "global_config:{name}"
 
+    def set(self, value: Any) -> None:
+        super().set(value, GLOBAL_CONFIG_CACHE_TTL)
+
 
 class GlobalConfigManager(SoftDeleteModelManager):
 
@@ -41,7 +44,7 @@ class GlobalConfigManager(SoftDeleteModelManager):
         else:
             cache_value = default
         # 刷新缓存
-        cache.set(cache_value, GLOBAL_CONFIG_CACHE_TTL)
+        cache.set(cache_value)
 
         return cache_value
 
@@ -52,7 +55,7 @@ class GlobalConfigManager(SoftDeleteModelManager):
         instance = self.filter(name=name).first()
         new_model = self.model.create_option(value)
         if instance:
-            instance.value = new_model.value if value is not None else None
+            instance.value = new_model.value
             instance.value_type = new_model.value_type
             instance.description = description
             instance.save(update_fields=["description", "value", "value_type"])
@@ -61,7 +64,7 @@ class GlobalConfigManager(SoftDeleteModelManager):
         # 刷新缓存
         if new_model.value_type != self.model.TYPE_NONE:
             cache = GlobalConfigCacheKey(name=name)
-            cache.set(value, GLOBAL_CONFIG_CACHE_TTL)
+            cache.set(value)
 
 
 class GlobalConfig(OptionBase):
@@ -81,3 +84,9 @@ class GlobalConfig(OptionBase):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def create_option(cls, value: Any) -> "GlobalConfig":
+        new_model = super().create_option(value)
+        new_model.value = new_model.value if value is not None else None
+        return new_model
