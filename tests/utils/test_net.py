@@ -1,20 +1,12 @@
-# -*- coding: utf-8 -*-
-
 import socket
 
-from xTool.utils.net import (
-    get_hostname,
-    int_to_ipv4,
-    ipv4_to_int,
-    url_concat,
-    is_ipv4,
-    is_ipv6)
+from xTool.utils.net import get_hostname, int_to_ipv4, ipv4_to_int, url_concat, is_ipv4, is_ipv6
 
 
 def test_get_hostname():
     hostname = get_hostname()
     assert hostname == socket.getfqdn()
-    hostname = get_hostname('socket:getfqdn')
+    hostname = get_hostname("socket:getfqdn")
     assert hostname == socket.getfqdn()
 
 
@@ -26,12 +18,9 @@ def test_int2ip():
 
 
 def test_url_concat():
-    assert url_concat("http://example.com/foo",
-                      dict(c="d")) == 'http://example.com/foo?c=d'
-    assert url_concat("http://example.com/foo?a=b",
-                      dict(c="d")) == 'http://example.com/foo?a=b&c=d'
-    assert url_concat("http://example.com/foo?a=b",
-                      [("c", "d"), ("c", "d2")]) == 'http://example.com/foo?a=b&c=d&c=d2'
+    assert url_concat("http://example.com/foo", dict(c="d")) == "http://example.com/foo?c=d"
+    assert url_concat("http://example.com/foo?a=b", dict(c="d")) == "http://example.com/foo?a=b&c=d"
+    assert url_concat("http://example.com/foo?a=b", [("c", "d"), ("c", "d2")]) == "http://example.com/foo?a=b&c=d&c=d2"
 
 
 def test_is_ipv4():

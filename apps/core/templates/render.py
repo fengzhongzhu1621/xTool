@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import json
 import re
 from typing import Dict, List, Union
@@ -25,11 +23,7 @@ class Jinja2Renderer:
         """
         只支持json和re函数
         """
-        return (
-            jinja2_environment()
-            .from_string(template_value)
-            .render({"json": json, "re": re, **context})
-        )
+        return jinja2_environment().from_string(template_value).render({"json": json, "re": re, **context})
 
 
 def jinja_render(template_value, context) -> Union[str, Dict, List]:

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from enum import Enum
 
 TASK_STORAGE_QUEUE = "task_storage"

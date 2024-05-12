@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import pytest
 
 from xTool.decorators.signal import Signal, receiver
@@ -13,15 +11,15 @@ def signal():
 def test_connect_to_frozen_signal(signal):
     signal.freeze()
 
-    async def cb():
-        ...
+    async def cb(): ...
 
     with pytest.raises(RuntimeError):
         signal.connect(cb)
 
 
 @pytest.mark.parametrize(
-    "callback", [
+    "callback",
+    [
         None,
         max,
         lambda x: x,

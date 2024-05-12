@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
-import signal
 import platform
+import signal
 
 from xTool.exceptions import XToolTimeoutError
 from xTool.utils.log.logging_mixin import LoggingMixin
@@ -21,10 +19,10 @@ class timeout(LoggingMixin):
             raise
     """
 
-    def __init__(self, seconds=1, error_message='Timeout'):
+    def __init__(self, seconds=1, error_message="Timeout"):
         self.seconds = seconds
         self.error_message = error_message
-        if platform.system() == 'Linux':
+        if platform.system() == "Linux":
             self.use_signals = True
         else:
             self.use_signals = False
@@ -41,8 +39,7 @@ class timeout(LoggingMixin):
                 signal.signal(signal.SIGALRM, self.handle_timeout)
                 signal.alarm(self.seconds)
             except ValueError as e:
-                self.log.warning(
-                    "timeout can't be used in the current context")
+                self.log.warning("timeout can't be used in the current context")
                 self.log.exception(e)
 
     def __exit__(self, _, value, traceback):
@@ -51,6 +48,5 @@ class timeout(LoggingMixin):
                 # 关闭信号
                 signal.alarm(0)
             except ValueError as e:
-                self.log.warning(
-                    "timeout can't be used in the current context")
+                self.log.warning("timeout can't be used in the current context")
                 self.log.exception(e)

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import logging
 from functools import partial
@@ -9,7 +7,6 @@ from croniter import croniter
 
 from xTool import aiomisc
 from xTool.utils.timezone import now
-
 
 log = logging.getLogger(__name__)
 
@@ -23,10 +20,7 @@ class CronCallback:
 
     """
 
-    __slots__ = (
-        "_cb", "_closed", "_task", "_loop", "_handle", "__name",
-        "_croniter"
-    )
+    __slots__ = ("_cb", "_closed", "_task", "_loop", "_handle", "__name", "_croniter")
 
     def __init__(self, coroutine_func, *args, **kwargs):
         self.__name = repr(coroutine_func)
@@ -53,27 +47,23 @@ class CronCallback:
             raise asyncio.InvalidStateError
         loop_time = self._loop.time()
         timestamp = now(timezone).timestamp()
-        return (
-                loop_time +
-                (self._croniter.get_next(float) - timestamp)
-        )
+        return loop_time + (self._croniter.get_next(float) - timestamp)
 
     def start(
-            self,
-            spec: str,
-            loop=None, *,
-            shield: bool = False,
-            suppress_exceptions: Tuple[Type[Exception]] = (),
-            timezone=None
+        self,
+        spec: str,
+        loop=None,
+        *,
+        shield: bool = False,
+        suppress_exceptions: Tuple[Type[Exception]] = (),
+        timezone=None
     ):
         if self._task and not self._task.done():
             raise asyncio.InvalidStateError
 
         self._loop = loop or asyncio.get_event_loop()
 
-        self._croniter = croniter(
-            spec, start_time=now(timezone).timestamp()
-        )
+        self._croniter = croniter(spec, start_time=now(timezone).timestamp())
 
         self._closed = False
 
@@ -105,9 +95,7 @@ class CronCallback:
             self._handle = self._loop.call_at(self.get_next(), cron)
 
         # 第一次运行
-        self._loop.call_at(
-            self.get_next(), self._loop.call_soon_threadsafe, cron
-        )
+        self._loop.call_at(self.get_next(), self._loop.call_soon_threadsafe, cron)
 
     def stop(self):
         self._closed = True

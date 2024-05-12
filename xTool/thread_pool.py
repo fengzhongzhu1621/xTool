@@ -1,23 +1,20 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
+import inspect
+import logging
+import threading
+import typing
 from asyncio import Future, AbstractEventLoop, Task  # noqa
 from asyncio.events import get_event_loop
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
-import inspect
-import typing
 from types import MappingProxyType
 from typing import NamedTuple, Any, Optional, TypeVar, Callable  # noqa
-from concurrent.futures import ThreadPoolExecutor
-import threading
-import logging
 
 from xTool.aiomisc import awaiter, context_partial
 from xTool.iterator_wrapper import IteratorWrapper
 
-
-T = typing.TypeVar('T')
-F = TypeVar('F', bound=Callable[..., Any])
+T = typing.TypeVar("T")
+F = TypeVar("F", bound=Callable[..., Any])
 
 log = logging.getLogger(__name__)
 
@@ -32,14 +29,12 @@ def run_in_executor(
     loop = get_event_loop()
     # noinspection PyTypeChecker
     return loop.run_in_executor(  # type: ignore
-        executor, context_partial(func, *args, **kwargs),
+        executor,
+        context_partial(func, *args, **kwargs),
     )
 
 
-def threaded_iterable(
-    func: F = None,
-    max_size: int = 0
-) -> Any:
+def threaded_iterable(func: F = None, max_size: int = 0) -> Any:
     """线程迭代器 ."""
     if isinstance(func, int):
         return partial(threaded_iterable, max_size=func)
@@ -104,7 +99,8 @@ def run_in_new_thread(
         try:
             # 执行业务逻辑，设置成功结果到future
             loop.call_soon_threadsafe(
-                set_result, target(),
+                set_result,
+                target(),
             )
         except Exception as exc:
             if loop.is_closed() and no_return:
@@ -118,10 +114,9 @@ def run_in_new_thread(
             loop.call_soon_threadsafe(set_exception, exc)
 
     thread = threading.Thread(
-        target=in_thread, name=func.__name__,
-        args=(
-            context_partial(func, *args, **kwargs),
-        ),
+        target=in_thread,
+        name=func.__name__,
+        args=(context_partial(func, *args, **kwargs),),
     )
 
     # 默认为True： 主线程结束时，子线程也随之结束
@@ -131,10 +126,7 @@ def run_in_new_thread(
     return future
 
 
-def threaded_separate(
-    func: F,
-    detouch: bool = True
-) -> Callable[..., typing.Awaitable[Any]]:
+def threaded_separate(func: F, detouch: bool = True) -> Callable[..., typing.Awaitable[Any]]:
     """独立线程运行任务装饰器 ."""
     if isinstance(func, bool):
         return partial(threaded_separate, detouch=detouch)
@@ -145,7 +137,10 @@ def threaded_separate(
     @wraps(func)
     def wrap(*args: Any, **kwargs: Any) -> Any:
         future = run_in_new_thread(
-            func, args=args, kwargs=kwargs, detouch=detouch,
+            func,
+            args=args,
+            kwargs=kwargs,
+            detouch=detouch,
         )
 
         return awaiter(future)
@@ -176,16 +171,8 @@ def threaded_iterable_separate(func: F = None, max_size: int = 0) -> Any:
 
 
 class CoroutineWaiter:
-    def __init__(
-        self,
-        loop: asyncio.AbstractEventLoop,
-        coroutine_func: F,
-        *args: Any,
-        **kwargs: Any
-    ):
-        self.__func = partial(
-            coroutine_func, *args, **kwargs
-        )  # type: partial[Any]
+    def __init__(self, loop: asyncio.AbstractEventLoop, coroutine_func: F, *args: Any, **kwargs: Any):
+        self.__func = partial(coroutine_func, *args, **kwargs)  # type: partial[Any]
         self.__loop = loop
         self.__event = threading.Event()
         self.__result = None
@@ -212,12 +199,7 @@ class CoroutineWaiter:
         return self.__result
 
 
-def sync_wait_coroutine(
-    loop: AbstractEventLoop,
-    coro_func: F,
-    *args: Any,
-    **kwargs: Any
-) -> Any:
+def sync_wait_coroutine(loop: AbstractEventLoop, coro_func: F, *args: Any, **kwargs: Any) -> Any:
     """同步协程等待器 ."""
     waiter = CoroutineWaiter(loop, coro_func, *args, **kwargs)
     waiter.start()

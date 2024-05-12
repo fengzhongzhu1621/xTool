@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # According to https://tools.ietf.org/html/rfc2616#section-7.1
 _ENTITY_HEADERS = frozenset(
     [
@@ -54,8 +52,6 @@ def remove_entity_headers(headers, allowed=("content-location", "expires")):
     """
     allowed = set([h.lower() for h in allowed])
     headers = {
-        header: value
-        for header, value in headers.items()
-        if not is_entity_header(header) or header.lower() in allowed
+        header: value for header, value in headers.items() if not is_entity_header(header) or header.lower() in allowed
     }
     return headers

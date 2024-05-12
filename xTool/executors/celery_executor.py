@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -18,7 +16,9 @@
 # under the License.
 
 import time
+
 from celery import states as celery_states
+
 from xTool.executors.base_executor import BaseExecutor
 
 
@@ -31,6 +31,7 @@ class CeleryExecutor(BaseExecutor):
     vast amounts of messages, while providing operations with the tools
     required to maintain such a system.
     """
+
     def __init__(self, parallelism, execute_command):
         super(CeleryExecutor, self).__init__(parallelism)
         self.execute_command = execute_command
@@ -41,14 +42,10 @@ class CeleryExecutor(BaseExecutor):
         # 任务实例的最新状态
         self.last_state = {}
 
-    def execute_async(self, key, command,
-                      queue,
-                      executor_config=None):
-        self.log.info("[celery] queuing {key} through celery, "
-                      "queue={queue}".format(**locals()))
+    def execute_async(self, key, command, queue, executor_config=None):
+        self.log.info("[celery] queuing {key} through celery, " "queue={queue}".format(**locals()))
         # 向celery发送任务
-        self.tasks[key] = self.execute_command.apply_async(
-            args=[command], queue=queue)
+        self.tasks[key] = self.execute_command.apply_async(args=[command], queue=queue)
         # 记录任务的最新状态
         self.last_state[key] = celery_states.PENDING
 
@@ -82,9 +79,7 @@ class CeleryExecutor(BaseExecutor):
     def end(self, synchronous=False):
         if synchronous:
             # 等待所有的任务完成
-            while any([
-                    task.state not in celery_states.READY_STATES
-                    for task in self.tasks.values()]):
+            while any([task.state not in celery_states.READY_STATES for task in self.tasks.values()]):
                 time.sleep(5)
         self.sync()
 

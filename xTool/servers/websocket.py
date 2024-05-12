@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import (
     Any,
     Awaitable,
@@ -21,7 +19,6 @@ from websockets import (  # type: ignore
 from xTool.exceptions import InvalidUsage
 from xTool.servers.server import HttpProtocol
 
-
 __all__ = ["ConnectionClosed", "WebSocketProtocol", "WebSocketConnection"]
 
 ASIMessage = MutableMapping[str, Any]
@@ -34,8 +31,8 @@ class WebSocketProtocol(HttpProtocol):
         websocket_timeout=10,
         websocket_max_size=None,
         websocket_max_queue=None,
-        websocket_read_limit=2 ** 16,
-        websocket_write_limit=2 ** 16,
+        websocket_read_limit=2**16,
+        websocket_write_limit=2**16,
         **kwargs
     ):
         super().__init__(*args, **kwargs)
@@ -96,10 +93,7 @@ class WebSocketProtocol(HttpProtocol):
         subprotocol = None
         if subprotocols and "Sec-Websocket-Protocol" in request.headers:
             # select a subprotocol
-            client_subprotocols = [
-                p.strip()
-                for p in request.headers["Sec-Websocket-Protocol"].split(",")
-            ]
+            client_subprotocols = [p.strip() for p in request.headers["Sec-Websocket-Protocol"].split(",")]
             for p in client_subprotocols:
                 if p in subprotocols:
                     subprotocol = p

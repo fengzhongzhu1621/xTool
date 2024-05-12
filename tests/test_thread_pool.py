@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import gc
 import os
@@ -51,7 +49,8 @@ async def test_future_gc(loop):
 
         cfuture.add_done_callback(
             lambda *_: loop.call_soon_threadsafe(
-                future.set_result, True,
+                future.set_result,
+                True,
             ),
         )
 
@@ -227,7 +226,7 @@ async def test_threaded_generator_close(iterator_decorator, loop, timer):
         counter = 0
 
         async with noise() as gen:
-            async for _ in gen:     # NOQA
+            async for _ in gen:  # NOQA
                 counter += 1
                 if counter > 9:
                     break
@@ -256,7 +255,7 @@ async def test_threaded_generator_close_cm(iterator_decorator, loop, timer):
     async with timeout(2):
         async with noise() as gen:
             counter = 0
-            async for _ in gen:     # NOQA
+            async for _ in gen:  # NOQA
                 counter += 1
                 if counter > 9:
                     break
@@ -265,16 +264,14 @@ async def test_threaded_generator_close_cm(iterator_decorator, loop, timer):
         assert stopped.is_set()
 
 
-async def test_threaded_generator_non_generator_raises(
-        iterator_decorator, loop, timer
-):
+async def test_threaded_generator_non_generator_raises(iterator_decorator, loop, timer):
     @iterator_decorator()
     def errored():
         raise RuntimeError("Aaaaaaaa")
 
     async with timeout(2):
         with pytest.raises(RuntimeError):
-            async for _ in errored():       # NOQA
+            async for _ in errored():  # NOQA
                 pass
 
 
@@ -288,7 +285,7 @@ async def test_threaded_generator_func_raises(iterator_decorator, loop, timer):
 
     async with timeout(2):
         with pytest.raises(RuntimeError):
-            async for _ in errored(True):    # NOQA
+            async for _ in errored(True):  # NOQA
                 pass
 
 

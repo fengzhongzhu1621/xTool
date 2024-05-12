@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-
 import pytest
-from xTool.decorators.reify import reify_py, reify_c
+
+from xTool.decorators.reify import reify_py
 
 
 class ReifyMixin:
@@ -31,7 +30,7 @@ class ReifyMixin:
                 return 1
 
         assert isinstance(A.prop, self.reify)
-        assert 'Docstring.' == A.prop.__doc__
+        assert "Docstring." == A.prop.__doc__
 
     def test_reify_assignment(self) -> None:
         class A:

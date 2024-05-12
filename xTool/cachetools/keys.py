@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 class HashedTuple(tuple):
     """A tuple that ensures that hash() will be called no more than once
     per element, since cache decorators will hash the key multiple

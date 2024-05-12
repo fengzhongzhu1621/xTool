@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
+from typing import Optional
 
 import zlib
-from typing import Optional
 
 from xTool.plugin import register_plugin, PluginType
 from .base import CompressType
 
 
-@register_plugin(
-    PluginType.COMPRESS, CompressType.ZLIB
-)
+@register_plugin(PluginType.COMPRESS, CompressType.ZLIB)
 class ZlibCompress:
     @classmethod
     def compress(cls, data: bytes, compression_level: int = 6) -> Optional[bytes]:

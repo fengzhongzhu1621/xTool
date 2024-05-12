@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 class HealthzHandler:
     """用于拨测 ."""
 

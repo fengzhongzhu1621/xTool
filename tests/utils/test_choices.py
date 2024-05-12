@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from xTool.utils.choices import IntegerChoices
 
 
@@ -12,22 +11,22 @@ class TestIntegerChoices:
         actual = []
         for name, member in DemoIntegerChoices.__members__.items():
             actual.append([name, member.value, member.name])
-        expect = [['a', 1, 'a'], ['b', 2, 'b']]
+        expect = [["a", 1, "a"], ["b", 2, "b"]]
         assert actual == expect
 
     def test_names(self):
         actual = DemoIntegerChoices.names
-        expect = ['a', 'b']
+        expect = ["a", "b"]
         assert actual == expect
 
     def test_choices(self):
         actual = DemoIntegerChoices.choices
-        expect = [(1, 'name_a'), (2, 'name_b')]
+        expect = [(1, "name_a"), (2, "name_b")]
         assert actual == expect
 
     def test_labels(self):
         actual = DemoIntegerChoices.labels
-        expect = ['name_a', 'name_b']
+        expect = ["name_a", "name_b"]
         assert actual == expect
 
     def test_values(self):

@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-
 import unittest
+
 from xTool.decorators.utils import CallableContextManager
 
 
@@ -25,6 +24,7 @@ class TestCallableContextManager(unittest.TestCase):
         @decorator
         def _func():
             return 3
+
         actual = _func()
         assert actual == 3
         assert decorator.value == 2

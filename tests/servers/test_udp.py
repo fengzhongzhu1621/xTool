@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import socket
+
 from xTool.servers.udp import UDPServer
 
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from enum import Enum
 
 from django.db.models import TextChoices

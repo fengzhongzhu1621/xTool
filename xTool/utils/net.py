@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import importlib
 import ipaddress
 import socket
@@ -70,9 +68,7 @@ def url_concat(url, args):
         parsed_query = parse_qsl(parsed_url.query, keep_blank_values=True)
         parsed_query.extend(args)
     else:
-        err = "'args' parameter should be dict, list or tuple. Not {0}".format(
-            type(args)
-        )
+        err = "'args' parameter should be dict, list or tuple. Not {0}".format(type(args))
         raise TypeError(err)
     final_query = urlencode(parsed_query)
     url = urlunparse(
@@ -110,9 +106,7 @@ def get_local_host_ip(ifname=b"eth1", ip: str = None, port: int = None) -> str:
         sock = None
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            o_ip = socket.inet_ntoa(
-                fcntl.ioctl(sock.fileno(), 0x8915, struct.pack("256s", ifname[:15]))[20:24]
-            )
+            o_ip = socket.inet_ntoa(fcntl.ioctl(sock.fileno(), 0x8915, struct.pack("256s", ifname[:15]))[20:24])
         finally:
             if sock:
                 sock.close()
@@ -198,13 +192,9 @@ def is_ipv6(ip: str) -> bool:
 def new_socket(ip: str, stream: bool = True) -> socket.socket:
     sock = None
     if is_ipv4(ip):
-        sock = socket.socket(
-            socket.AF_INET,
-            socket.SOCK_STREAM if stream else socket.SOCK_DGRAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM if stream else socket.SOCK_DGRAM)
     elif is_ipv6(ip):
-        sock = socket.socket(
-            socket.AF_INET6,
-            socket.SOCK_STREAM if stream else socket.SOCK_DGRAM)
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM if stream else socket.SOCK_DGRAM)
     return sock
 
 
@@ -293,9 +283,7 @@ def ipv6_to_long(ipv6):
 
 
 def long_to_ipv6(ip_num):
-    return socket.inet_ntop(
-        socket.AF_INET6, struct.pack("!QQ", ip_num >> 64, ip_num & 0xFFFFFFFFFFFFFFFF)
-    )
+    return socket.inet_ntop(socket.AF_INET6, struct.pack("!QQ", ip_num >> 64, ip_num & 0xFFFFFFFFFFFFFFFF))
 
 
 def ip_to_bytes(ip):

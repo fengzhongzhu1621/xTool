@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-
 from xTool.plugin import register_plugin, PluginType
 from .base import CodecType
 
 
-@register_plugin(
-    PluginType.CODEC, CodecType.PB
-)
+@register_plugin(PluginType.CODEC, CodecType.PB)
 class ProtocCodec:
     @classmethod
     def encode(cls, obj: object) -> bytes:

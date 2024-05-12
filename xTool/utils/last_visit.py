@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
-from typing import List
 import time
+from typing import List
 
 import arrow
 from django.utils import timezone
@@ -38,24 +36,16 @@ def get_value(redis_client, key: str, field: str) -> str:
 
 def get_all_fields(redis_client, key: str) -> List:
     """从最近的访问记录中获取所有的field和分数 ."""
-    return [
-        item
-        for item in redis_client.zrange(f"{key}:time", 0, -1, withscores=True)
-        if item[0]
-    ]
+    return [item for item in redis_client.zrange(f"{key}:time", 0, -1, withscores=True) if item[0]]
 
 
-def get_all_fields_with_current_timezone(
-    redis_client, key: str, datetime_format: str = "YYYY-MM-DD HH:mm:ss"
-) -> List:
+def get_all_fields_with_current_timezone(redis_client, key: str, datetime_format: str = "YYYY-MM-DD HH:mm:ss") -> List:
     """从最近的访问记录中获取所有的field和分数 ."""
     data = get_all_fields(redis_client, key)
     result = [
         (
             item[0],
-            arrow.get(item[1])
-            .to(timezone.get_current_timezone().zone)
-            .format(datetime_format),
+            arrow.get(item[1]).to(timezone.get_current_timezone().zone).format(datetime_format),
         )
         for item in data
     ]

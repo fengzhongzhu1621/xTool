@@ -42,8 +42,8 @@ class CacheKey(abc.ABC):
 
 class CacheKeyTemplate(CacheKey):
     def __init__(self, key_template: str, need_md5=False, *args, **kwargs):
-        super().__init__(need_md5, *args, **kwargs)
         self.key_template = key_template
+        super().__init__(need_md5, *args, **kwargs)
 
     def key_template(self) -> str:
         return self.key_template

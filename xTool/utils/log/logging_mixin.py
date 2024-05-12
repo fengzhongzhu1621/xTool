@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -8,12 +6,11 @@ from __future__ import unicode_literals
 import logging
 import sys
 import warnings
-
-import six
-
 from builtins import object
 from contextlib import contextmanager
 from logging import Handler, StreamHandler
+
+import six
 
 
 class LoggingMixin(object):
@@ -30,11 +27,9 @@ class LoggingMixin(object):
     @property
     def logger(self):
         warnings.warn(
-            'Initializing logger for {} using logger(), which will '
-            'be replaced by .log in future version'.format(
-                self.__class__.__module__ + '.' + self.__class__.__name__
-            ),
-            DeprecationWarning
+            "Initializing logger for {} using logger(), which will "
+            "be replaced by .log in future version".format(self.__class__.__module__ + "." + self.__class__.__name__),
+            DeprecationWarning,
         )
         return self.log
 
@@ -43,9 +38,7 @@ class LoggingMixin(object):
         try:
             return self._log
         except AttributeError:
-            self._log = logging.root.getChild(
-                self.__class__.__module__ + '.' + self.__class__.__name__
-            )
+            self._log = logging.root.getChild(self.__class__.__module__ + "." + self.__class__.__name__)
             return self._log
 
     def _set_context(self, context):
@@ -58,6 +51,7 @@ class StreamLogWriter(object):
     """添加带有缓冲的日志流，用于重定向标准输入和输出
     Allows to redirect stdout and stderr to logger
     """
+
     encoding = False
 
     def __init__(self, logger, level):
@@ -104,14 +98,14 @@ class RedirectStdHandler(StreamHandler):
     whatever sys.stderr/stderr is currently set to rather than the value of
     sys.stderr/stdout at handler construction time.
     """
+
     def __init__(self, stream):
         # stream是必填的，且必须是字符串，不能使用文件对象
         if not isinstance(stream, six.string_types):
-            raise Exception("Cannot use file like objects. Use 'stdout' or 'stderr'"
-                            " as a str and without 'ext://'.")
+            raise Exception("Cannot use file like objects. Use 'stdout' or 'stderr'" " as a str and without 'ext://'.")
 
         self._use_stderr = True
-        if 'stdout' in stream:
+        if "stdout" in stream:
             self._use_stderr = False
 
         # StreamHandler tries to set self.stream

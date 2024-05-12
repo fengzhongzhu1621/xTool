@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 class Default:
     """
     It is used to replace `None` or `object()` as a sentinel

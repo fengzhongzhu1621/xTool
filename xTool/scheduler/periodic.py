@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import logging
 from functools import partial
@@ -13,6 +11,7 @@ log = logging.getLogger(__name__)
 
 class PeriodicCallback:
     """周期回调 ."""
+
     __slots__ = "_cb", "_closed", "_task", "_loop", "_handle", "__name"
 
     def __init__(self, coroutine_func, *args, **kwargs):
@@ -34,8 +33,10 @@ class PeriodicCallback:
             log.exception("Periodic task error:")
 
     def start(
-        self, interval: Union[int, float],
-        loop=None, *,
+        self,
+        interval: Union[int, float],
+        loop=None,
+        *,
         delay: Union[int, float] = 0,
         shield: bool = False,
         suppress_exceptions: Tuple[Type[Exception]] = ()

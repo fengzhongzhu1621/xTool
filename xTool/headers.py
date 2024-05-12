@@ -1,25 +1,19 @@
-# -*- coding: utf-8 -*-
-
 import re
-
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 from urllib.parse import unquote
 
 from xTool.status import STATUS_CODES
-
 
 HeaderIterable = Iterable[Tuple[str, Any]]  # Values convertible to str
 Options = Dict[str, Union[int, str]]  # key=value fields in various headers
 OptionsIterable = Iterable[Tuple[str, str]]  # May contain duplicate keys
 
 _token, _quoted = r"([\w!#$%&'*+\-.^_`|~]+)", r'"([^"]*)"'
-_param = re.compile(fr";\s*{_token}=(?:{_token}|{_quoted})", re.ASCII)
+_param = re.compile(rf";\s*{_token}=(?:{_token}|{_quoted})", re.ASCII)
 _firefox_quote_escape = re.compile(r'\\"(?!; |\s*$)')
 _ipv6 = "(?:[0-9A-Fa-f]{0,4}:){2,7}[0-9A-Fa-f]{0,4}"
 _ipv6_re = re.compile(_ipv6)
-_host_re = re.compile(
-    r"((?:\[" + _ipv6 + r"\])|[a-zA-Z0-9.\-]{1,253})(?::(\d{1,5}))?"
-)
+_host_re = re.compile(r"((?:\[" + _ipv6 + r"\])|[a-zA-Z0-9.\-]{1,253})(?::(\d{1,5}))?")
 
 # RFC's quoted-pair escapes are mostly ignored by browsers. Chrome, Firefox and
 # curl all have different escaping, that we try to handle as well as possible,
@@ -43,8 +37,7 @@ def parse_content_header(value: str) -> Tuple[str, Options]:
         options: Dict[str, Union[int, str]] = {}
     else:
         options = {
-            m.group(1).lower(): m.group(2) or m.group(3).replace("%22", '"')
-            for m in _param.finditer(value[pos:])
+            m.group(1).lower(): m.group(2) or m.group(3).replace("%22", '"') for m in _param.finditer(value[pos:])
         }
         value = value[:pos]
     return value.strip().lower(), options
@@ -106,13 +99,7 @@ def parse_xforwarded(headers, config) -> Optional[Options]:
         try:
             # Combine, split and filter multiple headers' entries
             forwarded_for = headers.getall(config.FORWARDED_FOR_HEADER)
-            proxies = [
-                p
-                for p in (
-                    p.strip() for h in forwarded_for for p in h.split(",")
-                )
-                if p
-            ]
+            proxies = [p for p in (p.strip() for h in forwarded_for for p in h.split(",")) if p]
             addr = proxies[-proxies_count]
         except (KeyError, IndexError):
             pass
@@ -186,9 +173,7 @@ def format_http1(headers: HeaderIterable) -> bytes:
     return "".join(f"{name}: {val}\r\n" for name, val in headers).encode()
 
 
-def format_http1_response(
-    status: int, headers: HeaderIterable, body=b""
-) -> bytes:
+def format_http1_response(status: int, headers: HeaderIterable, body=b"") -> bytes:
     """Format a full HTTP/1.1 response.
 
     - If `body` is included, content-length must be specified in headers.

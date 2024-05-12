@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 def enable_windows_color_support():
     import ctypes
 

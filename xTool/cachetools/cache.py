@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from collections.abc import MutableMapping
 from typing import Optional, Callable
 

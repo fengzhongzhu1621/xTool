@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.codec.pb_json_codec import PbJsonCodec
 from .codec_pb2 import Request
 

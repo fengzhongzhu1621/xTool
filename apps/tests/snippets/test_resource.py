@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import pytest
 
 from apps.core.drf_resource import ModelResource
@@ -29,9 +27,7 @@ class SnippetViewSetResource(ModelResource):
 class TestSnippetViewSet:
 
     def test_perform_request(self):
-        actual = SnippetViewSetResource().request({
-            "a": 1
-        }, action="list")
+        actual = SnippetViewSetResource().request({"a": 1}, action="list")
         assert actual == []
 
         # actual = SnippetViewSetResource().request({

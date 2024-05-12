@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from bk_resource.routers import ResourceRouter
 from django.urls import include, path
 

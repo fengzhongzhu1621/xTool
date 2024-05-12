@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-
 from typing import Union
+
 from xTool.units.exceptions import UnitSuffixNotFound
 
 
@@ -9,12 +8,9 @@ class Unit:
     def __init__(self, suffix: str = "") -> None:
         self.suffix = suffix
 
-    def convert(self,
-                value: Union[int, float],
-                to_suffix: str,
-                from_suffix: str = "",
-                decimal=None,
-                show_suffix=False) -> Union[int, float, str]:
+    def convert(
+        self, value: Union[int, float], to_suffix: str, from_suffix: str = "", decimal=None, show_suffix=False
+    ) -> Union[int, float, str]:
         if from_suffix == "":
             from_suffix = self.suffix
         try:
@@ -31,7 +27,7 @@ class Unit:
         if distance > 0:
             value = value * (self.factor**distance)
         elif distance < 0:
-            value = value / (self.factor**(distance * -1))
+            value = value / (self.factor ** (distance * -1))
 
         if decimal is not None:
             value = round(value, decimal)
@@ -42,5 +38,6 @@ class Unit:
                     "value": value,
                     "from_suffix": from_suffix,
                     "to_suffix": to_suffix,
-                })
+                }
+            )
         return value

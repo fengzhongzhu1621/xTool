@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -205,16 +203,14 @@ def grouper(n, iterable, padvalue=None):
 
 def chunks(items, chunk_len):
     """Yield successive n-sized chunks from l."""
-    return (items[i: i + chunk_len] for i in xrange(0, len(items), chunk_len))
+    return (items[i : i + chunk_len] for i in xrange(0, len(items), chunk_len))
 
 
 def chunked(it, chunk_len):
     marker = object()
-    for group in (
-        list(g) for g in izip_longest(*[iter(it)] * chunk_len, fillvalue=marker)
-    ):
+    for group in (list(g) for g in izip_longest(*[iter(it)] * chunk_len, fillvalue=marker)):
         if group[-1] is marker:
-            del group[group.index(marker):]
+            del group[group.index(marker) :]
         yield group
 
 
@@ -289,9 +285,7 @@ def properties(obj):
     Note how the entry for prop is not a bound method (i.e. the getter) but a the return value of
     that getter.
     """
-    return dict(
-        (attr, getattr(obj, attr)) for attr in dir(obj) if not attr.startswith("__")
-    )
+    return dict((attr, getattr(obj, attr)) for attr in dir(obj) if not attr.startswith("__"))
 
 
 def get_first_duplicate(items):
@@ -403,10 +397,7 @@ def camel_to_snake_2(camel_str: str) -> str:
             prev_letter = camel_str[i - 1]
             next_letter = camel_str[i + 1] if i < str_len - 1 else "A"
             if cur_letter.isalpha():
-                if (
-                    prev_letter != prev_letter.upper()
-                    or next_letter != next_letter.upper()
-                ):
+                if prev_letter != prev_letter.upper() or next_letter != next_letter.upper():
                     buf.write("_")
         buf.write(cur_letter)
 
@@ -452,10 +443,7 @@ def file_md5sum(file):
 
 def count_md5(content, dict_sort=True, list_sort=True):
     if dict_sort and isinstance(content, dict):
-        content = [
-            (str(k), count_md5(content[k], dict_sort, list_sort))
-            for k in sorted(content.keys())
-        ]
+        content = [(str(k), count_md5(content[k], dict_sort, list_sort)) for k in sorted(content.keys())]
         return count_md5(content, dict_sort, list_sort)
     elif isinstance(content, (list, tuple)):
         content = (
@@ -544,9 +532,7 @@ def extract_stack(f=None, limit=None):
         # Limit the amount of work to a reasonable amount, as extract_stack()
         # can be called for each coroutine and future in debug mode.
         limit = DEBUG_STACK_DEPTH
-    stack = traceback.StackSummary.extract(
-        traceback.walk_stack(f), limit=limit, lookup_lines=False
-    )
+    stack = traceback.StackSummary.extract(traceback.walk_stack(f), limit=limit, lookup_lines=False)
     stack.reverse()
     return stack
 
@@ -642,9 +628,7 @@ def convert_img_to_base64(image, format="PNG"):
     img_buffer = StringIO()
     image.save(img_buffer, format=format, quality=95)
     base64_value = base64.b64encode(img_buffer.getvalue())
-    return "data:image/{format};base64,{value}".format(
-        format=format.lower(), value=base64_value
-    )
+    return "data:image/{format};base64,{value}".format(format=format.lower(), value=base64_value)
 
 
 def safe_int(int_str, dft=0):
@@ -720,10 +704,7 @@ def camel_to_underscore(camel_str):
             prev_letter = camel_str[i - 1]
             next_letter = camel_str[i + 1] if i < str_len - 1 else "A"
             if cur_letter.isalpha():
-                if (
-                    prev_letter != prev_letter.upper()
-                    or next_letter != next_letter.upper()
-                ):
+                if prev_letter != prev_letter.upper() or next_letter != next_letter.upper():
                     buf.write("_")
         buf.write(cur_letter)
 
@@ -768,9 +749,7 @@ def retry_once(action: callable):
             raise exc_info
 
 
-def classify(
-    seq: Iterable, key: Optional[Callable] = None, value: Optional[Callable] = None
-) -> Dict:
+def classify(seq: Iterable, key: Optional[Callable] = None, value: Optional[Callable] = None) -> Dict:
     """将迭代器按规则分类 ."""
     d: Dict[Any, Any] = {}
     for item in seq:

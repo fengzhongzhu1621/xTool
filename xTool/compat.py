@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import atexit
 import itertools
 import logging
@@ -19,25 +17,28 @@ PY_36 = sys.version_info >= (3, 6)
 PY_37 = sys.version_info >= (3, 7)
 PY_38 = sys.version_info >= (3, 8)
 
-IS_HPUX = sys.platform.startswith('hp-ux')
+IS_HPUX = sys.platform.startswith("hp-ux")
 # Specifies whether the current runtime is HP-UX.
-IS_LINUX = sys.platform.startswith('linux')
+IS_LINUX = sys.platform.startswith("linux")
 # Specifies whether the current runtime is HP-UX.
-IS_UNIX = hasattr(socket, 'AF_UNIX')
+IS_UNIX = hasattr(socket, "AF_UNIX")
 
 
 # Specifies whether the current runtime is *NIX.
 
 
-def _identity(x): return x
+def _identity(x):
+    return x
 
 
 try:  # Python 2.7+
     from logging import NullHandler
 except ImportError:
+
     class NullHandler(logging.Handler):
         def emit(self, record):
             pass
+
 
 try:
     import pwd
@@ -53,14 +54,18 @@ except ImportError:
 try:
     callable
 except NameError:
+
     def callable(object):
-        return hasattr(object, '__call__')
+        return hasattr(object, "__call__")
+
 
 try:
     callable
 except NameError:
+
     def callable(object):
-        return hasattr(object, '__call__')
+        return hasattr(object, "__call__")
+
 
 if PY3:
     try:
@@ -70,7 +75,8 @@ if PY3:
 
 # Python 3.x (and backports) use a modified iterator syntax
 # This will allow 2.x to behave with 3.x iterators
-if not hasattr(__builtins__, 'next'):
+if not hasattr(__builtins__, "next"):
+
     def next(iter):
         try:
             # Try new style iterators
@@ -78,13 +84,17 @@ if not hasattr(__builtins__, 'next'):
         except AttributeError:
             # Fallback in case of a "native" iterator
             return iter.next()
+
+
 # Python < 2.5 does not have "any"
-if not hasattr(__builtins__, 'any'):
+if not hasattr(__builtins__, "any"):
+
     def any(iterator):
         for item in iterator:
             if item:
                 return True
         return False
+
 
 # Random numbers for rotation temp file names, using secrets module if available (Python 3.6).
 # Otherwise use `random.SystemRandom` if available, then fall back on
@@ -95,16 +105,16 @@ try:
 except ImportError:
     import random
 
-    if hasattr(
-        random,
-        "SystemRandom"):  # May not be present in all Python editions
+    if hasattr(random, "SystemRandom"):  # May not be present in all Python editions
         # Should be safe to reuse `SystemRandom` - not software state dependant
         randbits = random.SystemRandom().getrandbits
     else:
+
         def randbits(nb):
             return random.Random().getrandbits(nb)
 
-b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode('latin1'))
+
+b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode("latin1"))
 
 if PY3:
     import builtins
@@ -119,8 +129,8 @@ if PY3:
     zip = builtins.zip
     xrange = builtins.range
     map = builtins.map
-    get_self = operator.attrgetter('__self__')
-    get_func = operator.attrgetter('__func__')
+    get_self = operator.attrgetter("__self__")
+    get_func = operator.attrgetter("__func__")
     text = str
     text_type = str
     bytes_type = bytes
@@ -131,27 +141,22 @@ if PY3:
     long = int
     unicode_type = str
     basestring_type = str
-    print_ = getattr(builtins, 'print')
+    print_ = getattr(builtins, "print")
     izip_longest = itertools.zip_longest
     implements_to_string = _identity
     xrange = range
 
-
     def iterkeys(d):
         return iter(d.keys())
-
 
     def itervalues(d):
         return iter(d.values())
 
-
     def iteritems(d):
         return iter(d.items())
 
-
     def callable_(c):
         return isinstance(c, Callable)
-
 
     def reraise(tp, value, tb=None):
         """
@@ -168,7 +173,6 @@ if PY3:
             raise value.with_traceback(tb)
         raise value
 
-
     def raise_exc_info(exc_info):
         try:
             raise exc_info[1].with_traceback(exc_info[2])
@@ -184,8 +188,8 @@ else:
     zip = itertools.izip
     xrange = __builtin__.xrange
     map = itertools.imap
-    get_self = operator.attrgetter('im_self')
-    get_func = operator.attrgetter('im_func')
+    get_self = operator.attrgetter("im_self")
+    get_func = operator.attrgetter("im_func")
     text = (str, unicode)
     text_type = unicode
     bytes_type = str
@@ -197,37 +201,32 @@ else:
     izip_longest = itertools.izip_longest
     callable_ = callable
 
-
     def iterkeys(d):
         return d.iterkeys()
-
 
     def itervalues(d):
         return d.itervalues()
 
-
     def iteritems(d):
         return d.iteritems()
 
+    exec("def reraise(tp, value, tb=None):\n raise tp, value, tb")
 
-    exec('def reraise(tp, value, tb=None):\n raise tp, value, tb')
-
-    exec("""
+    exec(
+        """
 def raise_exc_info(exc_info):
     raise exc_info[0], exc_info[1], exc_info[2]
-""")
-
+"""
+    )
 
     def print_(s):
         sys.stdout.write(s)
-        sys.stdout.write('\n')
-
+        sys.stdout.write("\n")
 
     def implements_to_string(cls):
         cls.__unicode__ = cls.__str__
-        cls.__str__ = lambda x: x.__unicode__().encode('utf-8')
+        cls.__str__ = lambda x: x.__unicode__().encode("utf-8")
         return cls
-
 
     FileNotFoundError = EnvironmentError
 
@@ -244,7 +243,6 @@ except ImportError:
             return L != []
 
         return is_finalizing
-
 
     is_finalizing = _get_emulated_is_finalizing()
 
@@ -268,7 +266,7 @@ def with_metaclass(meta, *bases):
                 return type.__new__(cls, name, (), d)
             return meta(name, bases, d)
 
-    return metaclass('temporary_class', None, {})
+    return metaclass("temporary_class", None, {})
 
 
 def flatten_list_bytes(list_of_data):
@@ -276,10 +274,8 @@ def flatten_list_bytes(list_of_data):
     if not PY34:
         # On Python 3.3 and older, bytes.join() doesn't handle
         # memoryview.
-        list_of_data = (
-            bytes(data) if isinstance(data, memoryview) else data
-            for data in list_of_data)
-    return b''.join(list_of_data)
+        list_of_data = (bytes(data) if isinstance(data, memoryview) else data for data in list_of_data)
+    return b"".join(list_of_data)
 
 
 def qualname(x):
@@ -287,8 +283,7 @@ def qualname(x):
         return x.__qualname__
 
     # not perfect - but it is ok for cache key
-    if hasattr(x, 'im_class'):
-        return '.'.join(
-            (x.im_class.__name__, x.__name__))
+    if hasattr(x, "im_class"):
+        return ".".join((x.im_class.__name__, x.__name__))
     else:
         return x.__name__

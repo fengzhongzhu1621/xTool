@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
-
 from typing import Optional
 
 from xTool.plugin import register_plugin, PluginType
 from .base import CompressType
 
 
-@register_plugin(
-    PluginType.COMPRESS, CompressType.DUMMY
-)
+@register_plugin(PluginType.COMPRESS, CompressType.DUMMY)
 class DummyCompress:
     @classmethod
     def compress(cls, data: bytes, _: int = 6) -> Optional[bytes]:

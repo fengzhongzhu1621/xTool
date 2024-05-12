@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from typing import List
 
 import pytest
+
 from xTool.type_hint import Protocol
 
 
@@ -12,8 +11,7 @@ class Duck(Protocol):
 
 
 class Proto(Protocol):
-    def meth(self) -> int:
-        ...
+    def meth(self) -> int: ...
 
 
 class C:
@@ -30,11 +28,11 @@ def func(x: Proto) -> int:
 
 
 class Template(Protocol):
-    name: str        # This is a protocol member
-    value: int = 0   # This one too (with default)
+    name: str  # This is a protocol member
+    value: int = 0  # This one too (with default)
 
     def method(self) -> None:
-        self.temp: List[int] = []   # Error in type checker
+        self.temp: List[int] = []  # Error in type checker
 
 
 def test_func():

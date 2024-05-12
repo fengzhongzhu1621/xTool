@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import logging
 
 from xTool.scheduler.periodic import PeriodicCallback
 from xTool.servers.base import Service
-
 
 log = logging.getLogger(__name__)
 

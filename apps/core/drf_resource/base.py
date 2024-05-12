@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
-
 from abc import abstractmethod, ABCMeta
+from typing import Dict, List, Union, Optional
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
-from typing import Dict, List, Union, Optional
+from rest_framework.exceptions import APIException
 
 from apps.core.drf_resource.logger import tracer, logger
-from rest_framework.exceptions import APIException
-from xTool.plugin import (
-    register_plugin)
+from xTool.plugin import register_plugin
 
 
 class ResourceMeta(ABCMeta):
@@ -33,6 +31,7 @@ class ResourceMeta(ABCMeta):
 
 class Resource(metaclass=ResourceMeta):
     """资源基类 ."""
+
     RequestSerializer = None  # 请求序列化器
     ResponseSerializer = None  # 响应序列化器
 
@@ -69,13 +68,14 @@ class Resource(metaclass=ResourceMeta):
         finally:
             end_time = timezone.now()
             name = f"{tmp_resource.__class__.__module__}.{tmp_resource.__class__.__name__}"
-            logger.info("Resource => %s, StartTime => %s, EndTime => %s, RequestData => %s, ResponseData = %s",
-                        name,
-                        start_time,
-                        end_time,
-                        request_data,
-                        response_data,
-                        )
+            logger.info(
+                "Resource => %s, StartTime => %s, EndTime => %s, RequestData => %s, ResponseData = %s",
+                name,
+                start_time,
+                end_time,
+                request_data,
+                response_data,
+            )
 
             return response_data
 
@@ -89,8 +89,7 @@ class Resource(metaclass=ResourceMeta):
             # 执行请求操作
             response_data = self.perform_request(validated_request_data, *args, **kwargs)
             # 验证响应结果
-            validated_response_data = self.validate_response_data(
-                response_data)
+            validated_response_data = self.validate_response_data(response_data)
             return validated_response_data
 
     def validate_request_data(self, request_data: Optional[Dict]) -> Optional[Dict]:
@@ -106,14 +105,12 @@ class Resource(metaclass=ResourceMeta):
         # .data - Only available after calling `is_valid()`
         many_request_data = bool(self.many_request_data)
         if isinstance(request_data, (models.Model, models.QuerySet)):
-            request_serializer_obj = self.RequestSerializer(
-                request_data, many=many_request_data)
+            request_serializer_obj = self.RequestSerializer(request_data, many=many_request_data)
             # 返回传出的原始数据
             result = request_serializer_obj.data
         else:
             many_request_data = isinstance(request_data, List)
-            request_serializer_obj = self.RequestSerializer(
-                data=request_data, many=many_request_data)
+            request_serializer_obj = self.RequestSerializer(data=request_data, many=many_request_data)
             # 验证输入参数
             if not request_serializer_obj.is_valid():
                 errors = request_serializer_obj.errors
@@ -128,13 +125,11 @@ class Resource(metaclass=ResourceMeta):
         return result
 
     @abstractmethod
-    def perform_request(
-        self, validated_request_data: Optional[Dict], *args, **kwargs) -> Union[List, Dict, None]:
+    def perform_request(self, validated_request_data: Optional[Dict], *args, **kwargs) -> Union[List, Dict, None]:
         """执行请求操作 ."""
         ...
 
-    def validate_response_data(
-        self, response_data: Union[List, Dict]) -> Union[List, Dict, None]:
+    def validate_response_data(self, response_data: Union[List, Dict]) -> Union[List, Dict, None]:
         """验证请求返回的数据 ."""
         if not self.ResponseSerializer:
             # 没有响应序列化器则直接返回结果
@@ -143,13 +138,11 @@ class Resource(metaclass=ResourceMeta):
         # model类型的数据需要特殊处理
         many_response_data = bool(self.many_response_data)
         if isinstance(response_data, (models.Model, models.QuerySet)):
-            response_serializer_obj = self.ResponseSerializer(
-                response_data, many=many_response_data)
+            response_serializer_obj = self.ResponseSerializer(response_data, many=many_response_data)
             result = response_serializer_obj.data
         else:
             many_response_data = isinstance(many_response_data, List)
-            response_serializer_obj = self.ResponseSerializer(
-                data=response_data, many=many_response_data)
+            response_serializer_obj = self.ResponseSerializer(data=response_data, many=many_response_data)
             self._response_serializer_obj = response_serializer_obj
             if not response_serializer_obj.is_valid():
                 errors = response_serializer_obj.errors

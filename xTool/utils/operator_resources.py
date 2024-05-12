@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.exceptions import XToolException
 
 # Constants for resources (megabytes are the base unit)
@@ -23,11 +21,13 @@ class Resource(object):
         execution of the operator.
     :type qty: long
     """
+
     def __init__(self, name, units_str, qty):
         if qty < 0:
             raise XToolException(
-                'Received resource quantity {} for resource {} but resource quantity '
-                'must be non-negative.'.format(qty, name))
+                "Received resource quantity {} for resource {} but resource quantity "
+                "must be non-negative.".format(qty, name)
+            )
         # 资源名称
         self._name = name
         # 资源单位
@@ -56,22 +56,22 @@ class Resource(object):
 
 class CpuResource(Resource):
     def __init__(self, qty):
-        super(CpuResource, self).__init__('CPU', 'core(s)', qty)
+        super(CpuResource, self).__init__("CPU", "core(s)", qty)
 
 
 class RamResource(Resource):
     def __init__(self, qty):
-        super(RamResource, self).__init__('RAM', 'MB', qty)
+        super(RamResource, self).__init__("RAM", "MB", qty)
 
 
 class DiskResource(Resource):
     def __init__(self, qty):
-        super(DiskResource, self).__init__('Disk', 'MB', qty)
+        super(DiskResource, self).__init__("Disk", "MB", qty)
 
 
 class GpuResource(Resource):
     def __init__(self, qty):
-        super(GpuResource, self).__init__('GPU', 'gpu(s)', qty)
+        super(GpuResource, self).__init__("GPU", "gpu(s)", qty)
 
 
 class Resources(object):
@@ -88,6 +88,7 @@ class Resources(object):
     :param gpus: The number of gpu units that are required
     :type gpus: long
     """
+
     def __init__(self, cpus, ram, disk, gpus):
         self.cpus = CpuResource(cpus)
         self.ram = RamResource(ram)

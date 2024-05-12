@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -31,11 +29,12 @@ def get_task_runner(local_task_job, conf):
     :return: The task runner to use to run the task.
     :rtype: airflow.task.task_runner.base_task_runner.BaseTaskRunner
     """
-    _TASK_RUNNER = conf.get('core', 'TASK_RUNNER')
+    _TASK_RUNNER = conf.get("core", "TASK_RUNNER")
     if _TASK_RUNNER == "BashTaskRunner":
         return BashTaskRunner(local_task_job, conf)
     elif _TASK_RUNNER == "CgroupTaskRunner":
         from airflow.contrib.task_runner.cgroup_task_runner import CgroupTaskRunner
+
         return CgroupTaskRunner(local_task_job, conf)
     else:
         raise XToolException("Unknown task runner type {}".format(_TASK_RUNNER))

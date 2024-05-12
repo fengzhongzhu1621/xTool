@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
-
 import os
 
 # inspect.signature is only available in Python 3. funcsigs.signature is
 # a backport.
 try:
     import inspect
+
     signature = inspect.signature
 except AttributeError:
     import funcsigs
+
     signature = funcsigs.signature
 
 from copy import copy
@@ -29,6 +29,7 @@ def apply_defaults(func):
     """
     # 获得函数签名
     import airflow.models
+
     # Cache inspect.signature for the wrapper closure to avoid calling it
     # at every decorated invocation. This is separate sig_cache created
     # per decoration, i.e. each function decorated using apply_defaults will
@@ -37,39 +38,40 @@ def apply_defaults(func):
 
     # 获得默认值为空的参数名，且此参数不为self, 且此参数不为可变参数
     non_optional_args = {
-        name for (name, param) in sig_cache.parameters.items()
-        if param.default == param.empty and
-        param.name != 'self' and
-        param.kind not in (param.VAR_POSITIONAL, param.VAR_KEYWORD)}
+        name
+        for (name, param) in sig_cache.parameters.items()
+        if param.default == param.empty
+        and param.name != "self"
+        and param.kind not in (param.VAR_POSITIONAL, param.VAR_KEYWORD)
+    }
 
     @wraps(func)
     def wrapper(*args, **kwargs):
         # 列表参数最多一个
         if len(args) > 1:
-            raise XToolException(
-                "Use keyword arguments when initializing operators")
+            raise XToolException("Use keyword arguments when initializing operators")
         # 获得参数中的dag对象，或从全局变量中获取dag
         dag_args = {}
         dag_params = {}
-        dag = kwargs.get('dag', None) or airflow.models._CONTEXT_MANAGER_DAG
+        dag = kwargs.get("dag", None) or airflow.models._CONTEXT_MANAGER_DAG
         if dag:
             dag_args = copy(dag.default_args) or {}
             dag_params = copy(dag.params) or {}
 
         # 把函数的params参数，与dag.parms合并
         params = {}
-        if 'params' in kwargs:
-            params = kwargs['params']
+        if "params" in kwargs:
+            params = kwargs["params"]
         dag_params.update(params)
 
         # 把函数参数中的kwargs['default_args']['params'] 与 dag.parms合并
         # 删除函数参数中的 kwargs['default_args']['params']
         default_args = {}
-        if 'default_args' in kwargs:
-            default_args = kwargs['default_args']
-            if 'params' in default_args:
-                dag_params.update(default_args['params'])
-                del default_args['params']
+        if "default_args" in kwargs:
+            default_args = kwargs["default_args"]
+            if "params" in default_args:
+                dag_params.update(default_args["params"])
+                del default_args["params"]
 
         # 把函数参数中kwargs['default_args']，与dag.default_args合并
         dag_args.update(default_args)
@@ -86,7 +88,7 @@ def apply_defaults(func):
             msg = "Argument {0} is required".format(missing_args)
             raise XToolException(msg)
 
-        kwargs['params'] = dag_params
+        kwargs["params"] = dag_params
 
         result = func(*args, **kwargs)
         return result
@@ -94,7 +96,8 @@ def apply_defaults(func):
     return wrapper
 
 
-if 'BUILDING_AIRFLOW_DOCS' in os.environ:
+if "BUILDING_AIRFLOW_DOCS" in os.environ:
     # flake8: noqa: F811
     # Monkey patch hook to get good function headers while building docs
-    def apply_defaults(x): return x
+    def apply_defaults(x):
+        return x

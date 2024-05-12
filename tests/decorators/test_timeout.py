@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
+
 import pytest
+
 from xTool.decorators import timeout
 
 
@@ -28,6 +28,7 @@ async def test_already_done_2(loop):
 
 async def test_non_coroutine(loop):
     with pytest.raises(TypeError):
+
         @timeout.timeout(0)
         def test():
             return

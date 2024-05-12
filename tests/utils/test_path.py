@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.utils.path import path_to_dotted
 
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.algorithms.collections.object import ObjectSet
 from xTool.eval.expression import make_expression
 

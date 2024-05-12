@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 from random import shuffle
 
 import pytest
+
 from xTool import aiomisc
 
 
@@ -63,9 +62,7 @@ def test_shield(loop):
 
 
 async def test_cancel_tasks_wait(loop):
-    done, pending = await asyncio.wait([
-        asyncio.sleep(i) for i in range(10)
-    ], timeout=5)
+    done, pending = await asyncio.wait([asyncio.sleep(i) for i in range(10)], timeout=5)
 
     # 取消任务
     await aiomisc.cancel_tasks(pending)
@@ -81,9 +78,7 @@ async def test_cancel_tasks(loop):
     semaphore = asyncio.Semaphore(10)
 
     # 创建20个资源获取task
-    tasks = [
-        loop.create_task(semaphore.acquire()) for _ in range(20)
-    ]
+    tasks = [loop.create_task(semaphore.acquire()) for _ in range(20)]
     done, pending = await asyncio.wait(tasks, timeout=0.5)
 
     for task in pending:

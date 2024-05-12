@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.codec.yaml_codec import YamlCodec
 
 
@@ -15,12 +13,13 @@ dict: {hp: 13, sp: 5}
 """
         actual = YamlCodec.decode(value)
         expect = {
-            'none': [None, None],
-            'bool': [True, False, True, False],
-            'int': 42,
-            'float': 3.14159,
-            'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
-            'dict': {'hp': 13, 'sp': 5}}
+            "none": [None, None],
+            "bool": [True, False, True, False],
+            "int": 42,
+            "float": 3.14159,
+            "list": ["LITE", "RES_ACID", "SUS_DEXT"],
+            "dict": {"hp": 13, "sp": 5},
+        }
         assert actual == expect
 
         actual = YamlCodec.encode(expect)

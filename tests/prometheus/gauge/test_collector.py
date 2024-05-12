@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 from unittest import TestCase
+
 from xTool.prometheus.gauge.collector import GaugeCollector
 from xTool.prometheus.gauge.decorator import register
 
@@ -31,19 +31,11 @@ class TestGaugeCollector(TestCase):
 
     def test_generate_latest(self):
         actual = self.collector.generate_latest()
-        expect = '# HELP register_a a register\n# TYPE register_a gauge\nregister_a 0.0\n'
+        expect = "# HELP register_a a register\n# TYPE register_a gauge\nregister_a 0.0\n"
         assert actual == expect
 
     def test_get_samples(self):
         samples = self.collector.get_samples()
         actual = [dict(sample._asdict()) for sample in samples]
-        expect = [
-            {
-                'exemplar': None,
-                'labels': {},
-                'name': 'register_a',
-                'timestamp': None,
-                'value': 0.0
-            }
-        ]
+        expect = [{"exemplar": None, "labels": {}, "name": "register_a", "timestamp": None, "value": 0.0}]
         assert actual == expect

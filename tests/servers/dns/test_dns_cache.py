@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from unittest import TestCase
 import pytest
 from xTool.servers.dns.dns_cache import DNSCacheTable
@@ -10,17 +8,20 @@ class TestDNSCacheTable(TestCase):
         self.tl_dns_cache = 10
         self.cached_hosts = DNSCacheTable(self.tl_dns_cache)
         self.key = ("example.com", 9000)
-        self.addrs = [{
-            "hostname": 'example.com',
-            "host": "192.168.10.1",
-            "port": 9000,
-            "proto": 0,
-        }, {
-            "hostname": 'example.com',
-            "host": "192.168.10.2",
-            "port": 9000,
-            "proto": 0,
-        }]
+        self.addrs = [
+            {
+                "hostname": "example.com",
+                "host": "192.168.10.1",
+                "port": 9000,
+                "proto": 0,
+            },
+            {
+                "hostname": "example.com",
+                "host": "192.168.10.2",
+                "port": 9000,
+                "proto": 0,
+            },
+        ]
 
     def test_add(self):
         self.cached_hosts.add(self.key, self.addrs)

@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 
 
 class ExecutorProtocol(asyncio.Protocol):
-    __slots__ = ("transport", )
+    __slots__ = ("transport",)
 
     def __init__(self, *args, **kargs):
         self.transport = None

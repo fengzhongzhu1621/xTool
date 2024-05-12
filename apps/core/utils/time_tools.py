@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from datetime import datetime
 
 import arrow
@@ -47,9 +45,7 @@ def humanize_datetime(value: datetime, datetime_format="YYYY-MM-DD HH:mm:ss") ->
     return deadline_time
 
 
-def format_date_string(
-    date_string: str, output_format: str = api_settings.DATETIME_FORMAT
-):
+def format_date_string(date_string: str, output_format: str = api_settings.DATETIME_FORMAT):
     """将时间字符串格式化为指定的日期格式 ."""
     try:
         date = arrow.get(date_string)
@@ -68,9 +64,7 @@ def format_request_in_param(value: str) -> str:
     if not value:
         return ""
     value = value.replace("\n", ",").replace(";", ",")
-    result = ",".join(
-        item.strip() for item in value.strip(",").split(",") if item.strip()
-    )
+    result = ",".join(item.strip() for item in value.strip(",").split(",") if item.strip())
 
     return result
 

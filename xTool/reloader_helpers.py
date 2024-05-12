@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 import signal
 import subprocess
@@ -143,12 +141,8 @@ def watchdog(sleep_interval):
     """
     mtimes = {}
     worker_process = restart_with_reloader()
-    signal.signal(
-        signal.SIGTERM, lambda *args: kill_program_completly(worker_process)
-    )
-    signal.signal(
-        signal.SIGINT, lambda *args: kill_program_completly(worker_process)
-    )
+    signal.signal(signal.SIGTERM, lambda *args: kill_program_completly(worker_process))
+    signal.signal(signal.SIGINT, lambda *args: kill_program_completly(worker_process))
     while True:
         # 循环检测时间
         for filename in _iter_module_files():

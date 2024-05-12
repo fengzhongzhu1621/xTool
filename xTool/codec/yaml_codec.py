@@ -1,35 +1,33 @@
-# -*- coding: utf-8 -*-
-
 from typing import Union, Dict, Hashable, Any, List
 
 import yaml
+
 from xTool.plugin import register_plugin, PluginType
 from .base import CodecType
 
 
-@register_plugin(
-    PluginType.CODEC, CodecType.YAML
-)
+@register_plugin(PluginType.CODEC, CodecType.YAML)
 class YamlCodec:
     @classmethod
     def encode(
-            cls,
-            obj: object,
-            stream=None,
-            dumper=yaml.Dumper,
-            default_style=None,
-            default_flow_style=False,
-            canonical=None,
-            indent=None,
-            width=None,
-            allow_unicode=None,
-            line_break=None,
-            encoding=None,
-            explicit_start=None,
-            explicit_end=None,
-            version=None,
-            tags=None,
-            sort_keys=True) -> bytes:
+        cls,
+        obj: object,
+        stream=None,
+        dumper=yaml.Dumper,
+        default_style=None,
+        default_flow_style=False,
+        canonical=None,
+        indent=None,
+        width=None,
+        allow_unicode=None,
+        line_break=None,
+        encoding=None,
+        explicit_start=None,
+        explicit_end=None,
+        version=None,
+        tags=None,
+        sort_keys=True,
+    ) -> bytes:
         """python对象转化为yaml ."""
         return yaml.dump(
             obj,
@@ -47,7 +45,8 @@ class YamlCodec:
             explicit_end=explicit_end,
             version=version,
             tags=tags,
-            sort_keys=sort_keys)
+            sort_keys=sort_keys,
+        )
 
     @classmethod
     def decode(cls, data: str, loader=yaml.FullLoader) -> Union[Dict[Hashable, Any], List, None]:

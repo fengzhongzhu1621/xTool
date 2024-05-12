@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import abc
 import copy
 import logging
@@ -10,9 +9,9 @@ from typing import Dict
 import orjson as json
 from redis.exceptions import ConnectionError
 from redis.sentinel import Sentinel
-from xTool.cache.constants import TASK_DELAY_QUEUE, TASK_STORAGE_QUEUE, CacheBackendType
 
 import redis
+from xTool.cache.constants import TASK_DELAY_QUEUE, TASK_STORAGE_QUEUE, CacheBackendType
 
 logger = logging.getLogger("cache")
 

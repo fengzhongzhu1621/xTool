@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.utils.translation import gettext_lazy as _lazy
 from rest_framework import serializers
 

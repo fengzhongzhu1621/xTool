@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.compress.dummy_compress import DummyCompress
 
 

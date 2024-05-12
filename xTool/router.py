@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import re
 import uuid
 
@@ -12,9 +10,7 @@ from xTool.exceptions import MethodNotSupported, NotFound
 from xTool.views import CompositionView
 
 
-Route = namedtuple(
-    "Route", ["handler", "methods", "pattern", "parameters", "name", "uri"]
-)
+Route = namedtuple("Route", ["handler", "methods", "pattern", "parameters", "name", "uri"])
 Parameter = namedtuple("Parameter", ["name", "cast"])
 
 REGEX_TYPES = {
@@ -25,8 +21,7 @@ REGEX_TYPES = {
     "path": (str, r"[^/].*?"),
     "uuid": (
         uuid.UUID,
-        r"[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-"
-        r"[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}",
+        r"[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-" r"[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}",
     ),
 }
 
@@ -111,9 +106,7 @@ class Router:
         if ":" in parameter_string:
             name, pattern = parameter_string.split(":", 1)
             if not name:
-                raise ValueError(
-                    f"Invalid parameter syntax: {parameter_string}"
-                )
+                raise ValueError(f"Invalid parameter syntax: {parameter_string}")
 
         default = (str, pattern)
         # Pull from pre-configured types
@@ -164,20 +157,14 @@ class Router:
         slashed_methods = self.routes_all.get(uri + "/", frozenset({}))
         unslashed_methods = self.routes_all.get(uri[:-1], frozenset({}))
         if isinstance(methods, Iterable):
-            _slash_is_missing = all(
-                method in slashed_methods for method in methods
-            )
-            _without_slash_is_missing = all(
-                method in unslashed_methods for method in methods
-            )
+            _slash_is_missing = all(method in slashed_methods for method in methods)
+            _without_slash_is_missing = all(method in unslashed_methods for method in methods)
         else:
             _slash_is_missing = methods in slashed_methods
             _without_slash_is_missing = methods in unslashed_methods
 
         slash_is_missing = not uri[-1] == "/" and not _slash_is_missing
-        without_slash_is_missing = (
-            uri[-1] == "/" and not _without_slash_is_missing and not uri == "/"
-        )
+        without_slash_is_missing = uri[-1] == "/" and not _without_slash_is_missing and not uri == "/"
         # add version with trailing slash
         if slash_is_missing:
             routes.append(self._add(uri + "/", methods, handler, host, name))
@@ -205,10 +192,7 @@ class Router:
 
             else:
                 if not isinstance(host, Iterable):
-                    raise ValueError(
-                        f"Expected either string or Iterable of "
-                        f"host strings, not {host!r}"
-                    )
+                    raise ValueError(f"Expected either string or Iterable of " f"host strings, not {host!r}")
 
                 for host_ in host:
                     self.add(uri, methods, handler, host_, name)
@@ -227,9 +211,7 @@ class Router:
             name, _type, pattern = self.parse_parameter_string(name)
 
             if name in parameter_names:
-                raise ParameterNameConflicts(
-                    f"Multiple parameter named <{name}> " f"in route uri {uri}"
-                )
+                raise ParameterNameConflicts(f"Multiple parameter named <{name}> " f"in route uri {uri}")
             parameter_names.add(name)
 
             parameter = Parameter(name=name, cast=_type)
@@ -245,7 +227,7 @@ class Router:
             return f"({pattern})"
 
         pattern_string = re.sub(self.parameter_pattern, add_parameter, uri)
-        pattern = re.compile(fr"^{pattern_string}$")
+        pattern = re.compile(rf"^{pattern_string}$")
 
         def merge_route(route, methods, handler):
             # merge to the existing route when possible.
@@ -257,32 +239,24 @@ class Router:
                 duplicated = methods.intersection(route.methods)
                 duplicated_methods = ",".join(list(duplicated))
 
-                raise RouteExists(
-                    f"Route already registered: {uri} [{duplicated_methods}]"
-                )
+                raise RouteExists(f"Route already registered: {uri} [{duplicated_methods}]")
             if isinstance(route.handler, CompositionView):
                 view = route.handler
             else:
                 view = CompositionView()
                 view.add(route.methods, route.handler)
             view.add(methods, handler)
-            route = route._replace(
-                handler=view, methods=methods.union(route.methods)
-            )
+            route = route._replace(handler=view, methods=methods.union(route.methods))
             return route
 
         if parameters:
             # TODO: This is too complex, we need to reduce the complexity
             if properties["unhashable"]:
                 routes_to_check = self.routes_always_check
-                ndx, route = self.check_dynamic_route_exists(
-                    pattern, routes_to_check, parameters
-                )
+                ndx, route = self.check_dynamic_route_exists(pattern, routes_to_check, parameters)
             else:
                 routes_to_check = self.routes_dynamic[url_hash(uri)]
-                ndx, route = self.check_dynamic_route_exists(
-                    pattern, routes_to_check, parameters
-                )
+                ndx, route = self.check_dynamic_route_exists(pattern, routes_to_check, parameters)
             if ndx != -1:
                 # Pop the ndx of the route, no dups of the same route
                 routes_to_check.pop(ndx)
@@ -384,9 +358,7 @@ class Router:
         # virtual hosts specified; try to match route to the host header
 
         try:
-            return self._get(
-                request.path, request.method, request.headers.get("Host", "")
-            )
+            return self._get(request.path, request.method, request.headers.get("Host", ""))
         # try default hosts
         except NotFound:
             return self._get(request.path, request.method, "")
@@ -446,17 +418,14 @@ class Router:
                         raise method_not_supported
                     raise NotFound(f"Requested URL {url} not found")
 
-        kwargs = {
-            p.name: p.cast(value)
-            for value, p in zip(match.groups(1), route.parameters)
-        }
+        kwargs = {p.name: p.cast(value) for value, p in zip(match.groups(1), route.parameters)}
         route_handler = route.handler
         if hasattr(route_handler, "handlers"):
             route_handler = route_handler.handlers[method]
         return route_handler, [], kwargs, route.uri, route.name
 
     def is_stream_handler(self, request):
-        """ Handler for request is stream or not.
+        """Handler for request is stream or not.
         :param request: Request object
         :return: bool
         """
@@ -464,8 +433,6 @@ class Router:
             handler = self.get(request)[0]
         except (NotFound, MethodNotSupported):
             return False
-        if hasattr(handler, "view_class") and hasattr(
-            handler.view_class, request.method.lower()
-        ):
+        if hasattr(handler, "view_class") and hasattr(handler.view_class, request.method.lower()):
             handler = getattr(handler.view_class, request.method.lower())
         return hasattr(handler, "is_stream")

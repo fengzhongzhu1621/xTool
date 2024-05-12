@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
-from xTool.status import has_message_body
 from xTool.header import is_entity_header, is_hop_by_hop_header, remove_entity_headers
+from xTool.status import has_message_body
 
 
 def test_has_message_body():

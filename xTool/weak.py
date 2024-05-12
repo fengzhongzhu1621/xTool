@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-
 import weakref
 from contextlib import suppress
+
 from math import ceil
 
 

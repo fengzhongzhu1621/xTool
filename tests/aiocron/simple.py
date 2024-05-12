@@ -1,28 +1,28 @@
-# -*- coding: utf-8 -*-
-from xTool.aiocron import crontab
-from xTool.aiocron import asyncio
 import logging
+
+from xTool.aiocron import asyncio
+from xTool.aiocron import crontab
 
 logging.basicConfig()
 
 loop = asyncio.get_event_loop()
 
 
-@crontab('* * * * * */3')
+@crontab("* * * * * */3")
 def mycron():
-    print('function')
+    print("function")
 
 
-@crontab('* * * * * */2', start=False)
+@crontab("* * * * * */2", start=False)
 def mycron2(i):
     if i == 2:
         raise ValueError(i)
-    return 'yielded function (%i)' % i
+    return "yielded function (%i)" % i
 
 
 @asyncio.coroutine
 def main():
-    cron = crontab('* * * * * */2')
+    cron = crontab("* * * * * */2")
     for i in range(3):
         try:
             # 使用yield from的原因是 future是通过asyncio.gather返回的，是一个批量操作有多个值
@@ -30,7 +30,7 @@ def main():
         except Exception:
             pass
         else:
-            print('yielded (%i)' % i)
+            print("yielded (%i)" % i)
 
     for i in range(3):
         try:

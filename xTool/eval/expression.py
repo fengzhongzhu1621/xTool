@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from typing import Dict
+
 from xTool.eval.constants import OP
-from xTool.eval.operators import (Operator, BINARY_OPERATORS, AndOperator, OrOperator)
+from xTool.eval.operators import Operator, BINARY_OPERATORS, AndOperator, OrOperator
 
 
 def make_expression(data: Dict) -> Operator:

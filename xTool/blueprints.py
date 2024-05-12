@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from collections import defaultdict, namedtuple
 
 from xTool.algorithms.collections.blueprint_group import BlueprintGroup
@@ -20,16 +18,10 @@ FutureRoute = namedtuple(
         "name",
     ],
 )
-FutureListener = namedtuple(
-    "FutureListener", ["handler", "uri", "methods", "host"]
-)
-FutureMiddleware = namedtuple(
-    "FutureMiddleware", ["middleware", "args", "kwargs"]
-)
+FutureListener = namedtuple("FutureListener", ["handler", "uri", "methods", "host"])
+FutureMiddleware = namedtuple("FutureMiddleware", ["middleware", "args", "kwargs"])
 FutureException = namedtuple("FutureException", ["handler", "args", "kwargs"])
-FutureStatic = namedtuple(
-    "FutureStatic", ["uri", "file_or_directory", "args", "kwargs"]
-)
+FutureStatic = namedtuple("FutureStatic", ["uri", "file_or_directory", "args", "kwargs"])
 
 
 def chain(nested):
@@ -168,9 +160,7 @@ class Blueprint:
         for future in self.statics:
             # Prepend the blueprint URI prefix if available
             uri = url_prefix + future.uri if url_prefix else future.uri
-            app.static(
-                uri, future.file_or_directory, *future.args, **future.kwargs
-            )
+            app.static(uri, future.file_or_directory, *future.args, **future.kwargs)
 
         # Event listeners
         for event, listeners in self.listeners.items():
@@ -272,9 +262,7 @@ class Blueprint:
         )(handler)
         return handler
 
-    def websocket(
-        self, uri, host=None, strict_slashes=None, version=None, name=None
-    ):
+    def websocket(self, uri, host=None, strict_slashes=None, version=None, name=None):
         """Create a blueprint websocket route from a decorated function.
 
         :param uri: endpoint at which the route will be accessible.
@@ -288,17 +276,13 @@ class Blueprint:
             strict_slashes = self.strict_slashes
 
         def decorator(handler):
-            route = FutureRoute(
-                handler, uri, [], host, strict_slashes, False, version, name
-            )
+            route = FutureRoute(handler, uri, [], host, strict_slashes, False, version, name)
             self.websocket_routes.append(route)
             return handler
 
         return decorator
 
-    def add_websocket_route(
-        self, handler, uri, host=None, version=None, name=None
-    ):
+    def add_websocket_route(self, handler, uri, host=None, version=None, name=None):
         """Create a blueprint websocket route from a function.
 
         :param handler: function for handling uri requests. Accepts function,
@@ -392,9 +376,7 @@ class Blueprint:
         self.statics.append(static)
 
     # Shorthand method decorators
-    def get(
-        self, uri, host=None, strict_slashes=None, version=None, name=None
-    ):
+    def get(self, uri, host=None, strict_slashes=None, version=None, name=None):
         """
         Add an API URL under the **GET** *HTTP* method
 
@@ -475,9 +457,7 @@ class Blueprint:
             name=name,
         )
 
-    def head(
-        self, uri, host=None, strict_slashes=None, version=None, name=None
-    ):
+    def head(self, uri, host=None, strict_slashes=None, version=None, name=None):
         """
         Add an API URL under the **HEAD** *HTTP* method
 
@@ -498,9 +478,7 @@ class Blueprint:
             name=name,
         )
 
-    def options(
-        self, uri, host=None, strict_slashes=None, version=None, name=None
-    ):
+    def options(self, uri, host=None, strict_slashes=None, version=None, name=None):
         """
         Add an API URL under the **OPTIONS** *HTTP* method
 
@@ -551,9 +529,7 @@ class Blueprint:
             name=name,
         )
 
-    def delete(
-        self, uri, host=None, strict_slashes=None, version=None, name=None
-    ):
+    def delete(self, uri, host=None, strict_slashes=None, version=None, name=None):
         """
         Add an API URL under the **DELETE** *HTTP* method
 

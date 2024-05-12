@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
-
 import time
 from unittest import TestCase
+
 from statsd import StatsClient
-from xTool.metrics.stats import (SafeStatsdLogger, get_stats_logger, StatsParamConfig)
+
+from xTool.metrics.stats import SafeStatsdLogger, get_stats_logger, StatsParamConfig
 
 
 class TestSafeStatsdLogger(TestCase):
     def setUp(self) -> None:
-        statsd_client = StatsClient(host='localhost', port=8125, prefix="test.statsd", maxudpsize=512)
+        statsd_client = StatsClient(host="localhost", port=8125, prefix="test.statsd", maxudpsize=512)
         self.stats_logger = SafeStatsdLogger(statsd_client)
 
     def test_incr(self):
@@ -23,17 +23,17 @@ class TestSafeStatsdLogger(TestCase):
                 time.sleep(0.1)
 
     def test_gauge(self):
-        self.stats_logger.gauge('test_gauge', 70)  # Set the 'foo' gauge to 70.
-        self.stats_logger.gauge('test_gauge', 1, delta=True)  # Set 'foo' to 71.
-        self.stats_logger.gauge('test_gauge', -3, delta=True)  # Set 'foo' to 68.
+        self.stats_logger.gauge("test_gauge", 70)  # Set the 'foo' gauge to 70.
+        self.stats_logger.gauge("test_gauge", 1, delta=True)  # Set 'foo' to 71.
+        self.stats_logger.gauge("test_gauge", -3, delta=True)  # Set 'foo' to 68.
 
     def test_set(self):
-        self.stats_logger.set('test_set', "user0")
-        self.stats_logger.set('test_set', "user1")
-        self.stats_logger.set('test_set', "user1")
-        self.stats_logger.set('test_set', "user2")
-        self.stats_logger.set('test_set', "user2")
-        self.stats_logger.set('test_set', "user2")
+        self.stats_logger.set("test_set", "user0")
+        self.stats_logger.set("test_set", "user1")
+        self.stats_logger.set("test_set", "user1")
+        self.stats_logger.set("test_set", "user2")
+        self.stats_logger.set("test_set", "user2")
+        self.stats_logger.set("test_set", "user2")
 
 
 def test_get_stats_logger():

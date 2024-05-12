@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Gunicorn ‘Green Unicorn’ 是一个 UNIX 下的 WSGI HTTP 服务器。这是一个从 Ruby 的 Unicorn 项目移植过来的预分叉工作者模型。
 
@@ -19,9 +17,11 @@ import traceback
 try:
     import gunicorn.workers.base as base  # type: ignore
 except ModuleNotFoundError:
+
     class base:
         class Worker:
             pass
+
 
 from xTool.servers.server import HttpProtocol, Signal, serve, trigger_events
 from xTool.servers.websocket import WebSocketProtocol
@@ -68,11 +68,7 @@ class GunicornWorker(base.Worker):
 
     def run(self):
         is_debug = self.log.loglevel == logging.DEBUG
-        protocol = (
-            self.websocket_protocol
-            if self.app.callable.websocket_enabled
-            else self.http_protocol
-        )
+        protocol = self.websocket_protocol if self.app.callable.websocket_enabled else self.http_protocol
 
         self._server_settings = self.app.callable._helper(
             loop=self.loop,
@@ -83,30 +79,22 @@ class GunicornWorker(base.Worker):
         )
         self._server_settings["signal"] = self.signal
         self._server_settings.pop("sock")
-        trigger_events(
-            self._server_settings.get("before_start", []), self.loop
-        )
+        trigger_events(self._server_settings.get("before_start", []), self.loop)
         self._server_settings["before_start"] = ()
 
         self._runner = asyncio.ensure_future(self._run(), loop=self.loop)
         try:
             self.loop.run_until_complete(self._runner)
             self.app.callable.is_running = True
-            trigger_events(
-                self._server_settings.get("after_start", []), self.loop
-            )
+            trigger_events(self._server_settings.get("after_start", []), self.loop)
             self.loop.run_until_complete(self._check_alive())
-            trigger_events(
-                self._server_settings.get("before_stop", []), self.loop
-            )
+            trigger_events(self._server_settings.get("before_stop", []), self.loop)
             self.loop.run_until_complete(self.close())
         except BaseException:
             traceback.print_exc()
         finally:
             try:
-                trigger_events(
-                    self._server_settings.get("after_stop", []), self.loop
-                )
+                trigger_events(self._server_settings.get("after_stop", []), self.loop)
             except BaseException:
                 traceback.print_exc()
             finally:
@@ -135,9 +123,7 @@ class GunicornWorker(base.Worker):
             # gracefully shutdown timeout
             start_shutdown = 0
             graceful_shutdown_timeout = self.cfg.graceful_timeout
-            while self.connections and (
-                start_shutdown < graceful_shutdown_timeout
-            ):
+            while self.connections and (start_shutdown < graceful_shutdown_timeout):
                 await asyncio.sleep(0.1)
                 start_shutdown = start_shutdown + 0.1
 
@@ -157,12 +143,7 @@ class GunicornWorker(base.Worker):
             state = dict(requests_count=0)
             self._server_settings["host"] = None
             self._server_settings["port"] = None
-            server = await serve(
-                sock=sock,
-                connections=self.connections,
-                state=state,
-                **self._server_settings
-            )
+            server = await serve(sock=sock, connections=self.connections, state=state, **self._server_settings)
             self.servers[server] = state
 
     async def _check_alive(self):
@@ -172,14 +153,10 @@ class GunicornWorker(base.Worker):
             while self.alive:
                 self.notify()
 
-                req_count = sum(
-                    self.servers[srv]["requests_count"] for srv in self.servers
-                )
+                req_count = sum(self.servers[srv]["requests_count"] for srv in self.servers)
                 if self.max_requests and req_count > self.max_requests:
                     self.alive = False
-                    self.log.info(
-                        "Max requests exceeded, shutting down: %s", self
-                    )
+                    self.log.info("Max requests exceeded, shutting down: %s", self)
                 elif pid == os.getpid() and self.ppid != os.getppid():
                     self.alive = False
                     self.log.info("Parent changed, shutting down: %s", self)
@@ -190,7 +167,7 @@ class GunicornWorker(base.Worker):
 
     @staticmethod
     def _create_ssl_context(cfg):
-        """ Creates SSLContext instance for usage in asyncio.create_server.
+        """Creates SSLContext instance for usage in asyncio.create_server.
         See ssl.SSLSocket.__init__ for more details.
         """
         ctx = ssl.SSLContext(cfg.ssl_version)
@@ -205,29 +182,17 @@ class GunicornWorker(base.Worker):
     def init_signals(self):
         # Set up signals through the event loop API.
 
-        self.loop.add_signal_handler(
-            signal.SIGQUIT, self.handle_quit, signal.SIGQUIT, None
-        )
+        self.loop.add_signal_handler(signal.SIGQUIT, self.handle_quit, signal.SIGQUIT, None)
 
-        self.loop.add_signal_handler(
-            signal.SIGTERM, self.handle_exit, signal.SIGTERM, None
-        )
+        self.loop.add_signal_handler(signal.SIGTERM, self.handle_exit, signal.SIGTERM, None)
 
-        self.loop.add_signal_handler(
-            signal.SIGINT, self.handle_quit, signal.SIGINT, None
-        )
+        self.loop.add_signal_handler(signal.SIGINT, self.handle_quit, signal.SIGINT, None)
 
-        self.loop.add_signal_handler(
-            signal.SIGWINCH, self.handle_winch, signal.SIGWINCH, None
-        )
+        self.loop.add_signal_handler(signal.SIGWINCH, self.handle_winch, signal.SIGWINCH, None)
 
-        self.loop.add_signal_handler(
-            signal.SIGUSR1, self.handle_usr1, signal.SIGUSR1, None
-        )
+        self.loop.add_signal_handler(signal.SIGUSR1, self.handle_usr1, signal.SIGUSR1, None)
 
-        self.loop.add_signal_handler(
-            signal.SIGABRT, self.handle_abort, signal.SIGABRT, None
-        )
+        self.loop.add_signal_handler(signal.SIGABRT, self.handle_abort, signal.SIGABRT, None)
 
         # Don't let SIGTERM and SIGUSR1 disturb active requests
         # by interrupting system calls

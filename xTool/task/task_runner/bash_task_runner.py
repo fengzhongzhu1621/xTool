@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import psutil
 
 from xTool.task.task_runner.base_task_runner import BaseTaskRunner
@@ -10,6 +8,7 @@ class BashTaskRunner(BaseTaskRunner):
     """
     Runs the raw Airflow task by invoking through the Bash shell.
     """
+
     def __init__(self, local_task_job, conf):
         super(BashTaskRunner, self).__init__(local_task_job, conf)
 
@@ -21,18 +20,18 @@ class BashTaskRunner(BaseTaskRunner):
         bash -c "cmd string"
         bash -c "./atest hello world"
         """
-        self.process = self.run_command(['bash', '-c'], join_args=True)
+        self.process = self.run_command(["bash", "-c"], join_args=True)
 
     def return_code(self):
         """检查子进程状态
 
-            0 正常结束
-            1 sleep
-            2 子进程不存在
-            -15 kill
-            None 在运行
+        0 正常结束
+        1 sleep
+        2 子进程不存在
+        -15 kill
+        None 在运行
 
-            poll() == 0 判断子进程是否正常结束 正确
+        poll() == 0 判断子进程是否正常结束 正确
 
         """
         return self.process.poll()
@@ -40,9 +39,7 @@ class BashTaskRunner(BaseTaskRunner):
     def terminate(self):
         """终止bash进程 ."""
         if self.process and psutil.pid_exists(self.process.pid):
-            reap_process_group(self.process.pid, self.log, self.conf.getint(
-                'core', 'KILLED_TASK_CLEANUP_TIME'
-            ))
+            reap_process_group(self.process.pid, self.log, self.conf.getint("core", "KILLED_TASK_CLEANUP_TIME"))
 
     def on_finish(self):
         """删除临时配置文件 ."""

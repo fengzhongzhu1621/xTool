@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import sys
 
 from traceback import extract_tb
@@ -19,10 +17,7 @@ def escape(text):
 
 def exception_response(request, exception, debug):
     status = 500
-    text = (
-        "The server encountered an internal error "
-        "and cannot complete your request."
-    )
+    text = "The server encountered an internal error " "and cannot complete your request."
 
     headers = {}
     if isinstance(exception, HttpStatusException):
@@ -99,15 +94,10 @@ TRACEBACK_STYLE = """
     .frame-descriptor { background: #e2eafb; font-size: 14px }
 """
 
-TRACEBACK_WRAPPER_HTML = (
-    "<div class=tb-header>{exc_name}: {exc_value}</div>"
-    "<div class=tb-wrapper>{frame_html}</div>"
-)
+TRACEBACK_WRAPPER_HTML = "<div class=tb-header>{exc_name}: {exc_value}</div>" "<div class=tb-wrapper>{frame_html}</div>"
 
 TRACEBACK_BORDER = (
-    "<div class=frame-border>"
-    "The above exception was the direct cause of the following exception:"
-    "</div>"
+    "<div class=frame-border>" "The above exception was the direct cause of the following exception:" "</div>"
 )
 
 TRACEBACK_LINE_HTML = (

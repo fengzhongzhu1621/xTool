@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
 class BaseLockException(Exception):
     # Error codes:
     LOCK_FAILED = 1
 
     def __init__(self, *args, **kwargs):
-        self.fh = kwargs.pop('fh', None)
+        self.fh = kwargs.pop("fh", None)
         Exception.__init__(self, *args, **kwargs)
 
 

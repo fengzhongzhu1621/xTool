@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
 """
 convert the expression into sql where clause
 """
 
-from xTool.eval.constants import OP
 from xTool.converter.base import Converter
+from xTool.eval.constants import OP
 
 
 class SQLConverter(Converter):

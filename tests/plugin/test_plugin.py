@@ -1,11 +1,4 @@
-# -*- coding: utf-8 -*-
-
-from xTool.plugin import (
-    PluginType,
-    register_plugin,
-    get_plugin_instance,
-    PluginRegister
-)
+from xTool.plugin import PluginType, register_plugin, get_plugin_instance, PluginRegister
 
 
 @register_plugin(PluginType.UNITTEST, "unittest")

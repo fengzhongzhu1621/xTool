@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import warnings
 from functools import partial
 from mimetypes import guess_type

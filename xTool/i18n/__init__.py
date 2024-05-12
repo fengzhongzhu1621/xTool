@@ -1,3 +1,1 @@
-# -*- coding: utf-8 -*-
-
-from .i18n import *
+from .i18n import *  # noqa

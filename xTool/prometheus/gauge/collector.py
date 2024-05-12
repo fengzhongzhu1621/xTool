@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
-from typing import List
 import inspect
 import itertools
+from typing import List
 
 from prometheus_client.exposition import generate_latest
 

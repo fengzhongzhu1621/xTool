@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import collections
 from typing import Any, Optional
@@ -17,6 +15,7 @@ class EventResultOrError:
 
     thanks to @vorpalsmith for the simple design.
     """
+
     def __init__(self, loop: asyncio.AbstractEventLoop) -> None:
         self._loop = loop
         self._exc = None  # type: Optional[BaseException]
@@ -24,7 +23,7 @@ class EventResultOrError:
         self._event = asyncio.Event(loop=loop)
         self._waiters = collections.deque()  # type: Deque[asyncio.Future[Any]]
 
-    def set(self, exc: Optional[BaseException]=None) -> None:
+    def set(self, exc: Optional[BaseException] = None) -> None:
         # 可以通过设置异常来唤醒任务
         self._exc = exc
         # 设置Event对象内部的信号标志为真
@@ -49,6 +48,6 @@ class EventResultOrError:
         return val
 
     def cancel(self) -> None:
-        """ Cancel all waiters """
+        """Cancel all waiters"""
         for waiter in self._waiters:
             waiter.cancel()

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import logging
 import tracemalloc
 from enum import Enum
@@ -7,7 +5,6 @@ from enum import Enum
 from xTool.scheduler.periodic import PeriodicCallback
 from xTool.servers.base import Service
 from xTool.thread_pool import threaded
-
 
 log = logging.getLogger(__name__)
 
@@ -19,24 +16,18 @@ class GroupBy(Enum):
 
 
 class MemoryTracer(Service):
-    _tracer = None      # type: PeriodicCallback
-    _log = None         # type: logging.Logger
+    _tracer = None  # type: PeriodicCallback
+    _log = None  # type: logging.Logger
     _snapshot_on_start = None
 
     logger = log.info
 
-    interval = 5        # type: int
-    top_results = 20    # type: int
+    interval = 5  # type: int
+    top_results = 20  # type: int
 
-    group_by = GroupBy.lineno   # type: GroupBy
+    group_by = GroupBy.lineno  # type: GroupBy
 
-    STAT_FORMAT = (
-        "%(count)8s | "
-        "%(count_diff)8s | "
-        "%(size)8s | "
-        "%(size_diff)8s | "
-        "%(traceback)s\n"
-    )
+    STAT_FORMAT = "%(count)8s | " "%(count_diff)8s | " "%(size)8s | " "%(size_diff)8s | " "%(traceback)s\n"
 
     async def start(self):
         log.warning("Start memory tracer")
@@ -62,7 +53,8 @@ class MemoryTracer(Service):
         return tracemalloc.take_snapshot()
 
     def compare_snapshot(
-        self, snapshot_from: tracemalloc.Snapshot,
+        self,
+        snapshot_from: tracemalloc.Snapshot,
         snapshot_to: tracemalloc.Snapshot,
     ):
         return snapshot_to.compare_to(snapshot_from, self.group_by.value)
@@ -75,7 +67,7 @@ class MemoryTracer(Service):
             "size_diff": "Mem.Diff",
             "traceback": "Traceback",
         }
-        for stat in diff[:self.top_results]:
+        for stat in diff[: self.top_results]:
             results += self.STAT_FORMAT % {
                 "count": stat.count,
                 "count_diff": stat.count_diff,

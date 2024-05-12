@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -68,8 +66,7 @@ def create_object_from_plugin_module(name, *args, **kwargs):
     items = name.split(".")
     if len(items) != 2:
         raise XToolException(
-            "Executor {0} not supported: "
-            "please specify in format plugin_module.executor".format(name)
+            "Executor {0} not supported: " "please specify in format plugin_module.executor".format(name)
         )
     # items[0]：表示插件名
     # items[1]：表示插件中的类名
@@ -109,9 +106,7 @@ def load_backend_module_from_conf(section, key, default_backend, conf=None):
     try:
         module = import_module(backend)
     except ImportError as err:
-        log.critical(
-            "Cannot import %s for %s %s due to: %s", backend, section, key, err
-        )
+        log.critical("Cannot import %s for %s %s due to: %s", backend, section, key, err)
         raise XToolException(err)
 
     return module
@@ -138,11 +133,7 @@ def import_string(dotted_path: str) -> Callable:
         # 返回模块中的类
         return getattr(module, class_name)
     except AttributeError:
-        raise ImportError(
-            'Module "{}" does not define a "{}" attribute/class'.format(
-                module_path, class_name
-            )
-        )
+        raise ImportError('Module "{}" does not define a "{}" attribute/class'.format(module_path, class_name))
 
 
 def import_string_from_package(module_name, package=None):
@@ -244,9 +235,7 @@ class XToolImporter(object):
             folder = os.path.dirname(path)
             # 在父模块的目录下所有的文件中查找指定的module
             f, filename, description = imp.find_module(module, [folder])
-            self._loaded_modules[module] = imp.load_module(
-                module, f, filename, description
-            )
+            self._loaded_modules[module] = imp.load_module(module, f, filename, description)
 
             # This functionality is deprecated
             warnings.warn(

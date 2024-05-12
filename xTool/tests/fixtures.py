@@ -1,25 +1,18 @@
-# -*- coding: utf-8 -*-
-
 import random
-import string
-import uuid
-import time
-import subprocess
 import shlex
+import string
+import subprocess
+import time
+import uuid
 from contextlib import contextmanager
 
 import pytest
 
-
 TYPE_TO_GENERATOR_MAP = {
-    "string": lambda: "".join(
-        [random.choice(string.ascii_letters + string.digits) for _ in range(4)]
-    ),
+    "string": lambda: "".join([random.choice(string.ascii_letters + string.digits) for _ in range(4)]),
     "int": lambda: random.choice(range(1000000)),
     "number": lambda: random.random(),
-    "alpha": lambda: "".join(
-        [random.choice(string.ascii_letters) for _ in range(4)]
-    ),
+    "alpha": lambda: "".join([random.choice(string.ascii_letters) for _ in range(4)]),
     "uuid": lambda: str(uuid.uuid1()),
 }
 

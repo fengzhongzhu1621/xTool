@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 
 from xTool.servers.tracer import MemoryTracer

@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import operator
 
-from six.moves import reduce
 from django.db.models import Q
+from six.moves import reduce
 
-from xTool.eval.constants import OP
 from xTool.converter.base import Converter
+from xTool.eval.constants import OP
 
 """
 表达式解析

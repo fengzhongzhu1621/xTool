@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import cProfile
 import io
 import logging
@@ -12,17 +10,17 @@ from xTool.servers.base import Service
 
 
 class Profiler(Service):
-    profiler = None        # type: cProfile.Profile
-    periodic = None        # type: PeriodicCallback
+    profiler = None  # type: cProfile.Profile
+    periodic = None  # type: PeriodicCallback
 
-    order = "cumulative"    # type: str
+    order = "cumulative"  # type: str
 
-    path = None             # type: str
-    logger = None           # type: logging.Logger
+    path = None  # type: str
+    logger = None  # type: logging.Logger
 
-    interval = 10           # type: int
-    top_results = 10        # type: int
-    log = logging.getLogger(__name__)   # type: logging.Logger
+    interval = 10  # type: int
+    top_results = 10  # type: int
+    log = logging.getLogger(__name__)  # type: logging.Logger
 
     async def start(self):
         self.logger = self.log.getChild(str(id(self)))
@@ -35,9 +33,14 @@ class Profiler(Service):
 
     def save_stats(self):
         with io.StringIO() as stream:
-            stats = Stats(
-                self.profiler, stream=stream,
-            ).strip_dirs().sort_stats(self.order)
+            stats = (
+                Stats(
+                    self.profiler,
+                    stream=stream,
+                )
+                .strip_dirs()
+                .sort_stats(self.order)
+            )
 
             stats.print_stats(self.top_results)
             self.logger.info(stream.getvalue())

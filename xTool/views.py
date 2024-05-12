@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import Any, Callable, List
 
 from xTool.constants import HTTP_METHODS

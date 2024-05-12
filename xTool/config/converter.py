@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import Dict, List
 
 import sys
@@ -11,7 +9,7 @@ class DictConfigConverter:
         self.dict_config = dict_config
 
     def marshal(self):
-        "将配置对象转换为Dict配置 ."""
+        "将配置对象转换为Dict配置 ." ""
         pass
 
     def unmarshal(self, key: str, target_object: object) -> object:
@@ -24,7 +22,7 @@ class DictConfigConverter:
         return self.unmarshal_dict_to_object(dict_config, target_object)
 
     @classmethod
-    def unmarshal_dict_to_object(cls, dict_config: Dict,  target_object: object):
+    def unmarshal_dict_to_object(cls, dict_config: Dict, target_object: object):
         """将dict类型的配置转换为配置对象 ."""
         for name, value in dict_config.items():
             # 判断对象中属性是否存在
@@ -34,9 +32,9 @@ class DictConfigConverter:
             attr_type = get_class_object_init_type(target_object, name)
             py_version = sys.version_info
             if py_version.major == 3 and py_version.minor == 6:
-                attr_type_class = getattr(attr_type, '__extra__', attr_type)
+                attr_type_class = getattr(attr_type, "__extra__", attr_type)
             elif py_version.version_info > (3, 6):
-                attr_type_class = getattr(attr_type, '__origin__', attr_type)
+                attr_type_class = getattr(attr_type, "__origin__", attr_type)
             else:
                 attr_type_class = attr_type
             # 类型转换
@@ -60,7 +58,7 @@ class DictConfigConverter:
                     sub_object_list = []
                     setattr(target_object, name, sub_object_list)
                     for sub_value in value:
-                        sub_value_object = getattr(attr_type, '__args__')[0]()
+                        sub_value_object = getattr(attr_type, "__args__")[0]()
                         sub_object_list.append(sub_value_object)
                         cls.unmarshal_dict_to_object(sub_value, sub_value_object)
             else:

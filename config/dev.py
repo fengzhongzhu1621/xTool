@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from blueapps.conf.validators import EnvValidator
 
 from config import RUN_VER

@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import multiprocessing
+
 import pytest
+
 from xTool.servers.pipeline import SocketPairPipeline
 
 

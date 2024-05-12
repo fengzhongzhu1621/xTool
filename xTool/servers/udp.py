@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import socket
 from functools import partial
 
 from xTool.aiomisc import awaitable
-from xTool.servers.helpers import bind_socket, OptionsType
 from xTool.servers.base import SimpleServer
+from xTool.servers.helpers import bind_socket, OptionsType
 
 
 class UDPSimpleProtocol(asyncio.DatagramProtocol):
@@ -31,15 +29,18 @@ class UDPSimpleProtocol(asyncio.DatagramProtocol):
 class UDPServer(SimpleServer):
 
     def __init__(
-        self, address: str = None, port: int = None,
-        options: OptionsType = (), sock=None,
-        protocol_factory=None, **kwargs
+        self,
+        address: str = None,
+        port: int = None,
+        options: OptionsType = (),
+        sock=None,
+        protocol_factory=None,
+        **kwargs
     ):
         if not sock:
             if not (address and port):
                 raise RuntimeError(
-                    "You should pass socket instance or "
-                    '"address" and "port" couple',
+                    "You should pass socket instance or " '"address" and "port" couple',
                 )
 
             self.make_socket = partial(

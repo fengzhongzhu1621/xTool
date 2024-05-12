@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import socket
+
 from xTool.servers.tcp import TCPServer
 
 
@@ -11,15 +10,13 @@ def test_tcp_server(aiomisc_unused_port):
     class TestTcpService(TCPServer):
         DATA = []
 
-        async def handle_client(self, reader: asyncio.StreamReader,
-                                writer: asyncio.StreamWriter):
+        async def handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
             while True:
                 data = await reader.readline()
                 writer.write(data)
                 self.DATA.append(data)
 
-    service = TestTcpService(
-        "127.0.0.1", aiomisc_unused_port, **{"loop": loop})
+    service = TestTcpService("127.0.0.1", aiomisc_unused_port, **{"loop": loop})
 
     async def writer():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

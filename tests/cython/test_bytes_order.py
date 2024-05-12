@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import struct
 
 import pytest
@@ -9,7 +7,8 @@ from xTool.cython.bytes_order import (
     endian_uint_to_bytes,
     endian_byte_to_uchar,
     endian_byte_to_ushort,
-    endian_byte_to_uint)
+    endian_byte_to_uint,
+)
 
 
 def test_endian_uchar_to_bytes():
@@ -34,21 +33,21 @@ def test_endian_uint_to_bytes():
 
 
 def test_endian_byte_to_uchar():
-    package = struct.pack('>B', 0x12)
+    package = struct.pack(">B", 0x12)
     assert package.hex() == "12"
     actual = endian_byte_to_uchar(package)
     assert actual == 0x12
 
 
 def test_endian_byte_to_ushort():
-    package = struct.pack('>H', 0x1234)
+    package = struct.pack(">H", 0x1234)
     assert package.hex() == "1234"
     actual = endian_byte_to_ushort(package)
     assert actual == 0x1234
 
 
 def test_endian_byte_to_uint():
-    package = struct.pack('>I', 0x12345678)
+    package = struct.pack(">I", 0x12345678)
     assert package.hex() == "12345678"
     actual = endian_byte_to_uint(package)
     assert actual == 0x12345678

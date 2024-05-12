@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -27,18 +25,18 @@ def validate_key(k, max_length=250):
     if not isinstance(k, basestring):
         raise TypeError("The key has to be a string")
     elif len(k) > max_length:
-        raise XToolException(
-            "The key has to be less than {0} characters".format(max_length))
-    elif not re.match(r'^[A-Za-z0-9_\-\.]+$', k):
+        raise XToolException("The key has to be less than {0} characters".format(max_length))
+    elif not re.match(r"^[A-Za-z0-9_\-\.]+$", k):
         raise XToolException(
             "The key ({k}) has to be made of alphanumeric characters, dashes, "
-            "dots and underscores exclusively".format(**locals()))
+            "dots and underscores exclusively".format(**locals())
+        )
     else:
         return True
 
 
 def alchemy_to_dict(obj):
-    """ 将SQLAlchemy model instance转化为字典，
+    """将SQLAlchemy model instance转化为字典，
     并将时间格式化为iso格式的字符串
     Transforms a SQLAlchemy model instance into a dictionary
     """
@@ -55,8 +53,8 @@ def alchemy_to_dict(obj):
 
 
 def ask_yesno(question):
-    yes = set(['yes', 'y'])
-    no = set(['no', 'n'])
+    yes = set(["yes", "y"])
+    no = set(["no", "n"])
 
     done = False
     print(question)
@@ -103,7 +101,7 @@ def is_container(obj):
     """判断对象是否可以遍历，但不是字符串
     Test if an object is a container (iterable) but not a string
     """
-    return hasattr(obj, '__iter__') and not isinstance(obj, basestring)
+    return hasattr(obj, "__iter__") and not isinstance(obj, basestring)
 
 
 def as_tuple(obj):
@@ -122,9 +120,9 @@ def chunks(items, chunk_size):
     Yield successive chunks of a given size from a list of items
     """
     if chunk_size <= 0:
-        raise ValueError('Chunk size must be a positive integer')
+        raise ValueError("Chunk size must be a positive integer")
     for i in range(0, len(items), chunk_size):
-        yield items[i:i + chunk_size]
+        yield items[i : i + chunk_size]
 
 
 def reduce_in_chunks(fn, iterable, initializer, chunk_size=0):
@@ -140,7 +138,7 @@ def reduce_in_chunks(fn, iterable, initializer, chunk_size=0):
 
 
 def as_flattened_list(iterable):
-    """ 将二维数组展开为一维数组
+    """将二维数组展开为一维数组
     Return an iterable with one level flattened
 
     >>> as_flattened_list((('blue', 'red'), ('green', 'yellow', 'pink')))
@@ -178,7 +176,7 @@ def pprinttable(rows):
         return
 
     # 获得表格的头部
-    if hasattr(rows[0], '_fields'):  # if namedtuple
+    if hasattr(rows[0], "_fields"):  # if namedtuple
         headers = rows[0]._fields
     else:
         headers = ["col{}".format(i) for i in range(len(rows[0]))]
@@ -204,18 +202,18 @@ def pprinttable(rows):
     pattern = " | ".join(formats)
     hpattern = " | ".join(hformats)
     # 获得每一行的分隔符
-    separator = "-+-".join(['-' * n for n in lens])
+    separator = "-+-".join(["-" * n for n in lens])
     s = ""
-    s += separator + '\n'
-    s += (hpattern % tuple(headers)) + '\n'
-    s += separator + '\n'
+    s += separator + "\n"
+    s += (hpattern % tuple(headers)) + "\n"
+    s += separator + "\n"
 
     def f(t):
         return "{}".format(t) if isinstance(t, basestring) else t
 
     for line in rows:
-        s += pattern % tuple(f(t) for t in line) + '\n'
-    s += separator + '\n'
+        s += pattern % tuple(f(t) for t in line) + "\n"
+    s += separator + "\n"
     return s
 
 
@@ -249,24 +247,21 @@ def expand_env_var(env_var):
 
 def run_command(command):
     """执行shell命令，返回标准输出（Unicode编码） ."""
-    if platform.system() == 'Windows':
+    if platform.system() == "Windows":
         close_fds = False
     else:
         close_fds = True
     process = subprocess.Popen(
-        shlex.split(command),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        shell=True,
-        close_fds=close_fds)
+        shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, close_fds=close_fds
+    )
     # 将结果转换为unicode编码
-    output, stderr = [stream.decode(sys.getdefaultencoding(), 'ignore')
-                      for stream in process.communicate()]
+    output, stderr = [stream.decode(sys.getdefaultencoding(), "ignore") for stream in process.communicate()]
 
     if process.returncode != 0:
         raise XToolException(
-            "Cannot execute {}. Error code is: {}. Output: {}, Stderr: {}"
-            .format(command, process.returncode, output, stderr)
+            "Cannot execute {}. Error code is: {}. Output: {}, Stderr: {}".format(
+                command, process.returncode, output, stderr
+            )
         )
     # 返回unicode编码的标准输出
     return output

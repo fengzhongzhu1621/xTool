@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -23,9 +22,9 @@ from builtins import object
 
 
 class WeightRule(object):
-    DOWNSTREAM = 'downstream'
-    UPSTREAM = 'upstream'
-    ABSOLUTE = 'absolute'
+    DOWNSTREAM = "downstream"
+    UPSTREAM = "upstream"
+    ABSOLUTE = "absolute"
 
     _ALL_WEIGHT_RULES = {}
 
@@ -37,8 +36,6 @@ class WeightRule(object):
     def all_weight_rules(cls):
         if not cls._ALL_WEIGHT_RULES:
             cls._ALL_WEIGHT_RULES = {
-                getattr(cls, attr)
-                for attr in dir(cls)
-                if not attr.startswith("_") and not callable(getattr(cls, attr))
+                getattr(cls, attr) for attr in dir(cls) if not attr.startswith("_") and not callable(getattr(cls, attr))
             }
         return cls._ALL_WEIGHT_RULES

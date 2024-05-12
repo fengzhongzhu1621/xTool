@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-
-import distributed
 import subprocess
 import warnings
+
+import distributed
 
 from xTool.executors.base_executor import BaseExecutor
 from xTool.misc import USE_WINDOWS
@@ -12,15 +11,10 @@ class DaskExecutor(BaseExecutor):
     """
     DaskExecutor submits tasks to a Dask Distributed cluster.
     """
-    def __init__(self,
-                 parallelism,
-                 cluster_address,
-                 tls_ca,
-                 tls_key,
-                 tls_cert):
+
+    def __init__(self, parallelism, cluster_address, tls_ca, tls_key, tls_cert):
         if not cluster_address:
-            raise ValueError(
-                'Please provide a Dask cluster address in airflow.cfg')
+            raise ValueError("Please provide a Dask cluster address in airflow.cfg")
         self.cluster_address = cluster_address
         # ssl / tls parameters
         self.tls_ca = tls_ca
@@ -31,6 +25,7 @@ class DaskExecutor(BaseExecutor):
     def start(self):
         if (self.tls_ca) or (self.tls_key) or (self.tls_cert):
             from distributed.security import Security
+
             security = Security(
                 tls_client_key=self.tls_key,
                 tls_client_cert=self.tls_cert,
@@ -46,10 +41,7 @@ class DaskExecutor(BaseExecutor):
 
     def execute_async(self, key, command, queue=None, executor_config=None):
         if queue is not None:
-            warnings.warn(
-                'DaskExecutor does not support queues. '
-                'All tasks will be run in the same cluster'
-            )
+            warnings.warn("DaskExecutor does not support queues. " "All tasks will be run in the same cluster")
 
         def airflow_run():
             return subprocess.check_call(command, shell=True, close_fds=False if USE_WINDOWS else True)

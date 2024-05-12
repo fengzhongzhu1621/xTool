@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-
-from apps.core.request import get_or_create_local_request_id
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.status import is_success
+
+from apps.core.request import get_or_create_local_request_id
 
 
 class APIRenderer(JSONRenderer):

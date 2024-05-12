@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
+
 import pytest
+
 from xTool.tests.testing import loop_context
 
 

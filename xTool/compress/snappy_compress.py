@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-
 from typing import Optional
+
 import snappy
 
 from xTool.plugin import register_plugin, PluginType
 from .base import CompressType
 
 
-@register_plugin(
-    PluginType.COMPRESS, CompressType.SNAPPY
-)
+@register_plugin(PluginType.COMPRESS, CompressType.SNAPPY)
 class SnappyCompress:
     @classmethod
     def compress(cls, data: bytes, compression_level: int = 6) -> Optional[bytes]:

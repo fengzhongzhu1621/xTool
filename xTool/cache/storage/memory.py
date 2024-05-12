@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import time
 from typing import Any
 
@@ -18,9 +17,7 @@ class InstanceCache:
     def clear(self) -> None:
         self.__cache = {}
 
-    def set(
-        self, key: str, value: Any, timeout: int = 0, use_round: bool = False
-    ) -> None:
+    def set(self, key: str, value: Any, timeout: int = 0, use_round: bool = False) -> None:
         """
         :param key:
         :param value:

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from multidict import CIMultiDict  # type: ignore
 
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 
 from xTool.contextmanagers.temp import temp_path

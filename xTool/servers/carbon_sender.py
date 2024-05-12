@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import logging
 import re
 from types import MappingProxyType
@@ -10,9 +8,9 @@ from aiocarbon.protocol.tcp import TCPClient
 from aiocarbon.protocol.udp import UDPClient
 from aiocarbon.setup import set_client
 from aiocarbon.storage import TotalStorage
+
 from xTool.scheduler.periodic import PeriodicCallback
 from xTool.servers.base import Service
-
 
 log = logging.getLogger(__name__)
 
@@ -21,26 +19,26 @@ def strip_carbon_ns(string):
     return re.sub(r"[^\w\d\-]+", "_", string).strip("_").lower()
 
 
-PROTOCOLS = MappingProxyType({
-    "udp": UDPClient,
-    "tcp": TCPClient,
-    "pickle": PickleClient,
-})
+PROTOCOLS = MappingProxyType(
+    {
+        "udp": UDPClient,
+        "tcp": TCPClient,
+        "pickle": PickleClient,
+    }
+)
 
 
 class CarbonSender(Service):
-    host = "127.0.0.1"          # type: str
-    port = 2003                 # type: int
-    send_interval = 5           # type: int
-    protocol = "udp"            # type: str
-    namespace = ""              # type: List[str]
+    host = "127.0.0.1"  # type: str
+    port = 2003  # type: int
+    send_interval = 5  # type: int
+    protocol = "udp"  # type: str
+    namespace = ""  # type: List[str]
     storage = TotalStorage
-    _handle = None              # type: PeriodicCallback
+    _handle = None  # type: PeriodicCallback
 
     async def start(self):
-        namespace = ".".join(
-            strip_carbon_ns(item) for item in self.namespace
-        )
+        namespace = ".".join(strip_carbon_ns(item) for item in self.namespace)
 
         client = PROTOCOLS[self.protocol](
             self.host,
@@ -54,8 +52,10 @@ class CarbonSender(Service):
         self._handle = PeriodicCallback(client.send)
         self._handle.start(self.send_interval, loop=self.loop)
         log.info(
-            "Periodic carbon metrics sender started. Send to %s://%s:%d with "
-            "interval %rs", self.protocol, self.host, self.port,
+            "Periodic carbon metrics sender started. Send to %s://%s:%d with " "interval %rs",
+            self.protocol,
+            self.host,
+            self.port,
             self.send_interval,
         )
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import textwrap
 import string
 import logging
@@ -145,16 +143,12 @@ class PipelineBase(StatsClientBase):
 class StatsClient(StatsClientBase):
     """A client for statsd. （线程安全）"""
 
-    def __init__(
-        self, host="localhost", port=8125, prefix=None, maxudpsize=512, ipv6=False
-    ):
+    def __init__(self, host="localhost", port=8125, prefix=None, maxudpsize=512, ipv6=False):
         """Create a new client."""
         super().__init__()
         # 解析主机地址
         fam = socket.AF_INET6 if ipv6 else socket.AF_INET
-        family, _, _, _, addr = socket.getaddrinfo(host, port, fam, socket.SOCK_DGRAM)[
-            0
-        ]
+        family, _, _, _, addr = socket.getaddrinfo(host, port, fam, socket.SOCK_DGRAM)[0]
         self._addr = addr
         # 创建socket
         self._sock = socket.socket(family, socket.SOCK_DGRAM)
@@ -246,9 +240,7 @@ class StreamClientBase(StatsClientBase):
 class TCPStatsClient(StreamClientBase):
     """TCP version of StatsClient."""
 
-    def __init__(
-        self, host="localhost", port=8125, prefix=None, timeout=None, ipv6=False
-    ):
+    def __init__(self, host="localhost", port=8125, prefix=None, timeout=None, ipv6=False):
         """Create a new client."""
         super().__init__()
         self._host = host
@@ -260,9 +252,7 @@ class TCPStatsClient(StreamClientBase):
 
     def connect(self):
         fam = socket.AF_INET6 if self._ipv6 else socket.AF_INET
-        family, _, _, _, addr = socket.getaddrinfo(
-            self._host, self._port, fam, socket.SOCK_STREAM
-        )[0]
+        family, _, _, _, addr = socket.getaddrinfo(self._host, self._port, fam, socket.SOCK_STREAM)[0]
         self._sock = socket.socket(family, socket.SOCK_STREAM)
         self._sock.settimeout(self._timeout)
         self._sock.connect(addr)
@@ -349,11 +339,9 @@ class StatsdTimer(object):
 class TimerProtocol(Protocol):
     """Type protocol for StatsLogger.timer"""
 
-    def __enter__(self):
-        ...
+    def __enter__(self): ...
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        ...
+    def __exit__(self, exc_type, exc_value, traceback): ...
 
     def start(self):
         """Start the timer"""
@@ -453,9 +441,7 @@ def validate_stat(fn: T) -> T:
                 else:
                     name = "default"
                     max_length = STATS_NAME_DEFAULT_MAX_LENGTH
-                handler_stat_name_func = get_current_handler_stat_name_func(
-                    name
-                ).handler
+                handler_stat_name_func = get_current_handler_stat_name_func(name).handler
                 stat = handler_stat_name_func(stat, max_length)
             return fn(_self, stat, *args, **kwargs)
         except InvalidStatsNameException:
@@ -466,16 +452,12 @@ def validate_stat(fn: T) -> T:
 
 
 class AllowListValidatorProtocol(Protocol):
-    def set_allow_list(self, allow_list: Optional[Union[Sequence[str], str]]) -> None:
-        ...
+    def set_allow_list(self, allow_list: Optional[Union[Sequence[str], str]]) -> None: ...
 
-    def test(self, stat: str) -> bool:
-        ...
+    def test(self, stat: str) -> bool: ...
 
 
-@register_plugin(
-    plugin_type=PluginType.STATS_NAME_ALLOW_VALIDATOR, plugin_name="default"
-)
+@register_plugin(plugin_type=PluginType.STATS_NAME_ALLOW_VALIDATOR, plugin_name="default")
 class DefaultAllowListValidator:
     """Class to filter unwanted stats"""
 
@@ -487,9 +469,7 @@ class DefaultAllowListValidator:
         if allow_list:
             # pylint: disable=consider-using-generator
             if isinstance(allow_list, str):
-                self.allow_list = tuple(
-                    [item.strip().lower() for item in allow_list.split(",")]
-                )
+                self.allow_list = tuple([item.strip().lower() for item in allow_list.split(",")])
         else:
             self.allow_list = None
 
@@ -550,9 +530,7 @@ class BaseStatsdLogger:
         else:
             allow_validator_name = None
             allow_list = None
-        self.allow_list_validator = get_current_allow_list_validator(
-            allow_validator_name
-        )
+        self.allow_list_validator = get_current_allow_list_validator(allow_validator_name)
         self.allow_list_validator.set_allow_list(allow_list)
 
 
@@ -668,9 +646,7 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
         stats_name_config: Optional[StatsNameConfig] = None,
         allow_name_validator_config: Optional[StatsAllowNameValidatorConfig] = None,
     ):
-        super().__init__(
-            dog_statsd_client, stats_name_config, allow_name_validator_config
-        )
+        super().__init__(dog_statsd_client, stats_name_config, allow_name_validator_config)
 
     def create_client(self, statsd_config: StatsParamConfig):
         from datadog import DogStatsd  # noqa
@@ -688,9 +664,7 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
         """Increment stat"""
         if self.allow_list_validator.test(stat):
             tags = tags or []
-            return self.statsd_client.increment(
-                metric=stat, value=count, tags=tags, sample_rate=rate
-            )
+            return self.statsd_client.increment(metric=stat, value=count, tags=tags, sample_rate=rate)
         return None
 
     @validate_stat
@@ -698,21 +672,15 @@ class SafeDogStatsdLogger(BaseStatsdLogger):
         """Decrement stat"""
         if self.allow_list_validator.test(stat):
             tags = tags or []
-            return self.statsd_client.decrement(
-                metric=stat, value=count, tags=tags, sample_rate=rate
-            )
+            return self.statsd_client.decrement(metric=stat, value=count, tags=tags, sample_rate=rate)
         return None
 
     @validate_stat
-    def gauge(
-        self, stat, value, rate=1, delta=False, tags=None
-    ):  # pylint: disable=unused-argument
+    def gauge(self, stat, value, rate=1, delta=False, tags=None):  # pylint: disable=unused-argument
         """Gauge stat"""
         if self.allow_list_validator.test(stat):
             tags = tags or []
-            return self.statsd_client.gauge(
-                metric=stat, value=value, tags=tags, sample_rate=rate
-            )
+            return self.statsd_client.gauge(metric=stat, value=value, tags=tags, sample_rate=rate)
         return None
 
     @validate_stat

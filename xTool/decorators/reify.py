@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import (
     Any,
     Callable,
@@ -44,6 +42,7 @@ reify_py = reify
 
 try:
     from ._helpers import reify as reify_c
+
     reify = reify_c  # type: ignore
 except ImportError:
     pass

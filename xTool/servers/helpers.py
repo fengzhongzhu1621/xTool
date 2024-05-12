@@ -1,18 +1,19 @@
-# -*- coding: utf-8 -*-
-
-import socket
 import logging
+import socket
 from typing import Iterable, Tuple
 
 OptionsType = Iterable[Tuple[int, int, int]]
 
 
 def bind_socket(
-    address: str, port: int,
-    family=socket.AF_INET, type=socket.SOCK_STREAM,
+    address: str,
+    port: int,
+    family=socket.AF_INET,
+    type=socket.SOCK_STREAM,
     options: OptionsType = (),
-    reuse_addr: bool = True, reuse_port: bool = False,
-    proto_name: str = "tcp"
+    reuse_addr: bool = True,
+    reuse_port: bool = False,
+    proto_name: str = "tcp",
 ):
     """绑定端口 ."""
     sock = socket.socket(family, type)
@@ -32,13 +33,9 @@ def bind_socket(
     # 每一个进程有一个独立的监听socket，并且bind相同的ip:port，独立的listen()和accept()；提高接收连接的能力。（例如nginx多进程同时监听同一个ip:port）
     # 内核层面实现负载均衡，保证每个进程或者线程接收均衡的连接数。
     if hasattr(socket, "SO_REUSEPORT"):
-        sock.setsockopt(
-            socket.SOL_SOCKET,
-            socket.SO_REUSEPORT,
-            int(reuse_port))
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, int(reuse_port))
     else:
-        logging.warning(
-            "SO_REUSEPORT is not implemented by underlying library.")
+        logging.warning("SO_REUSEPORT is not implemented by underlying library.")
 
     # level: 支持SOL_SOCKET、IPPROTO_TCP、IPPROTO_IP和IPPROTO_IPV6
     for level, option, value in options:

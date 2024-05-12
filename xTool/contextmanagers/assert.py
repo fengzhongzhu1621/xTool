@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 class assert_raises(object):
     """A context manager that asserts a given exception was raised.
 
@@ -47,9 +44,8 @@ class assert_raises(object):
         return self
 
     def __exit__(self, typ, value, tb):
-        assert typ, 'No exception raised.'
-        assert typ in self.exc_cls, '%s not in %s' % (
-            typ.__name__, [e.__name__ for e in self.exc_cls])
+        assert typ, "No exception raised."
+        assert typ in self.exc_cls, "%s not in %s" % (typ.__name__, [e.__name__ for e in self.exc_cls])
         self.exc_type = typ
         self.exception = value
         self.traceback = tb

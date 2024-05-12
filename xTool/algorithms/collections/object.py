@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 class DictObject:
     def __init__(self, obj):
         self.obj = obj

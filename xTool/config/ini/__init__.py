@@ -1,3 +1,1 @@
-# -*- coding: utf-8 -*-
-
-from xTool.utils.configuration import XToolConfigParser
+from xTool.utils.configuration import XToolConfigParser  # noqa

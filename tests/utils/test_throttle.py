@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-
-import time
 import threading
+import time
 
 import pytest
+
 from xTool.utils.throttle import (
     BoundedEmptySemaphore,
     GlobalThrottle,

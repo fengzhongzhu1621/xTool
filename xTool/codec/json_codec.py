@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import Union
 
 import rapidjson as json
@@ -9,9 +7,7 @@ from xTool.misc import tob
 from .base import CodecType
 
 
-@register_plugin(
-    PluginType.CODEC, CodecType.JSON
-)
+@register_plugin(PluginType.CODEC, CodecType.JSON)
 class JsonCodec:
     @classmethod
     def encode(cls, obj: object) -> bytes:

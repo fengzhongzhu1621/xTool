@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.compress.gzip_compress import GzipCompress
 
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -23,12 +22,12 @@ from builtins import object
 
 
 class TriggerRule(object):
-    ALL_SUCCESS = 'all_success'
-    ALL_FAILED = 'all_failed'
-    ALL_DONE = 'all_done'
-    ONE_SUCCESS = 'one_success'
-    ONE_FAILED = 'one_failed'
-    DUMMY = 'dummy'
+    ALL_SUCCESS = "all_success"
+    ALL_FAILED = "all_failed"
+    ALL_DONE = "all_done"
+    ONE_SUCCESS = "one_success"
+    ONE_FAILED = "one_failed"
+    DUMMY = "dummy"
 
     _ALL_TRIGGER_RULES = {}
 
@@ -40,8 +39,6 @@ class TriggerRule(object):
     def all_triggers(cls):
         if not cls._ALL_TRIGGER_RULES:
             cls._ALL_TRIGGER_RULES = {
-                getattr(cls, attr)
-                for attr in dir(cls) if not attr.startswith("_")
-                and not callable(getattr(cls, attr))
+                getattr(cls, attr) for attr in dir(cls) if not attr.startswith("_") and not callable(getattr(cls, attr))
             }
         return cls._ALL_TRIGGER_RULES

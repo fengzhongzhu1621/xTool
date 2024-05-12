@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
+from .exceptions import PluginTypeNotFound
 from .plugin import Plugin
 from .store import DefaultPluginStore
-from .exceptions import PluginTypeNotFound
 
 
 class PluginMeta(type):
@@ -38,5 +36,4 @@ class PluginMeta(type):
 
 
 class PluginRegister(metaclass=PluginMeta):
-    def __init__(self):
-        ...
+    def __init__(self): ...

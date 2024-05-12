@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 文件锁
 
@@ -20,12 +18,12 @@ from . import portalocker
 from . import constants
 
 __all__ = [
-    'lock',
-    'unlock',
-    'Lock',
-    'RLock',
-    'BoundedSemaphore',
-    'open_atomic',
+    "lock",
+    "unlock",
+    "Lock",
+    "RLock",
+    "BoundedSemaphore",
+    "open_atomic",
 ]
 
 
@@ -37,12 +35,13 @@ DEFAULT_CHECK_INTERVAL = 0.25
 LOCK_METHOD = constants.LOCK_EX | constants.LOCK_NB
 
 
-if os.name == 'nt':  # pragma: no cover
+if os.name == "nt":  # pragma: no cover
     import win32con
     import win32file
     import pywintypes
     import winerror
     import msvcrt
+
     __overlapped = pywintypes.OVERLAPPED()
 
     if sys.version_info.major == 2:
@@ -72,10 +71,7 @@ if os.name == 'nt':  # pragma: no cover
                 # error: (33, 'LockFileEx', 'The process cannot access the file
                 # because another process has locked a portion of the file.')
                 if exc_value.winerror == winerror.ERROR_LOCK_VIOLATION:
-                    raise exceptions.LockException(
-                        exceptions.LockException.LOCK_FAILED,
-                        exc_value.strerror,
-                        fh=file_)
+                    raise exceptions.LockException(exceptions.LockException.LOCK_FAILED, exc_value.strerror, fh=file_)
                 else:
                     # Q:  Are there exceptions/codes we should be dealing with
                     # here?
@@ -102,17 +98,12 @@ if os.name == 'nt':  # pragma: no cover
                     msvcrt.locking(file_.fileno(), mode, lock_length)
                 except IOError as exc_value:
                     # [ ] be more specific here
-                    raise exceptions.LockException(
-                        exceptions.LockException.LOCK_FAILED,
-                        exc_value.strerror,
-                        fh=file_)
+                    raise exceptions.LockException(exceptions.LockException.LOCK_FAILED, exc_value.strerror, fh=file_)
                 finally:
                     if savepos:
                         file_.seek(savepos)
             except IOError as exc_value:
-                raise exceptions.LockException(
-                    exceptions.LockException.LOCK_FAILED, exc_value.strerror,
-                    fh=file_)
+                raise exceptions.LockException(exceptions.LockException.LOCK_FAILED, exc_value.strerror, fh=file_)
 
     def unlock(file_):
         try:
@@ -123,11 +114,10 @@ if os.name == 'nt':  # pragma: no cover
             try:
                 msvcrt.locking(file_.fileno(), constants.LOCK_UN, lock_length)
             except IOError as exc_value:
-                if exc_value.strerror == 'Permission denied':
+                if exc_value.strerror == "Permission denied":
                     hfile = win32file._get_osfhandle(file_.fileno())
                     try:
-                        win32file.UnlockFileEx(
-                            hfile, 0, -0x10000, __overlapped)
+                        win32file.UnlockFileEx(hfile, 0, -0x10000, __overlapped)
                     except pywintypes.error as exc_value:
                         if exc_value.winerror == winerror.ERROR_NOT_LOCKED:
                             # error: (158, 'UnlockFileEx',
@@ -140,25 +130,20 @@ if os.name == 'nt':  # pragma: no cover
                             # dealing with here?
                             raise
                 else:
-                    raise exceptions.LockException(
-                        exceptions.LockException.LOCK_FAILED,
-                        exc_value.strerror,
-                        fh=file_)
+                    raise exceptions.LockException(exceptions.LockException.LOCK_FAILED, exc_value.strerror, fh=file_)
             finally:
                 if savepos:
                     file_.seek(savepos)
         except IOError as exc_value:
-            raise exceptions.LockException(
-                exceptions.LockException.LOCK_FAILED, exc_value.strerror,
-                fh=file_)
+            raise exceptions.LockException(exceptions.LockException.LOCK_FAILED, exc_value.strerror, fh=file_)
 
-elif os.name == 'posix':  # pragma: no cover
+elif os.name == "posix":  # pragma: no cover
     import fcntl
 
     def lock(file_, flags):
-        locking_exceptions = IOError,
+        locking_exceptions = (IOError,)
         try:  # pragma: no cover
-            locking_exceptions += BlockingIOError,
+            locking_exceptions += (BlockingIOError,)
         except NameError:  # pragma: no cover
             pass
 
@@ -173,12 +158,12 @@ elif os.name == 'posix':  # pragma: no cover
         fcntl.flock(file_.fileno(), constants.LOCK_UN)
 
 else:  # pragma: no cover
-    raise RuntimeError('PortaLocker only defined for nt and posix platforms')
+    raise RuntimeError("PortaLocker only defined for nt and posix platforms")
 
 
 @contextlib.contextmanager
 def open_atomic(filename, binary=True):
-    '''Open a file for atomic writing. Instead of locking this method allows
+    """Open a file for atomic writing. Instead of locking this method allows
     you to write the entire file and move it to the actual location. Note that
     this makes the assumption that a rename is atomic on your platform which
     is generally the case but not a guarantee.
@@ -194,8 +179,8 @@ def open_atomic(filename, binary=True):
     >>> assert os.path.exists(filename)
     >>> os.remove(filename)
 
-    '''
-    assert not os.path.exists(filename), '%r exists' % filename
+    """
+    assert not os.path.exists(filename), "%r exists" % filename
     path, name = os.path.split(filename)
 
     # 创建文件所在的目录
@@ -204,7 +189,7 @@ def open_atomic(filename, binary=True):
         os.makedirs(path)
 
     temp_fh = tempfile.NamedTemporaryFile(
-        mode=binary and 'wb' or 'w',
+        mode=binary and "wb" or "w",
         dir=path,
         delete=False,
     )
@@ -228,8 +213,7 @@ def open_atomic(filename, binary=True):
 class LockBase(abc.ABC):  # pragma: no cover
 
     @abc.abstractmethod
-    def acquire(
-            self, timeout=None, check_interval=None, fail_when_locked=None):
+    def acquire(self, timeout=None, check_interval=None, fail_when_locked=None):
         return NotImplemented
 
     @abc.abstractmethod
@@ -249,10 +233,16 @@ class LockBase(abc.ABC):  # pragma: no cover
 class Lock(LockBase):
 
     def __init__(
-            self, filename, mode='a', timeout=DEFAULT_TIMEOUT,
-            check_interval=DEFAULT_CHECK_INTERVAL, fail_when_locked=False,
-            flags=LOCK_METHOD, **file_open_kwargs):
-        '''Lock manager with build-in timeout
+        self,
+        filename,
+        mode="a",
+        timeout=DEFAULT_TIMEOUT,
+        check_interval=DEFAULT_CHECK_INTERVAL,
+        fail_when_locked=False,
+        flags=LOCK_METHOD,
+        **file_open_kwargs
+    ):
+        """Lock manager with build-in timeout
 
         filename -- filename
         mode -- the open mode, 'a' or 'ab' should be used for writing
@@ -270,12 +260,12 @@ class Lock(LockBase):
 
         Note that the file is opened first and locked later. So using 'w' as
         mode will result in truncate _BEFORE_ the lock is checked.
-        '''
+        """
 
-        if 'w' in mode:
+        if "w" in mode:
             # 追加模式
             truncate = True
-            mode = mode.replace('w', 'a')
+            mode = mode.replace("w", "a")
         else:
             truncate = False
 
@@ -290,9 +280,8 @@ class Lock(LockBase):
         self.flags = flags
         self.file_open_kwargs = file_open_kwargs
 
-    def acquire(
-            self, timeout=None, check_interval=None, fail_when_locked=None):
-        '''Acquire the locked filehandle'''
+    def acquire(self, timeout=None, check_interval=None, fail_when_locked=None):
+        """Acquire the locked filehandle"""
         if timeout is None:
             timeout = self.timeout
         if timeout is None:
@@ -355,7 +344,7 @@ class Lock(LockBase):
         return fh
 
     def release(self):
-        '''Releases the currently locked file handle'''
+        """Releases the currently locked file handle"""
         if self.fh:
             # 释放锁
             portalocker.unlock(self.fh)
@@ -364,24 +353,24 @@ class Lock(LockBase):
             self.fh = None
 
     def _get_fh(self):
-        '''Get a new filehandle'''
+        """Get a new filehandle"""
         return open(self.filename, self.mode, **self.file_open_kwargs)
 
     def _get_lock(self, fh):
-        '''
+        """
         Try to lock the given filehandle
 
-        returns LockException if it fails'''
+        returns LockException if it fails"""
         portalocker.lock(fh, self.flags)
         return fh
 
     def _prepare_fh(self, fh):
-        '''
+        """
         Prepare the filehandle for usage
 
         If truncate is a number, the file will be truncated to that amount of
         bytes
-        '''
+        """
         if self.truncate:
             fh.seek(0)
             fh.truncate(0)
@@ -390,35 +379,36 @@ class Lock(LockBase):
 
 
 class RLock(Lock):
-    '''
+    """
     A reentrant lock, functions in a similar way to threading.RLock in that it
     can be acquired multiple times.  When the corresponding number of release()
     calls are made the lock will finally release the underlying file lock.
-    '''
+    """
 
     def __init__(
-            self, filename, mode='a', timeout=DEFAULT_TIMEOUT,
-            check_interval=DEFAULT_CHECK_INTERVAL, fail_when_locked=False,
-            flags=LOCK_METHOD):
-        super(RLock, self).__init__(filename, mode, timeout, check_interval,
-                                    fail_when_locked, flags)
+        self,
+        filename,
+        mode="a",
+        timeout=DEFAULT_TIMEOUT,
+        check_interval=DEFAULT_CHECK_INTERVAL,
+        fail_when_locked=False,
+        flags=LOCK_METHOD,
+    ):
+        super(RLock, self).__init__(filename, mode, timeout, check_interval, fail_when_locked, flags)
         self._acquire_count = 0
 
-    def acquire(
-            self, timeout=None, check_interval=None, fail_when_locked=None):
+    def acquire(self, timeout=None, check_interval=None, fail_when_locked=None):
         if self._acquire_count >= 1:
             fh = self.fh
         else:
             # 只有第一次才会加锁
-            fh = super(RLock, self).acquire(timeout, check_interval,
-                                            fail_when_locked)
+            fh = super(RLock, self).acquire(timeout, check_interval, fail_when_locked)
         self._acquire_count += 1
         return fh
 
     def release(self):
         if self._acquire_count == 0:
-            raise exceptions.LockException(
-                "Cannot release more times than acquired")
+            raise exceptions.LockException("Cannot release more times than acquired")
 
         if self._acquire_count == 1:
             super(RLock, self).release()
@@ -427,13 +417,24 @@ class RLock(Lock):
 
 class TemporaryFileLock(Lock):
 
-    def __init__(self, filename='.lock', timeout=DEFAULT_TIMEOUT,
-                 check_interval=DEFAULT_CHECK_INTERVAL, fail_when_locked=True,
-                 flags=LOCK_METHOD):
+    def __init__(
+        self,
+        filename=".lock",
+        timeout=DEFAULT_TIMEOUT,
+        check_interval=DEFAULT_CHECK_INTERVAL,
+        fail_when_locked=True,
+        flags=LOCK_METHOD,
+    ):
 
-        Lock.__init__(self, filename=filename, mode='w', timeout=timeout,
-                      check_interval=check_interval,
-                      fail_when_locked=fail_when_locked, flags=flags)
+        Lock.__init__(
+            self,
+            filename=filename,
+            mode="w",
+            timeout=timeout,
+            check_interval=check_interval,
+            fail_when_locked=fail_when_locked,
+            flags=flags,
+        )
         atexit.register(self.release)
 
     def release(self):
@@ -443,7 +444,7 @@ class TemporaryFileLock(Lock):
 
 
 class BoundedSemaphore(LockBase):
-    '''
+    """
     Bounded semaphore to prevent too many parallel processes from running
 
     It's also possible to specify a timeout when acquiring the lock to wait
@@ -456,12 +457,17 @@ class BoundedSemaphore(LockBase):
     PosixPath('bounded_semaphore.00.lock')
     >>> sorted(semaphore.get_random_filenames())[1]
     PosixPath('bounded_semaphore.01.lock')
-    '''
+    """
 
-    def __init__(self, maximum: int, name: str = 'bounded_semaphore',
-                 filename_pattern: str = '{name}.{number:02d}.lock', directory:
-                 str = tempfile.gettempdir(), timeout=DEFAULT_TIMEOUT,
-                 check_interval=DEFAULT_CHECK_INTERVAL):
+    def __init__(
+        self,
+        maximum: int,
+        name: str = "bounded_semaphore",
+        filename_pattern: str = "{name}.{number:02d}.lock",
+        directory: str = tempfile.gettempdir(),
+        timeout=DEFAULT_TIMEOUT,
+        check_interval=DEFAULT_CHECK_INTERVAL,
+    ):
         self.maximum = maximum
         self.name = name
         self.filename_pattern = filename_pattern
@@ -485,9 +491,8 @@ class BoundedSemaphore(LockBase):
             number=number,
         )
 
-    def acquire(
-            self, timeout=None, check_interval=None):
-        assert not self.lock, 'Already locked'
+    def acquire(self, timeout=None, check_interval=None):
+        assert not self.lock, "Already locked"
 
         if timeout is None:
             timeout = self.timeout

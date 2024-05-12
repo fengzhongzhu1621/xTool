@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import TypeVar, Optional, List, Literal, Any
 
 import pytest

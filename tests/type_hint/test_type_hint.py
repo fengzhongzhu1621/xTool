@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.type_hint import get_class_object_init_type
 
 

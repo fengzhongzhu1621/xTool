@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import socket
 from functools import partial
@@ -12,15 +10,11 @@ from xTool.servers.base import SimpleServer
 class TCPServer(SimpleServer):
     PROTO_NAME = "tcp"
 
-    def __init__(
-        self, address: str = None, port: int = None,
-        options: OptionsType = (), sock=None, **kwargs
-    ):
+    def __init__(self, address: str = None, port: int = None, options: OptionsType = (), sock=None, **kwargs):
         if not sock:
             if not (address and port):
                 raise RuntimeError(
-                    "You should pass socket instance or "
-                    '"address" and "port" couple',
+                    "You should pass socket instance or " '"address" and "port" couple',
                 )
 
             self.make_socket = partial(
@@ -38,14 +32,12 @@ class TCPServer(SimpleServer):
 
         super().__init__(**kwargs)
 
-    async def handle_client(
-        self, reader: asyncio.StreamReader,
-        writer: asyncio.StreamWriter
-    ):
+    async def handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         raise NotImplementedError
 
     def make_client_handler(
-        self, reader: asyncio.StreamReader,
+        self,
+        reader: asyncio.StreamReader,
         writer: asyncio.StreamWriter,
     ):
         return self.create_task(awaitable(self.handle_client)(reader, writer))

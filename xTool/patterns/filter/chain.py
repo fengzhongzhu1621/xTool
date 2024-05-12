@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 责任链模式
 """
@@ -9,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 
 class Method:
     """业务逻辑类 ."""
+
     def process_direct(self, *args, **kwargs):
         raise NotImplementedError
 
@@ -33,6 +32,7 @@ class IFilter:
 
 class BeforeFilter(IFilter):
     """前置过滤器 ."""
+
     def process(self, chain, method: Method, *args, **kwargs):
         self.before_process(*args, **kwargs)
         result = chain.process(*args, **kwargs)
@@ -52,6 +52,7 @@ class BeforeFilter(IFilter):
 
 class AfterFilter(IFilter):
     """后置过滤器 ."""
+
     def process(self, chain, method: Method, *args, **kwargs):
         result = chain.process(*args, **kwargs)
         self.after_process(*args, **kwargs)
@@ -77,6 +78,7 @@ class IFilterChain(metaclass=ABCMeta):
 
 class FilterChain(IFilterChain):
     """过滤器链 ."""
+
     def __init__(self, method: Method):
         self.method: Method = method
         self.filters: list = []
@@ -104,5 +106,3 @@ class FilterChain(IFilterChain):
         else:
             result = await self.method.async_process(*args, **kwargs)
         return result
-
-

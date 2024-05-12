@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from blueapps.account.models import User
 from django.db import models
 from pygments import highlight

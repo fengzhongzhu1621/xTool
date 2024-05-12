@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 cdef class reify:
     """Use as a class method decorator.  It operates almost exactly like
     the Python `@property` decorator, but it puts the result of the

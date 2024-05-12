@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import fakeredis
 
 from xTool.cache import Cache

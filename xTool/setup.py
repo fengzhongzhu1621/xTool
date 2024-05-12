@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import codecs
 import os
 import platform
@@ -24,23 +22,22 @@ try:
 except ImportError:
     cython_installed = False
 else:
-    if platform.python_implementation() != 'CPython':
+    if platform.python_implementation() != "CPython":
         cython_installed = extension_support = False
-        warnings.warn('C extensions disabled as you are not using CPython.')
+        warnings.warn("C extensions disabled as you are not using CPython.")
     else:
         cython_installed = True
 
-if 'sdist' in sys.argv and not cython_installed:
-    raise Exception('Building sdist requires that Cython be installed.')
+if "sdist" in sys.argv and not cython_installed:
+    raise Exception("Building sdist requires that Cython be installed.")
 
 if sys.version_info[0] < 3:
     FileNotFoundError = EnvironmentError
 
 if cython_installed:
-    src_ext = '.pyx'
+    src_ext = ".pyx"
 else:
-    src_ext = '.c'
-
+    src_ext = ".c"
 
     def cythonize(obj):
         return obj
@@ -64,31 +61,27 @@ def _have_sqlite_extension_support():
     from distutils.ccompiler import new_compiler
     from distutils.sysconfig import customize_compiler
 
-    libraries = ['sqlite3']
-    c_code = ('#include <sqlite3.h>\n\n'
-              'int main(int argc, char **argv) { return 0; }')
-    tmp_dir = tempfile.mkdtemp(prefix='tmp_pw_sqlite3_')
-    bin_file = os.path.join(tmp_dir, 'test_pw_sqlite3')
-    src_file = bin_file + '.c'
-    with open(src_file, 'w') as fh:
+    libraries = ["sqlite3"]
+    c_code = "#include <sqlite3.h>\n\n" "int main(int argc, char **argv) { return 0; }"
+    tmp_dir = tempfile.mkdtemp(prefix="tmp_pw_sqlite3_")
+    bin_file = os.path.join(tmp_dir, "test_pw_sqlite3")
+    src_file = bin_file + ".c"
+    with open(src_file, "w") as fh:
         fh.write(c_code)
 
     compiler = new_compiler()
     customize_compiler(compiler)
     success = False
     try:
-        compiler.link_executable(
-            compiler.compile([src_file], output_dir=tmp_dir),
-            bin_file,
-            libraries=['sqlite3'])
+        compiler.link_executable(compiler.compile([src_file], output_dir=tmp_dir), bin_file, libraries=["sqlite3"])
     except CCompilerError:
-        print('unable to compile sqlite3 C extensions - missing headers?')
+        print("unable to compile sqlite3 C extensions - missing headers?")
     except DistutilsExecError:
-        print('unable to compile sqlite3 C extensions - no c compiler?')
+        print("unable to compile sqlite3 C extensions - no c compiler?")
     except DistutilsPlatformError:
-        print('unable to compile sqlite3 C extensions - platform error')
+        print("unable to compile sqlite3 C extensions - platform error")
     except FileNotFoundError:
-        print('unable to compile sqlite3 C extensions - no compiler!')
+        print("unable to compile sqlite3 C extensions - no compiler!")
     else:
         success = True
     shutil.rmtree(tmp_dir)
@@ -99,11 +92,10 @@ def _have_sqlite_extension_support():
 sqlite_extension_support = False
 
 if extension_support:
-    if os.environ.get('NO_SQLITE'):
-        warnings.warn('SQLite extensions will not be built at users request.')
+    if os.environ.get("NO_SQLITE"):
+        warnings.warn("SQLite extensions will not be built at users request.")
     elif not _have_sqlite_extension_support():
-        warnings.warn('Could not find libsqlite3, SQLite extensions will not '
-                      'be built.')
+        warnings.warn("Could not find libsqlite3, SQLite extensions will not " "be built.")
     else:
         sqlite_extension_support = True
 
@@ -152,20 +144,18 @@ def open_local(paths, mode="r", encoding="utf8"):
 
 
 def get_version(module_name):
-    with open(f'{module_name}/__version__.py') as f:
-        empty, version = f.read().split('__version__ = ')
-    assert empty == ''
+    with open(f"{module_name}/__version__.py") as f:
+        empty, version = f.read().split("__version__ = ")
+    assert empty == ""
     version = version.strip().strip("'")
-    assert version.startswith('0.')
+    assert version.startswith("0.")
     return version
 
 
 def read_version_file(package):
     with open_local([package, "__version__.py"], encoding="latin1") as fp:
         try:
-            version = re.findall(
-                r"^__version__ = \"([^']+)\"\r?$", fp.read(), re.M
-            )[0]
+            version = re.findall(r"^__version__ = \"([^']+)\"\r?$", fp.read(), re.M)[0]
         except IndexError:
             raise RuntimeError("Unable to determine version.")
     return version
@@ -190,14 +180,14 @@ def read_readme_rst():
 
 def get_readme():
     try:
-        with open('README.rst') as f:
+        with open("README.rst") as f:
             return f.read().strip()
     except IOError:
-        return ''
-    
+        return ""
+
 
 def load_requirements(fname):
-    """ load requirements from a pip requirements file
+    """load requirements from a pip requirements file
 
     examples:
         extras_require={
@@ -206,4 +196,4 @@ def load_requirements(fname):
     """
     with open(fname) as f:
         line_iter = (line.strip() for line in f.readlines())
-        return [line for line in line_iter if line and line[0] != '#']
+        return [line for line in line_iter if line and line[0] != "#"]

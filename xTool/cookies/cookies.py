@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import re
 import string
 
@@ -15,14 +13,11 @@ DEFAULT_MAX_AGE = 0
 
 # Straight up copied this section of dark magic from SimpleCookie
 
-_LegalChars = "%s%s%s" % (string.ascii_letters,
-                          string.digits, "!#$%&'*+-.^_`|~:")
+_LegalChars = "%s%s%s" % (string.ascii_letters, string.digits, "!#$%&'*+-.^_`|~:")
 _UnescapedChars = "%s%s" % (_LegalChars, " ()/<=>?@[]{}")
 
 # 将字符转换为安全字符
-_Translator = {
-    n: "\\%03o" % n for n in set(range(256)) - set(map(ord, _UnescapedChars))
-}
+_Translator = {n: "\\%03o" % n for n in set(range(256)) - set(map(ord, _UnescapedChars))}
 _Translator.update({ord('"'): '\\"', ord("\\"): "\\\\"})
 
 # 判断key的有效性
@@ -120,9 +115,7 @@ class Cookie(dict):
             elif key.lower() == "expires":
                 # 判断过期时间格式
                 if not isinstance(value, datetime):
-                    raise TypeError(
-                        "Cookie 'expires' property must be a datetime"
-                    )
+                    raise TypeError("Cookie 'expires' property must be a datetime")
             return super().__setitem__(key, value)
 
     def encode(self, encoding):
@@ -150,10 +143,7 @@ class Cookie(dict):
                 except TypeError:
                     output.append("%s=%s" % (self._keys[key], value))
             elif key == "expires":
-                output.append(
-                    "%s=%s"
-                    % (self._keys[key], value.strftime("%a, %d-%b-%Y %T GMT"))
-                )
+                output.append("%s=%s" % (self._keys[key], value.strftime("%a, %d-%b-%Y %T GMT")))
             elif key in self._flags and self[key]:
                 output.append(self._keys[key])
             else:

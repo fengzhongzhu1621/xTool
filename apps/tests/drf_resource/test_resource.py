@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import pytest
 from typing import Dict, List, Optional
 
@@ -28,9 +26,9 @@ class TestResource:
 
     def test_perform_request__no_params(self):
         actual = MockResource().request()
-        assert actual == ['hello world']
+        assert actual == ["hello world"]
         actual = MockResource()()
-        assert actual == ['hello world']
+        assert actual == ["hello world"]
 
     def test_perform_request__params_existed(self):
         actual = MockResource().request({"a": 1})
@@ -43,12 +41,12 @@ class TestResource:
             MockResourceWithRequestSerializer().request({"a": 1})
         with pytest.raises(APIException):
             MockResourceWithRequestSerializer().request()
-        actual = MockResourceWithRequestSerializer().request({"name": 'a'})
-        assert actual == {"name": 'a'}
+        actual = MockResourceWithRequestSerializer().request({"name": "a"})
+        assert actual == {"name": "a"}
 
 
 def test_api():
     actual = api.test.MockResource.request()
-    assert actual == ['hello world']
+    assert actual == ["hello world"]
     actual = api.test.MockResource()
-    assert actual == ['hello world']
+    assert actual == ["hello world"]

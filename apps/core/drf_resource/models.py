@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import List, Union, Dict, Optional
 
 from django.test import RequestFactory
@@ -54,9 +52,7 @@ class ModelResource(Resource, ModelViewSet):
         elif method_lower in ["post", "put", "patch"]:
             setattr(request, "data", validated_request_data)
         # 创建请求视图
-        request_handler = self.__class__.as_view(actions={
-            method_lower: action
-        }, **init_kwargs)
+        request_handler = self.__class__.as_view(actions={method_lower: action}, **init_kwargs)
         # 执行视图方法
 
         response = request_handler(request, **request_handler_kwargs)

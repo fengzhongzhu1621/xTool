@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.codec.json_codec import JsonCodec
 
 

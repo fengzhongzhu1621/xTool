@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-
 """
 异步定时器，精确到秒级别
 
 如果当前的任务没有执行完成，下一个调度不会等待上一个任务执行完毕，所以业务层需要自行解决任务的幂等问题
 """
+
 from croniter.croniter import croniter
 from datetime import datetime
 from tzlocal import get_localzone
@@ -21,17 +20,18 @@ async def null_callback(*args):
 def wrap_func(func):
     """将方法转换为协程 ."""
     if not asyncio.iscoroutinefunction(func):
+
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
+
         return wrapper
     return func
 
 
 class Cron(object):
 
-    def __init__(self, spec, func=None, args=(), start=False, uuid=None,
-                 loop=None, tz=None):
+    def __init__(self, spec, func=None, args=(), start=False, uuid=None, loop=None, tz=None):
         self.spec = spec
         # 将执行函数转换为协程
         if func is not None:
@@ -69,7 +69,7 @@ class Cron(object):
         self.initialize()
         self.future = asyncio.Future(loop=self.loop)
         self.handle = self.loop.call_at(self.get_next(), self.call_func, *args)
-        return (await self.future)
+        return await self.future
 
     def initialize(self):
         """Initialize croniter and related times"""
@@ -101,8 +101,7 @@ class Cron(object):
         """Called. Take care of exceptions using gather"""
         # 如果业务逻辑返回异常，则不会退出，会将异常放在future中
         asyncio.gather(
-            self.cron(*args, **kwargs),     # 业务逻辑处理函数
-            loop=self.loop, return_exceptions=True
+            self.cron(*args, **kwargs), loop=self.loop, return_exceptions=True  # 业务逻辑处理函数
         ).add_done_callback(self.set_result)
 
     def set_result(self, result):
@@ -127,10 +126,10 @@ class Cron(object):
         return self
 
     def __str__(self):
-        return '{0.spec} {0.func}'.format(self)
+        return "{0.spec} {0.func}".format(self)
 
     def __repr__(self):
-        return '<Cron {0.spec} {0.func}>'.format(self)
+        return "<Cron {0.spec} {0.func}>".format(self)
 
 
 def crontab(spec, func=None, args=(), start=True, loop=None, tz=None):

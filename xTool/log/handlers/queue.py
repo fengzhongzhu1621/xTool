@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-
-import atexit
 import asyncio
-from contextlib import suppress
+import atexit
 import logging
 import queue
 import sys
+from contextlib import suppress
 from logging.handlers import QueueHandler, QueueListener
-from concurrent_log_handler.queue import (get_all_logger_names, queuify_logger)
+
+from concurrent_log_handler.queue import get_all_logger_names, queuify_logger
 
 
 def stop_queue_listeners(*listeners):
@@ -33,7 +32,7 @@ class AsyncioQueueListener(QueueListener):
         asyncio.set_event_loop(self.loop)
 
         q = self.queue
-        has_task_done = hasattr(q, 'task_done')
+        has_task_done = hasattr(q, "task_done")
         while True:
             try:
                 record = self.dequeue(True)
@@ -65,8 +64,7 @@ def setup_logging_asyncio_queue_listener():
             log_queue = queue.Queue(-1)  # No limit on size
 
             queue_handler = QueueHandler(log_queue)
-            queue_listener = AsyncioQueueListener(
-                log_queue, respect_handler_level=True)
+            queue_listener = AsyncioQueueListener(log_queue, respect_handler_level=True)
             # 将所有的handers绑定到queue_listener，然后将logger.handlers清空并设置为queue_handler
             queuify_logger(logger, queue_handler, queue_listener)
             queue_listeners.append(queue_listener)

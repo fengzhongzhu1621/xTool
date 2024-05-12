@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-
 import os
+
 try:
     import pwd
     import grp
@@ -11,7 +10,6 @@ import asyncio
 import signal
 import logging
 from typing import Protocol
-from typing import Union
 from xTool.misc import USE_WINDOWS
 
 
@@ -65,7 +63,7 @@ def which(name, path=None):
     []
     """
     if path is None:
-        path = os.environ.get('PATH')
+        path = os.environ.get("PATH")
         if path is None:
             return
         path = path.split(os.pathsep)
@@ -112,8 +110,7 @@ def kill_children_processes(pids_to_kill, timeout=5, log=None):
         # where we kill the wrong process because a child process died
         # but the PID got reused.
         # 获得存活的子进程
-        child_processes = [x for x in this_process.children(recursive=True)
-                           if x.is_running() and x.pid in pids_to_kill]
+        child_processes = [x for x in this_process.children(recursive=True) if x.is_running() and x.pid in pids_to_kill]
         # 终止多个DAG处理子进程
         # First try SIGTERM
         for child in child_processes:
@@ -121,19 +118,15 @@ def kill_children_processes(pids_to_kill, timeout=5, log=None):
             child.terminate()
         # TODO: Remove magic number
         # 等待多个DAG处理子进程结束
-        log.info(
-            "Waiting up to %s seconds for processes to exit...", timeout)
+        log.info("Waiting up to %s seconds for processes to exit...", timeout)
         try:
-            psutil.wait_procs(
-                child_processes, timeout=timeout,
-                callback=lambda x: log.info('Terminated PID %s', x.pid))
+            psutil.wait_procs(child_processes, timeout=timeout, callback=lambda x: log.info("Terminated PID %s", x.pid))
         except psutil.TimeoutExpired:
             log.debug("Ran out of time while waiting for processes to exit")
 
         # 判断子进程是否结束
         # Then SIGKILL
-        child_processes = [x for x in this_process.children(recursive=True)
-                           if x.is_running() and x.pid in pids_to_kill]
+        child_processes = [x for x in this_process.children(recursive=True) if x.is_running() and x.pid in pids_to_kill]
         if child_processes:
             log.info("SIGKILL processes that did not terminate gracefully")
             for child in child_processes:
@@ -142,8 +135,7 @@ def kill_children_processes(pids_to_kill, timeout=5, log=None):
                 child.wait()
 
 
-def reap_process_group(pid, log, sig=signal.SIGTERM,
-                       timeout=60):
+def reap_process_group(pid, log, sig=signal.SIGTERM, timeout=60):
     """终止进程id为pid的子进程（包括进程id的所有子进程）
     Tries really hard to terminate all children (including grandchildren). Will send
     sig (SIGTERM) to the process group of pid. If any process is alive after timeout
@@ -159,11 +151,7 @@ def reap_process_group(pid, log, sig=signal.SIGTERM,
 
     def on_terminate(p):
         """进程被关闭时的回调，打印进程ID和返回码 ."""
-        log.info(
-            "Process %s (%s) terminated with exit code %s",
-            p,
-            p.pid,
-            p.returncode)
+        log.info("Process %s (%s) terminated with exit code %s", p, p.pid, p.returncode)
 
     # 不允许杀死自己，pid必须是子进程
     if pid == os.getpid():
@@ -186,43 +174,36 @@ def reap_process_group(pid, log, sig=signal.SIGTERM,
     os.killpg(os.getpgid(pid), sig)
 
     # 等待正在被杀死的进程结束
-    gone, alive = psutil.wait_procs(
-        children, timeout=timeout, callback=on_terminate)
+    gone, alive = psutil.wait_procs(children, timeout=timeout, callback=on_terminate)
 
     # 如果仍然有进程存活
     if alive:
         # 打印存活的进程
         for p in alive:
-            log.warn(
-                "process %s (%s) did not respond to SIGTERM. Trying SIGKILL",
-                p,
-                pid)
+            log.warn("process %s (%s) did not respond to SIGTERM. Trying SIGKILL", p, pid)
 
         # 如果子进程仍然存活，则调用SIGKILL信号重新杀死
         os.killpg(os.getpgid(pid), signal.SIGKILL)
 
         # 等待子进程结束
-        gone, alive = psutil.wait_procs(
-            alive, timeout=timeout, callback=on_terminate)
+        gone, alive = psutil.wait_procs(alive, timeout=timeout, callback=on_terminate)
 
         # 如果子进程仍然存活，则记录错误日志
         if alive:
             for p in alive:
-                log.error(
-                    "Process %s (%s) could not be killed. Giving up.", p, p.pid)
+                log.error("Process %s (%s) could not be killed. Giving up.", p, p.pid)
 
 
 class AppProtocol(Protocol):
 
-    def stop(self):
-        ...
+    def stop(self): ...
 
-    def add_task(self, task) -> None:
-        ...
+    def add_task(self, task) -> None: ...
 
 
 def ctrlc_workaround_for_windows(app: AppProtocol):
     """在windows下重启进程 ."""
+
     async def stay_active(app: AppProtocol):
         """Asyncio wakeups to allow receiving SIGINT in Python"""
         while not die:

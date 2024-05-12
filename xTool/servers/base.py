@@ -1,19 +1,18 @@
-# -*- coding: utf-8 -*-
-
-import os
 import asyncio
-import logging
 import errno
+import logging
+import os
 
-from xTool.servers.context import Context, get_context
 from xTool.aiomisc import cancel_tasks
-from xTool.servers.signal import register_signal_hander
 from xTool.misc import OS_IS_WINDOWS
+from xTool.servers.context import Context, get_context
+from xTool.servers.signal import register_signal_hander
 from xTool.utils.processes import ctrlc_workaround_for_windows
 
 
 class ServiceMeta(type):
-    """在对象中添加变量__async_required__和__required__ . """
+    """在对象中添加变量__async_required__和__required__ ."""
+
     def __new__(cls, name, bases, namespace, **kwds):
         instance = type.__new__(cls, name, bases, dict(namespace))
 
@@ -21,15 +20,14 @@ class ServiceMeta(type):
             setattr(instance, key, frozenset(getattr(instance, key, ())))
 
         check_instance = all(
-            asyncio.iscoroutinefunction(getattr(instance, method))
-            for method in instance.__async_required__
+            asyncio.iscoroutinefunction(getattr(instance, method)) for method in instance.__async_required__
         )
 
         if not check_instance:
             raise TypeError(
-                "Following methods must be coroutine functions", tuple(
-                    "%s.%s" %
-                    (name, m) for m in instance.__async_required__), )
+                "Following methods must be coroutine functions",
+                tuple("%s.%s" % (name, m) for m in instance.__async_required__),
+            )
 
         return instance
 
@@ -48,7 +46,7 @@ class Service(metaclass=ServiceMeta):
         self.loop = None
         self._set_params(**kwargs)
         self.__context = None
-        self.start_event = None       # type: asyncio.Event
+        self.start_event = None  # type: asyncio.Event
 
     @property
     def context(self) -> Context:
@@ -150,10 +148,10 @@ class BaseServiceServer:
         self.stop()
 
     def find_child_process(self, child_pid):
-        raise NotImplementedError('Method not implemented')
+        raise NotImplementedError("Method not implemented")
 
     def restart_child_process(self, child_pid):
-        raise NotImplementedError('Method not implemented')
+        raise NotImplementedError("Method not implemented")
 
     def handle_child_process_exit(self):
         """子进程退出时系统会向父进程发送 SIGCHLD 信号，
@@ -166,10 +164,10 @@ class BaseServiceServer:
                 # os.waitpid 调用 wait 系统调用后阻止了子进程一直处于僵尸进程状态，从而实现了清除僵尸进程的效果
                 child_pid, status = os.waitpid(-1, os.WNOHANG)
                 if child_pid == 0:
-                    logging.info('no child process was immediately available')
+                    logging.info("no child process was immediately available")
                     break
                 exitcode = status >> 8
-                logging.info('child process %s exit with exitcode %s', child_pid, exitcode)
+                logging.info("child process %s exit with exitcode %s", child_pid, exitcode)
                 # 子进程退出时，父进程重新拉起子进程
                 if self.find_child_process(child_pid):
                     self.restart_child_process(child_pid)
@@ -177,11 +175,11 @@ class BaseServiceServer:
             exit()
         except OSError as e:
             if e.errno == errno.ECHILD:
-                logging.warning('current process has no existing unwaited-for child processes.')
+                logging.warning("current process has no existing unwaited-for child processes.")
             else:
                 exit()
         finally:
-            logging.info('handle SIGCHLD end')
+            logging.info("handle SIGCHLD end")
 
     def _register_signal_handler(self):
         if OS_IS_WINDOWS:

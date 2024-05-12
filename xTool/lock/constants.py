@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-'''
+"""
 Locking constants
 
 Lock types:
@@ -27,12 +26,13 @@ LOCK_UN，释放锁；无论使用共享/排他锁，使用完后需要解锁
 进程使用flock尝试锁文件时，如果文件已经被其他进程锁住，进程会被阻塞直到锁被释放掉，
 LOCK_NB，在尝试锁住该文件的时候，不阻塞而是提示锁定，发现已经被其他服务锁住，会返回错误，errno错误码为EWOULDBLOCK。(不支持windows)
 
-'''
+"""
+
 import os
 
 # The actual tests will execute the code anyhow so the following code can
 # safely be ignored from the coverage tests
-if os.name == 'nt':  # pragma: no cover
+if os.name == "nt":  # pragma: no cover
     import msvcrt
 
     LOCK_EX = 0x1  #: exclusive lock
@@ -40,8 +40,9 @@ if os.name == 'nt':  # pragma: no cover
     LOCK_NB = 0x4  #: non-blocking
     LOCK_UN = msvcrt.LK_UNLCK  #: unlock
 
-elif os.name == 'posix':  # pragma: no cover
+elif os.name == "posix":  # pragma: no cover
     import fcntl
+
     # 排他锁，同时只允许一个进程使用，常被用作写锁
     LOCK_EX = fcntl.LOCK_EX  #: exclusive lock
     # 共享锁，多个进程可以使用同一把锁，常被用作读共享锁
@@ -50,4 +51,4 @@ elif os.name == 'posix':  # pragma: no cover
     LOCK_UN = fcntl.LOCK_UN  #: unlock
 
 else:  # pragma: no cover
-    raise RuntimeError('Locker only defined for nt and posix platforms')
+    raise RuntimeError("Locker only defined for nt and posix platforms")

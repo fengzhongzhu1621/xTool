@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from abc import ABCMeta, abstractmethod
 from xTool.utils.net import new_socketpair
 

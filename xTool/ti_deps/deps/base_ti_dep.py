@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from collections import namedtuple
 
 from xTool.decorators.db import provide_session
@@ -35,7 +33,7 @@ class BaseTIDep(object):
     @property
     def name(self):
         """获得依赖名 ."""
-        return getattr(self, 'NAME', self.__class__.__name__)
+        return getattr(self, "NAME", self.__class__.__name__)
 
     def _get_dep_statuses(self, ti, session, dep_context=None):
         """返回一组依赖状态
@@ -69,14 +67,12 @@ class BaseTIDep(object):
         """
         # 忽略所有依赖的情况, IGNOREABLE开关必须打开
         if self.IGNOREABLE and dep_context.ignore_all_deps:
-            yield self._passing_status(
-                reason="Context specified all dependencies should be ignored.")
+            yield self._passing_status(reason="Context specified all dependencies should be ignored.")
             return
 
         # 忽略所有任务依赖的情况，IS_TASK_DEP开关必须打开
         if self.IS_TASK_DEP and dep_context.ignore_task_deps:
-            yield self._passing_status(
-                reason="Context specified all task dependencies should be ignored.")
+            yield self._passing_status(reason="Context specified all task dependencies should be ignored.")
             return
 
         # 返回自定义任务依赖
@@ -98,8 +94,7 @@ class BaseTIDep(object):
             state that can be used by this dependency.
         :type dep_context: BaseDepContext
         """
-        return all(status.passed for status in
-                   self.get_dep_statuses(ti, session, dep_context))
+        return all(status.passed for status in self.get_dep_statuses(ti, session, dep_context))
 
     @provide_session
     def get_failure_reasons(self, ti, session, dep_context=None):
@@ -118,15 +113,15 @@ class BaseTIDep(object):
             if not dep_status.passed:
                 yield dep_status.reason
 
-    def _failing_status(self, reason=''):
+    def _failing_status(self, reason=""):
         """返回依赖不满足状态."""
         return TIDepStatus(self.name, False, reason)
 
-    def _passing_status(self, reason=''):
+    def _passing_status(self, reason=""):
         """返回依赖满足状态."""
         return TIDepStatus(self.name, True, reason)
 
 
 # Dependency status for a specific task instance indicating whether or not the task
 # instance passed the dependency.
-TIDepStatus = namedtuple('TIDepStatus', ['dep_name', 'passed', 'reason'])
+TIDepStatus = namedtuple("TIDepStatus", ["dep_name", "passed", "reason"])

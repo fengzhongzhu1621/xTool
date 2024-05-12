@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 class Plugin:
     def __init__(
         self,

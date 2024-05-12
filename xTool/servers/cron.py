@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import logging
 from asyncio import iscoroutinefunction
@@ -8,14 +6,12 @@ from typing import Callable, Tuple, Type
 
 from croniter import croniter
 
-from xTool.servers.base import Service
 from xTool.scheduler.cron import CronCallback
+from xTool.servers.base import Service
 
 log = logging.getLogger(__name__)
 
-StoreItem = namedtuple(
-    "StoreItem", "callback, spec, shield, suppress_exceptions"
-)
+StoreItem = namedtuple("StoreItem", "callback, spec, shield, suppress_exceptions")
 
 
 class CronService(Service):
@@ -24,28 +20,19 @@ class CronService(Service):
         self._callbacks_storage = set()
 
     def register(
-            self,
-            function: Callable,
-            spec: str,
-            shield: bool = False,
-            suppress_exceptions: Tuple[Type[Exception]] = ()
+        self, function: Callable, spec: str, shield: bool = False, suppress_exceptions: Tuple[Type[Exception]] = ()
     ):
         if not iscoroutinefunction(function):
             raise TypeError("function should be a coroutine %r" % function)
         if not croniter.is_valid(spec):
             raise TypeError("Not valid cron spec %r" % spec)
 
-        self._callbacks_storage.add(
-            StoreItem(CronCallback(function), spec, shield, suppress_exceptions)
-        )
+        self._callbacks_storage.add(StoreItem(CronCallback(function), spec, shield, suppress_exceptions))
 
     async def start(self):
         for item in self._callbacks_storage:
             item.callback.start(
-                spec=item.spec,
-                loop=self.loop,
-                shield=item.shield,
-                suppress_exceptions=item.suppress_exceptions
+                spec=item.spec, loop=self.loop, shield=item.shield, suppress_exceptions=item.suppress_exceptions
             )
         log.info("Cron service %s started", self)
 
@@ -62,10 +49,7 @@ class CronService(Service):
         log.info("Cron service %s is stopped", self)
 
     def __str__(self):
-        storage = ", ".join(
-            "{}: {}".format(item.callback, item.spec) for item in
-            self._callbacks_storage
-        )
+        storage = ", ".join("{}: {}".format(item.callback, item.spec) for item in self._callbacks_storage)
         return "{}({})".format(
             self.__class__.__name__,
             storage,

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from enum import Enum, unique, IntEnum
 
 from xTool.status import STATUS_CODES
@@ -183,9 +181,7 @@ def abort(status_code, message=None):
         message = STATUS_CODES.get(status_code)
         # These are stored as bytes in the STATUS_CODES dict
         message = message.decode("utf8")
-    http_status_exception = _http_status_exceptions.get(
-        status_code, HttpStatusException
-    )
+    http_status_exception = _http_status_exceptions.get(status_code, HttpStatusException)
     raise http_status_exception(message=message, status_code=status_code)
 
 

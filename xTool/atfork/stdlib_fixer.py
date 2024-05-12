@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2009 Google Inc.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,9 +34,10 @@ In 2.4.5 the following additional stdlib modules use locks:
   _strptime
 """
 
-from . import atfork
 import sys
 import warnings
+
+from . import atfork
 
 
 class Error(Exception):
@@ -45,35 +45,36 @@ class Error(Exception):
 
 
 def fix_logging_module():
-    logging = sys.modules.get('logging')
+    logging = sys.modules.get("logging")
     # Prevent fixing multiple times as that would cause a deadlock.
     # 防止重复修复
-    if logging and getattr(logging, 'fixed_for_atfork', None):
+    if logging and getattr(logging, "fixed_for_atfork", None):
         return
     if logging:
-        warnings.warn('logging module already imported before fixup.')
+        warnings.warn("logging module already imported before fixup.")
     import logging
+
     if logging.getLogger().handlers:
         # We could register each lock with atfork for these handlers but if
         # these exist, other loggers or not yet added handlers could as well.
         # Its safer to insist that this fix is applied before logging has been
         # configured.
-        raise Error('logging handlers already registered.')
+        raise Error("logging handlers already registered.")
 
     logging._acquireLock()
     try:
+
         def fork_safe_createLock(self):
             self._orig_createLock()
             # 在os.fork()子进程中需要release
-            atfork(self.lock.acquire,
-                   self.lock.release, self.lock.release)
+            atfork(self.lock.acquire, self.lock.release, self.lock.release)
+
         # Fix the logging.Handler lock (a major source of deadlocks).
         logging.Handler._orig_createLock = logging.Handler.createLock
         logging.Handler.createLock = fork_safe_createLock
 
         # Fix the module level lock.
-        atfork(logging._acquireLock,
-               logging._releaseLock, logging._releaseLock)
+        atfork(logging._acquireLock, logging._releaseLock, logging._releaseLock)
 
         logging.fixed_for_atfork = True
     finally:

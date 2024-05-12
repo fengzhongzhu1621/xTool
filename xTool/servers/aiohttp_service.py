@@ -1,17 +1,14 @@
-# -*- coding: utf-8 -*-
-
 import socket
 
 from aiohttp.web import Application, AppRunner, SockSite
 
-from xTool.servers.tls import PathOrStr, get_ssl_context
-from xTool.servers.helpers import bind_socket
 from xTool.servers.base import Service
-
+from xTool.servers.helpers import bind_socket
+from xTool.servers.tls import PathOrStr, get_ssl_context
 
 try:
     from aiohttp.web_log import AccessLogger
-except ImportError:         # pragma: nocover
+except ImportError:  # pragma: nocover
     from aiohttp.helpers import AccessLogger
 
 
@@ -19,15 +16,18 @@ class AIOHTTPService(Service):
     __async_required__ = "start", "create_application"
 
     def __init__(
-        self, address: str = "localhost", port: int = None,
-        sock: socket.socket = None, shutdown_timeout: int = 5, **kwds
+        self,
+        address: str = "localhost",
+        port: int = None,
+        sock: socket.socket = None,
+        shutdown_timeout: int = 5,
+        **kwds
     ):
 
         if not sock:
             if not (address and port):
                 raise RuntimeError(
-                    "You should pass socket instance or "
-                    '"address" and "port" couple',
+                    "You should pass socket instance or " '"address" and "port" couple',
                 )
 
             self.socket = bind_socket(
@@ -49,13 +49,13 @@ class AIOHTTPService(Service):
 
     async def create_application(self) -> Application:
         raise NotImplementedError(
-            "You should implement "
-            '"create_application" method',
+            "You should implement " '"create_application" method',
         )
 
     async def create_site(self):
         return SockSite(
-            self.runner, self.socket,
+            self.runner,
+            self.socket,
             shutdown_timeout=self.shutdown_timeout,
         )
 
@@ -81,24 +81,27 @@ class AIOHTTPService(Service):
 
 class AIOHTTPSSLService(AIOHTTPService):
     def __init__(
-        self, cert: PathOrStr, key: PathOrStr, ca: PathOrStr = None,
-        address: str = None, port: int = None, verify: bool = True,
-        sock: socket.socket = None, shutdown_timeout: int = 5,
-        require_client_cert: bool = False, **kwds
+        self,
+        cert: PathOrStr,
+        key: PathOrStr,
+        ca: PathOrStr = None,
+        address: str = None,
+        port: int = None,
+        verify: bool = True,
+        sock: socket.socket = None,
+        shutdown_timeout: int = 5,
+        require_client_cert: bool = False,
+        **kwds
     ):
 
-        super().__init__(
-            address=address, port=port, sock=sock,
-            shutdown_timeout=shutdown_timeout, **kwds
-        )
+        super().__init__(address=address, port=port, sock=sock, shutdown_timeout=shutdown_timeout, **kwds)
 
         self.__ssl_options = cert, key, ca, verify, require_client_cert
 
     async def create_site(self):
         return SockSite(
-            self.runner, self.socket,
+            self.runner,
+            self.socket,
             shutdown_timeout=self.shutdown_timeout,
-            ssl_context=await self.loop.run_in_executor(
-                None, get_ssl_context, *self.__ssl_options
-            ),
+            ssl_context=await self.loop.run_in_executor(None, get_ssl_context, *self.__ssl_options),
         )

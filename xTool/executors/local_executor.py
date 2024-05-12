@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 LocalExecutor runs tasks by spawning processes in a controlled fashion in different
 modes. Given that BaseExecutor has the option to receive a `parallelism` parameter to
@@ -31,13 +29,12 @@ locally, into just one `LocalExecutor` with multiple modes.
 import multiprocessing
 import subprocess
 import time
-
 from builtins import range
 
 from xTool.executors.base_executor import BaseExecutor
+from xTool.misc import USE_WINDOWS
 from xTool.utils.log.logging_mixin import LoggingMixin
 from xTool.utils.state import State
-from xTool.misc import USE_WINDOWS
 
 
 class LocalWorker(multiprocessing.Process, LoggingMixin):
@@ -84,7 +81,6 @@ class LocalWorker(multiprocessing.Process, LoggingMixin):
 
 
 class QueuedLocalWorker(LocalWorker):
-
     """LocalWorker implementation that is waiting for tasks from a queue and will
     continue executing commands as they become available in the queue. It will terminate
     execution once the poison token is found."""
@@ -140,7 +136,7 @@ class LocalExecutor(BaseExecutor):
             local_worker.start()
 
         def sync(self):
-            """每次心跳都需要检查结果队列 . """
+            """每次心跳都需要检查结果队列 ."""
             while not self.executor.result_queue.empty():
                 # 从队列中获取子进程的执行结果 （key, state）
                 results = self.executor.result_queue.get()
@@ -205,8 +201,11 @@ class LocalExecutor(BaseExecutor):
         # 策略模式
         # parallelism = 0 不限制并发
         # parallelism !=0 同时运行的任务实例的数量
-        self.impl = (LocalExecutor._UnlimitedParallelism(self) if self.parallelism == 0
-                     else LocalExecutor._LimitedParallelism(self))
+        self.impl = (
+            LocalExecutor._UnlimitedParallelism(self)
+            if self.parallelism == 0
+            else LocalExecutor._LimitedParallelism(self)
+        )
 
         self.impl.start()
 

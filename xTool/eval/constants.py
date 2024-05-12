@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 class OP:
     """
     NOTE: don't want to use Enum

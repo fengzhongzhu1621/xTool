@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     "apps.custom_plugins",
     "apps.credential",
     "apps.global_conf",
+    "apps.http_client",
 )
 
 MIDDLEWARE = (

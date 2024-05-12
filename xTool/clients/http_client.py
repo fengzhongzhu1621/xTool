@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from json import JSONDecodeError
 
 import httpx
@@ -17,9 +15,7 @@ async def async_httpx_request(method, url, *args, **kwargs):
         async with httpx.AsyncClient(verify=False, trust_env=False) as session:
             try:
                 # 发送http请求
-                response = await getattr(session, method.lower())(
-                    url, *args, **kwargs
-                )
+                response = await getattr(session, method.lower())(url, *args, **kwargs)
             except NameError:
                 raise Exception(response.status_code)
 

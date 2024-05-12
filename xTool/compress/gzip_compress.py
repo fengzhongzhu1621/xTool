@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import gzip
 from typing import Optional
 
@@ -7,9 +5,7 @@ from xTool.plugin import register_plugin, PluginType
 from .base import CompressType
 
 
-@register_plugin(
-    PluginType.COMPRESS, CompressType.GZIP
-)
+@register_plugin(PluginType.COMPRESS, CompressType.GZIP)
 class GzipCompress:
     @classmethod
     def compress(cls, data: bytes, compression_level: int = 6) -> Optional[bytes]:

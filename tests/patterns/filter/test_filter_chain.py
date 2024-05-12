@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from xTool.patterns.filter.chain import FilterChain
 from . import BusinessMethod, BusinessAfterFilter, BusinessBeforeFilter
 

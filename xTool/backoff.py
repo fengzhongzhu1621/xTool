@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 from functools import wraps
 from typing import Callable, Optional, Type, TypeVar, Union
 
 from xTool.decorators.timeout import timeout
-
 
 Number = Union[int, float]
 T = TypeVar("T")
@@ -16,7 +13,8 @@ def asyncbackoff(
     attempt_timeout: Optional[Number],
     deadline: Optional[Number],
     pause: Number = 0,
-    *exc: Type[Exception], exceptions=(),
+    *exc: Type[Exception],
+    exceptions=(),
     max_tries: int = None,
     giveup: Callable[[Exception], bool] = None
 ):
@@ -41,7 +39,7 @@ def asyncbackoff(
         raise ValueError("'giveup' must be a callable or None")
 
     exceptions = tuple(exceptions) or ()
-    exceptions += asyncio.TimeoutError,
+    exceptions += (asyncio.TimeoutError,)
 
     def decorator(func):
         # 将函数改为延迟函数
@@ -85,4 +83,5 @@ def asyncbackoff(
                 raise
 
         return wrap
+
     return decorator

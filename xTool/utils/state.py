@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -65,30 +63,30 @@ class State(object):
     )
 
     state_color = {
-        QUEUED: 'gray',
-        RUNNING: 'lime',
-        SUCCESS: 'green',
-        SHUTDOWN: 'blue',
-        FAILED: 'red',
-        UP_FOR_RETRY: 'gold',
-        UPSTREAM_FAILED: 'orange',
-        SKIPPED: 'pink',
-        REMOVED: 'lightgrey',
-        SCHEDULED: 'tan',
-        NONE: 'lightblue',
+        QUEUED: "gray",
+        RUNNING: "lime",
+        SUCCESS: "green",
+        SHUTDOWN: "blue",
+        FAILED: "red",
+        UP_FOR_RETRY: "gold",
+        UPSTREAM_FAILED: "orange",
+        SKIPPED: "pink",
+        REMOVED: "lightgrey",
+        SCHEDULED: "tan",
+        NONE: "lightblue",
     }
 
     @classmethod
     def color(cls, state):
-        return cls.state_color.get(state, 'white')
+        return cls.state_color.get(state, "white")
 
     @classmethod
     def color_fg(cls, state):
         """背景色 ."""
         color = cls.color(state)
-        if color in ['green', 'red']:
-            return 'white'
-        return 'black'
+        if color in ["green", "red"]:
+            return "white"
+        return "black"
 
     @classmethod
     def finished(cls):
@@ -109,11 +107,4 @@ class State(object):
         A list of states indicating that a task either has not completed
         a run or has not even started.
         """
-        return [
-            cls.NONE,
-            cls.SCHEDULED,
-            cls.QUEUED,
-            cls.RUNNING,
-            cls.SHUTDOWN,
-            cls.UP_FOR_RETRY
-        ]
+        return [cls.NONE, cls.SCHEDULED, cls.QUEUED, cls.RUNNING, cls.SHUTDOWN, cls.UP_FOR_RETRY]

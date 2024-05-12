@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 可以使用第三方库：attrdict
 """
@@ -42,8 +40,7 @@ class AttrDict(dict):
 
 
 class ObjectDict(_ObjectDictBase):
-    """Makes a dictionary behave like an object, with attribute-style access.
-    """
+    """Makes a dictionary behave like an object, with attribute-style access."""
 
     def __getattr__(self, name):
         try:
@@ -97,10 +94,10 @@ class StripDict(UserDict):
 
 # based on http://stackoverflow.com/a/2082169/151401
 class CaseInsensitiveDict(dict):
-    """ A case-insensitive dictionary for header storage.
-        A limitation of this approach is the inability to store
-        multiple instances of the same header. If that is changed
-        then we suddenly care about the assembly rules in sec 2.3.
+    """A case-insensitive dictionary for header storage.
+    A limitation of this approach is the inability to store
+    multiple instances of the same header. If that is changed
+    then we suddenly care about the assembly rules in sec 2.3.
     """
 
     def __init__(self, d=None, **kwargs):
@@ -122,8 +119,7 @@ class ConstantDict(dict):
     """常量字典，不允许修改value值 ."""
 
     def __setitem__(self, key: Any, value: Any):
-        raise TypeError("modifying %s object values is not allowed"
-                        % self.__class__.__name__)
+        raise TypeError("modifying %s object values is not allowed" % self.__class__.__name__)
 
     def update(self, **kwargs):
         raise TypeError("'%s' object does not support item assignment" % self.__class__.__name__)

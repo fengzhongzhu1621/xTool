@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import multiprocessing
 from functools import partial
@@ -11,25 +9,27 @@ from xTool.servers.pipeline import IPipelineConnector
 
 
 class WorkerProcess(multiprocessing.Process):
-    def __init__(self,
-                 host,
-                 port,
-                 app,
-                 loop,
-                 ssl=None,
-                 reuse_port=None,
-                 sock=None,
-                 pineline_connector: IPipelineConnector = None,
-                 read_queue=None,
-                 write_queue=None,
-                 protocol_factory=HttpProtocol,
-                 backlog=100,
-                 connections=None,
-                 signal=Signal(),
-                 state=None,
-                 server_kwargs=None,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        host,
+        port,
+        app,
+        loop,
+        ssl=None,
+        reuse_port=None,
+        sock=None,
+        pineline_connector: IPipelineConnector = None,
+        read_queue=None,
+        write_queue=None,
+        protocol_factory=HttpProtocol,
+        backlog=100,
+        connections=None,
+        signal=Signal(),
+        state=None,
+        server_kwargs=None,
+        *args,
+        **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self.app = app
         if not loop:
@@ -94,7 +94,7 @@ class WorkerProcess(multiprocessing.Process):
                 ssl=self.ssl,
                 reuse_port=self.reuse_port,
                 sock=self.sock,
-                backlog=self.backlog
+                backlog=self.backlog,
             )
         return self.loop.run_until_complete(server_coroutine)
 

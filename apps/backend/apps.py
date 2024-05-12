@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 import traceback
 
@@ -25,7 +23,7 @@ def get_client_through_sentinel():
 
 def get_cluster_client():
     from rediscluster import RedisCluster
-    
+
     kwargs = {
         "startup_nodes": [{"host": settings.REDIS_HOST, "port": settings.REDIS_PORT}],
         "password": settings.REDIS_PASSWORD,

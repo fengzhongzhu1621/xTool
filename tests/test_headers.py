@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import pytest
 
 from xTool import headers
@@ -36,7 +34,7 @@ from xTool import headers
         ),
         (
             'form-data; name="files"; filename="fo\\"o;bar\\"',
-            ("form-data", {"name": "files", "filename": 'fo"o;bar\\'})
+            ("form-data", {"name": "files", "filename": 'fo"o;bar\\'}),
             # cgi.parse_header:
             # ('form-data', {'name': 'files', 'filename': 'fo"o;bar\\'})
             # werkzeug.parse_options_header:
@@ -47,7 +45,7 @@ from xTool import headers
             # Chrome:
             # Content-Disposition: form-data; name="foo%22;bar\"; filename="😀"
             'form-data; name="foo%22;bar\\"; filename="😀"',
-            ("form-data", {"name": 'foo";bar\\', "filename": "😀"})
+            ("form-data", {"name": 'foo";bar\\', "filename": "😀"}),
             # cgi: ('form-data', {'name': 'foo%22;bar"; filename="😀'})
             # werkzeug: ('form-data', {'name': 'foo%22;bar"; filename='})
         ),
@@ -55,7 +53,7 @@ from xTool import headers
             # Firefox:
             # Content-Disposition: form-data; name="foo\";bar\"; filename="😀"
             'form-data; name="foo\\";bar\\"; filename="😀"',
-            ("form-data", {"name": 'foo";bar\\', "filename": "😀"})
+            ("form-data", {"name": 'foo";bar\\', "filename": "😀"}),
             # cgi: ('form-data', {'name': 'foo";bar"; filename="😀'})
             # werkzeug: ('form-data', {'name': 'foo";bar"; filename='})
         ),

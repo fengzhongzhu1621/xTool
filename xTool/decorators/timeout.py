@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 from functools import wraps
 
@@ -16,5 +14,7 @@ def timeout(value):
                 func(*args, **kwargs),
                 timeout=value,
             )
+
         return wrap
+
     return decorator

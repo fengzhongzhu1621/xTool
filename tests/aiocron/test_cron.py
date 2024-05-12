@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-
-import time
 import datetime
+import time
+
+import pytest
 
 from xTool.aiocron import asyncio
 from xTool.aiocron import crontab
-import pytest
 
 
 class CustomError(Exception):

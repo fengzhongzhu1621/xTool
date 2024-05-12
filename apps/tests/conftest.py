@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
 import arrow
 import pytest
 from django.conf import settings
 from django.utils.functional import empty
 
 from apps.credential.models import CredentialResource, Credential
+from apps.http_client.models import RequestSystemConfig, RequestApiConfig
+from apps.http_client.resources import RequestApiConfigResource
 
 
 def pytest_configure():
@@ -33,17 +34,63 @@ def credential():
         "resource_type": "type_1",
         "filter_condition": [
             {
-                'field': 'operator',
-                'op': 'eq',
-                'value': "admin",
+                "field": "operator",
+                "op": "eq",
+                "value": "admin",
             },
             {
-                'field': 'username',
-                'op': 'eq',
-                'value': "username_1",
+                "field": "username",
+                "op": "eq",
+                "value": "username_1",
             },
         ],
     }
     CredentialResource.objects.create(**params)
 
     return instance
+
+
+@pytest.fixture
+def request_system_config() -> RequestSystemConfig:
+    RequestSystemConfig.hard_deleted_objects.all().delete()
+
+    instance = RequestSystemConfig.objects.create(
+        **{
+            "name": "system_name",
+            "code": "system_code",
+            "desc": "desc",
+            "owners": "owners_1",
+            "domain": "https://xxxxxxxxxx.com",
+        }
+    )
+
+    return instance
+
+
+@pytest.fixture
+def request_api_config(request_system_config) -> RequestApiConfig:
+    RequestApiConfig.hard_deleted_objects.all().delete()
+    instance = RequestApiConfig.objects.create(
+        **{
+            "system": request_system_config,
+            "code": "api_code",
+            "name": "api_name",
+            "path": "/path",
+            "method": "GET",
+            "request_params": {
+                "a": "{{a}}",
+                "b": "{{b}}",
+            },
+        }
+    )
+
+    return instance
+
+
+@pytest.fixture
+def monkeypatch_request_api_config(monkeypatch):
+    monkeypatch.setattr(
+        RequestApiConfigResource,
+        "perform_request",
+        lambda _self, params: {"code": 0,},
+    )

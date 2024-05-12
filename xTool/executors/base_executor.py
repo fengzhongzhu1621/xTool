@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -88,10 +86,7 @@ class BaseExecutor(LoggingMixin):
         self.log.debug("%s open slots", open_slots)
 
         # 按优先级逆序，优先级大的放在前面，优先执行；优先级默认为1
-        sorted_queue = sorted(
-            [(k, v) for k, v in self.queued_tasks.items()],
-            key=lambda x: x[1][1],
-            reverse=True)
+        sorted_queue = sorted([(k, v) for k, v in self.queued_tasks.items()], key=lambda x: x[1][1], reverse=True)
 
         # 执行任务实例
         for i in range(min((open_slots, len(self.queued_tasks)))):
@@ -110,15 +105,10 @@ class BaseExecutor(LoggingMixin):
             # 将未运行的任务实例放入执行队列，并发给执行器处理
             if ti.state != State.RUNNING:
                 self.running[key] = command
-                self.execute_async(key=key,
-                                   command=command,
-                                   queue=queue,
-                                   executor_config=ti.executor_config)
+                self.execute_async(key=key, command=command, queue=queue, executor_config=ti.executor_config)
             else:
                 # 正在运行的任务是不会重新执行的
-                self.logger.info(
-                    'Task is already running, not sending to '
-                    'executor: {}'.format(key))
+                self.logger.info("Task is already running, not sending to " "executor: {}".format(key))
 
         # Calling child class sync method
         # 如果是本地或顺序调度器，则是阻塞操作，同步任务实例执行结果
@@ -157,11 +147,7 @@ class BaseExecutor(LoggingMixin):
                     cleared_events[key] = self.event_buffer.pop(key)
         return cleared_events
 
-    def execute_async(self,
-                      key,
-                      command,
-                      queue=None,
-                      executor_config=None):  # pragma: no cover
+    def execute_async(self, key, command, queue=None, executor_config=None):  # pragma: no cover
         """
         This method will execute the command asynchronously.
         """

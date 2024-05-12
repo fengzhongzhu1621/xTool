@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import os
 from pstats import Stats
@@ -23,7 +21,8 @@ async def test_profiler_dump():
 
     try:
         profiler = Profiler(
-            interval=0.1, top_results=10,
+            interval=0.1,
+            top_results=10,
             path=path,
         )
         await profiler.start()

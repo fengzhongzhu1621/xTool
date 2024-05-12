@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import socket
 from asyncio import events
 
@@ -15,7 +13,5 @@ async def create_datagram_endpoint(protocol, host, port, loop=None, *kwargs):
             lambda: protocol, remote_addr=(host, port), family=socket.AF_INET6, **kwargs
         )
     else:
-        transport, _ = await loop.create_datagram_endpoint(
-            lambda: protocol, remote_addr=(host, port), **kwargs
-        )
+        transport, _ = await loop.create_datagram_endpoint(lambda: protocol, remote_addr=(host, port), **kwargs)
     return transport

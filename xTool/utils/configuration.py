@@ -1,26 +1,26 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
+
 # 开启除法浮点运算
 from __future__ import division
 from __future__ import print_function
+
 # 把你当前模块所有的字符串（string literals）转为unicode
 from __future__ import unicode_literals
 
-import os
-import json
-from tempfile import mkstemp
-from builtins import str
 import copy
-from collections import OrderedDict
-import warnings
+import json
+import os
 import types
+import warnings
+from builtins import str
+from collections import OrderedDict
+from tempfile import mkstemp
 
-from future import standard_library
 import six
+from future import standard_library
 from six import iteritems
-
 from six.moves import configparser
+
 if six.PY3:
     ConfigParser = configparser.ConfigParser
 else:
@@ -31,7 +31,7 @@ from xTool.utils.helpers import run_command
 from xTool.utils.helpers import strtobool
 from xTool.utils.log.logging_mixin import LoggingMixin
 from xTool.utils.module_loading import import_string_from_package
-from xTool.exceptions import (XToolConfigException, PyFileError)
+from xTool.exceptions import XToolConfigException, PyFileError
 from xTool.misc import USE_WINDOWS
 
 
@@ -45,9 +45,9 @@ def read_config_file(file_path):
     if six.PY2:
         with open(file_path) as f:
             config = f.read()
-            return config.decode('utf-8')
+            return config.decode("utf-8")
     else:
-        with open(file_path, encoding='utf-8') as f:
+        with open(file_path, encoding="utf-8") as f:
             return f.read()
 
 
@@ -66,7 +66,7 @@ def tmp_configuration_copy(cfg_dict, chmod=0o600):
     # 创建临时文件
     temp_fd, cfg_path = mkstemp()
     # 写临时文件
-    with os.fdopen(temp_fd, 'w') as temp_file:
+    with os.fdopen(temp_fd, "w") as temp_file:
         if chmod is not None:
             if not USE_WINDOWS:
                 os.fchmod(temp_fd, chmod)
@@ -88,6 +88,7 @@ class XToolConfigParser(ConfigParser):
         # 读取正式环境配置文件，覆盖默认配置
         conf.read(AIRFLOW_CONFIG)
     """
+
     env_prefix = "XTOOL"
 
     # These configuration elements can be fetched as the stdout of commands
@@ -99,8 +100,8 @@ class XToolConfigParser(ConfigParser):
 
     # 过期配置警告模版
     deprecation_format_string = (
-        'The {old} option in [{section}] has been renamed to {new} - the old '
-        'setting has been used, but please update your config.'
+        "The {old} option in [{section}] has been renamed to {new} - the old "
+        "setting has been used, but please update your config."
     )
 
     def __init__(self, default_config=None, *args, **kwargs):
@@ -121,26 +122,23 @@ class XToolConfigParser(ConfigParser):
         """从环境变量中获取配置的值，
         把环境变量的值中包含的”~”和”~user”转换成用户目录，并获取配置结果值 ."""
         # must have format XTOOL__{SECTION}__{KEY} (note double underscore)
-        env_var = '{E}__{S}__{K}'.format(
-            E=self.env_prefix, S=section.upper(), K=key.upper())
+        env_var = "{E}__{S}__{K}".format(E=self.env_prefix, S=section.upper(), K=key.upper())
         if env_var in os.environ:
             return expand_env_var(os.environ[env_var])
 
     def _get_cmd_option(self, section, key):
         """从配置项中获取指令，并执行指令获取指令执行后的返回值
 
-            - 如果key不存在_cmd结尾，则获取key的值
-            - 如果key没有配置 且 key以_cmd结尾，则获取key的值，并执行值表示的表达式，返回表达式的结果
+        - 如果key不存在_cmd结尾，则获取key的值
+        - 如果key没有配置 且 key以_cmd结尾，则获取key的值，并执行值表示的表达式，返回表达式的结果
         """
-        fallback_key = key + '_cmd'
+        fallback_key = key + "_cmd"
         # if this is a valid command key...
         if (section, key) in self.as_command_stdout:
             # 如果用户自定义配置中存在以"_cmd"结尾的配置值
             # 则执行此配置值的shell命令，获取其返回值作为真正的配置项的值
-            if super(XToolConfigParser, self) \
-                    .has_option(section, fallback_key):
-                command = super(XToolConfigParser, self) \
-                    .get(section, fallback_key)
+            if super(XToolConfigParser, self).has_option(section, fallback_key):
+                command = super(XToolConfigParser, self).get(section, fallback_key)
                 # 执行shell命令，返回标准输出（Unicode编码）
                 return run_command(command)
 
@@ -162,20 +160,11 @@ class XToolConfigParser(ConfigParser):
                 return option
         # 2. 从用户自定义配置文件中获取
         if super(XToolConfigParser, self).has_option(section, key):
-            return expand_env_var(
-                super(XToolConfigParser, self).get(section, key, **kwargs))
+            return expand_env_var(super(XToolConfigParser, self).get(section, key, **kwargs))
         if deprecated_name:
-            if super(
-                    XToolConfigParser,
-                    self).has_option(
-                    section,
-                    deprecated_name):
+            if super(XToolConfigParser, self).has_option(section, deprecated_name):
                 self._warn_deprecate(section, key, deprecated_name)
-                return expand_env_var(super(XToolConfigParser, self).get(
-                    section,
-                    deprecated_name,
-                    **kwargs
-                ))
+                return expand_env_var(super(XToolConfigParser, self).get(section, deprecated_name, **kwargs))
         # 3. 获得带有_cmd后缀的配置，执行表达式，获取结果
         option = self._get_cmd_option(section, key)
         if option:
@@ -187,30 +176,26 @@ class XToolConfigParser(ConfigParser):
                 return option
         # 4. 从默认配置文件中获取
         if self.defaults.has_option(section, key):
-            return expand_env_var(
-                self.defaults.get(section, key, **kwargs))
+            return expand_env_var(self.defaults.get(section, key, **kwargs))
         else:
-            log.warning(
-                "section/key [{section}/{key}] not found in config".format(**locals())
-            )
+            log.warning("section/key [{section}/{key}] not found in config".format(**locals()))
             # 配置不存在，抛出异常
-            raise XToolConfigException(
-                "section/key [{section}/{key}] not found "
-                "in config".format(**locals()))
+            raise XToolConfigException("section/key [{section}/{key}] not found " "in config".format(**locals()))
 
     def getboolean(self, section, key):
         val = str(self.get(section, key)).lower().strip()
         # 去掉结尾的注释
-        if '#' in val:
-            val = val.split('#')[0].strip()
-        if val.lower() in ('t', 'true', '1'):
+        if "#" in val:
+            val = val.split("#")[0].strip()
+        if val.lower() in ("t", "true", "1"):
             return True
-        elif val.lower() in ('f', 'false', '0'):
+        elif val.lower() in ("f", "false", "0"):
             return False
         else:
             raise XToolConfigException(
                 'The value for configuration option "{}:{}" is not a '
-                'boolean (received "{}").'.format(section, key, val))
+                'boolean (received "{}").'.format(section, key, val)
+            )
 
     def getint(self, section, key):
         return int(self.get(section, key))
@@ -268,20 +253,19 @@ class XToolConfigParser(ConfigParser):
                 try:
                     val = float(val)
                 except ValueError:
-                    if val.lower() in ('t', 'true'):
+                    if val.lower() in ("t", "true"):
                         val = True
-                    elif val.lower() in ('f', 'false'):
+                    elif val.lower() in ("f", "false"):
                         val = False
             _section[key] = val
         return _section
 
-    def as_dict(
-            self, display_sensitive=False, raw=False):
+    def as_dict(self, display_sensitive=False, raw=False):
         """将配置文件转换为配置字典 ."""
         cfg = {}
         configs = (
-            self.defaults,       # 默认配置文件解析器
-            self,                # 用户自定义配置文件解析器
+            self.defaults,  # 默认配置文件解析器
+            self,  # 用户自定义配置文件解析器
         )
 
         # 遍历所有配置端，将配置文件转换为字典格式
@@ -292,40 +276,35 @@ class XToolConfigParser(ConfigParser):
                 # items(self, section, raw=False, vars=None)
                 #     - 在raw为true的情况下，忽略%的替换语法，直接输出
                 #     - 在raw为false的情况下，vars中包含要替换的key，%语法中的内容被替换
-                for (k, val) in parser.items(section=section, raw=raw):
+                for k, val in parser.items(section=section, raw=raw):
                     sect[k] = val
 
         # 用户环境变量的配置覆盖配置文件的配置，环境变量有较高的优先级
-        for ev in [
-            ev for ev in os.environ if ev.startswith(
-                '%s__' %
-                self.env_prefix)]:
+        for ev in [ev for ev in os.environ if ev.startswith("%s__" % self.env_prefix)]:
             try:
-                _, section, key = ev.split('__')
+                _, section, key = ev.split("__")
                 # 从环境变量中获取配置的值
                 opt = self._get_env_var_option(section, key)
             except ValueError:
                 continue
-            if (not display_sensitive and ev !=
-                    '%s__CORE__UNIT_TEST_MODE' % self.env_prefix):
-                opt = '< hidden >'
+            if not display_sensitive and ev != "%s__CORE__UNIT_TEST_MODE" % self.env_prefix:
+                opt = "< hidden >"
             elif raw:
-                opt = opt.replace('%', '%%')
-            cfg.setdefault(section.lower(), OrderedDict()).update(
-                {key.lower(): opt})
+                opt = opt.replace("%", "%%")
+            cfg.setdefault(section.lower(), OrderedDict()).update({key.lower(): opt})
 
         # add bash commands
-        for (section, key) in self.as_command_stdout:
+        for section, key in self.as_command_stdout:
             # 从shell命令中获得配置项的值
             opt = self._get_cmd_option(section, key)
             if opt:
                 if not display_sensitive:
-                    opt = '< hidden >'
+                    opt = "< hidden >"
                 elif raw:
-                    opt = opt.replace('%', '%%')
+                    opt = opt.replace("%", "%%")
                 cfg.setdefault(section, OrderedDict()).update({key: opt})
                 # 去掉bash命令
-                del cfg[section][key + '_cmd']
+                del cfg[section][key + "_cmd"]
 
         return cfg
 
@@ -349,10 +328,10 @@ DEFAULT_CONFIG = {
     "RESPONSE_TIMEOUT": 60,  # 60 seconds
     "KEEP_ALIVE": True,
     "KEEP_ALIVE_TIMEOUT": 5,  # 5 seconds
-    "WEBSOCKET_MAX_SIZE": 2 ** 20,  # 1 megabyte
+    "WEBSOCKET_MAX_SIZE": 2**20,  # 1 megabyte
     "WEBSOCKET_MAX_QUEUE": 32,
-    "WEBSOCKET_READ_LIMIT": 2 ** 16,
-    "WEBSOCKET_WRITE_LIMIT": 2 ** 16,
+    "WEBSOCKET_READ_LIMIT": 2**16,
+    "WEBSOCKET_WRITE_LIMIT": 2**16,
     "GRACEFUL_SHUTDOWN_TIMEOUT": 15.0,  # 15 sec
     "ACCESS_LOG": True,
     "FORWARDED_SECRET": None,
@@ -371,13 +350,8 @@ BASE_LOGO = """
 
 class Config(dict):
     """基于字典的配置类 ."""
-    def __init__(
-            self,
-            defaults=None,
-            load_env=True,
-            keep_alive=None,
-            base_logo=None,
-            prefix="XTOOL_"):
+
+    def __init__(self, defaults=None, load_env=True, keep_alive=None, base_logo=None, prefix="XTOOL_"):
         defaults = defaults or {}
         super().__init__({**DEFAULT_CONFIG, **defaults})
 
@@ -411,8 +385,7 @@ class Config(dict):
         config_file = os.environ.get(variable_name)
         if not config_file:
             raise RuntimeError(
-                "The environment variable %r is not set and "
-                "thus configuration could not be loaded." % variable_name
+                "The environment variable %r is not set and " "thus configuration could not be loaded." % variable_name
             )
         return self.from_pyfile(config_file)
 

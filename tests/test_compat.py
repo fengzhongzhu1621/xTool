@@ -1,22 +1,20 @@
-# -*- coding: utf-8 -*-
-
 import pytest
 
 from xTool.compat import flatten_list_bytes, qualname
 
 
 def test_flatten_list_bytes():
-    list_of_data = ['a', 'b', 'c']
+    list_of_data = ["a", "b", "c"]
     with pytest.raises(TypeError):
         flatten_list_bytes(list_of_data)
 
-    list_of_data = [b'a', b'b', b'c']
+    list_of_data = [b"a", b"b", b"c"]
     actual = flatten_list_bytes(list_of_data)
-    assert actual == b'abc'
+    assert actual == b"abc"
 
-    list_of_data = [bytearray('abc', encoding='utf-8'), bytearray('def', encoding='utf-8')]
+    list_of_data = [bytearray("abc", encoding="utf-8"), bytearray("def", encoding="utf-8")]
     actual = flatten_list_bytes(list_of_data)
-    assert actual == b'abcdef'
+    assert actual == b"abcdef"
 
 
 class C:

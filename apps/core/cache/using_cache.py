@@ -32,7 +32,7 @@ def using_cache(key_template: str, duration: TimeEnum, need_md5=False):
         @functools.wraps(func)
         def inner(*args, **kwargs):
             # 获得缓存key
-            cache = CacheKeyTemplate(key_template, need_md5)
+            cache = CacheKeyTemplate(key_template, need_md5, *args, **kwargs)
 
             # 获得缓冲的结果
             cache_result = cache.get()

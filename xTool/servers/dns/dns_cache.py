@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 DNS缓存，来自aiohttp
 """
@@ -64,16 +63,13 @@ class DNSCacheTable:
         return self._timestamps[key] + self._ttl < monotonic()
 
 
-def clear_dns_cache(cached_hosts: DNSCacheTable,
-                    host: Optional[str] = None,
-                    port: Optional[int] = None) -> None:
+def clear_dns_cache(cached_hosts: DNSCacheTable, host: Optional[str] = None, port: Optional[int] = None) -> None:
     """Remove specified host/port or clear all dns local cache.
     清除内部DNS缓存。如果host和port指定了信息会删除指定的DNS，否则清除所有。
     """
     if host is not None and port is not None:
         cached_hosts.remove((host, port))
     elif host is not None or port is not None:
-        raise ValueError("either both host and port "
-                         "or none of them are allowed")
+        raise ValueError("either both host and port " "or none of them are allowed")
     else:
         cached_hosts.clear()

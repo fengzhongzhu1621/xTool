@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 python -W ignore -m pytest -v -s -x tests
 """
@@ -25,17 +24,17 @@ from Cython.Build import cythonize
 
 logger = logging.getLogger(__name__)
 
-version = import_module('xTool.version').version
+version = import_module("xTool.version").version
 
 PY3 = sys.version_info[0] == 3
 
 
 class Tox(TestCommand):
-    user_options = [('tox-args=', None, "Arguments to pass to tox")]
+    user_options = [("tox-args=", None, "Arguments to pass to tox")]
 
     def initialize_options(self):
         TestCommand.initialize_options(self)
-        self.tox_args = ''
+        self.tox_args = ""
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
@@ -45,12 +44,14 @@ class Tox(TestCommand):
     def run_tests(self):
         # import here, cause outside the eggs aren't loaded
         import tox
+
         errno = tox.cmdline(args=self.tox_args.split())
         sys.exit(errno)
 
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
+
     user_options = []
 
     def initialize_options(self):
@@ -60,7 +61,7 @@ class CleanCommand(Command):
         pass
 
     def run(self):
-        os.system('rm -vrf ./build ./dist ./*.pyc ./*.tgz ./*.egg-info')
+        os.system("rm -vrf ./build ./dist ./*.pyc ./*.tgz ./*.egg-info")
 
 
 def git_version(version):
@@ -74,32 +75,33 @@ def git_version(version):
     """
     try:
         import git
-        repo = git.Repo('.git')
+
+        repo = git.Repo(".git")
     except ImportError:
-        logger.warning('gitpython not found: Cannot compute the git version.')
-        return ''
+        logger.warning("gitpython not found: Cannot compute the git version.")
+        return ""
     except Exception as e:
-        logger.warning('Cannot compute the git version. {}'.format(e))
-        return ''
+        logger.warning("Cannot compute the git version. {}".format(e))
+        return ""
     if repo:
         sha = repo.head.commit.hexsha
         if repo.is_dirty():
-            return '.dev0+{sha}.dirty'.format(sha=sha)
+            return ".dev0+{sha}.dirty".format(sha=sha)
         # commit is clean
-        return '.release:{version}+{sha}'.format(version=version, sha=sha)
+        return ".release:{version}+{sha}".format(version=version, sha=sha)
     else:
-        return 'no_git_version'
+        return "no_git_version"
 
 
 def read(filename):
     """Read and return `filename` in root dir of project and return string ."""
     here = os.path.abspath(os.path.dirname(__file__))
-    return codecs.open(os.path.join(here, filename), 'r').read()
+    return codecs.open(os.path.join(here, filename), "r").read()
 
 
 test_requirements = [
-    'pytest',
-    'pytest-asyncio',
+    "pytest",
+    "pytest-asyncio",
 ]
 
 
@@ -113,6 +115,7 @@ class PyTest(TestCommand):
     def run_tests(self):
         import shlex
         import pytest
+
         errno = pytest.main(shlex.split(self.pytest_args))
         sys.exit(errno)
 
@@ -124,6 +127,7 @@ def refresh_plugin_cache():
     try:
         from twisted.plugin import getPlugins  # noqa
         from twisted.plugin import IPlugin  # noqa
+
         list(getPlugins(IPlugin))
     except Exception as e:
         print(e)  # noqa
@@ -131,54 +135,45 @@ def refresh_plugin_cache():
         # log.warn(str(e))
 
 
-README = os.path.join(os.path.dirname(__file__), 'README.md')
-long_description = open(README, encoding='utf-8').read() + '\n\n'
+README = os.path.join(os.path.dirname(__file__), "README.md")
+long_description = open(README, encoding="utf-8").read() + "\n\n"
 
 install_requires = []
 if os.path.exists("requirements.txt"):
     install_requires = read("requirements.txt").split()
     if "win" in sys.platform:
-        for item in ['pexpect']:
+        for item in ["pexpect"]:
             try:
                 install_requires.remove(item)
             except ValueError as e:
                 pass
 
-install_requires.extend([
-
-])
+install_requires.extend([])
 
 
 if PY3:
     ext_modules = [
-        Extension('xTool/decorators._helpers',
-                  ['xTool/decorators/_helpers.c']),
+        Extension("xTool/decorators._helpers", ["xTool/decorators/_helpers.c"]),
         Extension(
             "xTool.cython.example",
-            [
-                "xTool/cython/example.pyx"
-            ],
-            extra_compile_args=["-std=c++11", '-O3'],
-            include_dirs=['.'],
+            ["xTool/cython/example.pyx"],
+            extra_compile_args=["-std=c++11", "-O3"],
+            include_dirs=["."],
             language="c++",
-            extra_link_args=["-std=c++11"]
+            extra_link_args=["-std=c++11"],
         ),
         Extension(
             "xTool.codec.pickle_codec_c",
-            [
-                "xTool/codec/pickle_codec_c.pyx"
-            ],
-            extra_compile_args=['-O3'],
-            include_dirs=['.'],
+            ["xTool/codec/pickle_codec_c.pyx"],
+            extra_compile_args=["-O3"],
+            include_dirs=["."],
         ),
         Extension(
             "xTool.cython.bytes_order",
-            [
-                "xTool/cython/bytes_order.pyx"
-            ],
-            extra_compile_args=['-O3'],
-            include_dirs=['.'],
-        )
+            ["xTool/cython/bytes_order.pyx"],
+            extra_compile_args=["-O3"],
+            include_dirs=["."],
+        ),
     ]
 else:
     ext_modules = []
@@ -186,43 +181,40 @@ else:
 
 def do_setup():
     setup(
-        name='xTool',
+        name="xTool",
         version=version,
-        description='A python script tools',
+        description="A python script tools",
         long_description=long_description,
-        long_description_content_type='text/markdown',
-        author='jinyinqiao',
-        author_email='jinyinqiao@gmail.com',
-        license='Apache License 2.0',
-        packages=find_packages(exclude=['tests*']),
+        long_description_content_type="text/markdown",
+        author="jinyinqiao",
+        author_email="jinyinqiao@gmail.com",
+        license="Apache License 2.0",
+        packages=find_packages(exclude=["tests*"]),
         include_package_data=True,
         install_requires=install_requires,
         zip_safe=False,
         scripts=None,
-        keywords='xTool',
+        keywords="xTool",
         classifiers=[
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: Apache Software License',
-            'Natural Language :: English',
-            'Environment :: Console',
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: Apache Software License",
+            "Natural Language :: English",
+            "Environment :: Console",
             "Programming Language :: Python :: 2",
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.6',
+            "Programming Language :: Python :: 2.7",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.6",
         ],
         setup_requires=[
             "gitpython",
             "flake8",
-            'docutils>=0.14',
+            "docutils>=0.14",
         ],
-        extras_require={
-            'dev': ['pytest', 'pyyaml', 'pytest-sanic'],
-            'fast': ['uvloop']
-        },
+        extras_require={"dev": ["pytest", "pyyaml", "pytest-sanic"], "fast": ["uvloop"]},
         ext_modules=cythonize(ext_modules),
-        test_suite='tests',
+        test_suite="tests",
         tests_require=test_requirements,
-        cmdclass={'test': PyTest},
+        cmdclass={"test": PyTest},
         # cmdclass={
         #    'test': Tox,
         #    'extra_clean': CleanCommand,

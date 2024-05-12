@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import time
 from typing import Optional
 
@@ -11,6 +9,7 @@ class Timer:
     This class lets us have an accurate timer with the logic in one place (so
     that we don't use datetime math for duration -- it is error prone).
     """
+
     _start_time: Optional[float]
     duration: Optional[float]
 

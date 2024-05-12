@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
 
 import getpass
@@ -13,7 +11,7 @@ from xTool.misc import USE_WINDOWS
 from xTool.exceptions import XToolConfigException
 
 
-PYTHONPATH_VAR = 'PYTHONPATH'
+PYTHONPATH_VAR = "PYTHONPATH"
 
 
 class BaseTaskRunner(LoggingMixin):
@@ -21,6 +19,7 @@ class BaseTaskRunner(LoggingMixin):
     Runs Airflow task instances by invoking the `airflow run` command with raw
     mode enabled in a subprocess.
     """
+
     def __init__(self, local_task_job, conf):
         """
         :param local_task_job: The local task job associated with running the
@@ -33,7 +32,7 @@ class BaseTaskRunner(LoggingMixin):
         super(BaseTaskRunner, self).__init__(local_task_job.task_instance)
         # 获得job关联的任务实例
         self._task_instance = local_task_job.task_instance
-        
+
         # 获得任务设置的执行用户
         self.run_as_user = self._get_run_as_user()
         # 创建配置文件
@@ -58,7 +57,7 @@ class BaseTaskRunner(LoggingMixin):
             run_as_user = self._task_instance.run_as_user
         else:
             try:
-                run_as_user = self.conf.get('core', 'default_impersonation')
+                run_as_user = self.conf.get("core", "default_impersonation")
             except XToolConfigException:
                 run_as_user = None
         return run_as_user
@@ -77,16 +76,13 @@ class BaseTaskRunner(LoggingMixin):
         self.log.debug("Planning to run as the %s user", self.run_as_user)
         if self.run_as_user and (self.run_as_user != getpass.getuser()):
             # Give ownership of file to user; only they can read and write
-            subprocess.call(
-                ['sudo', 'chown', self.run_as_user, self._cfg_path],
-                close_fds=True
-            )
+            subprocess.call(["sudo", "chown", self.run_as_user, self._cfg_path], close_fds=True)
             # 用于在导入模块的时候搜索路径，例如 export PYTHONPATH=$PYTHONPATH:`pwd`:'pwd'/slim
-            pythonpath_value = os.environ.get(PYTHONPATH_VAR, '')
-            popen_prepend = ['sudo', '-E', '-H', '-u', self.run_as_user]
+            pythonpath_value = os.environ.get(PYTHONPATH_VAR, "")
+            popen_prepend = ["sudo", "-E", "-H", "-u", self.run_as_user]
 
             if pythonpath_value:
-                popen_prepend.append('{}={}'.format(PYTHONPATH_VAR, pythonpath_value))
+                popen_prepend.append("{}={}".format(PYTHONPATH_VAR, pythonpath_value))
         return popen_prepend
 
     def _read_task_logs(self, stream):
@@ -95,14 +91,14 @@ class BaseTaskRunner(LoggingMixin):
             line = stream.readline()
             # 转换为unicode编码
             if isinstance(line, bytes):
-                line = line.decode('utf-8')
+                line = line.decode("utf-8")
             if not line:
                 break
             # 捕获异常防止编码异常
             try:
-                self.log.info('Job %s: Subtask %s %s',
-                              self._task_instance.job_id, self._task_instance.task_id,
-                              line.rstrip('\n'))
+                self.log.info(
+                    "Job %s: Subtask %s %s", self._task_instance.job_id, self._task_instance.task_id, line.rstrip("\n")
+                )
             except Exception as e:
                 pass
 
@@ -122,7 +118,7 @@ class BaseTaskRunner(LoggingMixin):
         # 运行operator
         cmd = [" ".join(self._command)] if join_args else self._command
         full_cmd = run_with + cmd
-        self.log.info('Running: %s', full_cmd)
+        self.log.info("Running: %s", full_cmd)
         if USE_WINDOWS:
             preexec_fn = None
             shell = True
@@ -137,7 +133,7 @@ class BaseTaskRunner(LoggingMixin):
             universal_newlines=True,
             close_fds=False if USE_WINDOWS else True,
             env=os.environ.copy(),
-            preexec_fn=preexec_fn
+            preexec_fn=preexec_fn,
         )
 
         # 启动一个线程，airflow run --raw 命令执行完成后打印日志
@@ -178,4 +174,4 @@ class BaseTaskRunner(LoggingMixin):
             except FileNotFoundError:
                 pass
         elif self._cfg_path and os.path.isfile(self._cfg_path):
-            subprocess.call(['sudo', 'rm', self._cfg_path], close_fds=True)
+            subprocess.call(["sudo", "rm", self._cfg_path], close_fds=True)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 import sys
 
@@ -27,7 +26,5 @@ class Cache:
             redis_cache: BaseRedisCache = cls.CacheTypes[cache_instance_type]
             return redis_cache.instance(backend, **kwargs)
         except Exception as exc_info:
-            logger.exception(
-                "fail to use %s [%s] %s", backend, " ".join(sys.argv), exc_info
-            )
+            logger.exception("fail to use %s [%s] %s", backend, " ".join(sys.argv), exc_info)
             raise

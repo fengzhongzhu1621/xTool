@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 import pytest
+
 from xTool.units import PercentUnit
 from xTool.units.exceptions import UnitSuffixNotFound
 

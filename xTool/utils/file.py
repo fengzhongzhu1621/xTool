@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -47,9 +45,7 @@ def write_temp_file(
     delete=True,
 ):
     """写临时文件 ."""
-    with NamedTemporaryFile(
-        mode, buffering, encoding, newline, suffix, prefix, dir, delete
-    ) as writer:
+    with NamedTemporaryFile(mode, buffering, encoding, newline, suffix, prefix, dir, delete) as writer:
         writer.write(content)
         return writer.name
 
@@ -81,9 +77,7 @@ def mkdir_p(path):
         if exc.errno == errno.EEXIST and os.path.isdir(path):
             pass
         else:
-            raise XToolConfigException(
-                "Error creating {}: {}".format(path, exc.strerror)
-            )
+            raise XToolConfigException("Error creating {}: {}".format(path, exc.strerror))
 
 
 def list_py_file_paths(
@@ -125,11 +119,7 @@ def list_py_file_paths(
             # If we can ignore any subdirs entirely we should - fewer paths
             # to walk is better. We have to modify the ``dirs`` array in
             # place for this to affect os.walk
-            dirs[:] = [
-                d
-                for d in dirs
-                if not any(re.search(p, os.path.join(root, d)) for p in patterns)
-            ]
+            dirs[:] = [d for d in dirs if not any(re.search(p, os.path.join(root, d)) for p in patterns)]
 
             # We want patterns defined in a parent folder's .airflowignore to
             # apply to subdirs too
@@ -143,9 +133,7 @@ def list_py_file_paths(
                     if not os.path.isfile(file_path):
                         continue
                     # 验证文件后缀
-                    mod_name, file_extension = os.path.splitext(
-                        os.path.split(file_path)[-1]
-                    )
+                    mod_name, file_extension = os.path.splitext(os.path.split(file_path)[-1])
                     if file_extension != file_ext and not zipfile.is_zipfile(file_path):
                         continue
                     # 验证忽略规则
@@ -159,9 +147,7 @@ def list_py_file_paths(
                     if safe_mode and not zipfile.is_zipfile(file_path):
                         with open(file_path, "rb") as f:
                             content = f.read()
-                            might_contain_dag = all(
-                                [s in content for s in safe_filters]
-                            )
+                            might_contain_dag = all([s in content for s in safe_filters])
 
                     if not might_contain_dag:
                         continue

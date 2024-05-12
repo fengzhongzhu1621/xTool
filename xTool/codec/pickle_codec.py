@@ -1,17 +1,13 @@
-# -*- coding: utf-8 -*-
-
-from typing import Union
 import pickle
+from typing import Union
 
-from xTool.plugin import register_plugin, PluginType
 # from .pickle_codec_c import PickleCodec
 from xTool.misc import tob
+from xTool.plugin import register_plugin, PluginType
 from .base import CodecType
 
 
-@register_plugin(
-    PluginType.CODEC, CodecType.PICKLE
-)
+@register_plugin(PluginType.CODEC, CodecType.PICKLE)
 class PickleCodec:
     @classmethod
     def encode(cls, obj: object) -> bytes:

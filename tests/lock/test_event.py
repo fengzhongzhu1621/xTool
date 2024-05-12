@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
+
 import pytest
+
 from xTool.lock.event import EventResultOrError
 
 

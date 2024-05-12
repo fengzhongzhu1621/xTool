@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 from time import time
 import sys
@@ -96,9 +94,7 @@ class HttpProtocol(asyncio.Protocol):
         self.request_handler = self.app.handle_request
         self.error_handler = self.app.error_handler
         self.request_timeout = self.app.config.REQUEST_TIMEOUT
-        self.request_buffer_queue_size = (
-            self.app.config.REQUEST_BUFFER_QUEUE_SIZE
-        )
+        self.request_buffer_queue_size = self.app.config.REQUEST_BUFFER_QUEUE_SIZE
         self.response_timeout = self.app.config.RESPONSE_TIMEOUT
         self.keep_alive_timeout = self.app.config.KEEP_ALIVE_TIMEOUT
         self.request_max_size = self.app.config.REQUEST_MAX_SIZE
@@ -132,11 +128,7 @@ class HttpProtocol(asyncio.Protocol):
 
         :return: ``True`` if connection is to be kept alive ``False`` else
         """
-        return (
-            self._keep_alive
-            and not self.signal.stopped
-            and self.parser.should_keep_alive()
-        )
+        return self._keep_alive and not self.signal.stopped and self.parser.should_keep_alive()
 
     # -------------------------------------------- #
     # Connection
@@ -146,9 +138,7 @@ class HttpProtocol(asyncio.Protocol):
         """创建连接时执行 ."""
         self.connections.add(self)
         # 设置请求超时处理函数
-        self._request_timeout_handler = self.loop.call_later(
-            self.request_timeout, self.request_timeout_callback
-        )
+        self._request_timeout_handler = self.loop.call_later(self.request_timeout, self.request_timeout_callback)
         self.transport = transport
         # 记录请求时间
         self._last_request_time = time()
@@ -184,9 +174,7 @@ class HttpProtocol(asyncio.Protocol):
         # 没有超时，继续判断
         if time_elapsed < self.request_timeout:
             time_left = self.request_timeout - time_elapsed
-            self._request_timeout_handler = self.loop.call_later(
-                time_left, self.request_timeout_callback
-            )
+            self._request_timeout_handler = self.loop.call_later(time_left, self.request_timeout_callback)
         else:
             # 超时取消流任务
             if self._request_stream_task:
@@ -202,9 +190,7 @@ class HttpProtocol(asyncio.Protocol):
         time_elapsed = time() - self._last_request_time
         if time_elapsed < self.response_timeout:
             time_left = self.response_timeout - time_elapsed
-            self._response_timeout_handler = self.loop.call_later(
-                time_left, self.response_timeout_callback
-            )
+            self._response_timeout_handler = self.loop.call_later(time_left, self.response_timeout_callback)
         else:
             if self._request_stream_task:
                 self._request_stream_task.cancel()
@@ -223,9 +209,7 @@ class HttpProtocol(asyncio.Protocol):
         time_elapsed = time() - self._last_response_time
         if time_elapsed < self.keep_alive_timeout:
             time_left = self.keep_alive_timeout - time_elapsed
-            self._keep_alive_timeout_handler = self.loop.call_later(
-                time_left, self.keep_alive_timeout_callback
-            )
+            self._keep_alive_timeout_handler = self.loop.call_later(time_left, self.keep_alive_timeout_callback)
         else:
             logger.debug("KeepAlive Timeout. Closing connection.")
             # 关闭连接
@@ -275,18 +259,13 @@ class HttpProtocol(asyncio.Protocol):
         self._header_fragment += name
 
         if value is not None:
-            if (
-                self._header_fragment == b"Content-Length"
-                and int(value) > self.request_max_size
-            ):
+            if self._header_fragment == b"Content-Length" and int(value) > self.request_max_size:
                 self.write_error(PayloadTooLarge("Payload Too Large"))
             try:
                 value = value.decode()
             except UnicodeDecodeError:
                 value = value.decode("latin_1")
-            self.headers.append(
-                (self._header_fragment.decode().casefold(), value)
-            )
+            self.headers.append((self._header_fragment.decode().casefold(), value))
 
             self._header_fragment = b""
 
@@ -310,13 +289,9 @@ class HttpProtocol(asyncio.Protocol):
             self.expect_handler()
 
         if self.is_request_stream:
-            self._is_stream_handler = self.app.router.is_stream_handler(
-                self.request
-            )
+            self._is_stream_handler = self.app.router.is_stream_handler(self.request)
             if self._is_stream_handler:
-                self.request.stream = StreamBuffer(
-                    self.request_buffer_queue_size
-                )
+                self.request.stream = StreamBuffer(self.request_buffer_queue_size)
                 self.execute_request_handler()
 
     def expect_handler(self):
@@ -328,9 +303,7 @@ class HttpProtocol(asyncio.Protocol):
             if expect.lower() == "100-continue":
                 self.transport.write(b"HTTP/1.1 100 Continue\r\n\r\n")
             else:
-                self.write_error(
-                    HeaderExpectationFailed(f"Unknown Expect: {expect}")
-                )
+                self.write_error(HeaderExpectationFailed(f"Unknown Expect: {expect}"))
 
     def on_body(self, body):
         """服务器接收到body后，将其存放到请求对象中 ."""
@@ -340,22 +313,13 @@ class HttpProtocol(asyncio.Protocol):
             # 3.7. so we should not create more than one task putting into the
             # queue simultaneously.
             self._body_chunks.append(body)
-            if (
-                not self._request_stream_task
-                or self._request_stream_task.done()
-            ):
-                self._request_stream_task = self.loop.create_task(
-                    self.stream_append()
-                )
+            if not self._request_stream_task or self._request_stream_task.done():
+                self._request_stream_task = self.loop.create_task(self.stream_append())
         else:
             self.request.body_push(body)
 
     async def body_append(self, body):
-        if (
-            self.request is None
-            or self._request_stream_task is None
-            or self._request_stream_task.cancelled()
-        ):
+        if self.request is None or self._request_stream_task is None or self._request_stream_task.cancelled():
             return
 
         if self.request.stream.is_full():
@@ -384,13 +348,8 @@ class HttpProtocol(asyncio.Protocol):
             self._request_timeout_handler = None
         if self.is_request_stream and self._is_stream_handler:
             self._body_chunks.append(None)
-            if (
-                not self._request_stream_task
-                or self._request_stream_task.done()
-            ):
-                self._request_stream_task = self.loop.create_task(
-                    self.stream_append()
-                )
+            if not self._request_stream_task or self._request_stream_task.done():
+                self._request_stream_task = self.loop.create_task(self.stream_append())
             return
         # 服务器收到全部请求后，将完整的body放到请求对象中
         self.request.body_finish()
@@ -404,15 +363,11 @@ class HttpProtocol(asyncio.Protocol):
 
         :return: None
         """
-        self._response_timeout_handler = self.loop.call_later(
-            self.response_timeout, self.response_timeout_callback
-        )
+        self._response_timeout_handler = self.loop.call_later(self.response_timeout, self.response_timeout_callback)
         self._last_request_time = time()
         # 创建执行请求处理器任务
         self._request_handler_task = self.loop.create_task(
-            self.request_handler(
-                self.request, self.write_response, self.stream_response
-            )
+            self.request_handler(self.request, self.write_response, self.stream_response)
         )
 
     # -------------------------------------------- #
@@ -458,16 +413,11 @@ class HttpProtocol(asyncio.Protocol):
             self._response_timeout_handler = None
         try:
             keep_alive = self.keep_alive
-            self.transport.write(
-                response.output(
-                    self.request.version, keep_alive, self.keep_alive_timeout
-                )
-            )
+            self.transport.write(response.output(self.request.version, keep_alive, self.keep_alive_timeout))
             self.log_response(response)
         except AttributeError:
             logger.error(
-                "Invalid response object for url %s, "
-                "Expected Type: HTTPResponse, Actual Type: %s",
+                "Invalid response object for url %s, " "Expected Type: HTTPResponse, Actual Type: %s",
                 self.url,
                 type(response),
             )
@@ -511,14 +461,11 @@ class HttpProtocol(asyncio.Protocol):
         try:
             keep_alive = self.keep_alive
             response.protocol = self
-            await response.stream(
-                self.request.version, keep_alive, self.keep_alive_timeout
-            )
+            await response.stream(self.request.version, keep_alive, self.keep_alive_timeout)
             self.log_response(response)
         except AttributeError:
             logger.error(
-                "Invalid response object for url %s, "
-                "Expected Type: HTTPResponse, Actual Type: %s",
+                "Invalid response object for url %s, " "Expected Type: HTTPResponse, Actual Type: %s",
                 self.url,
                 type(response),
             )
@@ -566,9 +513,7 @@ class HttpProtocol(asyncio.Protocol):
                 from_error=True,
             )
         finally:
-            if self.parser and (
-                self.keep_alive or getattr(response, "status", 0) == 408
-            ):
+            if self.parser and (self.keep_alive or getattr(response, "status", 0) == 408):
                 self.log_response(response)
             try:
                 self.transport.close()
@@ -592,13 +537,8 @@ class HttpProtocol(asyncio.Protocol):
         """
         if from_error or self.transport is None or self.transport.is_closing():
             logger.error(
-                "Transport closed @ %s and exception "
-                "experienced during error handling",
-                (
-                    self.transport.get_extra_info("peername")
-                    if self.transport is not None
-                    else "N/A"
-                ),
+                "Transport closed @ %s and exception " "experienced during error handling",
+                (self.transport.get_extra_info("peername") if self.transport is not None else "N/A"),
             )
             logger.debug("Exception:", exc_info=True)
         else:
@@ -635,4 +575,3 @@ class HttpProtocol(asyncio.Protocol):
         if self.transport is not None:
             self.transport.close()
             self.transport = None
-

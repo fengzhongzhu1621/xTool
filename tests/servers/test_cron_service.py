@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
+
 from xTool.servers.cron import CronService
 
 
 def test_str_representation():
-    class FooCronService(CronService):
-        ...
+    class FooCronService(CronService): ...
 
     svc = FooCronService()
 
