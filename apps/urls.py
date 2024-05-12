@@ -23,9 +23,9 @@ from apps import views
 from apps.core.permissions import SwaggerPermission
 
 info = openapi.Info(
-    title="{{ cookiecutter.app_id }}",
+    title="xTool",
     default_version="v1",
-    description="{{ cookiecutter.app_id }}",
+    description="A Python learning project",
 )
 schema_view = get_schema_view(
     info,
@@ -41,7 +41,8 @@ urlpatterns = [
     path("swagger/", schema_view.with_ui(cache_timeout=0), name="schema-swagger-ui"),
     path("i18n/", include("django.conf.urls.i18n")),
     path("api_root", views.api_root),
-    path("quickstart/", include("apps.quickstart.urls")),
-    path("snippets/", include("apps.snippets.urls")),
+    # path("quickstart/", include("apps.quickstart.urls")),
+    # path("snippets/", include("apps.snippets.urls")),
+    path("global_conf/", include("apps.global_conf.urls")),
     path("", include("apps.entry.urls")),
 ]

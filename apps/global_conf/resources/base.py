@@ -1,0 +1,2 @@
+class Meta:
+    tags = ["Meta"]

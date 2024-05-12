@@ -30,7 +30,7 @@ INSTALLED_APPS = (
     "version_log",
     "blueapps.opentelemetry.instrument_app",
     "apps.core.drf_resource",
-    "apigw_manager.apigw",
+    # "apigw_manager.apigw",
     # bamboo-pipeline
     # "pipeline",
     # "pipeline.django_signal_valve",
@@ -43,8 +43,8 @@ INSTALLED_APPS = (
     # 业务逻辑
     "apps.backend",
     "apps.entry",
-    "apps.quickstart",
-    "apps.snippets",
+    # "apps.quickstart",
+    # "apps.snippets",
     "apps.custom_plugins",
     "apps.credential",
     "apps.global_conf",

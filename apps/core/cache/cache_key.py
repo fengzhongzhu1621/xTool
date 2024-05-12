@@ -3,9 +3,8 @@ from typing import Any, Union
 
 import orjson as json
 from django.core.cache import cache
-
+from xTool.misc import count_md5
 from apps.core.constants import TimeEnum
-from xTool.misc import md5 as md5_sum
 
 
 class CacheKey(abc.ABC):
@@ -24,7 +23,7 @@ class CacheKey(abc.ABC):
         except (IndexError, KeyError):
             actual_key = self.key_template
         if self.need_md5:
-            actual_key = md5_sum(actual_key)
+            actual_key = count_md5(actual_key)
 
         return actual_key
 
