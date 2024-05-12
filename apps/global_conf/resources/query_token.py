@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from bk_resource import Resource
 from django.utils.translation import gettext_lazy as _lazy
 
 from apps.core.cache import CacheKey
 from apps.core.constants import TimeEnum
 from apps.global_conf.serializers import GenerateQueryTokenSerializer, GetQueryDataSerializer
 from xTool.misc import count_md5
-from .base import Meta
+from .base import GlobalConfBaseResource
 
 
 class CacheGenerateToken(CacheKey):
     key_template = "generate_request_token:{token}"
 
 
-class GenerateQueryTokenResource(Meta, Resource):
+class GenerateQueryTokenResource(GlobalConfBaseResource):
     name = _lazy("创建请求参数的 token")
     RequestSerializer = GenerateQueryTokenSerializer
 
@@ -30,7 +29,7 @@ class GenerateQueryTokenResource(Meta, Resource):
         return {"query_token": token}
 
 
-class GetQueryDataResource(Meta, Resource):
+class GetQueryDataResource(GlobalConfBaseResource):
     name = _lazy("通过query_token获取请求数据")
     RequestSerializer = GetQueryDataSerializer
 

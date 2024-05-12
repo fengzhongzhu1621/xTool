@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import enum
+from typing import Callable
 
 __all__ = [
+    "ChoicesMeta",
     "Choices",
     "IntegerChoices",
     "TextChoices",
@@ -18,11 +20,7 @@ class ChoicesMeta(enum.EnumMeta):
         labels = []
         for key in classdict._member_names:
             value = classdict[key]
-            if (
-                isinstance(value, (list, tuple))
-                and len(value) > 1
-                and isinstance(value[-1], str)
-            ):
+            if isinstance(value, (list, tuple)) and len(value) > 1 and isinstance(value[-1], str):
                 *value, label = value
                 value = tuple(value)
             else:
@@ -93,7 +91,7 @@ class TextChoices(str, Choices):
 _default = {}
 
 
-def register_choices(name):
+def register_choices(name: str) -> Callable:
     """
     注册choices类型的配置
     """
