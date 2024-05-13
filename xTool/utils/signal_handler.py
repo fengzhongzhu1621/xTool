@@ -8,7 +8,7 @@ from six import iteritems
 
 def sigint_handler(sig, frame):
     """符合POSIX平台，信号情报是由它的控制终端，
-    当用户希望中断该过程发送到处理的信号。通常ctrl-C，但在某些系统上，“删除”字符或“break”键 - 当进程的控制终端的用户按下中断正在运行的进程的关键SIGINT被发送。 """
+    当用户希望中断该过程发送到处理的信号。通常ctrl-C，但在某些系统上，“删除”字符或“break”键 - 当进程的控制终端的用户按下中断正在运行的进程的关键SIGINT被发送。"""
     sys.exit(0)
 
 
@@ -27,11 +27,9 @@ def sigquit_handler(sig, frame):
     code = []
     # 获得线程栈
     for thread_id, stack in iteritems(sys._current_frames()):
-        code.append("\n# Thread: {}({})"
-                    .format(id_to_name.get(thread_id, ""), thread_id))
+        code.append("\n# Thread: {}({})".format(id_to_name.get(thread_id, ""), thread_id))
         for filename, line_number, name, line in traceback.extract_stack(stack):
-            code.append('File: "{}", line {}, in {}'
-                        .format(filename, line_number, name))
+            code.append('File: "{}", line {}, in {}'.format(filename, line_number, name))
             if line:
                 code.append("  {}".format(line.strip()))
     print("\n".join(code))
