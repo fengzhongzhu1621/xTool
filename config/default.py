@@ -1,5 +1,4 @@
 # pylint: disable=wildcard-import
-import sys
 
 from blueapps.conf.default_settings import *  # noqa
 from blueapps.conf.log import get_logging_config_dict
@@ -150,15 +149,20 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # noqa
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "apps.core.utils.exception.custom_exception_handler",
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "apps.core.pagination.CustomPageNumberWithColumnPagination",
     "PAGE_SIZE": 10,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.SessionAuthentication",),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
     "NON_FIELD_ERRORS_KEY": "params_error",
-    "DEFAULT_PARSER_CLASSES": ("rest_framework.parsers.JSONParser",),
+    "DEFAULT_PARSER_CLASSES": (
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.MultiPartParser",
+    ),
+    "DEFAULT_RENDERER_CLASSES": ("apps.core.utils.renderers.APIRenderer",),
     # 版本管理
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
     "DEFAULT_VERSION": "v1",
@@ -197,7 +201,6 @@ BK_BK_RESOURCE_LOG_ENABLED = strtobool(os.getenv("BKAPP_BK_RESOURCE_LOG_ENABLED"
 if BK_BK_RESOURCE_LOG_ENABLED:
     LOGGING["loggers"]["bk_resource"] = LOGGING["loggers"]["app"]
     LOGGING["loggers"]["iam"] = LOGGING["loggers"]["app"]
-sys.path.append(os.path.join(BASE_DIR, "apps"))
 
 # CORS
 SESSION_COOKIE_DOMAIN = os.getenv("BKAPP_SESSION_COOKIE_DOMAIN")
