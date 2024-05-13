@@ -3,7 +3,7 @@ from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _lazy
 
-from xTool.constants import LEN_MIDDLE, LEN_SHORT
+from apps.core.constants import LEN_MIDDLE, LEN_SHORT
 
 
 class DataManager(models.Manager):

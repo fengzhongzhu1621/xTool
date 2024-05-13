@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from bk_resource.routers import ResourceRouter
 from django.contrib import admin
 from django.urls import path, include
 from drf_yasg import openapi
@@ -21,6 +22,8 @@ from drf_yasg.views import get_schema_view
 
 from apps import views
 from apps.core.permissions import SwaggerPermission
+from apps.entry import views as EntryViews
+from apps.version import views as VersionViews
 
 info = openapi.Info(
     title="xTool",
@@ -33,6 +36,10 @@ schema_view = get_schema_view(
     permission_classes=(SwaggerPermission,),
 )
 
+base_router = ResourceRouter()
+base_router.register_module(VersionViews)
+base_router.register_module(EntryViews)
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     # path("account/", include("blueapps.account.urls")),
@@ -44,5 +51,5 @@ urlpatterns = [
     # path("quickstart/", include("apps.quickstart.urls")),
     # path("snippets/", include("apps.snippets.urls")),
     path("global_conf/", include("apps.global_conf.urls")),
-    path("", include("apps.entry.urls")),
+    path("", include(base_router.urls)),
 ]
