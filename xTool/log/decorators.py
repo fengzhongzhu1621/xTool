@@ -1,8 +1,22 @@
 import inspect
 import time
+import traceback
 from functools import wraps
 
 from xTool.log import logger
+
+try:
+    from raven.contrib.django.raven_compat.models import sentry_exception_handler
+except ImportError:
+    sentry_exception_handler = None
+
+
+def notify_sentry(func_name: str, log_enabled: bool = True):
+    """通知 sentry"""
+    if log_enabled:
+        logger.error(f"[{func_name}] execute error: {traceback.format_exc()}")
+    if sentry_exception_handler is not None:
+        sentry_exception_handler(request=None)
 
 
 def log(f):
@@ -19,9 +33,7 @@ def log(f):
             except IndexError:
                 pass
 
-        params.extend(
-            [f"args{index}={value}" for index, value in enumerate(args[len(params) :])]
-        )
+        params.extend([f"args{index}={value}" for index, value in enumerate(args[len(params) :])])
 
         d = kwargs.copy()
         # arg_spec.kwonlyargs = ["d", "e"]
@@ -41,13 +53,17 @@ def log(f):
         begin_time = time.time()
         try:
             logger.info(f"[{f.__name__}] execute begin: {', '.join(params)}")
-            result = f(*args, **kwargs)
+            try:
+                result = f(*args, **kwargs)
+                return result
+            except Exception:  # pylint: disable=broad-except
+                notify_sentry(f.__name__)
+                raise
+
         finally:
             end_time = time.time()
             cost = end_time - begin_time
-            logger.info(
-                f"[{f.__name__}] execute end: {', '.join(params)}, cost is {cost}"
-            )
+            logger.info(f"[{f.__name__}] execute end: {', '.join(params)}, cost is {cost}")
 
         return result
 

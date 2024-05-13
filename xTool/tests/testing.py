@@ -17,8 +17,7 @@ from typing import (  # noqa
 )
 
 import httpx
-import jsondiff
-import ujson as json
+import orjson as json
 import websockets
 
 from xTool.exceptions import MethodNotSupported
@@ -42,49 +41,6 @@ def format_serializer_data(serializer_data):
 def assert_equal(actual, expect):
     actual = format_serializer_data(actual)
     assert actual == expect
-
-
-def assert_dict_contains(data: dict, expect: dict, key: str = None):
-    """测试字典部分相等 ."""
-    if not expect:
-        try:
-            assert data == expect
-        except (AssertionError, AttributeError):
-            jsondiff.diff(data, expect, syntax="explicit", dump=True)
-            raise
-    for key, value in expect.items():
-        if isinstance(value, dict):
-            assert_dict_contains(data.get(key), value, key)
-        elif isinstance(value, list):
-            assert_list_contains(data.get(key), value, key)
-        else:
-            try:
-                assert data.get(key) == value
-            except (AssertionError, AttributeError):
-                jsondiff.diff(data, value, syntax="explicit", dump=True)
-                raise
-
-
-def assert_list_contains(data: list, expect: list, index: str = None):
-    """测试数组是部分相等 ."""
-    if not expect:
-        try:
-            assert data == expect
-        except (AssertionError, AttributeError):
-            jsondiff.diff(data, expect, syntax="explicit", dump=True)
-            raise
-    assert len(data) == len(expect)
-    for index, value in enumerate(expect):
-        if isinstance(value, dict):
-            assert_dict_contains(data[index], value)
-        elif isinstance(value, list):
-            assert_list_contains(data[index], value, index)
-        else:
-            try:
-                assert data[index] == value
-            except AssertionError:
-                jsondiff.diff(data, value, syntax="explicit", dump=True)
-                raise
 
 
 class SanicTestClient:

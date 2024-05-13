@@ -1,20 +1,38 @@
 import json
 import logging
 from json.decoder import JSONDecodeError
+from typing import Dict
 
+from bk_resource.exceptions import CoreException
 from blueapps.core.exceptions import BlueException
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import force_str
-from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
-
-from apps.core.constants import ErrorCode
-from iam.contrib.http import HTTP_AUTH_FORBIDDEN_CODE
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
+
+try:
+    from raven.contrib.django.raven_compat.models import sentry_exception_handler
+except ImportError:
+    sentry_exception_handler = None
+
+from apps.core.constants import ErrorCode
 from xTool.log import logger
+
+
+def notify_sentry(request: Request, response: Response, data: Dict, exc: Exception):
+    """通知 sentry"""
+    if response.status_code != status.HTTP_500_INTERNAL_SERVER_ERROR:
+        return
+    if isinstance(exc, (BlueException, CoreException, ValidationError)):
+        return
+    # notify sentry
+    if settings.RUN_MODE in ["PRODUCT", "STAGING"] and sentry_exception_handler is not None:
+        sentry_exception_handler(request=request)
 
 
 def custom_exception_handler(exc, context):
@@ -49,9 +67,7 @@ def custom_exception_handler(exc, context):
 
     # 如果是权限异常，返回403
     error_code = exc.code if isinstance(exc, AppException) else status.HTTP_500_INTERNAL_SERVER_ERROR
-    status_code = (
-        status.HTTP_403_FORBIDDEN if isinstance(exc, PermissionDeniedError) else status.HTTP_500_INTERNAL_SERVER_ERROR
-    )
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # 由前端处理无权限调整
     if exc_data and isinstance(exc_data, dict):
@@ -94,37 +110,37 @@ class ValidationError(BlueException):
 
 
 class ApiResultError(ApiError):
-    MESSAGE = _("远程服务请求结果异常")
+    MESSAGE = _lazy("远程服务请求结果异常")
     ERROR_CODE = "002"
 
 
 class ComponentCallError(BlueException):
-    MESSAGE = _("组件调用异常")
+    MESSAGE = _lazy("组件调用异常")
     ERROR_CODE = "003"
 
 
 class LocalError(BlueException):
-    MESSAGE = _("组件调用异常")
+    MESSAGE = _lazy("组件调用异常")
     ERROR_CODE = "004"
 
 
 class LanguageDoseNotSupported(BlueException):
-    MESSAGE = _("语言不支持")
+    MESSAGE = _lazy("语言不支持")
     ERROR_CODE = "005"
 
 
 class InstanceNotFound(BlueException):
-    MESSAGE = _("资源实例获取失败")
+    MESSAGE = _lazy("资源实例获取失败")
     ERROR_CODE = "006"
 
 
 class PermissionError(BlueException):
-    MESSAGE = _("权限不足")
+    MESSAGE = _lazy("权限不足")
     ERROR_CODE = "403"
 
 
 class ApiRequestError(ApiError):
-    MESSAGE = _("服务不稳定，请检查组件健康状况")
+    MESSAGE = _lazy("服务不稳定，请检查组件健康状况")
     ERROR_CODE = "015"
 
 
@@ -190,18 +206,3 @@ class BaseIAMError(CoreException):
 
     MODULE_CODE = 99  # 蓝鲸体系通用服务错误码
     MESSAGE = _lazy("权限中心异常")
-
-
-class PermissionDeniedError(BaseIAMError):
-    """权限校验不通过 ."""
-
-    ERROR_CODE = "403"
-    MESSAGE = _lazy("权限校验不通过")
-
-    def __init__(self, action_name, permission, apply_url=settings.BK_IAM_SAAS_HOST):
-        message = _("当前用户无 [{action_name}] 权限").format(action_name=action_name)
-        data = {
-            "permission": permission,
-            "apply_url": apply_url,
-        }
-        super().__init__(message, data=data, code=HTTP_AUTH_FORBIDDEN_CODE)

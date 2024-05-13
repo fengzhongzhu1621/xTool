@@ -149,9 +149,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # noqa
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "apps.core.utils.exception.custom_exception_handler",
+    "EXCEPTION_HANDLER": "apps.core.exception.custom_exception_handler",
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_PAGINATION_CLASS": "apps.core.pagination.CustomPageNumberWithColumnPagination",
+    "DEFAULT_PAGINATION_CLASS": "apps.core.drf.pagination.CustomPageNumberWithColumnPagination",
     "PAGE_SIZE": 10,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.SessionAuthentication",),
@@ -162,7 +162,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.MultiPartParser",
     ),
-    "DEFAULT_RENDERER_CLASSES": ("apps.core.utils.renderers.APIRenderer",),
+    "DEFAULT_RENDERER_CLASSES": ("apps.core.drf.renderers.APIRenderer",),
     # 版本管理
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
     "DEFAULT_VERSION": "v1",

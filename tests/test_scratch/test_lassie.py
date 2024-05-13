@@ -11,14 +11,13 @@ lassie 从网页中智能提取关键信息
 
 import lassie
 
-from xTool.tests.testing import assert_dict_contains
 
 url = "https://www.baidu.com"
 
 
 def test_fetch_title():
     actual = lassie.fetch(url)
-    expect = {
+    expecxt = {
         "description": "全球领先的中文搜索引擎、致力于让网民更便捷地获取信息，找到所求。百度超过千亿的中文网页数据库，可以瞬间找到相关的搜索结果。",
         "images": [
             {"src": "https://www.baidu.com/favicon.ico", "type": "favicon"},
@@ -30,4 +29,9 @@ def test_fetch_title():
         "videos": [],
     }
 
-    assert_dict_contains(actual, expect)
+    assert actual["description"] == expecxt["description"]
+    assert actual["images"] == expecxt["images"]
+    assert actual["status_code"] == expecxt["status_code"]
+    assert actual["title"] == expecxt["title"]
+    assert actual["url"] == expecxt["url"]
+    assert actual["videos"] == expecxt["videos"]

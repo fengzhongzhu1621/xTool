@@ -6,8 +6,8 @@ from mako import codegen, lexer
 from mako.exceptions import MakoException
 from mako.template import Template as MakoTemplate
 
-from apps.core.templates.exceptions import ForbiddenMakoTemplateException
 from xTool.log import logger
+from xTool.templates.exceptions import ForbiddenMakoTemplateException
 
 __all__ = [
     "Template",
@@ -89,9 +89,7 @@ class Template:
         try:
             node = lex.parse()
         except MakoException as ex:
-            logger.warning(
-                "pipeline get template[{}] reference error[{}]".format(template, ex)
-            )
+            logger.warning("pipeline get template[{}] reference error[{}]".format(template, ex))
             return []
 
         # Dummy compiler. _Identifiers class requires one
@@ -104,9 +102,7 @@ class Template:
 
         return list(identifiers.undeclared)
 
-    def _render_string(
-        self, string: str, context: dict, raise_error: bool = False
-    ) -> Any:
+    def _render_string(self, string: str, context: dict, raise_error: bool = False) -> Any:
         """使用参数的值填充模版字符串 .
 
         Examples:
@@ -127,11 +123,7 @@ class Template:
 
         # TODO keep render return object, here only process simple situation
         # 如果模版字符串只有一个单参数，即格式为 string为 ${a}，这种情况可能返回一个非字符串对象
-        if (
-            len(templates) == 1
-            and templates[0] == string
-            and deformat_var_key(string) in context
-        ):
+        if len(templates) == 1 and templates[0] == string and deformat_var_key(string) in context:
             return context[deformat_var_key(string)]
 
         for tpl in templates:
@@ -139,24 +131,18 @@ class Template:
                 try:
                     self.template_validator(tpl)
                 except ForbiddenMakoTemplateException as exec_info:
-                    logger.error(
-                        "forbidden template: {}, exception: {}".format(tpl, exec_info)
-                    )
+                    logger.error("forbidden template: {}, exception: {}".format(tpl, exec_info))
                     raise
                 except Exception:  # pylint: disable=broad-except
                     logger.exception("{} safety check error.".format(tpl))
                     raise
-            resolved = self.__class__._render_template(
-                tpl, context, raise_error=raise_error
-            )
+            resolved = self.__class__._render_template(tpl, context, raise_error=raise_error)
             # 将模版字符串中的${xxx}，替换为真实的值
             string = string.replace(tpl, resolved)
         return string
 
     @classmethod
-    def _render_template(
-        cls, template: str, context: dict, raise_error: bool = False
-    ) -> str:
+    def _render_template(cls, template: str, context: dict, raise_error: bool = False) -> str:
         """
         使用特定上下文渲染指定模板
 
@@ -182,9 +168,7 @@ class Template:
         data = {}
         data.update(context)
         if not isinstance(template, str):
-            raise TypeError(
-                "constant resolve error, template[%s] is not a string" % template
-            )
+            raise TypeError("constant resolve error, template[%s] is not a string" % template)
         try:
             # 添加允许的第三方库，注意库的安全性问题
             template_obj = MakoTemplate(template)
@@ -201,9 +185,7 @@ class Template:
             TypeError,
             KeyError,
         ) as exc_info:  # pylint: disable=broad-except
-            err_message = "constant content({}) is invalid, error: {}".format(
-                template, exc_info
-            )
+            err_message = "constant content({}) is invalid, error: {}".format(template, exc_info)
             logger.warning(err_message)
             if raise_error:
                 raise MakoException(err_message)

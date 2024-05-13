@@ -13,6 +13,7 @@ from django.db.models import TextChoices
 from django.db.models.lookups import Exact
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from rest_framework.settings import api_settings
 
 from apps.core.constants import LEN_NORMAL
 
@@ -285,6 +286,34 @@ class MultiStrSplitCharField(models.CharField, MultiStrSplitFieldMixin):
     def get_prep_value(self, value):
         """Perform preliminary non-db specific value checks and conversions."""
         return super().write_to_db(value)
+
+
+class ModelResourceMixin:
+    # 使用默认的分页器
+    view_set_attrs = {"pagination_class": api_settings.DEFAULT_PAGINATION_CLASS, "ordering_fields": ["created_at"]}
+    serializer_free_actions = ["list", "retrieve"]
+    ignore_request_serializer = True
+    origin_data = None
+    request_data = None
+    audit_info = None
+
+    def validate_request_data(self, request_data):
+        """
+        去掉 RequestSerializer校验，仅用于生成swagger
+        """
+        # 禁止drf_resources和bk_resource模块的双重验证
+        if self.serializer_class:
+            try:
+                if (
+                    self.ignore_request_serializer
+                    and hasattr(self, "action")
+                    and self.action not in self.serializer_free_actions
+                ):
+                    self._request_serializer = None
+                    return request_data
+            except NotImplementedError:
+                pass
+        return super().validate_request_data(request_data)
 
 
 class OptionType(TextChoices):
