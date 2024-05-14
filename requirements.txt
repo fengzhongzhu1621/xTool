@@ -101,4 +101,4 @@ python-magic
 xpinyin
 lassie
 html5lib==1.1
-
+PyJWT
