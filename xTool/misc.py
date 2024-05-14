@@ -15,7 +15,9 @@ import random
 import subprocess
 import traceback
 import warnings
+from contextlib import contextmanager
 from datetime import datetime, date
+import logging
 
 try:
     from StringIO import StringIO
@@ -852,3 +854,19 @@ def sorted_join(items: [Tuple, List], sep: str = ",") -> str:
         return ""
     result = sorted(list(set(items)))
     return sep.join(result)
+
+
+@contextmanager
+def ignored(*exceptions, **kwargs):
+    """
+    在忽略某异常下执行
+    example:
+        with ignored(Exception):
+            # 不会抛出异常
+            print(1/0)
+    """
+    try:
+        yield
+    except exceptions:
+        if kwargs.get("log_exception", True):
+            logging.warning(traceback.format_exc())
