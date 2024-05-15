@@ -11,13 +11,13 @@ import inspect
 import io
 import itertools
 import json
+import logging
 import random
 import subprocess
 import traceback
 import warnings
 from contextlib import contextmanager
 from datetime import datetime, date
-import logging
 
 try:
     from StringIO import StringIO
@@ -870,3 +870,10 @@ def ignored(*exceptions, **kwargs):
     except exceptions:
         if kwargs.get("log_exception", True):
             logging.warning(traceback.format_exc())
+
+
+def append_sep(value: str, sep="/") -> str:
+    """在字符串中添加前后缀 ."""
+    if not value:
+        return ""
+    return f"{sep}{value.strip(sep)}{sep}"

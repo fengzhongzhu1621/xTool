@@ -1,6 +1,8 @@
 import os
 import sys
 
+__all__ = ["is_backend"]
+
 
 def is_backend() -> bool:
     """判断进程是否是后台运行的 ."""

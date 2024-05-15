@@ -2,6 +2,10 @@ from typing import List
 
 from django.db.models.query import QuerySet
 
+__all__ = [
+    "custom_sort_order",
+]
+
 
 def custom_sort_order(
     queryset: QuerySet,

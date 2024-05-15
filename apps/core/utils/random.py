@@ -7,6 +7,10 @@ from django.conf import settings
 
 from apps.backend.data.api import exists, incr_expireat
 
+__all__ = [
+    "generate_random_sequence",
+]
+
 
 def generate_random_sequence(key: str, prefix: str = "", pad: int = 6) -> str:
     """生成随机串 ."""
