@@ -57,6 +57,7 @@ LOGGING_CONFIG_DEFAULTS = dict(
 logger = logging.getLogger("xTool.root")
 error_logger = logging.getLogger("xTool.error")
 access_logger = logging.getLogger("xTool.access")
+logger_celery = logging.getLogger("celery")
 
 
 def reset_logging():
