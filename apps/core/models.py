@@ -288,6 +288,27 @@ class MultiStrSplitCharField(models.CharField, MultiStrSplitFieldMixin):
         return super().write_to_db(value)
 
 
+class MultiStrSplitTextField(models.TextField, MultiStrSplitFieldMixin):
+    """
+    ORM Text字符串列表字段
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.sub_type = kwargs.get("sub_type") or str
+        kwargs.pop("sub_type", "")
+        super().__init__(*args, **kwargs)
+
+    def from_db_value(self, value, expression, connection):
+        """
+        从DB读取 与MultiStrSplitFieldMixin一致
+        """
+        return super().read_from_db(value, expression, connection)
+
+    def get_prep_value(self, value):
+        """Perform preliminary non-db specific value checks and conversions."""
+        return super().write_to_db(value)
+
+
 class ModelResourceMixin:
     # 使用默认的分页器
     view_set_attrs = {"pagination_class": api_settings.DEFAULT_PAGINATION_CLASS, "ordering_fields": ["created_at"]}

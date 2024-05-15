@@ -4,7 +4,6 @@ from typing import Dict
 import orjson as json
 from bk_resource.exceptions import ValidateException
 from blueapps.contrib.drf.utils.serializer_fields import CustomDateTimeField
-from blueapps.utils.db import MultiStrSplitTextField
 from django.db import models
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
@@ -17,7 +16,7 @@ from rest_framework.settings import api_settings
 from rest_framework.utils import model_meta
 
 from apps.core.exceptions import ParamValidationError
-from apps.core.models import MultiStrSplitCharField
+from apps.core.models import MultiStrSplitCharField, MultiStrSplitTextField
 
 
 class FilterConditionSerializer(serializers.Serializer):
