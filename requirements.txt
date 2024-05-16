@@ -1,6 +1,7 @@
 blueapps
 bk-resource
 
+pyparsing==2.4.7
 numpy
 psutil
 future
@@ -72,6 +73,7 @@ protobuf==3.19.5
 opentelemetry-api==1.11.1
 opentelemetry-sdk==1.11.1
 opentelemetry-exporter-otlp==1.11.1
+opentelemetry-exporter-otlp-proto-common==1.24.0
 opentelemetry-exporter-jaeger==1.11.1
 opentelemetry-instrumentation==0.30b1
 opentelemetry-instrumentation-django==0.30b1
@@ -80,25 +82,26 @@ opentelemetry-instrumentation-redis==0.30b1
 opentelemetry-instrumentation-requests==0.30b1
 opentelemetry-instrumentation-celery==0.30b1
 opentelemetry-instrumentation-logging==0.30b1
+opentelemetry-instrumentation-elasticsearch==0.30b1
 django-prometheus==2.2.0
 
-lark
-pydot
-graphviz
-pydotplus
-pyinstrument
+lark==1.1.9
+pydot==2.0.0
+graphviz==0.20.3
+pydotplus==2.0.2
+pyinstrument==4.6.2
 JSON-log-formatter==1.0
 ujson==5.9.0
-orjson
+orjson==3.10.3
 
 #bamboo-pipeline==3.29.2
-bk-iam
+bk-iam==1.3.6
 
 
-shortuuid
-pypinyin
-python-magic
-xpinyin
-lassie
-html5lib==1.1
-PyJWT
+shortuuid==1.0.13
+pypinyin==0.51.0
+python-magic==0.4.27
+xpinyin==0.7.6
+lassie==0.11.11
+html5lib==1.0b10
+PyJWT==2.8.0

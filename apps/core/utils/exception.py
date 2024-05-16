@@ -4,7 +4,6 @@ import json
 from json.decoder import JSONDecodeError
 from typing import Dict
 
-from bk_resource.exceptions import CoreException
 from blueapps.core.exceptions import BlueException
 from django.conf import settings
 from rest_framework import status
@@ -19,6 +18,7 @@ except ImportError:
     sentry_exception_handler = None
 from apps.core.constants import ErrorCode
 from apps.core.exceptions import PermissionDeniedError
+from apps.core.exceptions import CoreException
 
 
 def notify_sentry(request: Request, response: Response, data: Dict, exc: Exception):

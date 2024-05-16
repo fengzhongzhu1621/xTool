@@ -52,7 +52,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
-    # request instance provider
+    # 将请求对象注入到线程变量，方便根据 get_request() 方法获取
     "blueapps.middleware.request_provider.RequestProvider",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
