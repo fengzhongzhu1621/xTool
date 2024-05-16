@@ -53,7 +53,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE = (
     # 将请求对象注入到线程变量，方便根据 get_request() 方法获取
-    "blueapps.middleware.request_provider.RequestProvider",
+    "apps.core.middleware.RequestProvider",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -67,7 +67,7 @@ MIDDLEWARE = (
     # "blueapps.account.middlewares.WeixinLoginRequiredMiddleware",
     # "blueapps.account.middlewares.LoginRequiredMiddleware",
     # exception middleware
-    "blueapps.core.exceptions.middleware.AppExceptionMiddleware",
+    "apps.core.middleware.AppExceptionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     # "apigw_manager.apigw.authentication.ApiGatewayJWTGenericMiddleware",  # JWT 认证
     # "apigw_manager.apigw.authentication.ApiGatewayJWTAppMiddleware",  # JWT 透传的应用信息
