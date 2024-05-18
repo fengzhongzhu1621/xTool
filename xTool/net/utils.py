@@ -1,9 +1,7 @@
-import importlib
 import ipaddress
 import socket
 import struct
 from typing import List, Tuple
-from urllib.parse import urlparse, parse_qsl, unquote, urlunparse, urlencode
 
 import netifaces
 
@@ -11,77 +9,6 @@ from xTool.exceptions import PortInvalidError
 from xTool.misc import tob, OS_IS_WINDOWS
 
 DEFAULT_BACKLOG = 1500
-
-
-def get_hostname(callable_path=None) -> str:
-    """获得主机名 ."""
-    if not callable_path:
-        return socket.getfqdn()
-
-    # Since we have a callable path, we try to import and run it next.
-    # 根据配置文件中的设置的回调函数 module_path:attr_name 获取主机名
-    # 加载指定模块，获得模块定义的主机属性名
-    module_path, attr_name = callable_path.split(":")
-    module = importlib.import_module(module_path)
-    func = getattr(module, attr_name)
-    # 执行属性方法返回结果
-    return func()
-
-
-def parse_netloc_to_hostname(uri_parts):
-    """获得urlparse解析后的主机名
-    Python automatically converts all letters to lowercase in hostname
-    See: https://issues.apache.org/jira/browse/AIRFLOW-3615
-    """
-    hostname = unquote(uri_parts.hostname or "")
-    if "/" in hostname:
-        hostname = uri_parts.netloc
-        if "@" in hostname:
-            hostname = hostname.rsplit("@", 1)[1]
-        if ":" in hostname:
-            hostname = hostname.split(":", 1)[0]
-        hostname = unquote(hostname)
-    return hostname
-
-
-def url_concat(url, args):
-    """Concatenate url and arguments regardless of whether
-    url has existing query parameters.
-
-    ``args`` may be either a dictionary or a list of key-value pairs
-    the latter allows for multiple values with the same key.
-
-    >>> url_concat("http://example.com/foo", dict(c="d"))
-    'http://example.com/foo?c=d'
-    >>> url_concat("http://example.com/foo?a=b", dict(c="d"))
-    'http://example.com/foo?a=b&c=d'
-    >>> url_concat("http://example.com/foo?a=b", [("c", "d"), ("c", "d2")])
-    'http://example.com/foo?a=b&c=d&c=d2'
-    """
-    if args is None:
-        return url
-    parsed_url = urlparse(url)
-    if isinstance(args, dict):
-        parsed_query = parse_qsl(parsed_url.query, keep_blank_values=True)
-        parsed_query.extend(args.items())
-    elif isinstance(args, list) or isinstance(args, tuple):
-        parsed_query = parse_qsl(parsed_url.query, keep_blank_values=True)
-        parsed_query.extend(args)
-    else:
-        err = "'args' parameter should be dict, list or tuple. Not {0}".format(type(args))
-        raise TypeError(err)
-    final_query = urlencode(parsed_query)
-    url = urlunparse(
-        (
-            parsed_url[0],
-            parsed_url[1],
-            parsed_url[2],
-            parsed_url[3],
-            final_query,
-            parsed_url[5],
-        )
-    )
-    return url
 
 
 def get_local_host_ip(ifname=b"eth1", ip: str = None, port: int = None) -> str:
@@ -367,12 +294,6 @@ def new_socketpair():
         # 参数3（protocol）：表示类型，只能为0
         socket_pair = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM, 0)
     return socket_pair
-
-
-def format_host(host: str) -> str:
-    """格式化主机名 ."""
-    host = host.strip("/").split("//")[-1].split(":")[0]
-    return host
 
 
 def format_port(port: str) -> str:

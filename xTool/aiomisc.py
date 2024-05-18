@@ -22,7 +22,7 @@ from typing import (  # noqa
 
 from math import ceil
 
-from xTool.utils.net import is_ipv6
+from xTool.net.utils import is_ipv6
 
 UVLOOP_INSTALLED = False
 

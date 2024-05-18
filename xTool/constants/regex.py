@@ -36,3 +36,5 @@ REGEX_FOR_KEY = re.compile("^(?!_)(?!.*?_$)[A-Za-z0-9_]+$")
 
 RE_MOBILE = re.compile(r"Mobile|Android|iPhone|iPad|iPod", re.IGNORECASE)
 RE_WECHAT = re.compile(r"MicroMessenger", re.IGNORECASE)
+
+RE_HOST = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
