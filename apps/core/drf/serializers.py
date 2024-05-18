@@ -35,7 +35,7 @@ class GeneralSerializer(DrfModelSerializer):
         self.serializer_field_mapping[models.DateTimeField] = CustomDateTimeField
         self.serializer_field_mapping[MultiStrSplitCharField] = serializers.ListField
         self.serializer_field_mapping[MultiStrSplitTextField] = serializers.ListField
-        super(GeneralSerializer, self).__init__(instance=instance, data=data, **kwargs)
+        super().__init__(instance=instance, data=data, **kwargs)
 
     def is_valid(self, raise_exception=False):
         """
@@ -124,6 +124,54 @@ class ModelSerializer(GeneralSerializer):
             raise
 
         return not bool(self._errors)
+
+
+class PageSerializer(serializers.Serializer):
+    """
+    分页序列化器
+    """
+
+    page = serializers.IntegerField(help_text=_lazy("页数"))
+    page_size = serializers.IntegerField(help_text=_lazy("每页数量"))
+
+
+class SearchSerializer(serializers.Serializer):
+    """
+    关键字序列化器
+    """
+
+    search = serializers.CharField(help_text=_lazy("模糊查找，多个查找关键字以`,`分隔"), required=False)
+
+
+class PostFilterSerializer(serializers.Serializer):
+    """
+    ORM condition查询序列化器
+    example:
+    {
+        "conditions": [
+            {
+                "fields": ["name"],
+                "operator": "in",
+                "values": ["user1", "user2"]
+            }
+        ]
+    }
+    """
+
+    class ConditionSerializer(serializers.Serializer):
+        """
+        单个查询条件序列化器
+        """
+
+        fields = serializers.ListField(help_text=_lazy("查询目标字段列表"), child=serializers.CharField(), min_length=1)
+        operator = serializers.CharField(
+            help_text=_lazy("查询类型，可选：`in` `contains` `range` `gt(lt)` `gte(lte)...")
+        )
+        values = serializers.ListField(help_text=_lazy("查询目标值列表"), min_length=1)
+
+    conditions = serializers.ListField(
+        help_text=_lazy("查询条件"), child=ConditionSerializer(), required=False, default=[]
+    )
 
 
 def format_serializer_errors(  # pylint: disable=too-many-locals,too-many-branches
