@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from statsd import StatsClient
 
-from xTool.metrics.stats import SafeStatsdLogger, get_stats_logger, StatsParamConfig
+from xTool.opentelemetry.metrics.stats import SafeStatsdLogger, get_stats_logger, StatsParamConfig
 
 
 class TestSafeStatsdLogger(TestCase):
