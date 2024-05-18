@@ -56,7 +56,7 @@ class RequestProvider(MiddlewareMixin):
     def __new__(cls, get_response):
         """实现一个单例模式 ."""
         if cls._instance is None:
-            cls._instance = super().__new__()
+            cls._instance = super(RequestProvider, cls).__new__(cls)
         return cls._instance
 
     def __init__(self, get_response):
