@@ -17,7 +17,6 @@ try:
 except ImportError:
     sentry_exception_handler = None
 from apps.core.constants import ErrorCode
-from apps.core.exceptions import PermissionDeniedError
 from apps.core.exceptions import CoreException
 
 
@@ -65,9 +64,7 @@ def custom_exception_handler(exc, context: Dict):
 
     # 如果是权限异常，返回403
     error_code = exc.code if isinstance(exc, BlueException) else status.HTTP_500_INTERNAL_SERVER_ERROR
-    status_code = (
-        status.HTTP_403_FORBIDDEN if isinstance(exc, PermissionDeniedError) else status.HTTP_500_INTERNAL_SERVER_ERROR
-    )
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # 由前端处理无权限调整
     if exc_data and isinstance(exc_data, dict):

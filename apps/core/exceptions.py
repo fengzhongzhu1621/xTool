@@ -429,21 +429,6 @@ class BaseIAMError(CoreException):
     MESSAGE = _lazy("权限中心异常")
 
 
-class PermissionDeniedError(BaseIAMError):
-    """权限校验不通过 ."""
-
-    ERROR_CODE = "403"
-    MESSAGE = _lazy("权限校验不通过")
-
-    def __init__(self, action_name, permission, apply_url=settings.BK_IAM_SAAS_HOST):
-        message = _("当前用户无 [{action_name}] 权限").format(action_name=action_name)
-        data = {
-            "permission": permission,
-            "apply_url": apply_url,
-        }
-        super().__init__(message, data=data, code=HTTP_AUTH_FORBIDDEN_CODE)
-
-
 class CoreException(Exception):
     code = 100
     status_code = 500
