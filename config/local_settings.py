@@ -16,3 +16,5 @@ DATABASES = {
         },
     },
 }
+
+ENABLE_OTEL_METRICS = True

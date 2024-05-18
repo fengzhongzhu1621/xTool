@@ -6,6 +6,7 @@ from xTool.algorithms.collections import ConstantDict
 from .queue import *  # noqa
 from .regex import *  # noqa
 from .time import *  # noqa
+from .regex import *  # noqa
 
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] >= 3

@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from .regex import RE_MOBILE, RE_WECHAT
+from xTool.constants import RE_MOBILE, RE_WECHAT
 
 __all__ = ["is_mobile", "is_rio"]
 

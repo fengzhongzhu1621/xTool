@@ -33,3 +33,6 @@ RE_MAC = re.compile(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
 
 # 仅支持英文字符、数字及下划线的组合，不允许以下划线开头或结尾
 REGEX_FOR_KEY = re.compile("^(?!_)(?!.*?_$)[A-Za-z0-9_]+$")
+
+RE_MOBILE = re.compile(r"Mobile|Android|iPhone|iPad|iPod", re.IGNORECASE)
+RE_WECHAT = re.compile(r"MicroMessenger", re.IGNORECASE)
