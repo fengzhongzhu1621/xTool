@@ -1,20 +1,17 @@
-from datetime import datetime
 from typing import Dict
 
 import orjson as json
 from bk_resource.exceptions import ValidateException
-from blueapps.contrib.drf.utils.serializer_fields import CustomDateTimeField
 from django.db import models
-from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import ValidationError as DrfValidationError
 from rest_framework.fields import empty
 from rest_framework.serializers import ModelSerializer as DrfModelSerializer
 from rest_framework.settings import api_settings
 from rest_framework.utils import model_meta
 
+from apps.core.drf.serializer_fields import CustomDateTimeField
 from apps.core.exceptions import ParamValidationError
 from apps.core.models import MultiStrSplitCharField, MultiStrSplitTextField
 
@@ -113,7 +110,7 @@ class ModelSerializer(GeneralSerializer):
         try:
             super().is_valid(raise_exception)
         # 捕获原生的参数校验异常，抛出SaaS封装的参数校验异常
-        except ValidationError:
+        except DrfValidationError:
             if self._errors and raise_exception:
                 raise ValidateException(
                     format_serializer_errors(self),
@@ -127,32 +124,6 @@ class ModelSerializer(GeneralSerializer):
             raise
 
         return not bool(self._errors)
-
-
-class ListMultipleChoiceField(serializers.MultipleChoiceField):
-    """
-    类型为List的MultipleChoiceField
-    """
-
-    def to_internal_value(self, data) -> list:
-        data = list(super().to_internal_value(data))
-        data.sort()
-        return data
-
-    def to_representation(self, value):
-        value = list(super().to_representation(value))
-        value.sort()
-        return value
-
-
-class DateTimeField(serializers.CharField):
-    def run_validators(self, value):
-        super().run_validators(value)
-        if value:
-            try:
-                datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
-            except ValueError:
-                raise ValidationError(detail=_("当前输入非日期时间格式，请按格式[年-月-日 时:分:秒]填写"))
 
 
 def format_serializer_errors(  # pylint: disable=too-many-locals,too-many-branches
