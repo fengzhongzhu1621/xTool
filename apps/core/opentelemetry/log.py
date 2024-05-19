@@ -1,12 +1,12 @@
 from typing import Tuple
 
-from .settings import DEFAULT_LOGGING_TRACE_FORMAT
+from django.conf import settings
 
 
 def inject_logging_trace_info(
     logging: dict,
     inject_formatters: Tuple[str] = ("verbose",),
-    trace_format: str = DEFAULT_LOGGING_TRACE_FORMAT,
+    trace_format: str = settings.OPEN_TELEMETRY_OTEL_LOGGING_TRACE_FORMAT,
     format_keywords: Tuple[str] = ("format", "fmt"),
 ):
     """往logging配置中动态注入trace信息，直接修改logging数据"""

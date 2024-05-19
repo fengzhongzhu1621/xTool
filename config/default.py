@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     "apps.global_conf",
     "apps.http_client",
     "apps.version",
+    "apps.opentelemetry_instrument",
 )
 
 MIDDLEWARE = (
@@ -296,11 +297,16 @@ CACHES["login_db"] = CACHES["redis"]
 DATA_BACKEND_REDIS_MODE = os.environ.get("BKAPP_DATA_BACKEND_REDIS_MODE", "single")
 DATA_BACKEND = "apps.backend.data.redis_backend.RedisDataBackend"
 
-# Trace
-ENABLE_OTEL_TRACE = bool(strtobool(os.getenv("BKAPP_ENABLE_OTEL_TRACE", "False")))
-BK_APP_OTEL_INSTRUMENT_DB_API = bool(strtobool(os.getenv("BKAPP_OTEL_INSTRUMENT_DB_API", "False")))
-BKAPP_OTEL_SERVICE_NAME = APP_CODE
-BK_APP_OTEL_ADDTIONAL_INSTRUMENTORS = []
+# OpenTelemetry
+OPEN_TELEMETRY_ENABLE_OTEL_METRICS = bool(strtobool(os.getenv("OPEN_TELEMETRY_ENABLE_OTEL_METRICS", "False")))
+OPEN_TELEMETRY_ENABLE_OTEL_TRACE = bool(strtobool(os.getenv("OPEN_TELEMETRY_ENABLE_OTEL_TRACE", "False")))
+OPEN_TELEMETRY_OTEL_INSTRUMENT_DB_API = bool(strtobool(os.getenv("OPEN_TELEMETRY_OTEL_INSTRUMENT_DB_API", "False")))
+OPEN_TELEMETRY_OTEL_SERVICE_NAME = APP_CODE
+OPEN_TELEMETRY_OTEL_ADDTIONAL_INSTRUMENTORS = []
+OPEN_TELEMETRY_OTEL_LOGGING_TRACE_FORMAT = (
+    "[trace_id]: %(otelTraceID)s [span_id]: %(otelSpanID)s [resource.service.name]: %(otelServiceName)s"
+)
+
 
 # 本机地址
 BK_HOST = os.getenv("BKAPP_HOST", "")

@@ -1,5 +1,3 @@
-import os
-
 import django
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIHandler
@@ -17,7 +15,7 @@ def get_wsgi_application():
     """
     django.setup(set_prefix=False)
 
-    if os.getenv("ENABLE_METRICS") or getattr(settings, "ENABLE_OTEL_METRICS", False):
+    if settings.OPEN_TELEMETRY_ENABLE_OTEL_METRICS:
         start_metrics_http_server()
 
     return WSGIHandler()
