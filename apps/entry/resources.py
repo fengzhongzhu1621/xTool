@@ -2,12 +2,11 @@ import abc
 import os
 
 from bk_resource import Resource
-from blueapps.account.conf import ConfFixture
-from blueapps.utils.request_provider import get_local_request
 from django.conf import settings
 from django.contrib import auth
 from rest_framework.response import Response
 
+from apps.core.utils.request_provider import get_local_request
 from apps.entry.handler import HealthzHandler
 
 
@@ -31,8 +30,6 @@ class HomeResource(EntryBaseResource):
             # 静态资源
             "STATIC_URL": static_url,
             "STATIC_VERSION": settings.STATIC_VERSION,
-            # 登录跳转链接
-            "LOGIN_URL": ConfFixture.LOGIN_URL,
         }
         return data
 
