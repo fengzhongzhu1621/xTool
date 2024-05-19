@@ -24,7 +24,6 @@ class AccessorSignal(Signal):
     """"""
 
     allowed_receivers = [
-        "blueapps.utils.request_provider.RequestProvider",
         "apps.core.utils.request_provider.RequestProvider",
     ]
 

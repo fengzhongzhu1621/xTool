@@ -2,7 +2,7 @@ import time
 from datetime import timedelta
 
 import arrow
-from blueapps.utils.logger import logger
+from apps.logger import logger
 from django.conf import settings
 
 from apps.backend.data.api import exists, incr_expireat

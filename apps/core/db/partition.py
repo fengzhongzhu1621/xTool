@@ -2,7 +2,7 @@ import calendar
 from datetime import timedelta
 from typing import List
 
-from blueapps.utils.logger import logger
+from apps.logger import logger
 from django.db import connection
 from django.db.utils import OperationalError
 from django.utils import timezone
