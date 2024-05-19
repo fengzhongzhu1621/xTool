@@ -14,7 +14,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = (
     "bkoauth",
     # 框架自定义命令
-    "blueapps.contrib.bk_commands",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -28,7 +27,6 @@ INSTALLED_APPS = (
     "bk_resource",
     "drf_yasg",
     "version_log",
-    "blueapps.opentelemetry.instrument_app",
     "apps.core.drf_resource",
     # "apigw_manager.apigw",
     # bamboo-pipeline

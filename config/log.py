@@ -13,7 +13,6 @@ def get_logging_config_dict(settings_module):
     is_local = settings_module.get("IS_LOCAL", False)
     if is_local:
         log_dir = os.path.join(BASE_DIR, "logs", APP_CODE)
-        print("log_dir = ", log_dir)
         log_name_prefix = os.getenv("BKPAAS_LOG_NAME_PREFIX", APP_CODE)
         logging_format = {
             "format": (
