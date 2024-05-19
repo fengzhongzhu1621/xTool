@@ -22,11 +22,11 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # account app
-    "blueapps.account",
     "rest_framework",
     "bk_resource",
     "drf_yasg",
     "version_log",
+    "apps.account",
     "apps.core.drf_resource",
     # "apigw_manager.apigw",
     # bamboo-pipeline
@@ -63,22 +63,14 @@ MIDDLEWARE = (
     # 蓝鲸静态资源服务
     "whitenoise.middleware.WhiteNoiseMiddleware",
     # Auth middleware
-    # "blueapps.account.middlewares.RioLoginRequiredMiddleware",
-    # "blueapps.account.middlewares.WeixinLoginRequiredMiddleware",
-    # "blueapps.account.middlewares.LoginRequiredMiddleware",
     # exception middleware
     "apps.core.middleware.AppExceptionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
-    # "apigw_manager.apigw.authentication.ApiGatewayJWTGenericMiddleware",  # JWT 认证
-    # "apigw_manager.apigw.authentication.ApiGatewayJWTAppMiddleware",  # JWT 透传的应用信息
-    # "apigw_manager.apigw.authentication.ApiGatewayJWTUserMiddleware",  # JWT 透传的用户信息
     "corsheaders.middleware.CorsMiddleware",
     "core.middleware.csrf.CSRFExemptMiddleware",
 )
 
 AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
-# AUTHENTICATION_BACKENDS += ("apigw_manager.apigw.authentication.UserModelBackend",)
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
