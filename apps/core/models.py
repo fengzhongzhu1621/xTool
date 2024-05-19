@@ -5,7 +5,6 @@ from typing import Any, Dict, List, Tuple
 
 import orjson as json
 from bk_resource.utils.common_utils import is_backend
-from blueapps.utils.request_provider import get_local_request
 from django.conf import settings
 from django.core import exceptions
 from django.db import models
@@ -16,6 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.settings import api_settings
 
 from apps.core.constants import LEN_NORMAL
+from apps.core.utils.request_provider import get_local_request
 
 
 def get_non_request_username():

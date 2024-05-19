@@ -1,12 +1,12 @@
 from datetime import datetime
 
-from blueapps.core.exceptions import ParamValidationError
 from django.conf import settings
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from apps.core.exceptions import ParamValidationError
 from xTool.utils.dates import strftime_local
 
 

@@ -1,5 +1,4 @@
-from blueapps.account.models import User
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets

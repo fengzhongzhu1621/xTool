@@ -42,7 +42,7 @@ base_router.register_module(EntryViews)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # path("account/", include("blueapps.account.urls")),
+    path("account/", include("apps.account.urls")),
     # path("pipeline_admin/", include("pipeline.contrib.engine_admin.urls")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("swagger/", schema_view.with_ui(cache_timeout=0), name="schema-swagger-ui"),

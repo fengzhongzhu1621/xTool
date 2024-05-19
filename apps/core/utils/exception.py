@@ -4,13 +4,14 @@ import json
 from json.decoder import JSONDecodeError
 from typing import Dict
 
-from blueapps.core.exceptions import BlueException
 from django.conf import settings
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
+
+from apps.core.exceptions import BlueException
 
 try:
     from raven.contrib.django.raven_compat.models import sentry_exception_handler
