@@ -1,20 +1,3 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -22,6 +5,7 @@ from __future__ import unicode_literals
 
 import datetime as dt
 from datetime import datetime, timedelta
+from timeit import default_timer
 
 import arrow
 import six
@@ -305,3 +289,31 @@ def strftime_local(aware_time, fmt="%Y-%m-%d %H:%M:%S"):
         # translate to time in local timezone
         aware_time = timezone.localtime(aware_time)
     return aware_time.strftime(fmt)
+
+
+def Time():
+    """Returns some representation of the current time.
+
+    This wrapper is meant to take advantage of a higher time
+    resolution when available. Thus, its return value should be
+    treated as an opaque object. It can be compared to the current
+    time with TimeSince().
+    """
+    return default_timer()
+
+
+def TimeSince(t):
+    """Compares a value returned by Time() to the current time.
+
+    Returns:
+      the time since t, in fractional seconds.
+    """
+    return default_timer() - t
+
+
+def PowersOf(logbase, count, lower=0, include_zero=True):
+    """Returns a list of count powers of logbase (from logbase**lower)."""
+    if not include_zero:
+        return [logbase**i for i in range(lower, count + lower)]
+    else:
+        return [0] + [logbase**i for i in range(lower, count + lower)]

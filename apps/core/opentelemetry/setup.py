@@ -64,4 +64,5 @@ def setup_by_settings():
     enable_metrics = settings.OPEN_TELEMETRY_ENABLE_OTEL_METRICS
     if enable_metrics:
         SaaSMetricsInstrumentor().instrument()
+        # celery worker 启动时启动 metric http server
         celery_app.steps["worker"].add(MetricsServerStep)

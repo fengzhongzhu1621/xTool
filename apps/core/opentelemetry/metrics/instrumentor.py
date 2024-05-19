@@ -27,33 +27,28 @@ class SaaSMetricsInstrumentor(BaseInstrumentor):
             SaaSMetricsBeforeMiddleware.__qualname__,
         ]
     )
-    _after_middleware = ".".join([SaaSMetricsAfterMiddleware.__module__, SaaSMetricsAfterMiddleware.__qualname__])
+    _after_middleware = ".".join(
+        [
+            SaaSMetricsAfterMiddleware.__module__,
+            SaaSMetricsAfterMiddleware.__qualname__,
+        ]
+    )
 
     def instrumentation_dependencies(self) -> Collection[str]:
+        """需要的依赖支持 ."""
         return _instruments
 
     def _instrument(self, **kwargs):
-        # This can not be solved, but is an inherent problem of this approach:
-        # the order of middleware entries matters, and here you have no control
-        # on that:
-        # https://docs.djangoproject.com/en/3.0/topics/http/middleware/#activating-middleware
-        # https://docs.djangoproject.com/en/3.0/ref/middleware/#middleware-ordering
-
-        _middleware_setting = _get_django_middleware_setting()
-        settings_middleware = getattr(settings, _middleware_setting, [])
-
-        # Django allows to specify middlewares as a tuple, so we convert this tuple to a
-        # list, otherwise we wouldn't be able to call append/remove
-        if isinstance(settings_middleware, tuple):
-            settings_middleware = list(settings_middleware)
+        """动态增加中间件 ."""
+        settings_middleware = settings.MIDDLEWARE
+        settings_middleware = list(settings_middleware)
 
         settings_middleware.insert(0, self._before_middleware)
         settings_middleware.append(self._after_middleware)
-        setattr(settings, _middleware_setting, settings_middleware)
+        setattr(settings, "MIDDLEWARE", settings_middleware)
 
     def _uninstrument(self, **kwargs):
-        _middleware_setting = _get_django_middleware_setting()
-        settings_middleware = getattr(settings, _middleware_setting, None)
+        settings_middleware = settings.MIDDLEWARE
 
         if settings_middleware is None or (
             self._before_middleware not in settings_middleware and self._after_middleware not in settings_middleware
@@ -62,4 +57,4 @@ class SaaSMetricsInstrumentor(BaseInstrumentor):
 
         settings_middleware.remove(self._before_middleware)
         settings_middleware.remove(self._after_middleware)
-        setattr(settings, _middleware_setting, settings_middleware)
+        setattr(settings, "MIDDLEWARE", settings_middleware)
