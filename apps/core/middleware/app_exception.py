@@ -2,11 +2,12 @@ import json
 import logging
 import traceback
 
-from blueapps.core.exceptions.base import BlueException
 from django.conf import settings
 from django.http import Http404, JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext_lazy as _
+
+from apps.core.exceptions import BlueException
 
 try:
     from raven.contrib.django.raven_compat.models import sentry_exception_handler
@@ -14,7 +15,7 @@ try:
 except ImportError:
     sentry_exception_handler = None
 
-logger = logging.getLogger("blueapps")
+logger = logging.getLogger("apps")
 
 
 class AppExceptionMiddleware(MiddlewareMixin):
