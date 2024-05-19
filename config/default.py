@@ -1,8 +1,9 @@
 # pylint: disable=wildcard-import
 
 from blueapps.conf.default_settings import *  # noqa
-from blueapps.conf.log import get_logging_config_dict
 from celery.utils.serialization import strtobool
+
+from config.log import get_logging_config_dict
 
 INIT_SUPERUSER = []
 
