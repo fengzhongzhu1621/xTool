@@ -18,7 +18,7 @@ import environ
 # 配置优先级 环境变量 -> .env文件 -> settings.py
 environ.Env.read_env()
 
-ENVIRONMENT = os.getenv("BKPAAS_ENVIRONMENT", "dev")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
 DJANGO_CONF_MODULE = "config.{env}".format(env=ENVIRONMENT)
 try:
     _module = __import__(DJANGO_CONF_MODULE, globals(), locals(), ["*"])

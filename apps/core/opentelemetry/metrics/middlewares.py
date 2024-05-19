@@ -10,7 +10,7 @@ from django_prometheus.middleware import (
 from django_prometheus.utils import Time, TimeSince
 
 HOSTNAME = socket.gethostname()
-BK_ENV = os.getenv("BKPAAS_ENVIRONMENT", "dev")
+BK_ENV = os.getenv("ENVIRONMENT", "dev")
 
 
 class CustomMetrics(Metrics):

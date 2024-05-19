@@ -1,18 +1,54 @@
-# pylint: disable=wildcard-import
+import os
 
-from blueapps.conf.default_settings import *  # noqa
 from celery.utils.serialization import strtobool
 
+from config import APP_CODE, BASE_DIR
+from config.database import get_default_database_config_dict
 from config.log import get_logging_config_dict
+
+# 判断是否为本地开发环境
+IS_LOCAL = not os.getenv("ENVIRONMENT", False)
+if not IS_LOCAL:
+    STATIC_ROOT = "staticfiles"
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
+
+# About whitenoise
+WHITENOISE_STATIC_PREFIX = "/static/"
+
+# Rabbitmq & Celery
+if "RABBITMQ_VHOST" in os.environ:
+    RABBITMQ_VHOST = os.getenv("RABBITMQ_VHOST")
+    RABBITMQ_PORT = os.getenv("RABBITMQ_PORT")
+    RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
+    RABBITMQ_USER = os.getenv("RABBITMQ_USER")
+    RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
+    BROKER_URL = "amqp://{user}:{password}@{host}:{port}/{vhost}".format(
+        user=RABBITMQ_USER,
+        password=RABBITMQ_PASSWORD,
+        host=RABBITMQ_HOST,
+        port=RABBITMQ_PORT,
+        vhost=RABBITMQ_VHOST,
+    )
+DATABASES = {"default": get_default_database_config_dict(locals())}
+
+ROOT_URLCONF = "urls"
+
+SITE_ID = 1
 
 INIT_SUPERUSER = []
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+# 登录缓存时间配置, 单位秒（与django cache单位一致）
+LOGIN_CACHE_EXPIRED = int(os.getenv("LOGIN_CACHE_EXPIRED", 60))
+
 
 # Application definition
 
 INSTALLED_APPS = (
-    "bkoauth",
+    # "bkoauth",
     # 框架自定义命令
     "django.contrib.admin",
     "django.contrib.auth",
@@ -21,12 +57,11 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # account app
+    "apps.account",
     "rest_framework",
     "bk_resource",
     "drf_yasg",
     "version_log",
-    "apps.account",
     "apps.core.drf_resource",
     # "apigw_manager.apigw",
     # bamboo-pipeline
@@ -53,7 +88,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE = (
     # 将请求对象注入到线程变量，方便根据 get_request() 方法获取
-    "apps.core.middleware.RequestProvider",
+    "apps.core.middleware.request_provider.RequestProvider",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -64,28 +99,31 @@ MIDDLEWARE = (
     "whitenoise.middleware.WhiteNoiseMiddleware",
     # Auth middleware
     # exception middleware
-    "apps.core.middleware.AppExceptionMiddleware",
+    "apps.core.middleware.app_exception.AppExceptionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "core.middleware.csrf.CSRFExemptMiddleware",
+    "apps.core.middleware.csrf.CSRFExemptMiddleware",
 )
 
 AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
+TEMPLATE_CONTEXT_PROCESSORS = [
+    "django.template.context_processors.debug",
+    "django.template.context_processors.request",
+    "django.contrib.auth.context_processors.auth",
+    "django.contrib.messages.context_processors.messages",
+]
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
+            "context_processors": TEMPLATE_CONTEXT_PROCESSORS,
         },
     },
 ]
+MAKO_DIR_NAME = "mako_templates"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -122,6 +160,13 @@ LANGUAGES = (
     ("zh-hans", "简体中文"),
 )
 LANGUAGE_COOKIE_NAME = os.getenv("BKAPP_LANGUAGE_COOKIE_NAME", "blueking_language")
+# open环境使用cookie中的blueking_language来控制语言
+LANGUAGE_SESSION_KEY = "blueking_language"
+LANGUAGE_COOKIE_NAME = "blueking_language"
+IS_DISPLAY_LANGUAGE_CHANGE = "none"
+
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2
+SESSION_COOKIE_NAME = "_".join([APP_CODE, "sessionid"])
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -141,7 +186,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # noqa
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "apps.core.exception.custom_exception_handler",
+    "EXCEPTION_HANDLER": "apps.core.exceptions.custom_exception_handler",
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "apps.core.drf.pagination.CustomPageNumberWithColumnPagination",
     "PAGE_SIZE": 10,
@@ -204,6 +249,7 @@ CORS_ALLOWED_ORIGINS = [origin for origin in str(os.getenv("BKAPP_CORS_ALLOWED_O
 # CSRF
 CSRF_TRUSTED_ORIGINS = [origin for origin in str(os.getenv("BKAPP_CSRF_TRUSTED_ORIGINS", "")).split(",") if origin]
 CSRF_EXEMPT_PATHS = []
+CSRF_COOKIE_NAME = APP_CODE + "_csrftoken"
 
 # UserCookie
 AUTH_BACKEND_DOMAIN = os.getenv("BKAPP_AUTH_BACKEND_DOMAIN", SESSION_COOKIE_DOMAIN)
@@ -251,10 +297,11 @@ DATABASES["default"].setdefault("OPTIONS", {})["charset"] = "utf8mb4"
 # 下面的命令用于测试
 # python manage.py celery worker -O fair -l info -c 1 -Q celery,default,er_schedule,er_execute
 IS_USE_CELERY = True
-
+CELERYD_HIJACK_ROOT_LOGGER = False
+# CELERY与RabbitMQ增加60秒心跳设置项
+BROKER_HEARTBEAT = 60
 # celery settings
 if IS_USE_CELERY:
-    INSTALLED_APPS = locals().get("INSTALLED_APPS", [])
     INSTALLED_APPS += (
         "django_celery_beat",
         "django_celery_results",
@@ -281,10 +328,19 @@ MAX_PAGE_SIZE = int(os.getenv("BKAPP_MAX_PAGE_SIZE", 1000))
 DB_BATCH_SIZE = int(os.getenv("BKAPP_DB_BATCH_SIZE", 1000))
 
 # 缓存设置
-CACHES["redis"] = CACHES_GETTER[REDIS_MODE]
-CACHES["default"] = CACHES["redis"]
-# session 存储后端
-CACHES["login_db"] = CACHES["redis"]
+# CACHES = {
+#     "db": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "django_cache"},
+#     "login_db": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "account_cache"},
+#     "dummy": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
+#     "locmem": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+# }
+CACHES = {
+    "db": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "django_cache"},
+    "login_db": CACHES_GETTER[REDIS_MODE],
+    "dummy": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
+    "locmem": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+    "default": CACHES_GETTER[REDIS_MODE],
+}
 DATA_BACKEND_REDIS_MODE = os.environ.get("BKAPP_DATA_BACKEND_REDIS_MODE", "single")
 DATA_BACKEND = "apps.backend.data.redis_backend.RedisDataBackend"
 
@@ -311,28 +367,3 @@ LOG_PERSISTENT_DAYS = 30  # 设置引擎日志的有效期
 
 # 唯一随机串生成重试次数
 RANDOM_STR_GENERATE_REPEAT_TIMES = 3
-
-# remove disabled apps
-if locals().get("DISABLED_APPS"):
-    INSTALLED_APPS = locals().get("INSTALLED_APPS", [])
-    DISABLED_APPS = locals().get("DISABLED_APPS", [])
-
-    INSTALLED_APPS = [_app for _app in INSTALLED_APPS if _app not in DISABLED_APPS]
-
-    _keys = (
-        "AUTHENTICATION_BACKENDS",
-        "DATABASE_ROUTERS",
-        "FILE_UPLOAD_HANDLERS",
-        "MIDDLEWARE",
-        "PASSWORD_HASHERS",
-        "TEMPLATE_LOADERS",
-        "STATICFILES_FINDERS",
-        "TEMPLATE_CONTEXT_PROCESSORS",
-    )
-
-    import itertools
-
-    for _app, _key in itertools.product(DISABLED_APPS, _keys):
-        if locals().get(_key) is None:
-            continue
-        locals()[_key] = tuple([_item for _item in locals()[_key] if not _item.startswith(_app + ".")])

@@ -1,8 +1,8 @@
 # pylint: disable=wildcard-import
 from config.default import *  # noqa
 
-# 正式环境
-RUN_MODE = "PRODUCT"
+# 预发布环境
+RUN_MODE = "STAGING"
 
 # 只对正式环境日志级别进行配置，可以在这里修改
 LOG_LEVEL = "ERROR"

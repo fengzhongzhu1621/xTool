@@ -1,14 +1,8 @@
-from blueapps.conf.validators import EnvValidator
-
-from config import RUN_VER
+# pylint: disable=wildcard-import
+from config.default import *  # noqa
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-# 环境变量检测
-EnvValidator(RUN_VER).validate()
-# pylint: disable=wildcard-import
-from blueapps.patch.settings_open_saas import *  # noqa
 
 # 本地开发环境
 RUN_MODE = "DEVELOP"
