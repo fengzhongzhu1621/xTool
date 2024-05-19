@@ -70,13 +70,6 @@ def get_logging_config_dict(settings_module):
                 "maxBytes": 1024 * 1024 * 100,
                 "backupCount": 5,
             },
-            "blueapps": {
-                "class": log_class,
-                "formatter": "verbose",
-                "filename": os.path.join(log_dir, "%s-django.log" % log_name_prefix),
-                "maxBytes": 1024 * 1024 * 100,
-                "backupCount": 5,
-            },
         },
         "loggers": {
             "django": {"handlers": ["null"], "level": "INFO", "propagate": True},
@@ -88,9 +81,6 @@ def get_logging_config_dict(settings_module):
             # 组件调用日志
             "component": {"handlers": ["component"], "level": log_level, "propagate": True},
             "celery": {"handlers": ["celery"], "level": log_level, "propagate": True},
-            # other loggers...
-            # blueapps
-            "blueapps": {"handlers": ["blueapps"], "level": log_level, "propagate": True},
             # 普通app日志
             "app": {"handlers": ["root"], "level": log_level, "propagate": True},
         },
