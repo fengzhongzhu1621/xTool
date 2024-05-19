@@ -1,9 +1,9 @@
 import cryptography  # noqa
 import jwt
-from blueapps.utils.logger import logger
 from django.conf import settings
 from jwt import exceptions as jwt_exceptions
 
+from apps.logger import logger
 from xTool.algorithms.collections import FancyDict
 
 
