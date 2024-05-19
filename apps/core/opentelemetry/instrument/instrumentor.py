@@ -62,9 +62,6 @@ def django_request_hook(span, request):
 
 
 def django_response_hook(span, request, response):
-    """
-    处理蓝鲸标准协议 Django 响应
-    """
     if hasattr(response, "data"):
         result = response.data
     else:
