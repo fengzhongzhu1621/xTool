@@ -1,11 +1,3 @@
-from config import RUN_VER
-
-if RUN_VER == "open":
-    # pylint: disable=wildcard-import
-    from blueapps.patch.settings_open_saas import *  # noqa
-else:
-    from blueapps.patch.settings_paas_services import *  # pylint: disable=wildcard-import # noqa
-
 # 正式环境
 RUN_MODE = "PRODUCT"
 
