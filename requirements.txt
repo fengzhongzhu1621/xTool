@@ -51,6 +51,7 @@ openpyxl
 mysqlclient
 jsondiff
 
+Django==3.2.25
 djangorestframework==3.14.0
 drf-yasg
 drf_spectacular
