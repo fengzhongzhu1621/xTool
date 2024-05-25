@@ -5,13 +5,13 @@ import string
 import sys
 import uuid
 
-import fakeredis
-import pytest
+from pathlib import Path
 
-from xTool.cache import Cache
-from xTool.cache.constants import CacheInstanceType, CacheBackendType
+from xTool.testing.pytest_plugin import append_pytest_fixture_plugins
 
-# pytest_plugins = ['xTool.tests.pytest_plugin']
+path = Path(__file__).parent / "fixtures"
+root_path = Path(__file__).parent.parent
+pytest_plugins = append_pytest_fixture_plugins(root_path, path)
 
 logging_format = """module: %(module)s; \
 function: %(funcName)s(); \
@@ -78,32 +78,3 @@ class RouteStringGenerator:
             value = TYPE_TO_GENERATOR_MAP.get(param_type)()
             url = url.replace(pattern, str(value), -1)
         return url
-
-
-@pytest.fixture(scope="function")
-def url_param_generator():
-    return TYPE_TO_GENERATOR_MAP
-
-
-@pytest.fixture
-def aiomisc_unused_port():
-    from xTool.net.utils import get_unused_port
-
-    return get_unused_port()
-
-
-@pytest.fixture
-def cache():
-    connection_conf = {
-        "host": "localhost",
-        "port": "6379",
-        "db": 0,
-        "password": "",
-    }
-    cache = Cache(
-        CacheBackendType.CELERY,
-        CacheInstanceType.RedisCache,
-        redis_class=fakeredis.FakeStrictRedis,
-        connection_conf=connection_conf,
-    )
-    return cache

@@ -2,7 +2,7 @@ import asyncio
 
 import pytest
 
-from xTool.tests.testing import loop_context
+from xTool.testing import loop_context
 
 
 @pytest.fixture

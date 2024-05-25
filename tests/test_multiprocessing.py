@@ -6,7 +6,7 @@ import pytest
 
 from xTool.blueprints import Blueprint
 from xTool.response import text
-from xTool.tests.testing import HOST, PORT
+from xTool.testing.testing import HOST, PORT
 
 
 @pytest.mark.skipif(

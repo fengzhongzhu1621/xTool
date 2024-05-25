@@ -4,8 +4,6 @@ import os
 import threading
 import time
 import weakref
-from contextlib import suppress
-import concurrent
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
@@ -17,25 +15,6 @@ try:
     import contextvars
 except ImportError:
     contextvars = None
-
-
-@pytest.fixture(params=(thread_pool.threaded, thread_pool.threaded_separate))
-def threaded_decorator(request, executor: thread_pool.ThreadPoolExecutor):
-    assert executor
-    return request.param
-
-
-@pytest.fixture
-def executor(loop: asyncio.AbstractEventLoop):
-    pool = thread_pool.ThreadPoolExecutor(8)
-    loop.set_default_executor(pool)
-    try:
-        yield pool
-    finally:
-        with suppress(Exception):
-            pool.shutdown(wait=True)
-
-        pool.shutdown(wait=True)
 
 
 async def test_future_gc(loop):
@@ -136,17 +115,6 @@ async def test_simple(threaded_decorator, loop, timer):
                 sleep(1),
                 sleep(1),
             )
-
-
-gen_decos = (
-    thread_pool.threaded_iterable,
-    thread_pool.threaded_iterable_separate,
-)
-
-
-@pytest.fixture(params=gen_decos)
-def iterator_decorator(request):
-    return request.param
 
 
 async def test_threaded_generator(loop, timer):

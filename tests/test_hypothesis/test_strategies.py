@@ -4,7 +4,7 @@ import hypothesis.strategies as st
 from hypothesis import given, assume, example, settings
 from jsondiff import diff
 
-from xTool.tests.random import generate_random_json, perturbate_json
+from xTool.testing.random import generate_random_json, perturbate_json
 
 
 def generate_scenario_no_sets(rng):

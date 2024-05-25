@@ -1,15 +1,14 @@
 import asyncio
 import os
 import signal
-
 from queue import Queue
 from unittest.mock import MagicMock
 
 import pytest
 
-from xTool.utils.processes import ctrlc_workaround_for_windows
 from xTool.response import HTTPResponse
-from xTool.tests.testing import HOST, PORT
+from xTool.testing.testing import HOST, PORT
+from xTool.utils.processes import ctrlc_workaround_for_windows
 
 
 async def stop(app, loop):

@@ -8,7 +8,7 @@ import pytest
 from hypothesis import given, settings, strategies
 from jsondiff import diff, replace, add, discard, insert, delete, update, JsonDiffer  # noqa
 
-from xTool.tests.random import generate_random_json, perturbate_json
+from xTool.testing.random import generate_random_json, perturbate_json
 
 
 def generate_scenario(rng):
