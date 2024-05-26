@@ -59,15 +59,19 @@ class ResourceFinder(BaseFinder):
         if recursive is True, recursive traversal directory
         """
         matches = set()
-        if not path.startswith(settings.BASE_DIR):
+        base_dir = settings.BASE_DIR
+        if not path.startswith(base_dir):
             if from_settings:
                 raise ErrorSettingsWithResourceDirs("RESOURCE_DIRS settings error")
+            return []
+        # 忽略自己
+        if path.startswith(os.path.join(base_dir, "bk_resource")):
             return []
 
         for root, dirs, files in sorted(os.walk(path)):
             # 搜索 resources 目录
             if os.path.basename(root) == "resources":
-                relative_path = os.path.relpath(os.path.dirname(root), root_path or settings.BASE_DIR)
+                relative_path = os.path.relpath(os.path.dirname(root), root_path or base_dir)
                 matches.add(path_to_dotted(relative_path))
                 continue
 
@@ -79,7 +83,7 @@ class ResourceFinder(BaseFinder):
                     continue
 
                 if base_file_name in ["resources", "default"]:
-                    relative_path = os.path.relpath(root, root_path or settings.BASE_DIR)
+                    relative_path = os.path.relpath(root, root_path or base_dir)
                     matches.add(path_to_dotted(relative_path))
                     continue
 

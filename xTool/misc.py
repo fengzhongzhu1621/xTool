@@ -697,7 +697,7 @@ def to_dict(obj):
 def camel_to_underscore(camel_str: str) -> str:
     assert isinstance(camel_str, str)
 
-    buf = StringIO()
+    buf = io.StringIO()
     str_len = len(camel_str)
 
     for i in range(str_len):

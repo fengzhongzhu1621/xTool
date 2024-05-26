@@ -57,9 +57,9 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "apps.account",
     "rest_framework",
     "bk_resource",
+    "apps.account",
     "drf_yasg",
     "version_log",
     "core.drf_resource",
@@ -74,15 +74,14 @@ INSTALLED_APPS = (
     # "pipeline.eri",
     # "pipeline.contrib.engine_admin",
     # 业务逻辑
-    "apps.backend",
+    "apps.version",
     "apps.entry",
+    "apps.backend",
     # "apps.quickstart",
     # "apps.snippets",
-    "apps.custom_plugins",
     "apps.credential",
     "apps.global_conf",
     "apps.http_client",
-    "apps.version",
     "apps.opentelemetry_instrument",
 )
 
@@ -315,6 +314,7 @@ if IS_USE_CELERY:
     CELERYD_CONCURRENCY = os.getenv("BK_CELERYD_CONCURRENCY", 2)  # noqa
     # celery beat 间隔时间，默认为 1，是命令行-B参数指定的数目，可以通过环境变量或者 Procfile 设置
     CELERY_ENABLE_UTC = True
+    CELERY_TIMEZONE = TIME_ZONE
     CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
     # 允许传递对象给任务
     CELERY_TASK_SERIALIZER = "json"
