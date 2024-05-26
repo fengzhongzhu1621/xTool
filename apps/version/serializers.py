@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from apps.core.constants import LEN_SHORT
+from core.constants import LEN_SHORT
 
 
 class VersionLogDetailRequestSerializer(serializers.Serializer):

@@ -4,8 +4,8 @@ from django.conf import settings
 from django.dispatch import Signal
 from django.utils.deprecation import MiddlewareMixin
 
-from apps.core.exceptions import AccessForbidden, ServerBlueException
-from apps.core.utils.local import inject_request_id, release_request_local, request_local
+from core.exceptions import AccessForbidden, ServerBlueException
+from core.utils.local import inject_request_id, release_request_local, request_local
 
 # since each thread has its own greenlet we can just use those as identifiers
 # for the context.  If greenlets are not available we fall back to the

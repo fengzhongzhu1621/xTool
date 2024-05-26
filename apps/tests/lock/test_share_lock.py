@@ -1,4 +1,4 @@
-from apps.core.lock import share_lock
+from core.lock import share_lock
 
 count = 0
 

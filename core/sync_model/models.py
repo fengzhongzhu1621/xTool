@@ -4,7 +4,7 @@ from typing import Set, Any
 from django.db.models import Model
 from django.utils import timezone
 
-from apps.core.utils import from_iso_format
+from core.utils import from_iso_format
 
 
 def get_model_value(model: Model, field: str, datetime_fields: Set) -> Any:

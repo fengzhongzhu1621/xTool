@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/howto/deployment/wsgi/
 
 import os
 
-from apps.core.wsgi import get_wsgi_application
+from core.wsgi import get_wsgi_application
 
 # Django 支持编写异步（“async”）视图，如果在 ASGI 下运行，还支持完全异步的请求堆栈。
 # 异步视图仍然可以在 WSGI 下运行，但会有性能损失，并且不能有高效的长时间运行的请求。

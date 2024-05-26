@@ -12,7 +12,7 @@ class JSONLogFormatter(json_log_formatter.JSONFormatter):
     """
 
     def json_record(self, message: str, extra: dict, record: logging.LogRecord) -> dict:
-        from apps.core.utils.request_provider import get_or_create_local_request_id
+        from core.utils.request_provider import get_or_create_local_request_id
 
         # 移除request
         if "request" in extra:

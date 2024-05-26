@@ -7,7 +7,7 @@ from django.http import Http404, JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext_lazy as _
 
-from apps.core.exceptions import BlueException
+from core.exceptions import BlueException
 
 try:
     from raven.contrib.django.raven_compat.models import sentry_exception_handler

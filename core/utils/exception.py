@@ -11,14 +11,14 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
-from apps.core.exceptions import BlueException
+from core.exceptions import BlueException
 
 try:
     from raven.contrib.django.raven_compat.models import sentry_exception_handler
 except ImportError:
     sentry_exception_handler = None
-from apps.core.constants import ErrorCode
-from apps.core.exceptions import CoreException
+from core.constants import ErrorCode
+from core.exceptions import CoreException
 
 
 def notify_sentry(request: Request, response: Response, data: Dict, exc: Exception):

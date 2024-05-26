@@ -1,7 +1,7 @@
 from typing import Dict
 
-from apps.core.cache import cache_ten_minute
 from apps.http_client.models import RequestApiConfig
+from core.cache import cache_ten_minute
 
 
 @cache_ten_minute("http_client:fetch_request_api_config:{}:{}")

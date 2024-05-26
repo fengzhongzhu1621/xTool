@@ -21,9 +21,9 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
 from apps import views
-from apps.core.permissions import SwaggerPermission
 from apps.entry import views as EntryViews
 from apps.version import views as VersionViews
+from core.permissions import SwaggerPermission
 
 info = openapi.Info(
     title="xTool",

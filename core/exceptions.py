@@ -19,7 +19,7 @@ try:
 except ImportError:
     sentry_exception_handler = None
 
-from apps.core.constants import ErrorCode
+from core.constants import ErrorCode
 from apps.logger import logger
 
 

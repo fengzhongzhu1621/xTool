@@ -1,4 +1,4 @@
-from apps.core.drf_resource.cache import CacheTypeItem
+from core.drf_resource.cache import CacheTypeItem
 
 
 class TestCacheTypeItem:

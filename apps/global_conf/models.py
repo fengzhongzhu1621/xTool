@@ -4,12 +4,12 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
-from apps.core.cache import CacheKey
-from apps.core.constants import (
+from core.cache import CacheKey
+from core.constants import (
     LEN_LONG,
 )
-from apps.core.constants import TimeEnum
-from apps.core.models import OptionBase, SoftDeleteModelManager
+from core.constants import TimeEnum
+from core.models import OptionBase, SoftDeleteModelManager
 
 # 全局配置缓存时间
 GLOBAL_CONFIG_CACHE_TTL = getattr(settings, "GLOBAL_CONFIG_CACHE_TTL", TimeEnum.TEN_MINUTE_SECOND)

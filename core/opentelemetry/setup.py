@@ -9,12 +9,12 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.sampling import _KNOWN_SAMPLERS
 
-from apps.core.opentelemetry.export import LazyBatchSpanProcessor
-from apps.core.opentelemetry.instrument.instrumentor import DjangoAppInstrumentor
-from apps.core.opentelemetry.log import inject_logging_trace_info
-from apps.core.opentelemetry.metrics.celery import MetricsServerStep
-from apps.core.opentelemetry.metrics.instrumentor import SaaSMetricsInstrumentor
 from config.celery import app as celery_app
+from core.opentelemetry.export import LazyBatchSpanProcessor
+from core.opentelemetry.instrument.instrumentor import DjangoAppInstrumentor
+from core.opentelemetry.log import inject_logging_trace_info
+from core.opentelemetry.metrics.celery import MetricsServerStep
+from core.opentelemetry.metrics.instrumentor import SaaSMetricsInstrumentor
 
 
 def setup_trace_config(

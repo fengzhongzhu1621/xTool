@@ -6,15 +6,15 @@ import arrow
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
-from apps.core.cache import CacheKey
-from apps.core.constants import (
+from core.cache import CacheKey
+from core.constants import (
     EMPTY_STRING,
     LEN_MIDDLE,
     LEN_SHORT,
     LEN_X_LONG,
     TimeEnum,
 )
-from apps.core.models import SoftDeleteModel, SoftDeleteModelManager
+from core.models import SoftDeleteModel, SoftDeleteModelManager
 
 
 class CredentialCacheKey(CacheKey):

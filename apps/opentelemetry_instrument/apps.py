@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-from apps.core.opentelemetry.setup import setup_by_settings
+from core.opentelemetry.setup import setup_by_settings
 
 
 class InstrumentAppConfig(AppConfig):

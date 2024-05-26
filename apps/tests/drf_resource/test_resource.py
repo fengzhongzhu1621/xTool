@@ -1,10 +1,11 @@
-import pytest
 from typing import Dict, List, Optional
 
-from apps.core.drf_resource import api
-from apps.core.drf_resource.base import Resource
+import pytest
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
+
+from core.drf_resource import api
+from core.drf_resource.base import Resource
 
 
 # @register_plugin(PluginType.drf_resource, "MockResource")

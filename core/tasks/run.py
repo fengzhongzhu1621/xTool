@@ -1,8 +1,8 @@
 import time
 from typing import Callable
 
-from apps.core.lock import share_lock
 from apps.logger import logger
+from core.lock import share_lock
 
 
 def run_sub_task(task_name: str, wrapper: Callable, identify: str, *args, **kwargs):

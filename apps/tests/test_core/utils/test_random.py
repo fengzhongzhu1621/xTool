@@ -1,4 +1,4 @@
-from apps.core.utils import generate_random_sequence
+from core.utils import generate_random_sequence
 
 
 def test_generate_random_sequence():

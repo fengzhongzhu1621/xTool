@@ -1,6 +1,6 @@
 import functools
 
-from apps.core.constants import TimeEnum
+from core.constants import TimeEnum
 from .cache_key import CacheKeyTemplate
 
 

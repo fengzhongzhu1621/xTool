@@ -1,11 +1,11 @@
 import pytest
-
-from apps.core.drf_resource import ModelResource
-from apps.snippets.models import Snippet
-from apps.snippets.serializers import SnippetSerializer
 from rest_framework import renderers
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from apps.snippets.models import Snippet
+from apps.snippets.serializers import SnippetSerializer
+from core.drf_resource import ModelResource
 
 pytestmark = pytest.mark.django_db
 

@@ -1,4 +1,4 @@
-from apps.core.db import create_partitions, delete_partitions
+from core.db import create_partitions, delete_partitions
 
 
 def test_create_partitions():

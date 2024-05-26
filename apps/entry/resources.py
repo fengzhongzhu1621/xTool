@@ -1,13 +1,13 @@
 import abc
 import os
 
-from bk_resource import Resource
 from django.conf import settings
 from django.contrib import auth
 from rest_framework.response import Response
 
-from apps.core.utils.request_provider import get_local_request
 from apps.entry.handler import HealthzHandler
+from bk_resource import Resource
+from core.utils.request_provider import get_local_request
 
 
 class EntryBaseResource(Resource, abc.ABC):

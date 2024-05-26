@@ -1,4 +1,4 @@
-from apps.core.tasks import run_sub_task
+from core.tasks import run_sub_task
 
 
 def sub_task(a, b):

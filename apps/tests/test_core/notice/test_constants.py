@@ -1,4 +1,4 @@
-from apps.core.constants import NoticeWay
+from core.constants import NoticeWay
 
 
 class TestNoticeWay:

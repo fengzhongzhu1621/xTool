@@ -14,8 +14,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.settings import api_settings
 
-from apps.core.constants import LEN_NORMAL
-from apps.core.utils.request_provider import get_local_request
+from core.constants import LEN_NORMAL
+from core.utils.request_provider import get_local_request
 
 
 def get_non_request_username():

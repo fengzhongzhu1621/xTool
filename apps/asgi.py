@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/howto/deployment/asgi/
 
 import os
 
-from apps.core.wsgi import get_asgi_application
+from core.wsgi import get_asgi_application
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 

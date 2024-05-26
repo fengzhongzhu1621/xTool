@@ -1,10 +1,6 @@
 from django.http import Http404
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
-from apps.core.drf_resource import ModelResource
-from apps.snippets.models import Snippet
-from apps.snippets.serializers import SnippetSerializer, SnippetSerializer2
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import renderers
@@ -15,6 +11,10 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from apps.snippets.models import Snippet
+from apps.snippets.serializers import SnippetSerializer, SnippetSerializer2
+from core.drf_resource import ModelResource
 
 
 @csrf_exempt

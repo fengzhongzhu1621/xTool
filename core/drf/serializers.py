@@ -11,9 +11,9 @@ from rest_framework.serializers import ModelSerializer as DrfModelSerializer
 from rest_framework.settings import api_settings
 from rest_framework.utils import model_meta
 
-from apps.core.drf.serializer_fields import CustomDateTimeField
-from apps.core.exceptions import ParamValidationError
-from apps.core.models import MultiStrSplitCharField, MultiStrSplitTextField
+from core.drf.serializer_fields import CustomDateTimeField
+from core.exceptions import ParamValidationError
+from core.models import MultiStrSplitCharField, MultiStrSplitTextField
 
 
 class FilterConditionSerializer(serializers.Serializer):

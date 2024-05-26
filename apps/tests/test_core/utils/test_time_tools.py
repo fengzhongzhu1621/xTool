@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from apps.core.utils import from_iso_format
+from core.utils import from_iso_format
 
 
 def test_from_iso_format():

@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import APIException
 
-from apps.core.drf_resource.logger import tracer, logger
+from core.drf_resource.logger import tracer, logger
 from xTool.plugin import register_plugin
 
 
