@@ -1,5 +1,6 @@
 import django
 from django.conf import settings
+from django.core.handlers.asgi import ASGIHandler
 from django.core.handlers.wsgi import WSGIHandler
 
 from xTool.opentelemetry.metrics.server import start_metrics_http_server
@@ -19,3 +20,14 @@ def get_wsgi_application():
         start_metrics_http_server()
 
     return WSGIHandler()
+
+
+def get_asgi_application():
+    """
+    The public interface to Django's ASGI support. Return an ASGI 3 callable.
+
+    Avoids making django.core.handlers.ASGIHandler a public API, in case the
+    internal implementation changes or moves in the future.
+    """
+    django.setup(set_prefix=False)
+    return ASGIHandler()

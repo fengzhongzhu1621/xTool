@@ -50,6 +50,7 @@ ipy
 openpyxl
 mysqlclient
 jsondiff
+uvicorn==0.29.0
 
 Django==3.2.25
 djangorestframework==3.14.0
