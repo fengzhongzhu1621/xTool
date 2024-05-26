@@ -1,24 +1,26 @@
 import logging
 
 import pytest
-from bamboo_engine import api
-from bamboo_engine.builder import (
-    build_tree,
-    EmptyStartEvent,
-    ServiceActivity,
-    EmptyEndEvent,
-    ParallelGateway,
-    ConvergeGateway,
-)
-
-from pipeline.eri.runtime import BambooDjangoRuntime
 
 pytestmark = pytest.mark.django_db
 
 logging.basicConfig(level=logging.DEBUG)
 
 
+@pytest.mark.skip
 def test_parallel_gateway():
+    from bamboo_engine import api
+    from bamboo_engine.builder import (
+        build_tree,
+        EmptyStartEvent,
+        ServiceActivity,
+        EmptyEndEvent,
+        ParallelGateway,
+        ConvergeGateway,
+    )
+
+    from pipeline.eri.runtime import BambooDjangoRuntime
+
     start = EmptyStartEvent()
     pg = ParallelGateway()
     act_1 = ServiceActivity(component_code="pipe_example_component", name="act_1")

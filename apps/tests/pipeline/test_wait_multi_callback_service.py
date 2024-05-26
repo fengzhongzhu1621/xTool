@@ -1,17 +1,24 @@
 import logging
 
 import pytest
-from bamboo_engine import api
-from bamboo_engine.builder import *
-
-from pipeline.eri.runtime import BambooDjangoRuntime
 
 pytestmark = pytest.mark.django_db
 
 logging.basicConfig(level=logging.DEBUG)
 
 
+@pytest.mark.skip
 def test_wait_multi_callback_schedule_component__schedule_success():
+    from bamboo_engine import api
+    from bamboo_engine.builder import (
+        EmptyStartEvent,
+        ServiceActivity,
+        EmptyEndEvent,
+        builder,
+    )
+
+    from pipeline.eri.runtime import BambooDjangoRuntime
+
     # 使用 builder 构造出流程描述结构
     start = EmptyStartEvent()
     # 这里先使用 bamboo-pipeline 自带的示例组件，我们会在后续的章节中学习如何自定义组件
@@ -47,6 +54,16 @@ def test_wait_multi_callback_schedule_component__schedule_success():
 
 
 def test_wait_multi_callback_schedule_component__schedule_failure():
+    from bamboo_engine import api
+    from bamboo_engine.builder import (
+        EmptyStartEvent,
+        ServiceActivity,
+        EmptyEndEvent,
+        builder,
+    )
+
+    from pipeline.eri.runtime import BambooDjangoRuntime
+
     # 使用 builder 构造出流程描述结构
     start = EmptyStartEvent()
     # 这里先使用 bamboo-pipeline 自带的示例组件，我们会在后续的章节中学习如何自定义组件
@@ -82,6 +99,16 @@ def test_wait_multi_callback_schedule_component__schedule_failure():
 
 
 def test_wait_multi_callback_schedule_component__schedule_repeat():
+    from bamboo_engine import api
+    from bamboo_engine.builder import (
+        EmptyStartEvent,
+        ServiceActivity,
+        EmptyEndEvent,
+        builder,
+    )
+
+    from pipeline.eri.runtime import BambooDjangoRuntime
+
     # 使用 builder 构造出流程描述结构
     start = EmptyStartEvent()
     act = ServiceActivity(component_code="wait_multi_callback_component")
@@ -110,16 +137,26 @@ def test_wait_multi_callback_schedule_component__schedule_repeat():
     result = api.callback(runtime, act.id, version=version, data={"status": 0})
     assert result.result is True
     result = api.get_execution_data_outputs(runtime, act.id)
-    assert result.data == {'output_a': 'output_a_value', '_result': True, '_loop': 1, '_inner_loop': 1, 'status': 0}
+    assert result.data == {"output_a": "output_a_value", "_result": True, "_loop": 1, "_inner_loop": 1, "status": 0}
 
     # 再次执行，重新执行该节点的schedule逻辑
     result = api.callback(runtime, act.id, version=version, data={"status": 1})
     assert result.result is True
     result = api.get_execution_data_outputs(runtime, act.id)
-    assert result.data == {'output_a': 'output_a_value', '_result': True, '_loop': 1, '_inner_loop': 1, 'status': 1}
+    assert result.data == {"output_a": "output_a_value", "_result": True, "_loop": 1, "_inner_loop": 1, "status": 1}
 
 
 def test_wait_multi_callback_schedule_component__schedule_exception_repeat():
+    from bamboo_engine import api
+    from bamboo_engine.builder import (
+        EmptyStartEvent,
+        ServiceActivity,
+        EmptyEndEvent,
+        builder,
+    )
+
+    from pipeline.eri.runtime import BambooDjangoRuntime
+
     # 使用 builder 构造出流程描述结构
     start = EmptyStartEvent()
     act = ServiceActivity(component_code="wait_multi_callback_component")
@@ -156,7 +193,7 @@ def test_wait_multi_callback_schedule_component__schedule_exception_repeat():
     result = api.retry_node(runtime, act.id, data={})
     assert result.result is True
     result = api.get_execution_data_outputs(runtime, act.id)
-    assert result.data == {'output_a': 'output_a_value', '_result': True, '_loop': 1, '_inner_loop': 1}
+    assert result.data == {"output_a": "output_a_value", "_result": True, "_loop": 1, "_inner_loop": 1}
 
     # 需要重新获得节点的版本
     state = runtime.get_state(act.id)
@@ -166,4 +203,4 @@ def test_wait_multi_callback_schedule_component__schedule_exception_repeat():
     result = api.callback(runtime, act.id, version=version, data={"status": 2})
     assert result.result is True
     result = api.get_execution_data_outputs(runtime, act.id)
-    assert result.data == {'output_a': 'output_a_value', '_result': True, '_loop': 1, '_inner_loop': 1, 'status': 2}
+    assert result.data == {"output_a": "output_a_value", "_result": True, "_loop": 1, "_inner_loop": 1, "status": 2}

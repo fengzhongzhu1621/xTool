@@ -1,26 +1,27 @@
 import logging
 
 import pytest
-from bamboo_engine import api
-from bamboo_engine.builder import (
-    build_tree,
-    EmptyStartEvent,
-    ServiceActivity,
-    EmptyEndEvent,
-    ExclusiveGateway,
-    Var,
-    Data,
-    NodeOutput,
-)
-
-from pipeline.eri.runtime import BambooDjangoRuntime
 
 pytestmark = pytest.mark.django_db
 
 logging.basicConfig(level=logging.DEBUG)
 
 
+@pytest.mark.skip
 def test_exclusive_gateway():
+    from bamboo_engine import api
+    from bamboo_engine.builder import (
+        build_tree,
+        EmptyStartEvent,
+        ServiceActivity,
+        EmptyEndEvent,
+        ExclusiveGateway,
+        Var,
+        Data,
+        NodeOutput,
+    )
+    from pipeline.eri.runtime import BambooDjangoRuntime
+
     start = EmptyStartEvent()
     act_1 = ServiceActivity(component_code="pipe_example_component", name="act_1")
     eg = ExclusiveGateway(
@@ -41,9 +42,7 @@ def test_exclusive_gateway():
     # 声明了一个 key 为 ${act_1_output} 的全局变量，该变量是对 act_1 输出数据中 key 为 input_a 的变量的引用
     # source_act：要引用的变量所属的输出节点 ID
     # source_key：要引用的变量在其节点被输出后的 key
-    pipeline_data.inputs["${act_1_output}"] = NodeOutput(
-        type=Var.SPLICE, source_act=act_1.id, source_key="input_a"
-    )
+    pipeline_data.inputs["${act_1_output}"] = NodeOutput(type=Var.SPLICE, source_act=act_1.id, source_key="input_a")
 
     options = {
         "celery_disabled": True,

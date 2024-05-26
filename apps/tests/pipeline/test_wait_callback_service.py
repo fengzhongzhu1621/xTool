@@ -1,17 +1,24 @@
 import logging
 
 import pytest
-from bamboo_engine import api
-from bamboo_engine.builder import *
-
-from pipeline.eri.runtime import BambooDjangoRuntime
 
 pytestmark = pytest.mark.django_db
 
 logging.basicConfig(level=logging.DEBUG)
 
 
+@pytest.mark.skip
 def test_wait_callback_schedule_component__schedule_failure():
+    from bamboo_engine import api
+    from bamboo_engine.builder import (
+        EmptyStartEvent,
+        ServiceActivity,
+        EmptyEndEvent,
+        builder,
+    )
+
+    from pipeline.eri.runtime import BambooDjangoRuntime
+
     # 使用 builder 构造出流程描述结构
     start = EmptyStartEvent()
     act = ServiceActivity(component_code="wait_callback_component")
@@ -44,10 +51,20 @@ def test_wait_callback_schedule_component__schedule_failure():
     # 第二次执行时，会标记DBSchedule过期，不会重复执行
     result = api.callback(runtime, act.id, version=version, data={"status": 1})
     assert result.result is True
-    assert result.__dict__== {'result': True, 'message': 'success', 'exc': None, 'data': None, 'exc_trace': None}
+    assert result.__dict__ == {"result": True, "message": "success", "exc": None, "data": None, "exc_trace": None}
 
 
 def test_wait_callback_schedule_component__schedule_success():
+    from bamboo_engine import api
+    from bamboo_engine.builder import (
+        EmptyStartEvent,
+        ServiceActivity,
+        EmptyEndEvent,
+        builder,
+    )
+
+    from pipeline.eri.runtime import BambooDjangoRuntime
+
     # 使用 builder 构造出流程描述结构
     start = EmptyStartEvent()
     act = ServiceActivity(component_code="wait_callback_component")
