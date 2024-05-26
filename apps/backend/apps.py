@@ -2,10 +2,11 @@ import os
 import traceback
 
 import redis
-from blueapps.utils.logger import logger
 from django.apps import AppConfig
 from django.conf import settings
 from redis.sentinel import Sentinel
+
+from apps.logger import logger
 
 
 def get_client_through_sentinel():

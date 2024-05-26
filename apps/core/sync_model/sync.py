@@ -4,7 +4,7 @@ from django.db import transaction
 from django.db.models import Model
 
 from apps.core.sync_model.models import get_model_value
-from xTool.log import logger
+from apps.logger import logger
 from xTool.misc import chunks
 
 

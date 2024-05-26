@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from rest_framework.settings import api_settings
 
-from xTool.log import logger
+from apps.logger import logger
 
 __all__ = [
     "localtime",

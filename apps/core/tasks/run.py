@@ -2,7 +2,7 @@ import time
 from typing import Callable
 
 from apps.core.lock import share_lock
-from xTool.log import logger
+from apps.logger import logger
 
 
 def run_sub_task(task_name: str, wrapper: Callable, identify: str, *args, **kwargs):

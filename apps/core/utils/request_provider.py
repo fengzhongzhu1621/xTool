@@ -1,7 +1,6 @@
 import uuid
 
-from blueapps.conf import settings
-from blueapps.settings import blueapps_settings
+from django.conf import settings
 from django.dispatch import Signal
 from django.utils.deprecation import MiddlewareMixin
 
@@ -152,7 +151,7 @@ def get_request_username():
     try:
         operator = get_local_request().user.username
     except (IndexError, AttributeError):
-        if blueapps_settings.NON_REQUEST_USERNAME_PROVIDER:
-            operator = blueapps_settings.NON_REQUEST_USERNAME_PROVIDER()
+        if getattr(settings, "NON_REQUEST_USERNAME_PROVIDER"):
+            operator = settings.NON_REQUEST_USERNAME_PROVIDER()
 
     return operator

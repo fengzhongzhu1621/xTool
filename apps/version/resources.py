@@ -2,13 +2,13 @@ import abc
 from typing import Dict
 
 import orjson as json
-from bk_resource import Resource
-from blueapps.utils.request_provider import get_local_request
 from django.utils.translation import gettext_lazy as _lazy
 from version_log import config, views
 from version_log.models import VersionLogVisited
 
+from apps.core.utils.request_provider import get_local_request
 from apps.version.serializers import VersionLogDetailRequestSerializer
+from bk_resource import Resource
 
 
 class VersionBaseResource(Resource, abc.ABC):

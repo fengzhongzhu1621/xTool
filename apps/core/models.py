@@ -19,7 +19,7 @@ from apps.core.utils.request_provider import get_local_request
 
 
 def get_non_request_username():
-    provider = getattr(settings, "BLUEAPPS", {}).get("NON_REQUEST_USERNAME_PROVIDER")
+    provider = getattr(settings, "NON_REQUEST_USERNAME_PROVIDER", "")
     if provider:
         try:
             module, method = provider.rsplit(".", 1)
