@@ -23,7 +23,7 @@ class AccessorSignal(Signal):
     """"""
 
     allowed_receivers = [
-        "apps.core.utils.request_provider.RequestProvider",
+        "core.utils.request_provider.RequestProvider",
     ]
 
     def __init__(self, providing_args=None):

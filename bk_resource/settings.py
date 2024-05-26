@@ -1,16 +1,16 @@
 from collections import defaultdict
-from typing import Union
 
 from django.conf import settings
-from django.utils.module_loading import import_string
+
+from core.settings import UserSettings
 
 
-class BkResourceSettings():
+class BkResourceSettings(UserSettings):
     """
     Settings
     """
 
-    SETTINGS = defaultdict(
+    DEFAULT_SETTINGS = defaultdict(
         None,
         DEFAULT_API_DIR="api",
         DEFAULT_RESOURCE_DIRS=[],
@@ -42,55 +42,5 @@ class BkResourceSettings():
         "REQUEST_LOG_HANDLER",
     )
 
-    LOADED_SETTINGS = {}
 
-    def __getattr__(self, key: str) -> any:
-        """
-        get settings from self
-        """
-
-        # 0. validate key
-        self.__validate_key(key)
-
-        # 1. load Key from cache
-        if key in self.LOADED_SETTINGS.keys():
-            return self.LOADED_SETTINGS[key]
-
-        # 2. load key from django.conf.settings
-        if key in self.custom_settings.keys():
-            return self.__load_key(key, self.custom_settings[key])
-
-        # 3. load key from default settings
-        return self.__load_key(key, self.SETTINGS[key])
-
-    def __validate_key(self, key: str) -> None:
-        """
-        validate key
-        """
-
-        if key not in self.SETTINGS.keys():
-            raise KeyError("[%s] is not a valid key for bk_resource" % key)
-
-    def __load_key(self, key: str, val: Union[str, callable]) -> any:
-        """
-        load lazy import key to cache
-        """
-
-        # load lazy setting
-        if key in self.LAZY_IMPORT_SETTINGS and isinstance(val, str):
-            val = import_string(val)
-            self.LOADED_SETTINGS[key] = val
-
-        # return value
-        return val
-
-    @property
-    def custom_settings(self) -> dict:
-        """
-        Custom settings in django.conf.settings
-        """
-
-        return getattr(settings, "BK_RESOURCE", {})
-
-
-bk_resource_settings = BkResourceSettings()
+bk_resource_settings = BkResourceSettings("BK_RESOURCE")

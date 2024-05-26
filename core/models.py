@@ -4,7 +4,6 @@ from importlib import import_module
 from typing import Any, Dict, List, Tuple
 
 import orjson as json
-from bk_resource.utils.common_utils import is_backend
 from django.conf import settings
 from django.core import exceptions
 from django.db import models
@@ -15,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.settings import api_settings
 
 from core.constants import LEN_NORMAL
+from core.utils.process import is_backend
 from core.utils.request_provider import get_local_request
 
 

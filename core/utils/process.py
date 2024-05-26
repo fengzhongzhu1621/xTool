@@ -11,7 +11,7 @@ def is_backend() -> bool:
     # 非web请求
     if any(
         [
-            "manage.py" == basename and "runserver" not in sys.argv,
+            "manage.py" == basename and "runserver" not in sys.argv and "runsslserver" not in sys.argv,
             "celery" in sys.argv,
             "test" in sys.argv,
             "migrate" in sys.argv,

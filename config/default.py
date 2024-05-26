@@ -62,7 +62,7 @@ INSTALLED_APPS = (
     "bk_resource",
     "drf_yasg",
     "version_log",
-    "apps.core.drf_resource",
+    "core.drf_resource",
     # "apigw_manager.apigw",
     # bamboo-pipeline
     # "pipeline",
@@ -88,7 +88,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE = (
     # 将请求对象注入到线程变量，方便根据 get_request() 方法获取
-    "apps.core.middleware.request_provider.RequestProvider",
+    "core.middleware.request_provider.RequestProvider",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -99,10 +99,10 @@ MIDDLEWARE = (
     "whitenoise.middleware.WhiteNoiseMiddleware",
     # Auth middleware
     # exception middleware
-    "apps.core.middleware.app_exception.AppExceptionMiddleware",
+    "core.middleware.app_exception.AppExceptionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "apps.core.middleware.csrf.CSRFExemptMiddleware",
+    "core.middleware.csrf.CSRFExemptMiddleware",
 )
 
 AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
@@ -186,9 +186,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # noqa
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "apps.core.exceptions.custom_exception_handler",
+    "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler",
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_PAGINATION_CLASS": "apps.core.drf.pagination.CustomPageNumberWithColumnPagination",
+    "DEFAULT_PAGINATION_CLASS": "core.drf.pagination.CustomPageNumberWithColumnPagination",
     "PAGE_SIZE": 10,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.SessionAuthentication",),
@@ -199,7 +199,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.MultiPartParser",
     ),
-    "DEFAULT_RENDERER_CLASSES": ("apps.core.drf.renderers.APIRenderer",),
+    "DEFAULT_RENDERER_CLASSES": ("core.drf.renderers.APIRenderer",),
     # 版本管理
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
     "DEFAULT_VERSION": "v1",
