@@ -94,7 +94,7 @@ def is_container(obj):
     """判断对象是否可以遍历，但不是字符串
     Test if an object is a container (iterable) but not a string
     """
-    return hasattr(obj, "__iter__") and not isinstance(obj, basestring)
+    return hasattr(obj, "__iter__") and not isinstance(obj, str)
 
 
 def as_tuple(obj):
@@ -202,7 +202,7 @@ def pprinttable(rows):
     s += separator + "\n"
 
     def f(t):
-        return "{}".format(t) if isinstance(t, basestring) else t
+        return "{}".format(t) if isinstance(t, str) else t
 
     for line in rows:
         s += pattern % tuple(f(t) for t in line) + "\n"
