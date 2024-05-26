@@ -10,9 +10,10 @@ from bk_resource.utils.request import set_local_username
 
 
 @task(bind=True)
-def run_perform_request(self, resource_obj, username, request_data):
+def run_perform_request(self, resource_obj: "Resource", username, request_data):
     """
-    将resource作为异步任务执行
+    将resource作为异步任务执行，
+    指定任务函数的第一个参数为任务实例本身(通常命名为self)，允许您在任务函数内部访问任务实例的属性和方法。
     :param self: 任务对象
     :param resource_obj: Resource实例
     :param username: 用户
@@ -23,7 +24,7 @@ def run_perform_request(self, resource_obj, username, request_data):
         resource_obj = import_string(resource_obj)()
     # 设置任务的执行人
     set_local_username(username)
-    # 绑定任务管理器
+    # 绑定celery task 和 Resource 对象
     resource_obj._task_manager = self
     # 执行任务
     validated_request_data = resource_obj.validate_request_data(request_data)

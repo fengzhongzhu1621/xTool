@@ -694,7 +694,7 @@ def to_dict(obj):
         return obj
 
 
-def camel_to_underscore(camel_str):
+def camel_to_underscore(camel_str: str) -> str:
     assert isinstance(camel_str, str)
 
     buf = StringIO()
