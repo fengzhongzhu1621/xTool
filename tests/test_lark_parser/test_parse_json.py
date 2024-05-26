@@ -114,9 +114,7 @@ start: WORD "," WORD "!"
 
     tree = lark_obj.parse("Hello, World!")
 
-    expect = Tree(
-        Token("RULE", "start"), [Token("WORD", "Hello"), Token("WORD", "World")]
-    )
+    expect = Tree(Token("RULE", "start"), [Token("WORD", "Hello"), Token("WORD", "World")])
     assert tree == expect
 
 
@@ -249,19 +247,17 @@ def test_parse_json_3():
     text = '{"key": ["item0", "item1", 3.14, true]}'
     parser = json_parser_3.parse(text)
     expect = (
-        """
-    value
-      dict
-        pair
-          string    "key"
-          value
-            list
-              value
-                string      "item0"
-              value
-                string      "item1"
-              number        3.14
-              true
-    """
+        "value\n"
+        "  dict\n"
+        "    pair\n"
+        '      string\t"key"\n'
+        "      value\n"
+        "        list\n"
+        "          value\n"
+        '            string\t"item0"\n'
+        "          value\n"
+        '            string\t"item1"\n'
+        "          number\t3.14\n"
+        "          true\n"
     ).lstrip()
     assert parser.pretty() == expect

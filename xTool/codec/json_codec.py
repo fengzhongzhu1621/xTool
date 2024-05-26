@@ -1,9 +1,9 @@
 from typing import Union
 
-import rapidjson as json
+import orjson as json
 
-from xTool.plugin import register_plugin, PluginType
 from xTool.misc import tob
+from xTool.plugin import register_plugin, PluginType
 from .base import CodecType
 
 
@@ -11,7 +11,7 @@ from .base import CodecType
 class JsonCodec:
     @classmethod
     def encode(cls, obj: object) -> bytes:
-        return json.dumps(obj).encode("utf8")
+        return tob(json.dumps(obj))
 
     @classmethod
     def decode(cls, data: Union[str, bytes]) -> object:

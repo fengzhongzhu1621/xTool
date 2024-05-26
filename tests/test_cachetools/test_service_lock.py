@@ -11,7 +11,7 @@ def test_share_lock(cache):
 
     run_task = share_lock(cache)(_run_task)
     assert run_task(a=1) == 1
-    assert _run_task._cache_key == "share_lock:cachetools.test_service_lock:_run_task"
+    assert _run_task._cache_key == "share_lock:tests.test_cachetools.test_service_lock:_run_task"
     assert run_task(a=1) == 2
 
     run_task = share_lock(cache, identify="task_a")(_run_task)

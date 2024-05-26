@@ -17,12 +17,6 @@ exclude = '''
 
 [build-system]
 
-[project]
-
-[project.urls]
-
-[project.scripts]
-
 [tool.setuptools.packages.find]
 exclude = ["tests*"]
 
@@ -96,7 +90,6 @@ pymysql = "^1.1.1"
 curlify = "^2.2.1"
 tzlocal = "^5.2"
 python-snappy = "^0.7.1"
-rapidjson = "^1.0.0"
 statsd = "^4.0.1"
 typing-extensions = "^4.12.0"
 netifaces = "^0.11.0"
@@ -104,7 +97,6 @@ aiohttp = "^3.9.5"
 beautifulsoup4 = "^4.12.3"
 ipaddress = "^1.0.23"
 trio = "^0.25.1"
-websockets = "^12.0"
 httpx = "^0.27.0"
 gunicorn = "^22.0.0"
 httptools = "^0.6.1"
@@ -145,6 +137,8 @@ werkzeug = "^3.0.3"
 bk-iam = "^1.3.6"
 django-rest-framework-condition = "^0.1.1"
 aiocron = "^1.8"
+sanic = "^23.12.1"
+speaklater = "^1.3"
 
 [tool.poetry.scripts]
 
@@ -178,4 +172,5 @@ black = "^24.4.2"
 hypothesis = "^6.102.6"
 mockafka-py = "^0.1.55"
 pytest-helpers-namespace = "^2021.12.29"
+pytest-sanic = "^1.9.1"
 

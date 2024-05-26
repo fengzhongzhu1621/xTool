@@ -17,7 +17,6 @@ from collections import OrderedDict
 from tempfile import mkstemp
 
 import six
-from future import standard_library
 from six import iteritems
 from six.moves import configparser
 
@@ -34,8 +33,6 @@ from xTool.utils.module_loading import import_string_from_package
 from xTool.exceptions import XToolConfigException, PyFileError
 from xTool.misc import USE_WINDOWS
 
-
-standard_library.install_aliases()
 
 log = LoggingMixin().log
 

@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 
 import time
 import sys
@@ -6,13 +6,13 @@ import sys
 import pytest
 
 from xTool.utils.timeout import timeout
-from xTool.exceptions import XToolTaskTimeout
+from xTool.exceptions import XToolTimeoutError
 
 
-@pytest.mark.skipif(sys.platform == 'win32', reason="requires windows")
+@pytest.mark.skipif(sys.platform == "win32", reason="requires windows")
 def test_timeout():
     with timeout(1):
         pass
-    with pytest.raises(XToolTaskTimeout):
+    with pytest.raises(XToolTimeoutError):
         with timeout(1):
             time.sleep(2)

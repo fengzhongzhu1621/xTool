@@ -12,14 +12,14 @@ def test_vargs():
         def integer2(cls, *args, **kwargs):
             return args, kwargs
 
-        hello = staticmethod(lambda args: 'hello')
+        hello = staticmethod(lambda args: "hello")
 
-    x = MyTransformer().transform(Tree('integer', [2]))
+    x = MyTransformer().transform(Tree("integer", [2]))
     assert x == (([2],), {})
-    x = MyTransformer().transform(Tree('integer2', [2]))
+    x = MyTransformer().transform(Tree("integer2", [2]))
     assert x == (([2],), {})
-    x = MyTransformer().transform(Tree('hello', [2]))
-    assert x == 'hello'
+    x = MyTransformer().transform(Tree("hello", [2]))
+    assert x == "hello"
 
 
 def test_vargs_inline():
@@ -36,16 +36,16 @@ def test_vargs_inline():
         def integer3(self, *args, **kwargs):
             return args, kwargs
 
-        hello = staticmethod(lambda args: 'hello')
+        hello = staticmethod(lambda args: "hello")
 
-    x = MyTransformer().transform(Tree('integer', [2]))
+    x = MyTransformer().transform(Tree("integer", [2]))
     assert x == ((2,), {})
-    x = MyTransformer().transform(Tree('integer2', [2]))
+    x = MyTransformer().transform(Tree("integer2", [2]))
     assert x == ((2,), {})
-    x = MyTransformer().transform(Tree('integer3', [2]))
+    x = MyTransformer().transform(Tree("integer3", [2]))
     assert x == ((2,), {})
-    x = MyTransformer().transform(Tree('hello', [2]))
-    assert x == 'hello'
+    x = MyTransformer().transform(Tree("hello", [2]))
+    assert x == "hello"
 
 
 def test_vargs_tree():
@@ -62,16 +62,16 @@ def test_vargs_tree():
         def integer3(self, *args, **kwargs):
             return args, kwargs
 
-        hello = staticmethod(lambda args: 'hello')
+        hello = staticmethod(lambda args: "hello")
 
-    x = MyTransformer().transform(Tree('integer', [2]))
-    assert x == ((Tree('integer', [2]),), {})
-    x = MyTransformer().transform(Tree('integer2', [2]))
-    assert x == ((Tree('integer2', [2]),), {})
-    x = MyTransformer().transform(Tree('integer3', [2]))
-    assert x == ((Tree('integer3', [2]),), {})
-    x = MyTransformer().transform(Tree('hello', [2]))
-    assert x == 'hello'
+    x = MyTransformer().transform(Tree("integer", [2]))
+    assert x == ((Tree("integer", [2]),), {})
+    x = MyTransformer().transform(Tree("integer2", [2]))
+    assert x == ((Tree("integer2", [2]),), {})
+    x = MyTransformer().transform(Tree("integer3", [2]))
+    assert x == ((Tree("integer3", [2]),), {})
+    x = MyTransformer().transform(Tree("hello", [2]))
+    assert x == "hello"
 
 
 def test_vargs_meta_inline():
@@ -88,28 +88,32 @@ def test_vargs_meta_inline():
         def integer3(self, *args, **kwargs):
             return args, kwargs
 
-        hello = staticmethod(lambda args: 'hello')
+        hello = staticmethod(lambda args: "hello")
 
-    x = MyTransformer().transform(Tree('integer', [2]))
-    assert x == ((Tree('integer', [2]),), {})
-    x = MyTransformer().transform(Tree('integer2', [2]))
-    assert x == ((Tree('integer2', [2]),), {})
-    x = MyTransformer().transform(Tree('integer3', [2]))
-    assert x == ((Tree('integer3', [2]),), {})
-    x = MyTransformer().transform(Tree('hello', [2]))
-    assert x == 'hello'
+    x = MyTransformer().transform(Tree("integer", [2]))
+    assert x == ((Tree("integer", [2]),), {})
+    x = MyTransformer().transform(Tree("integer2", [2]))
+    assert x == ((Tree("integer2", [2]),), {})
+    x = MyTransformer().transform(Tree("integer3", [2]))
+    assert x == ((Tree("integer3", [2]),), {})
+    x = MyTransformer().transform(Tree("hello", [2]))
+    assert x == "hello"
 
 
 def test_transformer():
-    t = Tree('add',
-             [
-                 Tree('sub',
-                      [
-                          Tree('i', ['3']),
-                          Tree('f', ['1.1']),
-                      ]),
-                 Tree('i', ['1'])
-             ])
+    t = Tree(
+        "add",
+        [
+            Tree(
+                "sub",
+                [
+                    Tree("i", ["3"]),
+                    Tree("f", ["1.1"]),
+                ],
+            ),
+            Tree("i", ["1"]),
+        ],
+    )
 
     class T(Transformer):
         i = v_args(inline=True)(int)

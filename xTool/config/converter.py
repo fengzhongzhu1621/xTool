@@ -1,6 +1,6 @@
+import sys
 from typing import Dict, List
 
-import sys
 from xTool.type_hint import get_class_object_init_type
 
 
@@ -9,7 +9,7 @@ class DictConfigConverter:
         self.dict_config = dict_config
 
     def marshal(self):
-        "将配置对象转换为Dict配置 ." ""
+        """将配置对象转换为Dict配置 ."""
         pass
 
     def unmarshal(self, key: str, target_object: object) -> object:
@@ -33,7 +33,7 @@ class DictConfigConverter:
             py_version = sys.version_info
             if py_version.major == 3 and py_version.minor == 6:
                 attr_type_class = getattr(attr_type, "__extra__", attr_type)
-            elif py_version.version_info > (3, 6):
+            elif py_version > (3, 6):
                 attr_type_class = getattr(attr_type, "__origin__", attr_type)
             else:
                 attr_type_class = attr_type

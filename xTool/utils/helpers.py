@@ -1,19 +1,12 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
-
-from builtins import input
-from past.builtins import basestring
-from datetime import datetime
-from functools import reduce
 import os
+import platform
 import re
 import shlex
 import subprocess
 import sys
-import platform
+from builtins import input
+from datetime import datetime
+from functools import reduce
 
 from jinja2 import Template
 
@@ -22,7 +15,7 @@ from xTool.exceptions import XToolException
 
 def validate_key(k, max_length=250):
     """验证key的格式 ."""
-    if not isinstance(k, basestring):
+    if not isinstance(k, str):
         raise TypeError("The key has to be a string")
     elif len(k) > max_length:
         raise XToolException("The key has to be less than {0} characters".format(max_length))

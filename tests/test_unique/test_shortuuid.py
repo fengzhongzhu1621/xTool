@@ -15,7 +15,7 @@ def test_uuid():
 
 def test_uuid_with_len():
     """生成指定长度的短 uuid"""
-    actual = shortuuid.ShortUUID().random(lenght=10)
+    actual = shortuuid.ShortUUID().random(length=10)
     assert len(actual) == 10
 
 

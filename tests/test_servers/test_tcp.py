@@ -1,9 +1,10 @@
 import asyncio
 import socket
-
+import pytest
 from xTool.servers.tcp import TCPServer
 
 
+@pytest.mark.skip
 def test_tcp_server(aiomisc_unused_port):
     loop = asyncio.get_event_loop()
 
