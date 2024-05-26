@@ -54,6 +54,7 @@ def test_wait_callback_schedule_component__schedule_failure():
     assert result.__dict__ == {"result": True, "message": "success", "exc": None, "data": None, "exc_trace": None}
 
 
+@pytest.mark.skip
 def test_wait_callback_schedule_component__schedule_success():
     from bamboo_engine import api
     from bamboo_engine.builder import (

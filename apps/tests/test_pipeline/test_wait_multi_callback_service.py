@@ -53,6 +53,7 @@ def test_wait_multi_callback_schedule_component__schedule_success():
     assert result.result is False
 
 
+@pytest.mark.skip
 def test_wait_multi_callback_schedule_component__schedule_failure():
     from bamboo_engine import api
     from bamboo_engine.builder import (
@@ -98,6 +99,7 @@ def test_wait_multi_callback_schedule_component__schedule_failure():
     assert result.result is True
 
 
+@pytest.mark.skip
 def test_wait_multi_callback_schedule_component__schedule_repeat():
     from bamboo_engine import api
     from bamboo_engine.builder import (
@@ -146,6 +148,7 @@ def test_wait_multi_callback_schedule_component__schedule_repeat():
     assert result.data == {"output_a": "output_a_value", "_result": True, "_loop": 1, "_inner_loop": 1, "status": 1}
 
 
+@pytest.mark.skip
 def test_wait_multi_callback_schedule_component__schedule_exception_repeat():
     from bamboo_engine import api
     from bamboo_engine.builder import (

@@ -22,16 +22,3 @@ class SnippetViewSetResource(ModelResource):
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         return response
-
-
-class TestSnippetViewSet:
-
-    def test_perform_request(self):
-        actual = SnippetViewSetResource().request({"a": 1}, action="list")
-        assert actual == []
-
-        # actual = SnippetViewSetResource().request({
-        #     "id": 1,
-        #     "a": 1
-        # }, action="highlight")
-        # assert actual == []

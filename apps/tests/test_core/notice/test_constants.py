@@ -4,7 +4,7 @@ from core.constants import NoticeWay
 class TestNoticeWay:
     def test_names(self):
         actual = NoticeWay.names
-        expect = ["SMS", "EMAIL", "WEIXIN", "QY_WEIXIN", "VOICE", "WX_BOT"]
+        expect = ["SMS", "EMAIL", "WECHAT", "WECOM", "VOICE", "WECOM_BOT"]
         assert actual == expect
 
     def test_choices(self):

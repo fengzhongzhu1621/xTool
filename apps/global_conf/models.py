@@ -52,6 +52,7 @@ class GlobalConfigManager(SoftDeleteModelManager):
         """
         设置配置信息
         """
+        # 配置不存则在创建
         instance = self.filter(name=name).first()
         new_model = self.model.create_option(value)
         if instance:
@@ -84,9 +85,3 @@ class GlobalConfig(OptionBase):
 
     def __str__(self):
         return self.name
-
-    @classmethod
-    def create_option(cls, value: Any) -> "GlobalConfig":
-        new_model = super().create_option(value)
-        new_model.value = new_model.value if value is not None else None
-        return new_model
