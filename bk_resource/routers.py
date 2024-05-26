@@ -31,6 +31,7 @@ class ResourceRouter(DefaultRouter):
             # 全小写的属性不是类，忽略
             if attr.startswith("_") or attr[0].islower():
                 continue
+            # 忽略 ResourceViewSet
             if attr == "ResourceViewSet":
                 continue
             if isinstance(viewset, type) and issubclass(viewset, GenericViewSet):

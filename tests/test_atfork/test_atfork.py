@@ -19,13 +19,12 @@
 # Author: Gregory P. Smith <greg@krypto.org>
 
 """Tests for atfork."""
-
-import os
-import sys
 import importlib
-from xTool.compat import StringIO
+import os  # noqa
+import sys
 import traceback
 import unittest
+from io import StringIO
 
 from xTool import atfork
 
@@ -133,9 +132,7 @@ class AtforkTest(unittest.TestCase):
         if pid == 0:
             try:
                 try:
-                    self.assertEqual(
-                        [self._pre, self._other, self._child, self._other], self.calls
-                    )
+                    self.assertEqual([self._pre, self._other, self._child, self._other], self.calls)
                     self.assertFalse(atfork._fork_lock.locked())
                     self._assert_expected_child_stderr(sys.stderr.getvalue())
                 except BaseException:
@@ -147,9 +144,7 @@ class AtforkTest(unittest.TestCase):
             finally:
                 os._exit(0)
         else:
-            self.assertEqual(
-                [self._pre, self._other, self._parent, self._other], self.calls
-            )
+            self.assertEqual([self._pre, self._other, self._parent, self._other], self.calls)
             self.assertFalse(atfork._fork_lock.locked())
             self.assertEqual(0, os.waitpid(pid, 0)[1], "error in child")
         self._assert_expected_parent_stderr(sys.stderr.getvalue())

@@ -2,6 +2,9 @@ import asyncio
 import threading
 import time
 
+import aiocron
+import pytest
+
 
 class CronThread(threading.Thread):
 
@@ -25,15 +28,15 @@ class CronThread(threading.Thread):
         return aiocron.crontab(*args, **kwargs)
 
 
-cron = CronThread()
+@pytest.mark.skip
+def test_cron_thread():
+    cron = CronThread()
 
+    @cron.crontab("* * * * * *")
+    @asyncio.coroutine
+    def run():
+        yield from asyncio.sleep(0.1)
+        print("It works")
 
-@cron.crontab("* * * * * *")
-@asyncio.coroutine
-def run():
-    yield from asyncio.sleep(0.1)
-    print("It works")
-
-
-asyncio.get_event_loop().run_forever()
-cron.stop()
+    asyncio.get_event_loop().run_forever()
+    cron.stop()

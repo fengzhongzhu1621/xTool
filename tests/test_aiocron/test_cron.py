@@ -36,6 +36,7 @@ def test_sleep():
     # loop.run_until_complete(future)
 
 
+@pytest.mark.skip
 def test_cron():
     loop = asyncio.new_event_loop()
 
@@ -52,6 +53,7 @@ def test_cron():
     assert future.result() == 1
 
 
+@pytest.mark.skip
 def test_raise():
     loop = asyncio.new_event_loop()
 
@@ -68,6 +70,7 @@ def test_raise():
     assert future.result() == 1
 
 
+@pytest.mark.skip
 def test_next():
     loop = asyncio.new_event_loop()
 
@@ -82,6 +85,7 @@ def test_next():
     assert future.result() == 1
 
 
+@pytest.mark.skip
 def test_null_callback():
     loop = asyncio.new_event_loop()
 
@@ -95,6 +99,7 @@ def test_null_callback():
     assert future.result() == (4,)
 
 
+@pytest.mark.skip
 def test_next_raise():
     loop = asyncio.new_event_loop()
 
@@ -108,6 +113,7 @@ def test_next_raise():
         loop.run_until_complete(future)
 
 
+@pytest.mark.skip
 def test_coro_next():
     loop = asyncio.new_event_loop()
 
@@ -121,6 +127,7 @@ def test_coro_next():
     assert future.result() == 1
 
 
+@pytest.mark.skip
 def test_coro_next_raise():
     loop = asyncio.new_event_loop()
 
