@@ -67,9 +67,7 @@ class TestSerializer:
         class Serializer(serializers.Serializer):
             field = serializers.IntegerField(read_only=True)
 
-        data = {
-            "field": 1
-        }
+        data = {"field": 1}
 
         serializer = Serializer(data=data)
         assert serializer.initial_data == data
@@ -80,13 +78,16 @@ class TestSerializer:
         serializer.field = 2
         assert serializer.data == {}
 
-    @pytest.mark.parametrize("data,output,is_valid", [
-        [{"field": 1}, {'field': '1'}, True],
-        [{"field": 0}, {"field": '0'}, True],
-        [{}, {}, False],
-        [{"field": None}, {"field": None}, False],
-        [{"field": ""}, {"field": ""}, False],
-    ])
+    @pytest.mark.parametrize(
+        "data,output,is_valid",
+        [
+            [{"field": 1}, {"field": "1"}, True],
+            [{"field": 0}, {"field": "0"}, True],
+            [{}, {}, False],
+            [{"field": None}, {"field": None}, False],
+            [{"field": ""}, {"field": ""}, False],
+        ],
+    )
     def test_char_field_required(self, data, output, is_valid):
         class Serializer(serializers.Serializer):
             field = serializers.CharField(required=True)
@@ -96,14 +97,17 @@ class TestSerializer:
         assert serializer.is_valid() is is_valid
         assert serializer.data == output
 
-    @pytest.mark.parametrize("data,output,is_valid", [
-        [{"field": 1}, {'field': 1}, True],
-        [{"field": 0}, {"field": 0}, True],
-        [{"field": '0'}, {"field": 0}, True],
-        [{}, {}, False],
-        [{"field": None}, {"field": None}, False],
-        [{"field": ""}, {"field": ""}, False],
-    ])
+    @pytest.mark.parametrize(
+        "data,output,is_valid",
+        [
+            [{"field": 1}, {"field": 1}, True],
+            [{"field": 0}, {"field": 0}, True],
+            [{"field": "0"}, {"field": 0}, True],
+            [{}, {}, False],
+            [{"field": None}, {"field": None}, False],
+            [{"field": ""}, {"field": ""}, False],
+        ],
+    )
     def test_int_field_required(self, data, output, is_valid):
         class Serializer(serializers.Serializer):
             field = serializers.IntegerField(required=True)
@@ -112,61 +116,61 @@ class TestSerializer:
         assert serializer.is_valid() is is_valid
         assert serializer.data == output
 
-    @pytest.mark.parametrize("serializer_cls,data,output,is_valid", [
-        [SerializerRequiredIsTrueAndAllowBlankIsFlse, {"field": 1}, {'field': '1'}, True],
-        [SerializerRequiredIsTrueAndAllowBlankIsFlse, {"field": 0}, {"field": '0'}, True],
-        [SerializerRequiredIsTrueAndAllowBlankIsFlse, {"field": ""}, {"field": ""}, False],
-        [SerializerRequiredIsTrueAndAllowBlankIsFlse, {}, {}, False],
-        [SerializerRequiredIsTrueAndAllowBlankIsFlse, {"field": None}, {"field": None}, False],
-
-        [SerializerRequiredIsTrueAndAllowBlankIsTrue, {"field": 1}, {'field': '1'}, True],
-        [SerializerRequiredIsTrueAndAllowBlankIsTrue, {"field": 0}, {"field": '0'}, True],
-        [SerializerRequiredIsTrueAndAllowBlankIsTrue, {"field": ""}, {"field": ""}, True],
-        [SerializerRequiredIsTrueAndAllowBlankIsTrue, {}, {}, False],
-        [SerializerRequiredIsTrueAndAllowBlankIsTrue, {"field": None}, {"field": None}, False],
-
-        [SerializerRequiredIsFalseAndAllowBlankIsTrue, {"field": 1}, {'field': '1'}, True],
-        [SerializerRequiredIsFalseAndAllowBlankIsTrue, {"field": 0}, {"field": '0'}, True],
-        [SerializerRequiredIsFalseAndAllowBlankIsTrue, {"field": ""}, {"field": ""}, True],
-        [SerializerRequiredIsFalseAndAllowBlankIsTrue, {}, {}, True],
-        [SerializerRequiredIsFalseAndAllowBlankIsTrue, {"field": None}, {"field": None}, False],
-
-        [SerializerRequiredIsFalseAndAllowBlankIsFalse, {"field": 1}, {'field': '1'}, True],
-        [SerializerRequiredIsFalseAndAllowBlankIsFalse, {"field": 0}, {"field": '0'}, True],
-        [SerializerRequiredIsFalseAndAllowBlankIsFalse, {"field": ""}, {"field": ""}, False],
-        [SerializerRequiredIsFalseAndAllowBlankIsFalse, {}, {}, True],
-        [SerializerRequiredIsFalseAndAllowBlankIsFalse, {"field": None}, {"field": None}, False],
-    ])
+    @pytest.mark.parametrize(
+        "serializer_cls,data,output,is_valid",
+        [
+            [SerializerRequiredIsTrueAndAllowBlankIsFlse, {"field": 1}, {"field": "1"}, True],
+            [SerializerRequiredIsTrueAndAllowBlankIsFlse, {"field": 0}, {"field": "0"}, True],
+            [SerializerRequiredIsTrueAndAllowBlankIsFlse, {"field": ""}, {"field": ""}, False],
+            [SerializerRequiredIsTrueAndAllowBlankIsFlse, {}, {}, False],
+            [SerializerRequiredIsTrueAndAllowBlankIsFlse, {"field": None}, {"field": None}, False],
+            [SerializerRequiredIsTrueAndAllowBlankIsTrue, {"field": 1}, {"field": "1"}, True],
+            [SerializerRequiredIsTrueAndAllowBlankIsTrue, {"field": 0}, {"field": "0"}, True],
+            [SerializerRequiredIsTrueAndAllowBlankIsTrue, {"field": ""}, {"field": ""}, True],
+            [SerializerRequiredIsTrueAndAllowBlankIsTrue, {}, {}, False],
+            [SerializerRequiredIsTrueAndAllowBlankIsTrue, {"field": None}, {"field": None}, False],
+            [SerializerRequiredIsFalseAndAllowBlankIsTrue, {"field": 1}, {"field": "1"}, True],
+            [SerializerRequiredIsFalseAndAllowBlankIsTrue, {"field": 0}, {"field": "0"}, True],
+            [SerializerRequiredIsFalseAndAllowBlankIsTrue, {"field": ""}, {"field": ""}, True],
+            [SerializerRequiredIsFalseAndAllowBlankIsTrue, {}, {}, True],
+            [SerializerRequiredIsFalseAndAllowBlankIsTrue, {"field": None}, {"field": None}, False],
+            [SerializerRequiredIsFalseAndAllowBlankIsFalse, {"field": 1}, {"field": "1"}, True],
+            [SerializerRequiredIsFalseAndAllowBlankIsFalse, {"field": 0}, {"field": "0"}, True],
+            [SerializerRequiredIsFalseAndAllowBlankIsFalse, {"field": ""}, {"field": ""}, False],
+            [SerializerRequiredIsFalseAndAllowBlankIsFalse, {}, {}, True],
+            [SerializerRequiredIsFalseAndAllowBlankIsFalse, {"field": None}, {"field": None}, False],
+        ],
+    )
     def test_allow_blank(self, serializer_cls, data, output, is_valid):
         serializer = serializer_cls(data=data)
         assert serializer.is_valid() is is_valid
         assert serializer.data == output
 
-    @pytest.mark.parametrize("serializer_cls,data,output,is_valid", [
-        [SerializerRequiredIsTrueAndAllowNoneIsFlse, {"field": 1}, {'field': '1'}, True],
-        [SerializerRequiredIsTrueAndAllowNoneIsFlse, {"field": 0}, {"field": '0'}, True],
-        [SerializerRequiredIsTrueAndAllowNoneIsFlse, {"field": ""}, {"field": ""}, False],
-        [SerializerRequiredIsTrueAndAllowNoneIsFlse, {}, {}, False],
-        [SerializerRequiredIsTrueAndAllowNoneIsFlse, {"field": None}, {"field": None}, False],
-
-        [SerializerRequiredIsTrueAndAllowNoneIsTrue, {"field": 1}, {'field': '1'}, True],
-        [SerializerRequiredIsTrueAndAllowNoneIsTrue, {"field": 0}, {"field": '0'}, True],
-        [SerializerRequiredIsTrueAndAllowNoneIsTrue, {"field": ""}, {"field": ""}, False],
-        [SerializerRequiredIsTrueAndAllowNoneIsTrue, {}, {}, False],
-        [SerializerRequiredIsTrueAndAllowNoneIsTrue, {"field": None}, {"field": None}, True],
-
-        [SerializerRequiredIsFalseAndAllowNoneIsTrue, {"field": 1}, {'field': '1'}, True],
-        [SerializerRequiredIsFalseAndAllowNoneIsTrue, {"field": 0}, {"field": '0'}, True],
-        [SerializerRequiredIsFalseAndAllowNoneIsTrue, {"field": ""}, {"field": ""}, False],
-        [SerializerRequiredIsFalseAndAllowNoneIsTrue, {}, {"field": None}, True],
-        [SerializerRequiredIsFalseAndAllowNoneIsTrue, {"field": None}, {"field": None}, True],
-
-        [SerializerRequiredIsFalseAndAllowNoneIsFalse, {"field": 1}, {'field': '1'}, True],
-        [SerializerRequiredIsFalseAndAllowNoneIsFalse, {"field": 0}, {"field": '0'}, True],
-        [SerializerRequiredIsFalseAndAllowNoneIsFalse, {"field": ""}, {"field": ""}, False],
-        [SerializerRequiredIsFalseAndAllowNoneIsFalse, {}, {}, True],
-        [SerializerRequiredIsFalseAndAllowNoneIsFalse, {"field": None}, {"field": None}, False],
-    ])
+    @pytest.mark.parametrize(
+        "serializer_cls,data,output,is_valid",
+        [
+            [SerializerRequiredIsTrueAndAllowNoneIsFlse, {"field": 1}, {"field": "1"}, True],
+            [SerializerRequiredIsTrueAndAllowNoneIsFlse, {"field": 0}, {"field": "0"}, True],
+            [SerializerRequiredIsTrueAndAllowNoneIsFlse, {"field": ""}, {"field": ""}, False],
+            [SerializerRequiredIsTrueAndAllowNoneIsFlse, {}, {}, False],
+            [SerializerRequiredIsTrueAndAllowNoneIsFlse, {"field": None}, {"field": None}, False],
+            [SerializerRequiredIsTrueAndAllowNoneIsTrue, {"field": 1}, {"field": "1"}, True],
+            [SerializerRequiredIsTrueAndAllowNoneIsTrue, {"field": 0}, {"field": "0"}, True],
+            [SerializerRequiredIsTrueAndAllowNoneIsTrue, {"field": ""}, {"field": ""}, False],
+            [SerializerRequiredIsTrueAndAllowNoneIsTrue, {}, {}, False],
+            [SerializerRequiredIsTrueAndAllowNoneIsTrue, {"field": None}, {"field": None}, True],
+            [SerializerRequiredIsFalseAndAllowNoneIsTrue, {"field": 1}, {"field": "1"}, True],
+            [SerializerRequiredIsFalseAndAllowNoneIsTrue, {"field": 0}, {"field": "0"}, True],
+            [SerializerRequiredIsFalseAndAllowNoneIsTrue, {"field": ""}, {"field": ""}, False],
+            [SerializerRequiredIsFalseAndAllowNoneIsTrue, {}, {"field": None}, True],
+            [SerializerRequiredIsFalseAndAllowNoneIsTrue, {"field": None}, {"field": None}, True],
+            [SerializerRequiredIsFalseAndAllowNoneIsFalse, {"field": 1}, {"field": "1"}, True],
+            [SerializerRequiredIsFalseAndAllowNoneIsFalse, {"field": 0}, {"field": "0"}, True],
+            [SerializerRequiredIsFalseAndAllowNoneIsFalse, {"field": ""}, {"field": ""}, False],
+            [SerializerRequiredIsFalseAndAllowNoneIsFalse, {}, {}, True],
+            [SerializerRequiredIsFalseAndAllowNoneIsFalse, {"field": None}, {"field": None}, False],
+        ],
+    )
     def test_allow_null(self, serializer_cls, data, output, is_valid):
         serializer = serializer_cls(data=data)
         assert serializer.is_valid() is is_valid
@@ -175,11 +179,11 @@ class TestSerializer:
     def test_default(self):
         serializer = SerializerRequiredIsFalseDefault(data={})
         assert serializer.is_valid() is True
-        assert serializer.data == {'field_1': [], 'field_2': [], 'field_3': [], 'field_4': 0}
+        assert serializer.data == {"field_1": [], "field_2": [], "field_3": [], "field_5": 0}
 
         serializer = SerializerRequiredIsFalseDefault(data={"field_2": None})
         assert serializer.is_valid() is True
-        assert serializer.data == {'field_1': [], 'field_2': None, 'field_3': [], 'field_4': 0}
+        assert serializer.data == {"field_1": [], "field_2": None, "field_3": [], "field_5": 0}
 
     def test_list_field(self):
         class RequestSerializer(serializers.Serializer):
