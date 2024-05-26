@@ -2,14 +2,13 @@
 python -W ignore -m pytest -v -s -x tests
 """
 
-from __future__ import unicode_literals
-from setuptools import find_packages
-
+import codecs
 import logging
 import os
-import codecs
 import sys
 from io import open
+
+from setuptools import find_packages
 
 try:
     from setuptools import setup
