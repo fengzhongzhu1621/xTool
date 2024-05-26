@@ -1,8 +1,8 @@
 import inspect
 from contextlib import contextmanager
 from importlib import import_module
+from typing import List
 
-from bk_resource.management.finder import API_DIR, ResourceFinder
 from django.conf import settings
 from django.utils.module_loading import import_string
 
@@ -12,6 +12,7 @@ from bk_resource.management.exceptions import (
     ResourceModuleNotRegistered,
     ResourceNotRegistered,
 )
+from bk_resource.management.finder import API_DIR, ResourceFinder, ResourcePath
 from bk_resource.utils.logger import logger
 from xTool.misc import camel_to_underscore
 from xTool.utils.path import path_to_dotted
@@ -56,7 +57,7 @@ def lazy_load(func):
     return wrapper
 
 
-class ResourceShortcut(object):
+class ResourceShortcut:
 
     _package_pool = {}
 
@@ -78,11 +79,9 @@ class ResourceShortcut(object):
         return cls._package_pool[module_path]
 
     def __init__(self, module_path):
-        # init in __new__ function
         pass
 
     def __getitem__(self, x):
-        # delete _entry(replace once from right)
         path = "".join(self._path.rsplit(self._entry, 1)).strip(".")
         dotted_path = path.split(".")
         if not isinstance(x, slice):
@@ -203,15 +202,17 @@ def setup():
     if __setup__:
         return
 
+    # 查询 django 所有 apps 的 ResourcePath
     finder = ResourceFinder()
-    for path in finder.resource_path:
+    resource_paths: List[ResourcePath] = finder.resource_path
+    for path in resource_paths:
         install_resource(path)
 
     __setup__ = True
     resource.__finder__ = finder
 
 
-def install_resource(rs_path):
+def install_resource(rs_path: ResourcePath):
     dotted_path = rs_path.path
     _resource = None
     endpoint = None
@@ -249,7 +250,7 @@ def install_resource(rs_path):
         setattr(resource, endpoint, resource_module)
 
 
-def install_adapter(rs_path):
+def install_adapter(rs_path: ResourcePath):
     dotted_path = rs_path.path
     adapter_cls = AdapterResourceShortcut
     # adapter 和 api 代码结构一致， 唯一区别是entry不同，adapter多了一层`adapter`目录
@@ -274,6 +275,7 @@ def install_adapter(rs_path):
         rs_path.error()
         return
 
+    # 支持不同环境的模块导入
     if ada.startswith(settings.RUN_VER):
         platform_adapter = ResourceShortcut(dotted_path)
         # load method from platform adapter to default adapter
