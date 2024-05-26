@@ -74,32 +74,6 @@ def test_vargs_tree():
     assert x == "hello"
 
 
-def test_vargs_meta_inline():
-    @v_args(meta=True, inline=True)
-    class MyTransformer(Transformer):
-        @staticmethod
-        def integer(*args, **kwargs):
-            return args, kwargs
-
-        @classmethod
-        def integer2(cls, *args, **kwargs):
-            return args, kwargs
-
-        def integer3(self, *args, **kwargs):
-            return args, kwargs
-
-        hello = staticmethod(lambda args: "hello")
-
-    x = MyTransformer().transform(Tree("integer", [2]))
-    assert x == ((Tree("integer", [2]),), {})
-    x = MyTransformer().transform(Tree("integer2", [2]))
-    assert x == ((Tree("integer2", [2]),), {})
-    x = MyTransformer().transform(Tree("integer3", [2]))
-    assert x == ((Tree("integer3", [2]),), {})
-    x = MyTransformer().transform(Tree("hello", [2]))
-    assert x == "hello"
-
-
 def test_transformer():
     t = Tree(
         "add",

@@ -129,7 +129,7 @@ class IteratorWrapper(typing.AsyncIterator):
         await self.__close_event.wait()
         await asyncio.gather(
             self.__gen_task,
-            loop=self.loop,
+            self.loop,
             return_exceptions=True,
         )
         del self.__queue
