@@ -2,6 +2,17 @@ import requests
 from django.conf import settings
 
 
+def get_request_ip(request) -> str:
+    """获取请求IP ."""
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[-1].strip()
+        return ip
+    ip = request.META.get("REMOTE_ADDR", "") or getattr(request, "request_ip", None)
+
+    return ip or "unknown"
+
+
 def get_ip_analysis(ip: str):
     """
     获取ip详细概略

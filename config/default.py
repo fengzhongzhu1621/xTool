@@ -57,6 +57,7 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "apps.opentelemetry_instrument",
     "rest_framework",
     "bk_resource",
     "apps.account",
@@ -82,7 +83,7 @@ INSTALLED_APPS = (
     "apps.credential",
     "apps.global_conf",
     "apps.http_client",
-    "apps.opentelemetry_instrument",
+    "apps.login_log",
 )
 
 MIDDLEWARE = (

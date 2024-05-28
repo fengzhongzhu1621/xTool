@@ -3,10 +3,7 @@ from typing import Dict
 
 import orjson as json
 import user_agents
-from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.auth.models import AnonymousUser
 from django.urls.resolvers import ResolverMatch
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from werkzeug.local import Local
 
 request_local = Local()
@@ -84,21 +81,14 @@ def get_request_data(request) -> Dict:
     return data
 
 
-def get_request_ip(request) -> str:
-    """获取请求IP ."""
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[-1].strip()
-        return ip
-    ip = request.META.get("REMOTE_ADDR", "") or getattr(request, "request_ip", None)
-
-    return ip or "unknown"
-
-
 def get_request_user(request):
     """
     获取请求user
     """
+
+    from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
+    from rest_framework_simplejwt.authentication import JWTAuthentication
+
     user: AbstractBaseUser = getattr(request, "user", None)
     if user and user.is_authenticated:
         return user
