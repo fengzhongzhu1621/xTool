@@ -104,7 +104,8 @@ MIDDLEWARE = (
     "core.middleware.csrf.CSRFExemptMiddleware",
 )
 
-AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
+# AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
+AUTHENTICATION_BACKENDS = ("core.auth.backends.Md5ModelBackend",)
 TEMPLATE_CONTEXT_PROCESSORS = [
     "django.template.context_processors.debug",
     "django.template.context_processors.request",

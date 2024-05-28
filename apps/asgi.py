@@ -12,5 +12,6 @@ import os
 from core.wsgi import get_asgi_application
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 application = get_asgi_application()
