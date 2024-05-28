@@ -540,3 +540,24 @@ class UUIDField(models.CharField):
     @classmethod
     def get_default_value(cls) -> str:
         return uuid.uuid1().hex
+
+
+def get_verbose_name(queryset=None, view=None, model=None) -> str:
+    """
+    获取模型的 verbose_name
+    """
+    try:
+        if queryset is not None and hasattr(queryset, "model"):
+            model = queryset.model
+        elif view and hasattr(view.get_queryset(), "model"):
+            model = view.get_queryset().model
+        elif view and hasattr(view.get_serializer(), "Meta") and hasattr(view.get_serializer().Meta, "model"):
+            model = view.get_serializer().Meta.model
+        if model:
+            return getattr(model, "_meta").verbose_name
+        else:
+            model = queryset.model._meta.verbose_name
+    except Exception:
+        pass
+
+    return model if model else ""

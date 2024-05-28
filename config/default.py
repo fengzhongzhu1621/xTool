@@ -368,3 +368,6 @@ LOG_PERSISTENT_DAYS = 30  # 设置引擎日志的有效期
 
 # 唯一随机串生成重试次数
 RANDOM_STR_GENERATE_REPEAT_TIMES = 3
+
+# 是否开启 IP 分析
+LOGIN_ANALYSIS_LOG_ENABLED = False
