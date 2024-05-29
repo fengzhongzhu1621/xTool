@@ -8,5 +8,5 @@ class RequestMethod(TextChoices):
     GET = "GET", _lazy("GET")
     POST = "POST", _lazy("POST")
     PUT = "PUT", _lazy("PUT")
-    PUT = "PATCH", _lazy("PATCH")
+    PATCH = "PATCH", _lazy("PATCH")
     DELETE = "DELETE", _lazy("DELETE")
