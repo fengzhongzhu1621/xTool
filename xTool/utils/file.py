@@ -206,3 +206,9 @@ class FS:
             return atomicwrites.atomic_write(name, mode=mode, overwrite=True, **kwargs)
         else:
             return open(name, mode, **kwargs)
+
+
+def get_file_store_path(h: str, filename: str) -> str:
+    """获得文件存储目录 ."""
+    basename, ext = os.path.splitext(filename)
+    return os.path.join("files", h[:1], h[1:2], h + ext.lower())

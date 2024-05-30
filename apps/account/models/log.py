@@ -55,3 +55,21 @@ class LoginLog(SoftDeleteModel):
     class Meta:
         verbose_name = "登录日志"
         verbose_name_plural = verbose_name
+
+
+class OperationLog(SoftDeleteModel):
+    request_modular = models.CharField(max_length=64, verbose_name=_lazy("请求模块"), null=True, blank=True)
+    request_path = models.CharField(max_length=400, verbose_name=_lazy("请求地址"), null=True, blank=True)
+    request_body = models.TextField(verbose_name=_lazy("请求参数"), null=True, blank=True)
+    request_method = models.CharField(max_length=8, verbose_name=_lazy("请求方式"), null=True, blank=True)
+    request_msg = models.TextField(verbose_name=_lazy("操作说明"), null=True, blank=True)
+    request_ip = models.CharField(max_length=32, verbose_name=_lazy("请求ip地址"), null=True, blank=True)
+    request_browser = models.CharField(max_length=64, verbose_name=_lazy("请求浏览器"), null=True, blank=True)
+    response_code = models.CharField(max_length=32, verbose_name=_lazy("响应状态码"), null=True, blank=True)
+    request_os = models.CharField(max_length=64, verbose_name=_lazy("操作系统"), null=True, blank=True)
+    json_result = models.TextField(verbose_name=_lazy("返回信息"), null=True, blank=True)
+    status = models.BooleanField(default=False, verbose_name=_lazy("响应状态"))
+
+    class Meta:
+        verbose_name = _lazy("操作日志")
+        verbose_name_plural = verbose_name

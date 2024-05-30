@@ -44,6 +44,7 @@ ALLOWED_HOSTS = ["*"]
 # 登录缓存时间配置, 单位秒（与django cache单位一致）
 LOGIN_CACHE_EXPIRED = int(os.getenv("LOGIN_CACHE_EXPIRED", 60))
 
+AUTH_USER_MODEL = "account.Users"
 
 # Application definition
 
@@ -78,12 +79,11 @@ INSTALLED_APPS = (
     "apps.version",
     "apps.entry",
     "apps.backend",
-    "apps.quickstart",
-    "apps.snippets",
+    # "apps.quickstart",
+    # "apps.snippets",
     "apps.credential",
     "apps.global_conf",
     "apps.http_client",
-    "apps.login_log",
 )
 
 MIDDLEWARE = (
