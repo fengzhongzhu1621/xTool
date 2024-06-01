@@ -104,6 +104,7 @@ MIDDLEWARE = (
     "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "core.middleware.csrf.CSRFExemptMiddleware",
+    "apps.account.middleware.ApiLoggingMiddleware",
 )
 
 # AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
@@ -376,3 +377,12 @@ LOGIN_ANALYSIS_LOG_ENABLED = False
 
 # 列权限需要排除的App应用
 COLUMN_EXCLUDE_APPS = ["channels", "captcha"] + locals().get("COLUMN_EXCLUDE_APPS", [])
+
+# 操作日志
+API_LOG_ENABLE = True
+API_LOG_METHODS = ["POST", "DELETE", "PUT", "PATCH"]
+API_MODEL_MAP = {
+    "/token/": "登录模块",
+    "/api/login/": "登录模块",
+    "/api/plugins_market/plugins/": "插件市场",
+}

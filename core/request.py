@@ -97,3 +97,43 @@ def get_request_user(request):
     except Exception:
         pass
     return user or AnonymousUser()
+
+
+def get_request_path(request, *args, **kwargs):
+    """
+    获取请求路径
+    :param request:
+    :param args:
+    :param kwargs:
+    :return:
+    """
+    request_path = getattr(request, "request_path", None)
+    if request_path:
+        return request_path
+    values = []
+    for arg in args:
+        if len(arg) == 0:
+            continue
+        if isinstance(arg, str):
+            values.append(arg)
+        elif isinstance(arg, (tuple, set, list)):
+            values.extend(arg)
+        elif isinstance(arg, dict):
+            values.extend(arg.values())
+    if len(values) == 0:
+        return request.path
+    path: str = request.path
+    for value in values:
+        path = path.replace("/" + value, "/" + "{id}")
+    return path
+
+
+def get_request_ip(request) -> str:
+    """获取请求IP ."""
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[-1].strip()
+        return ip
+    ip = request.META.get("REMOTE_ADDR", "") or getattr(request, "request_ip", None)
+
+    return ip or "unknown"

@@ -3,10 +3,11 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
 from apps.component.constants import LoginType
-from core.constants import LEN_NORMAL, LEN_SHORT, LEN_LONG
-from core.ip import get_ip_analysis, get_request_ip
+from core.constants import LEN_NORMAL, LEN_SHORT, LEN_LONG, LEN_X_LONG
+from core.ip import get_ip_analysis
 from core.models import SoftDeleteModel, SoftDeleteModelManager
 from core.request import get_browser, get_os
+from core.request import get_request_ip
 
 
 class LoginLogManager(SoftDeleteModelManager):
@@ -58,18 +59,20 @@ class LoginLog(SoftDeleteModel):
 
 
 class OperationLog(SoftDeleteModel):
-    request_modular = models.CharField(max_length=64, verbose_name=_lazy("请求模块"), null=True, blank=True)
-    request_path = models.CharField(max_length=400, verbose_name=_lazy("请求地址"), null=True, blank=True)
+    request_modular = models.CharField(max_length=LEN_NORMAL, verbose_name=_lazy("请求模块"), null=True, blank=True)
+    request_path = models.CharField(max_length=LEN_X_LONG, verbose_name=_lazy("请求地址"), null=True, blank=True)
     request_body = models.TextField(verbose_name=_lazy("请求参数"), null=True, blank=True)
-    request_method = models.CharField(max_length=8, verbose_name=_lazy("请求方式"), null=True, blank=True)
+    request_method = models.CharField(max_length=LEN_SHORT, verbose_name=_lazy("请求方式"), null=True, blank=True)
     request_msg = models.TextField(verbose_name=_lazy("操作说明"), null=True, blank=True)
-    request_ip = models.CharField(max_length=32, verbose_name=_lazy("请求ip地址"), null=True, blank=True)
-    request_browser = models.CharField(max_length=64, verbose_name=_lazy("请求浏览器"), null=True, blank=True)
-    response_code = models.CharField(max_length=32, verbose_name=_lazy("响应状态码"), null=True, blank=True)
+    request_ip = models.CharField(max_length=LEN_SHORT, verbose_name=_lazy("请求ip地址"), null=True, blank=True)
+    request_browser = models.CharField(max_length=LEN_NORMAL, verbose_name=_lazy("请求浏览器"), null=True, blank=True)
+    response_code = models.CharField(max_length=LEN_SHORT, verbose_name=_lazy("响应状态码"), null=True, blank=True)
     request_os = models.CharField(max_length=64, verbose_name=_lazy("操作系统"), null=True, blank=True)
     json_result = models.TextField(verbose_name=_lazy("返回信息"), null=True, blank=True)
     status = models.BooleanField(default=False, verbose_name=_lazy("响应状态"))
+    request_id = models.CharField(_lazy("请求唯一 ID"), max_length=LEN_SHORT, null=True)
 
     class Meta:
         verbose_name = _lazy("操作日志")
         verbose_name_plural = verbose_name
+        ordering = ("-created_at",)

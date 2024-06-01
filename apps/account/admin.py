@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.account.models import Users
+from apps.account.models import Users, OperationLog
 
 
 @admin.register(Users)
@@ -24,4 +24,22 @@ class UsersAdmin(admin.ModelAdmin):
         "created_by",
         "updated_at",
         "updated_by",
+    ]
+
+
+@admin.register(OperationLog)
+class OperationLogAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "request_modular",
+        "request_path",
+        "request_body",
+        "request_method",
+        "request_msg",
+        "request_ip",
+        "request_browser",
+        "response_code",
+        "request_os",
+        "json_result",
+        "status",
     ]
