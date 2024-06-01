@@ -4,6 +4,7 @@ from importlib import import_module
 from typing import Any, Dict, List, Tuple
 
 import orjson as json
+from django.apps import apps
 from django.conf import settings
 from django.core import exceptions
 from django.db import models
@@ -591,3 +592,26 @@ def get_model_from_app(app_name: str) -> List:
         )
 
     return model_list
+
+
+def get_custom_app_models(app_name=None):
+    """
+    获取所有项目下的app里的models
+    """
+    if app_name:
+        return get_model_from_app(app_name)
+    all_apps = apps.get_app_configs()
+    res = []
+    for app in all_apps:
+        if app.name.startswith("django"):
+            continue
+        if app.name in settings.COLUMN_EXCLUDE_APPS:
+            continue
+        try:
+            all_models = get_model_from_app(app.name)
+            if all_models:
+                for model in all_models:
+                    res.append(model)
+        except Exception:
+            pass
+    return res

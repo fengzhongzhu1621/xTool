@@ -372,3 +372,6 @@ RANDOM_STR_GENERATE_REPEAT_TIMES = 3
 
 # 是否开启 IP 分析
 LOGIN_ANALYSIS_LOG_ENABLED = False
+
+# 列权限需要排除的App应用
+COLUMN_EXCLUDE_APPS = ["channels", "captcha"] + locals().get("COLUMN_EXCLUDE_APPS", [])
