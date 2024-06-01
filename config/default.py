@@ -87,6 +87,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
+    "core.middleware.healthz.HealthCheckMiddleware",
     # 将请求对象注入到线程变量，方便根据 get_request() 方法获取
     "core.middleware.request_provider.RequestProvider",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -263,7 +264,7 @@ REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
 REDIS_VERSION = int(os.environ.get("REDIS_VERSION", 2))
-REDIS_KEY_PREFIX = os.environ.get("REDIS_KEY_PREFIX")
+REDIS_KEY_PREFIX = os.environ.get("REDIS_KEY_PREFIX", APP_CODE)
 REDIS_DB = os.getenv("REDIS_DB", "0")
 REDIS_SENTINEL_PASSWORD = os.environ.get("BKAPP_REDIS_SENTINEL_PASSWORD", REDIS_PASSWORD)
 REDIS_SERVICE_NAME = os.environ.get("BKAPP_REDIS_SERVICE_NAME", "mymaster")

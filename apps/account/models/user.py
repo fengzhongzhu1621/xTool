@@ -1,20 +1,21 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
+from apps.account.models import Role
 from apps.component.constants import Gender, UserType
 from core.constants import LEN_NORMAL, LEN_LONG, LEN_SHORT
 from core.models import SoftDeleteModel, SoftDeleteModelManager
 from xTool.misc import md5
 
 
-class UsersManager(SoftDeleteModelManager):
+class CustomUserManager(SoftDeleteModelManager, UserManager):
     def create_superuser(self, username: str, email=None, password=None, **extra_fields):
         user = super().create_superuser(username, email, password, **extra_fields)
         user.set_password(password)
         try:
-            user.role.add(Role.objects.get(name="管理员"))
+            user.role.add(Role.objects.get(key="admin"))
             user.save(using=self._db)
             return user
         except ObjectDoesNotExist:
@@ -50,7 +51,7 @@ class Users(SoftDeleteModel, AbstractUser):
     dept = models.ForeignKey(
         to="Dept", verbose_name=_lazy("所属部门"), on_delete=models.PROTECT, db_constraint=False, null=True, blank=True
     )
-    objects = UsersManager()
+    objects = CustomUserManager()
 
     def set_password(self, raw_password):
         """设置用户密码 ."""
