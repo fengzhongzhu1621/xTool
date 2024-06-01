@@ -82,6 +82,7 @@ class GlobalConfig(OptionBase):
     objects = GlobalConfigManager()
 
     class Meta:
+        app_label = "global_conf"
         verbose_name = _lazy("全局配置信息")
         verbose_name_plural = _lazy("全局配置信息")
         db_table = "global_setting"
@@ -108,6 +109,7 @@ class SystemConfig(SoftDeleteModel):
     setting = models.JSONField(null=True, blank=True, verbose_name=_lazy("配置"))
 
     class Meta:
+        app_label = "global_conf"
         verbose_name = _lazy("系统配置表")
         verbose_name_plural = verbose_name
         unique_together = (("key", "parent_id"),)
@@ -138,5 +140,6 @@ class Dictionary(SoftDeleteModel):
     remark = models.TextField(verbose_name=_lazy("备注"), default="")
 
     class Meta:
+        app_label = "global_conf"
         verbose_name = _lazy("字典表")
         verbose_name_plural = verbose_name

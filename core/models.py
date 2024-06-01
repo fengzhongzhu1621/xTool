@@ -561,3 +561,33 @@ def get_verbose_name(queryset=None, view=None, model=None) -> str:
         pass
 
     return model if model else ""
+
+
+def get_model_from_app(app_name: str) -> List:
+    """获取模型里的字段"""
+    model_module = import_module(app_name + ".models")
+    filter_model = [
+        getattr(model_module, item)
+        for item in dir(model_module)
+        if issubclass(getattr(model_module, item).__class__, models.base.ModelBase)
+    ]
+    model_list = []
+    for model in filter_model:
+        model_name = model.__name__
+        verbose_name = model._meta.verbose_name
+        if model_name in ["AbstractUser", "OptionBase"]:
+            continue
+        if getattr(model._meta, "abstract", False):
+            continue
+        fields = [{"title": field.verbose_name, "name": field.name, "object": field} for field in model._meta.fields]
+        model_list.append(
+            {
+                "app": app_name,
+                "verbose": verbose_name,
+                "model": model_name,
+                "object": model,
+                "fields": fields,
+            }
+        )
+
+    return model_list
