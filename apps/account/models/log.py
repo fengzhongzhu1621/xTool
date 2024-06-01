@@ -66,11 +66,10 @@ class OperationLog(SoftDeleteModel):
     request_msg = models.TextField(verbose_name=_lazy("操作说明"), null=True, blank=True)
     request_ip = models.CharField(max_length=LEN_SHORT, verbose_name=_lazy("请求ip地址"), null=True, blank=True)
     request_browser = models.CharField(max_length=LEN_NORMAL, verbose_name=_lazy("请求浏览器"), null=True, blank=True)
+    request_os = models.CharField(max_length=LEN_NORMAL, verbose_name=_lazy("操作系统"), null=True, blank=True)
     response_code = models.CharField(max_length=LEN_SHORT, verbose_name=_lazy("响应状态码"), null=True, blank=True)
-    request_os = models.CharField(max_length=64, verbose_name=_lazy("操作系统"), null=True, blank=True)
-    json_result = models.TextField(verbose_name=_lazy("返回信息"), null=True, blank=True)
-    status = models.BooleanField(default=False, verbose_name=_lazy("响应状态"))
-    request_id = models.CharField(_lazy("请求唯一 ID"), max_length=LEN_SHORT, null=True)
+    response_content = models.TextField(verbose_name=_lazy("返回信息"), null=True, blank=True)
+    request_id = models.CharField(_lazy("请求唯一 ID"), max_length=LEN_NORMAL, null=True)
 
     class Meta:
         verbose_name = _lazy("操作日志")

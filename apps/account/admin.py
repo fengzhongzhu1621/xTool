@@ -31,6 +31,7 @@ class UsersAdmin(admin.ModelAdmin):
 class OperationLogAdmin(admin.ModelAdmin):
     list_display = [
         "id",
+        "request_id",
         "request_modular",
         "request_path",
         "request_body",
@@ -38,8 +39,7 @@ class OperationLogAdmin(admin.ModelAdmin):
         "request_msg",
         "request_ip",
         "request_browser",
-        "response_code",
         "request_os",
-        "json_result",
-        "status",
+        "response_code",
+        "response_content",
     ]

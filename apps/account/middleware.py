@@ -37,28 +37,22 @@ class ApiLoggingMiddleware(MiddlewareMixin):
         body = getattr(request, "request_data", {})
         if isinstance(body, dict) and body.get("password", ""):
             body["password"] = "*" * len(body["password"])
-        if not hasattr(response, "data") or not isinstance(response.data, dict):
-            response.data = {}
+        response_content = response.content
         try:
-            if not response.data and response.content:
-                content = json.loads(response.content.decode())
-                response.data = content if isinstance(content, dict) else {}
+            if response_content:
+                response_content = json.loads(response.content.decode())
         except Exception:
-            return
+            pass
         info = {
             "request_ip": getattr(request, "request_ip", "unknown"),
             "request_method": request.method,
             "request_path": request.request_path,
             "request_body": body,
-            "response_code": response.data.get("code"),
             "request_os": get_os(request),
             "request_browser": get_browser(request),
             "request_msg": request.session.get("request_msg"),  # 操作说明
-            "status": response.data.get("code") == 0,
-            "json_result": {
-                "code": response.data.get("code"),
-                "message": response.data.get("message"),
-            },
+            "response_code": response.status_code,
+            "response_content": response_content,
             "request_id": get_or_create_local_request_id(),
         }
         operation_log, _created = OperationLog.objects.update_or_create(defaults=info, id=self.operation_log_id)
