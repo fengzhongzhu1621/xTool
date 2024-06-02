@@ -7,7 +7,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from core.exceptions import ParamValidationError
-from xTool.utils.dates import strftime_local
+from core.utils import strftime_local
 
 
 class MultipleIntField(serializers.Field):

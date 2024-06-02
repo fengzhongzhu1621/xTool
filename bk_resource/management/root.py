@@ -93,6 +93,7 @@ class ResourceShortcut:
 
     def _setup(self):
         try:
+
             self._package = import_module(self._path)
         except ImportError as e:
             raise ImportError("resource called before {} setup. detail: {}".format(self._path, e))

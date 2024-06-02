@@ -3,6 +3,8 @@ import time
 from django.http import JsonResponse
 from django.middleware import csrf
 
+from .user import UserViewSet
+
 
 def get_user_info(request):
 

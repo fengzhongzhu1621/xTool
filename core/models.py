@@ -311,19 +311,18 @@ class MultiStrSplitTextField(models.TextField, MultiStrSplitFieldMixin):
 
 
 class ModelResourceMixin:
-    # 使用默认的分页器
-    view_set_attrs = {"pagination_class": api_settings.DEFAULT_PAGINATION_CLASS, "ordering_fields": ["created_at"]}
+    view_set_attrs = {
+        "pagination_class": api_settings.DEFAULT_PAGINATION_CLASS,
+        "ordering_fields": ["created_at"],
+    }
     serializer_free_actions = ["list", "retrieve"]
     ignore_request_serializer = True
-    origin_data = None
     request_data = None
-    audit_info = None
 
-    def validate_request_data(self, request_data):
+    def validate_request_data(self, request_data: Dict):
         """
         去掉 RequestSerializer校验，仅用于生成swagger
         """
-        # 禁止drf_resources和bk_resource模块的双重验证
         if self.serializer_class:
             try:
                 if (
@@ -335,6 +334,7 @@ class ModelResourceMixin:
                     return request_data
             except NotImplementedError:
                 pass
+
         return super().validate_request_data(request_data)
 
 

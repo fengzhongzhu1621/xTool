@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import json
+import sys
+import traceback
 from json.decoder import JSONDecodeError
 from typing import Dict
 
@@ -83,6 +85,8 @@ def custom_exception_handler(exc, context: Dict):
         "message": exc_message,
         "data": exc_data,
     }
+    if settings.DEBUG:
+        data["data"] = traceback.format_exception(*sys.exc_info())
 
     # 构造响应
     response = Response(data, status=status_code)
