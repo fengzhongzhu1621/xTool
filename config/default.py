@@ -61,6 +61,8 @@ INSTALLED_APPS = (
     "apps.opentelemetry_instrument",
     "rest_framework",
     "bk_resource",
+    "captcha",
+    "channels",
     "apps.account",
     "drf_yasg",
     "version_log",

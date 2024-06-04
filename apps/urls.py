@@ -14,15 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from bk_resource.routers import ResourceRouter
 from django.contrib import admin
 from django.urls import path, include
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)
 
 from apps import views
+from apps.account.views import LoginTokenView, LoginView, LogoutView
 from apps.entry import views as EntryViews
 from apps.version import views as VersionViews
+from bk_resource.routers import ResourceRouter
 from core.permissions import SwaggerPermission
 
 info = openapi.Info(
@@ -52,4 +56,10 @@ urlpatterns = [
     # path("snippets/", include("apps.snippets.urls")),
     path("global_conf/", include("apps.global_conf.urls")),
     path("", include(base_router.urls)),
+    # 登录
+    path("api/login/", LoginView.as_view(), name="token_obtain_pair"),
+    path("api/logout/", LogoutView.as_view(), name="token_obtain_pair"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    # 仅用于开发，上线需关闭
+    path("api/token/", LoginTokenView.as_view()),
 ]

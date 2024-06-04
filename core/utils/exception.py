@@ -86,7 +86,7 @@ def custom_exception_handler(exc, context: Dict):
         "data": exc_data,
     }
     if settings.DEBUG:
-        data["data"] = traceback.format_exception(*sys.exc_info())
+        data["traceback"] = traceback.format_exception(*sys.exc_info())
 
     # 构造响应
     response = Response(data, status=status_code)
