@@ -172,6 +172,10 @@ IS_DISPLAY_LANGUAGE_CHANGE = "none"
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2
 SESSION_COOKIE_NAME = "_".join([APP_CODE, "sessionid"])
+# The module to store session data
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+# Whether to save the session data on every request.
+SESSION_SAVE_EVERY_REQUEST = False
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
