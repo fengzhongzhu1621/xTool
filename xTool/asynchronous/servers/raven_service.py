@@ -11,7 +11,7 @@ from raven.handlers.logging import SentryHandler
 from raven.transport import Transport
 from raven_aiohttp import QueuedAioHttpTransport
 
-from xTool.servers.base import Service
+from xTool.asynchronous.servers.base import Service
 
 log = logging.getLogger(__name__)
 

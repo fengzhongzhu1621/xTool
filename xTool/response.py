@@ -4,7 +4,7 @@ from mimetypes import guess_type
 from os import path
 from urllib.parse import quote_plus
 
-from xTool.aiomisc import open_async
+from xTool.asynchronous.aiomisc import open_async
 from xTool.algorithms.collections.header import Header
 from xTool.cookies.cookies import CookieJar
 from xTool.header import remove_entity_headers

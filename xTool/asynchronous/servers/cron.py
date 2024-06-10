@@ -6,8 +6,8 @@ from typing import Callable, Tuple, Type
 
 from croniter import croniter
 
+from xTool.asynchronous.servers.base import Service
 from xTool.scheduler.cron import CronCallback
-from xTool.servers.base import Service
 
 log = logging.getLogger(__name__)
 

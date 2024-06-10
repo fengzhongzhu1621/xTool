@@ -3,7 +3,7 @@ from random import shuffle
 
 import pytest
 
-from xTool import aiomisc
+from xTool.asynchronous import aiomisc
 
 
 async def test_awaitable_decorator(loop):

@@ -1,7 +1,7 @@
 import logging
 
+from xTool.asynchronous.servers.base import Service
 from xTool.scheduler.periodic import PeriodicCallback
-from xTool.servers.base import Service
 
 log = logging.getLogger(__name__)
 

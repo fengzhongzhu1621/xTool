@@ -12,6 +12,7 @@ from functools import wraps
 from multiprocessing import cpu_count
 from typing import (  # noqa
     Awaitable,
+    List,
     Any,
     Optional,
     Iterable,
@@ -381,6 +382,70 @@ except ImportError:
         return aio_open(file, mode, **kwargs)
 
     CancelledErrors = tuple([asyncio.CancelledError])
+
+
+async def await_many_dispatch(consumer_callables, dispatch):
+    """
+    Given a set of consumer callables, awaits on them all and passes results
+    from them to the dispatch awaitable as they come in.
+    """
+    # Call all callables, and ensure all return types are Futures
+    tasks = [asyncio.ensure_future(consumer_callable()) for consumer_callable in consumer_callables]
+    try:
+        while True:
+            # Wait for any of them to complete
+            await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+            # Find the completed one(s), yield results, and replace them
+            for i, task in enumerate(tasks):
+                if task.done():
+                    result = task.result()
+                    await dispatch(result)
+                    tasks[i] = asyncio.ensure_future(consumer_callables[i]())
+    finally:
+        # Make sure we clean up tasks on exit
+        for task in tasks:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+
+async def await_many_dispatch(consumer_callables: List[Awaitable], dispatch: Callable):
+    """
+    Given a set of consumer callables, awaits on them all and passes results
+    from them to the dispatch awaitable as they come in.
+    """
+    # Call all callables, and ensure all return types are Futures
+    # 从协程创建任务，创建多个消费者
+    tasks = [asyncio.ensure_future(consumer_callable()) for consumer_callable in consumer_callables]
+    try:
+        while True:
+            # Wait for any of them to complete
+            # 等待任意一个任务完成，即其中有一个消费者任务已处理完毕
+            # asyncio.ALL_COMPLETED（默认值）：当所有输入任务都完成时返回。这意味着 done 集合将包含所有已完成的任务，而 pending 集合将为空。
+            # asyncio.FIRST_COMPLETED：当第一个输入任务完成时返回。此时，done 集合将包含一个或多个已完成的任务（取决于哪个任务首先完成），而 pending 集合将包含剩余未完成的任务。
+            # asyncio.FIRST_EXCEPTION：当第一个输入任务引发异常时返回。如果没有任何任务引发异常，则行为与 asyncio.FIRST_COMPLETED 相同。
+            _done, _pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+            # Find the completed one(s), yield results, and replace them
+            # 定位已完成的任务
+            for i, task in enumerate(tasks):
+                if task.done():
+                    # 返回已完成任务的执行结果
+                    result = task.result()
+                    # 重新给消费者分配任务
+                    await dispatch(result)
+                    # 添加一个新的消费者，所有的消费者继续等待下一轮的处理
+                    tasks[i] = asyncio.ensure_future(consumer_callables[i]())
+    finally:
+        # Make sure we clean up tasks on exit
+        # 关闭消费者任务
+        for task in tasks:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
 
 
 if __name__ == "__main__":

@@ -2,8 +2,8 @@ import logging
 import tracemalloc
 from enum import Enum
 
+from xTool.asynchronous.servers.base import Service
 from xTool.scheduler.periodic import PeriodicCallback
-from xTool.servers.base import Service
 from xTool.thread_pool import threaded
 
 log = logging.getLogger(__name__)

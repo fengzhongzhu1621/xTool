@@ -3,9 +3,9 @@ import multiprocessing
 from functools import partial
 from signal import SIGTERM
 
-from xTool.servers.protocols.http_protocol import HttpProtocol
-from xTool.servers.signal import Signal
+from xTool.asynchronous.servers.protocols.http_protocol import HttpProtocol
 from xTool.servers.pipeline import IPipelineConnector
+from xTool.servers.signal import Signal
 
 
 class WorkerProcess(multiprocessing.Process):

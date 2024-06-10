@@ -10,7 +10,7 @@ from functools import partial, wraps
 from types import MappingProxyType
 from typing import NamedTuple, Any, Optional, TypeVar, Callable  # noqa
 
-from xTool.aiomisc import awaiter, context_partial
+from xTool.asynchronous.aiomisc import awaiter, context_partial
 from xTool.iterator_wrapper import IteratorWrapper
 
 T = typing.TypeVar("T")
