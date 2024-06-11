@@ -86,6 +86,7 @@ INSTALLED_APPS = (
     "apps.credential",
     "apps.global_conf",
     "apps.http_client",
+    "apps.websocket",
 )
 
 MIDDLEWARE = (
