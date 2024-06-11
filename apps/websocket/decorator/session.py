@@ -118,7 +118,7 @@ class InstanceSessionWrapper:
             )
 
 
-class SessionMiddleware:
+class SessionMiddlewareDecorator:
     """
     Class that adds Django sessions (from HTTP cookies) to the
     scope. Works with HTTP or WebSocket protocol types (or anything that
@@ -147,4 +147,4 @@ class SessionMiddleware:
 def SessionMiddlewareStack(inner):
     # 1. 先在 scope 中添加 cookies
     # 2. 再在 scope 中添加 session
-    return CookieMiddlewareDecorator(SessionMiddleware(inner))
+    return CookieMiddlewareDecorator(SessionMiddlewareDecorator(inner))

@@ -393,3 +393,6 @@ API_MODEL_MAP = {
     "/api/login/": "登录模块",
     "/api/plugins_market/plugins/": "插件市场",
 }
+
+# channels
+CHANNEL_LAYERS = {}
