@@ -7,7 +7,7 @@ from django.utils.module_loading import import_string
 from .exceptions import InvalidBackendError
 
 
-class InstanceManager:
+class BackendInstanceManager:
     """
     Takes a settings dictionary of backends and initialises them on request.
     """
@@ -78,15 +78,15 @@ class InstanceManager:
         return old
 
 
-def get_instance(key: str):
+def get_backend_instance(key: str):
     """
     Returns a channel layer by alias, or None if it is not configured.
     """
     try:
-        return instances[key]
+        return backend_instances[key]
     except KeyError:
         return None
 
 
 # Default global instance of the channel layer manager
-instances = InstanceManager()
+backend_instances = BackendInstanceManager()
