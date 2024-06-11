@@ -41,6 +41,7 @@ SECRET_KEY = "django-insecure-*!%)j#u)nk*s+7!tm6uqw*l)q+q++b9wctsdic#hq3pp(_*&*7
 # 入口配置
 ROOT_URLCONF = "apps.urls"
 WSGI_APPLICATION = "apps.wsgi.application"
+ASGI_APPLICATION = "apps.asgi.application"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
