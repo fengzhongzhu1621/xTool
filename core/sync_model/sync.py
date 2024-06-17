@@ -38,9 +38,7 @@ def delete_models(
 ) -> None:
     if not unique_value_deleted:
         return
-    delete_ids = [
-        old_unique_field_map[unique_value].id for unique_value in unique_value_deleted
-    ]
+    delete_ids = [old_unique_field_map[unique_value].id for unique_value in unique_value_deleted]
     for ids in chunks(delete_ids, chunk_deleted_size):
         resource.objects.filter(id__in=ids).delete()
 
@@ -63,12 +61,10 @@ def update_models(
                 old_resource_model = old_unique_field_map[unique_value]
                 new_resource_model = new_unique_field_map[unique_value]
                 old_compare_data = [
-                    get_model_value(old_resource_model, field, datetime_fields)
-                    for field in sync_fields
+                    get_model_value(old_resource_model, field, datetime_fields) for field in sync_fields
                 ]
                 new_compare_data = [
-                    get_model_value(new_resource_model, field, datetime_fields)
-                    for field in sync_fields
+                    get_model_value(new_resource_model, field, datetime_fields) for field in sync_fields
                 ]
                 # 补齐自增ID
                 new_resource_model.id = old_resource_model.id
@@ -108,15 +104,11 @@ def sync_data_to_model(
 
     # 新增记录
     unique_value_created_set = new_unique_field_value_set - old_unique_field_value_set
-    create_models(
-        resource, unique_value_created_set, new_unique_field_map, chunk_created_size
-    )
+    create_models(resource, unique_value_created_set, new_unique_field_map, chunk_created_size)
 
     # 删除记录
     unique_value_deleted = old_unique_field_value_set - new_unique_field_value_set
-    delete_models(
-        resource, unique_value_deleted, old_unique_field_map, chunk_deleted_size
-    )
+    delete_models(resource, unique_value_deleted, old_unique_field_map, chunk_deleted_size)
 
     # 更新记录
     unique_value_updated = new_unique_field_value_set & old_unique_field_value_set

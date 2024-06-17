@@ -16,6 +16,7 @@ class Add(BaseInvocation):
         """
         输入校验器
         """
+
         x: int
         y: int
 
@@ -32,6 +33,7 @@ class Subtract:
         """
         输入校验器
         """
+
         x: int
         y: int
 

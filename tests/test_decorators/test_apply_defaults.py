@@ -8,18 +8,15 @@ class Model(object):
 
 
 class BashOperator(object):
-    template_fields = ('bash_command', 'env')
-    template_ext = ('.sh', '.bash',)
-    ui_color = '#f0ede4'
+    template_fields = ("bash_command", "env")
+    template_ext = (
+        ".sh",
+        ".bash",
+    )
+    ui_color = "#f0ede4"
 
     # @apply_defaults
-    def __init__(
-            self,
-            bash_command,
-            xcom_push=False,
-            env=None,
-            output_encoding='utf-8',
-            *args, **kwargs):
+    def __init__(self, bash_command, xcom_push=False, env=None, output_encoding="utf-8", *args, **kwargs):
 
         self.bash_command = bash_command
         self.env = env
@@ -33,36 +30,27 @@ def test_apply_defaults():
     return
     bash_operator = BashOperator(bash_command="ls")
     assert bash_operator.args == ()
-    assert bash_operator.kwargs == {'params': {}}
+    assert bash_operator.kwargs == {"params": {}}
 
     model = Model()
     model.default_args = {
-        'a': 1,
-        'env': 2,
+        "a": 1,
+        "env": 2,
     }
     model.params = {
-        'c': 3,
+        "c": 3,
     }
     args = ()
     kwargs = {
-        'model': model,
-        'default_args': {
-            'params': {
-                'b': 22,
-                'c': 4
-            },
-            'e': 5,
-            'env': 8
+        "model": model,
+        "default_args": {"params": {"b": 22, "c": 4}, "e": 5, "env": 8},
+        "params": {
+            "g": 7,
+            "c": 5,
         },
-        'params': {
-            'g': 7,
-            'c': 5,
-        }
     }
 
-    bash_operator = BashOperator(
-        bash_command="ls", 
-        *args, **kwargs)
+    bash_operator = BashOperator(bash_command="ls", *args, **kwargs)
     assert bash_operator.args == ()
     """{
         'model': <test_apply_defaults.Model object at 0x027CA170>, 
@@ -72,31 +60,21 @@ def test_apply_defaults():
         'env': 8}
     """
     kwargs = bash_operator.kwargs
-    assert kwargs['params'] == {'b': 22, 'c': 4, 'g': 7}
-    assert kwargs['default_args'] == {'env': 8, 'e': 5}
+    assert kwargs["params"] == {"b": 22, "c": 4, "g": 7}
+    assert kwargs["default_args"] == {"env": 8, "e": 5}
 
     # env从model中的default_args中取值
     assert bash_operator.env == 8
-    assert bash_operator.bash_command == 'ls'
+    assert bash_operator.bash_command == "ls"
 
     kwargs = {
-        'model': model,
-        'default_args': {
-            'params': {
-                'b': 22,
-                'c': 4
-            },
-            'e': 5,
-            'env': 8
+        "model": model,
+        "default_args": {"params": {"b": 22, "c": 4}, "e": 5, "env": 8},
+        "params": {
+            "g": 7,
+            "c": 5,
         },
-        'params': {
-            'g': 7,
-            'c': 5,
-        }
     }
     # 如果BashOperator设置了默认值，则model中的相同的值对其没有影响
-    bash_operator = BashOperator(
-        bash_command="ls",
-        env=7,
-        *args, **kwargs)
+    bash_operator = BashOperator(bash_command="ls", env=7, *args, **kwargs)
     assert bash_operator.env == 7

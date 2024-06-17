@@ -1,4 +1,4 @@
-#coding:utf-8
+# coding:utf-8
 
 import unittest
 
@@ -6,11 +6,11 @@ from xTool.utils.tests import *
 
 
 class TestTests(unittest.TestCase):
-    @skipUnlessImported('xTool.utils.tests', 'skipUnlessImported')
+    @skipUnlessImported("xTool.utils.tests", "skipUnlessImported")
     def test_skipUnlessImported(self):
         self.assertEqual(1, 1)
 
-    @skipUnlessImported('xTool.utils.tests1', 'skipUnlessImported')
+    @skipUnlessImported("xTool.utils.tests1", "skipUnlessImported")
     def test_skipUnlessImported2(self):
         self.assertEqual(1, 2)
 

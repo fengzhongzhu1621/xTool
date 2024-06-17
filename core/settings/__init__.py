@@ -1,1 +1,1 @@
-from .user_settings import UserSettings # noqa
+from .user_settings import UserSettings  # noqa

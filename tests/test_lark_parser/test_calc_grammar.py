@@ -80,9 +80,7 @@ def test_calc():
     with pytest.raises(UnexpectedToken):
         calc("2**4")
 
-    transform_tree = CalculateTree().transform(
-        Lark(calc_grammar, parser="lalr").parse("2*(3+4)")
-    )
+    transform_tree = CalculateTree().transform(Lark(calc_grammar, parser="lalr").parse("2*(3+4)"))
     assert transform_tree == 14.0
 
     with pytest.raises(UnexpectedToken):

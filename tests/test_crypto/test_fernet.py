@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 
 import sys
 from xTool.crypto import fernet
@@ -14,28 +14,28 @@ def test_generate_fernet_key():
 
 def test_encrypt():
     key = fernet.generate_fernet_pbkdf2hmac_key()
-    plaintext = 'hello world'
+    plaintext = "hello world"
     ciphertext = fernet.encrypt(key, plaintext)
     plaintext2 = fernet.decrypt(key, ciphertext)
     assert plaintext == plaintext2
 
-    plaintext = u'hello world'
+    plaintext = "hello world"
     ciphertext = fernet.encrypt(key, plaintext)
     plaintext2 = fernet.decrypt(key, ciphertext)
     assert plaintext == plaintext2
 
-    plaintext = u'你好'
+    plaintext = "你好"
     ciphertext = fernet.encrypt(key, plaintext)
     plaintext2 = fernet.decrypt(key, ciphertext)
     assert plaintext == plaintext2
 
-    plaintext = '你好'
+    plaintext = "你好"
     ciphertext = fernet.encrypt(key, plaintext)
     plaintext2 = fernet.decrypt(key, ciphertext)
     if PY3:
         assert str(plaintext) == plaintext2
     else:
-        assert plaintext.decode('utf8') == plaintext2
+        assert plaintext.decode("utf8") == plaintext2
 
 
 def test_double_decrypt():
@@ -45,7 +45,7 @@ def test_double_decrypt():
     instance_key = fernet.generate_fernet_pbkdf2hmac_key()
     # 使用根秘钥加密实例秘钥
     instance_key_cipher = fernet.encrypt(root_key, instance_key)
-    plaintext = u'你好'
+    plaintext = "你好"
     # 加密密码
     cipher_text = fernet.double_encrypt(root_key, instance_key_cipher, plaintext)
     # 使用根秘钥和实例秘钥密文解密
@@ -60,7 +60,7 @@ def test_parseDbConfig():
     instance_key = fernet.generate_fernet_pbkdf2hmac_key()
     # 使用根秘钥加密实例秘钥
     instance_key_cipher = fernet.encrypt(root_key, instance_key)
-    password = '123456'
+    password = "123456"
     db_config = {
         "db_my_db": {
             "host": "localhost",
@@ -69,9 +69,8 @@ def test_parseDbConfig():
             "database": "db_my_db",
             "charset": "utf8",
             "root_key": root_key,
-            "instance_key_cipher": instance_key_cipher
+            "instance_key_cipher": instance_key_cipher,
         }
     }
     conf = fernet.parseDbConfig(db_config.get("db_my_db"))
     assert password == conf[3]
-

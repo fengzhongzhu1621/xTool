@@ -66,9 +66,9 @@ def test_make_naive():
 
 def test_parse():
     d = dt.datetime(1970, 1, 1)
-    d1 = parse('1970-01-01 00:00:00')
+    d1 = parse("1970-01-01 00:00:00")
     d2 = make_aware(d)
     assert d1 == d2
-    d3 = parse('1970-01-01 00:00:00', TIMEZONE_UTC)
+    d3 = parse("1970-01-01 00:00:00", TIMEZONE_UTC)
     d4 = utc_epoch()
     assert d3 == d4

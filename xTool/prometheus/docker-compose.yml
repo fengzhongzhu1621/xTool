@@ -5,6 +5,10 @@ networks:
         # 创建容器时如果没有配置网络参数则默认使用bridge网络
         driver: bridge
 
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
 services:
     jaegertracing:
         image: jaegertracing/all-in-one
@@ -23,31 +27,47 @@ services:
         hostname: prometheus
         restart: always
         volumes:
-            - ./prometheus.yml:/etc/prometheus/prometheus.yml
+            - ./conf/prometheus:/etc/prometheus
+            - ./data/prometheus/prometheus_db:/prometheus
         ports:
             - "9090:9090"
         networks:
             - monitor
 
-#    alertmanager:
-#        image: prom/alertmanager
-#        container_name: alertmanager
-#        hostname: alertmanager
-#        restart: always
-##        volumes:
-##            - ./alertmanager.yml:/usr/local/etc/alertmanager.yml
-#        ports:
-#            - "9093:9093"
-#        networks:
-#            - monitor
+    alertmanager:
+        image: prom/alertmanager
+        hostname: alertmanager
+        container_name: alertmanager
+        user: root
+        restart: always
+        ports:
+          - "9093:9093"
+        volumes:
+          - ./data/prometheus/alertmanager_data:/var/lib/alertmanager
+
+
+    pushgateway:
+        image: prom/pushgateway
+        container_name: pushgateway
+        restart: always
+        user: root
+        ports:
+            - "9091:9091"
+        volumes:
+            - ./data/prometheus/pushgateway_data:/var/lib/pushgateway
 
     grafana:
         image: grafana/grafana
         container_name: grafana
+        user: root
         hostname: grafana
         restart: always
         ports:
             - "3000:3000"
+        volumes:
+          - ./data/prometheus/grafana_data:/var/lib/grafana
+        depends_on:
+          - prometheus
         networks:
             - monitor
 

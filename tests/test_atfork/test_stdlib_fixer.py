@@ -30,18 +30,18 @@ class atfork_stdlib_fixer_test(unittest.TestCase):
     def test_fix_logging_module(self):
         return
         # Test that it issues the already imported warning.
-        warnings.filterwarnings('error', '.*module already imported.*')
+        warnings.filterwarnings("error", ".*module already imported.*")
         self.assertRaises(UserWarning, atfork.stdlib_fixer.fix_logging_module)
 
         # Now let it run, ignoring rather than raising the warning.
-        warnings.filterwarnings('ignore', '.*module already imported.*')
+        warnings.filterwarnings("ignore", ".*module already imported.*")
         atfork.stdlib_fixer.fix_logging_module()
         self.assertTrue(logging.fixed_for_atfork)
 
         # Test that the fixup is never installed twice.
         old_acquire_lock = logging._acquireLock
         try:
-            logging._acquireLock = lambda: self.fail('fixup ran a second time')
+            logging._acquireLock = lambda: self.fail("fixup ran a second time")
         finally:
             logging._acquireLock = old_acquire_lock
         atfork.stdlib_fixer.fix_logging_module()
@@ -59,10 +59,10 @@ class atfork_stdlib_fixer_test(unittest.TestCase):
             handler = logging.Handler(level=logging.DEBUG)
         finally:
             atfork.atfork = orig_atfork
-        self.assertEqual([(handler.lock.acquire,
-                           handler.lock.release, handler.lock.release)],
-                         logging_handler_atfork_calls)
+        self.assertEqual(
+            [(handler.lock.acquire, handler.lock.release, handler.lock.release)], logging_handler_atfork_calls
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

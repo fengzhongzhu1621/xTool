@@ -70,9 +70,7 @@ class CustomPageNumberWithColumnPagination(CustomPageNumberPagination):
         if page_size is not None:
             page_size = int(page_size)
             if page_size > settings.MAX_PAGE_SIZE:
-                raise ValidationError(
-                    _("分页查询数量超过限制的最大值, 建议值{}").format(settings.MAX_PAGE_SIZE)
-                )
+                raise ValidationError(_("分页查询数量超过限制的最大值, 建议值{}").format(settings.MAX_PAGE_SIZE))
             if page_size <= 0:
                 raise ValidationError(_("分页查询数量不能小于等于0"))
         if isinstance(queryset, dict):
