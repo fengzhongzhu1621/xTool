@@ -4,6 +4,7 @@ from importlib import import_module
 from typing import Any, Dict, List, Tuple
 
 import orjson as json
+from django.apps import apps
 from django.conf import settings
 from django.core import exceptions
 from django.db import models
@@ -310,19 +311,18 @@ class MultiStrSplitTextField(models.TextField, MultiStrSplitFieldMixin):
 
 
 class ModelResourceMixin:
-    # 使用默认的分页器
-    view_set_attrs = {"pagination_class": api_settings.DEFAULT_PAGINATION_CLASS, "ordering_fields": ["created_at"]}
+    view_set_attrs = {
+        "pagination_class": api_settings.DEFAULT_PAGINATION_CLASS,
+        "ordering_fields": ["created_at"],
+    }
     serializer_free_actions = ["list", "retrieve"]
     ignore_request_serializer = True
-    origin_data = None
     request_data = None
-    audit_info = None
 
-    def validate_request_data(self, request_data):
+    def validate_request_data(self, request_data: Dict):
         """
         去掉 RequestSerializer校验，仅用于生成swagger
         """
-        # 禁止drf_resources和bk_resource模块的双重验证
         if self.serializer_class:
             try:
                 if (
@@ -334,6 +334,7 @@ class ModelResourceMixin:
                     return request_data
             except NotImplementedError:
                 pass
+
         return super().validate_request_data(request_data)
 
 
@@ -540,3 +541,77 @@ class UUIDField(models.CharField):
     @classmethod
     def get_default_value(cls) -> str:
         return uuid.uuid1().hex
+
+
+def get_verbose_name(queryset=None, view=None, model=None) -> str:
+    """
+    获取模型的 verbose_name
+    """
+    try:
+        if queryset is not None and hasattr(queryset, "model"):
+            model = queryset.model
+        elif view and hasattr(view.get_queryset(), "model"):
+            model = view.get_queryset().model
+        elif view and hasattr(view.get_serializer(), "Meta") and hasattr(view.get_serializer().Meta, "model"):
+            model = view.get_serializer().Meta.model
+        if model:
+            return getattr(model, "_meta").verbose_name
+        else:
+            model = queryset.model._meta.verbose_name
+    except Exception:
+        pass
+
+    return model if model else ""
+
+
+def get_model_from_app(app_name: str) -> List:
+    """获取模型里的字段"""
+    model_module = import_module(app_name + ".models")
+    filter_model = [
+        getattr(model_module, item)
+        for item in dir(model_module)
+        if issubclass(getattr(model_module, item).__class__, models.base.ModelBase)
+    ]
+    model_list = []
+    for model in filter_model:
+        model_name = model.__name__
+        verbose_name = model._meta.verbose_name
+        if model_name in ["AbstractUser", "OptionBase"]:
+            continue
+        if getattr(model._meta, "abstract", False):
+            continue
+        fields = [{"title": field.verbose_name, "name": field.name, "object": field} for field in model._meta.fields]
+        model_list.append(
+            {
+                "app": app_name,
+                "verbose": verbose_name,
+                "model": model_name,
+                "object": model,
+                "fields": fields,
+            }
+        )
+
+    return model_list
+
+
+def get_custom_app_models(app_name=None):
+    """
+    获取所有项目下的app里的models
+    """
+    if app_name:
+        return get_model_from_app(app_name)
+    all_apps = apps.get_app_configs()
+    res = []
+    for app in all_apps:
+        if app.name.startswith("django"):
+            continue
+        if app.name in settings.COLUMN_EXCLUDE_APPS:
+            continue
+        try:
+            all_models = get_model_from_app(app.name)
+            if all_models:
+                for model in all_models:
+                    res.append(model)
+        except Exception:
+            pass
+    return res

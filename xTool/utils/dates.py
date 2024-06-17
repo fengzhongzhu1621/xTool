@@ -275,22 +275,6 @@ def date_to_string(_data):
     return _data.strftime("%Y-%m-%d")
 
 
-def strftime_local(aware_time, fmt="%Y-%m-%d %H:%M:%S"):
-    """
-    格式化aware_time为本地时间
-    :param {datetime} aware_time 时间字段
-    :param {string} fmt 时间format格式
-    :return 格式化时间字符串
-    """
-    if not aware_time:
-        # 当时间字段允许为NULL时，直接返回None
-        return None
-    if timezone.is_aware(aware_time):
-        # translate to time in local timezone
-        aware_time = timezone.localtime(aware_time)
-    return aware_time.strftime(fmt)
-
-
 def Time():
     """Returns some representation of the current time.
 

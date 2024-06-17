@@ -26,8 +26,10 @@ class ResourceFinder(BaseFinder):
             app_configs = [ac for ac in app_configs if ac.name in app_names]
 
         for app_config in app_configs:
-            self.resource_path += self.find(app_config.path, root_path=os.path.dirname(app_config.path))
-            app_path_directories.append(app_config.path)
+            app_path = app_config.path
+            root_path = os.path.dirname(app_path)
+            self.resource_path += self.find(app_path, root_path=root_path)
+            app_path_directories.append(app_path)
 
         for path in RESOURCE_DIRS:
             search_path = os.path.join(settings.BASE_DIR, path)

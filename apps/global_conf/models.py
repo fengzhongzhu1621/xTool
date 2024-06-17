@@ -4,12 +4,15 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
+from apps.component.constants import FieldType, FormItemType
 from core.cache import CacheKey
 from core.constants import (
     LEN_LONG,
 )
+from core.constants import LEN_SHORT, LEN_MIDDLE
 from core.constants import TimeEnum
 from core.models import OptionBase, SoftDeleteModelManager
+from core.models import SoftDeleteModel
 
 # 全局配置缓存时间
 GLOBAL_CONFIG_CACHE_TTL = getattr(settings, "GLOBAL_CONFIG_CACHE_TTL", TimeEnum.TEN_MINUTE_SECOND)
@@ -79,9 +82,64 @@ class GlobalConfig(OptionBase):
     objects = GlobalConfigManager()
 
     class Meta:
+        app_label = "global_conf"
         verbose_name = _lazy("全局配置信息")
         verbose_name_plural = _lazy("全局配置信息")
         db_table = "global_setting"
 
     def __str__(self):
         return self.name
+
+
+class SystemConfig(SoftDeleteModel):
+    parent = models.ForeignKey(
+        to="self", verbose_name=_lazy("父级"), on_delete=models.CASCADE, db_constraint=False, null=True, blank=True
+    )
+    title = models.CharField(max_length=50, verbose_name=_lazy("标题"))
+    key = models.CharField(max_length=20, verbose_name=_lazy("键"), db_index=True)
+    value = models.JSONField(max_length=100, verbose_name=_lazy("值"), null=True, blank=True)
+    sort = models.IntegerField(default=0, verbose_name=_lazy("排序"), blank=True)
+    status = models.BooleanField(default=True, verbose_name=_lazy("启用状态"))
+    data_options = models.JSONField(verbose_name=_lazy("数据options"), null=True, blank=True)
+    form_item_type = models.CharField(
+        max_length=LEN_SHORT, choices=FormItemType.choices, verbose_name=_lazy("表单类型"), default=0, blank=True
+    )
+    rule = models.JSONField(null=True, blank=True, verbose_name=_lazy("校验规则"))
+    placeholder = models.CharField(max_length=50, null=True, blank=True, verbose_name=_lazy("提示信息"))
+    setting = models.JSONField(null=True, blank=True, verbose_name=_lazy("配置"))
+
+    class Meta:
+        app_label = "global_conf"
+        verbose_name = _lazy("系统配置表")
+        verbose_name_plural = verbose_name
+        unique_together = (("key", "parent_id"),)
+
+    def __str__(self):
+        return f"{self.title}"
+
+
+class Dictionary(SoftDeleteModel):
+    label = models.CharField(max_length=LEN_MIDDLE, blank=True, null=True, verbose_name=_lazy("字典名称"))
+    value = models.CharField(max_length=LEN_LONG, blank=True, null=True, verbose_name=_lazy("字典编号"))
+    parent = models.ForeignKey(
+        to="self",
+        related_name="sublist",
+        db_constraint=False,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name=_lazy("父级"),
+    )
+    type = models.CharField(
+        choices=FieldType.choices, max_length=LEN_SHORT, default=FieldType.TEXT.value, verbose_name=_lazy("数据值类型")
+    )
+    color = models.CharField(max_length=LEN_SHORT, blank=True, null=True, verbose_name=_lazy("颜色"))
+    is_value = models.BooleanField(default=False, verbose_name=_lazy("是否为value值"))
+    status = models.BooleanField(default=True, verbose_name=_lazy("状态"))
+    sort = models.IntegerField(default=1, verbose_name=_lazy("显示排序"), null=True, blank=True)
+    remark = models.TextField(verbose_name=_lazy("备注"), default="")
+
+    class Meta:
+        app_label = "global_conf"
+        verbose_name = _lazy("字典表")
+        verbose_name_plural = verbose_name

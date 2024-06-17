@@ -2,6 +2,7 @@ import pymysql
 
 pymysql.install_as_MySQLdb()
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -28,3 +29,5 @@ ENABLE_LOGIN_ANALYSIS_LOG = True
 LOGIN_NO_CAPTCHA_AUTH = True
 # 列权限中排除App应用
 COLUMN_EXCLUDE_APPS = []
+# 开启 IP 分析
+ENABLE_LOGIN_ANALYSIS_LOG = True

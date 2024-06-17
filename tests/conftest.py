@@ -9,6 +9,7 @@ from pathlib import Path
 
 from xTool.testing.pytest_plugin import append_pytest_fixture_plugins
 
+# 导入其它的 fixtures
 path = Path(__file__).parent / "fixtures"
 root_path = Path(__file__).parent.parent
 pytest_plugins = append_pytest_fixture_plugins(root_path, path)

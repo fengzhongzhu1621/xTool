@@ -44,6 +44,7 @@ ALLOWED_HOSTS = ["*"]
 # 登录缓存时间配置, 单位秒（与django cache单位一致）
 LOGIN_CACHE_EXPIRED = int(os.getenv("LOGIN_CACHE_EXPIRED", 60))
 
+AUTH_USER_MODEL = "account.Users"
 
 # Application definition
 
@@ -57,8 +58,11 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "apps.opentelemetry_instrument",
     "rest_framework",
     "bk_resource",
+    "captcha",
+    "channels",
     "apps.account",
     "drf_yasg",
     "version_log",
@@ -77,15 +81,16 @@ INSTALLED_APPS = (
     "apps.version",
     "apps.entry",
     "apps.backend",
-    "apps.quickstart",
-    "apps.snippets",
+    # "apps.quickstart",
+    # "apps.snippets",
     "apps.credential",
     "apps.global_conf",
     "apps.http_client",
-    "apps.opentelemetry_instrument",
+    "apps.websocket",
 )
 
 MIDDLEWARE = (
+    "core.middleware.healthz.HealthCheckMiddleware",
     # 将请求对象注入到线程变量，方便根据 get_request() 方法获取
     "core.middleware.request_provider.RequestProvider",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -102,9 +107,11 @@ MIDDLEWARE = (
     "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "core.middleware.csrf.CSRFExemptMiddleware",
+    "apps.account.middleware.ApiLoggingMiddleware",
 )
 
-AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
+# AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
+AUTHENTICATION_BACKENDS = ("core.auth.backends.Md5ModelBackend",)
 TEMPLATE_CONTEXT_PROCESSORS = [
     "django.template.context_processors.debug",
     "django.template.context_processors.request",
@@ -166,6 +173,10 @@ IS_DISPLAY_LANGUAGE_CHANGE = "none"
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2
 SESSION_COOKIE_NAME = "_".join([APP_CODE, "sessionid"])
+# The module to store session data
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+# Whether to save the session data on every request.
+SESSION_SAVE_EVERY_REQUEST = False
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -185,7 +196,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # noqa
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler",
+    "EXCEPTION_HANDLER": "core.utils.exception.custom_exception_handler",
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "core.drf.pagination.CustomPageNumberWithColumnPagination",
     "PAGE_SIZE": 10,
@@ -261,7 +272,7 @@ REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
 REDIS_VERSION = int(os.environ.get("REDIS_VERSION", 2))
-REDIS_KEY_PREFIX = os.environ.get("REDIS_KEY_PREFIX")
+REDIS_KEY_PREFIX = os.environ.get("REDIS_KEY_PREFIX", APP_CODE)
 REDIS_DB = os.getenv("REDIS_DB", "0")
 REDIS_SENTINEL_PASSWORD = os.environ.get("BKAPP_REDIS_SENTINEL_PASSWORD", REDIS_PASSWORD)
 REDIS_SERVICE_NAME = os.environ.get("BKAPP_REDIS_SERVICE_NAME", "mymaster")
@@ -367,3 +378,21 @@ LOG_PERSISTENT_DAYS = 30  # 设置引擎日志的有效期
 
 # 唯一随机串生成重试次数
 RANDOM_STR_GENERATE_REPEAT_TIMES = 3
+
+# 是否开启 IP 分析
+LOGIN_ANALYSIS_LOG_ENABLED = False
+
+# 列权限需要排除的App应用
+COLUMN_EXCLUDE_APPS = ["channels", "captcha"] + locals().get("COLUMN_EXCLUDE_APPS", [])
+
+# 操作日志
+API_LOG_ENABLE = True
+API_LOG_METHODS = ["POST", "DELETE", "PUT", "PATCH"]
+API_MODEL_MAP = {
+    "/token/": "登录模块",
+    "/api/login/": "登录模块",
+    "/api/plugins_market/plugins/": "插件市场",
+}
+
+# channels
+CHANNEL_LAYERS = {}
