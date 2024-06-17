@@ -75,7 +75,10 @@ class RoleMenuButtonPermission(SoftDeleteModel):
         blank=True,
     )
     data_range = models.CharField(
-        max_length=LEN_SHORT, default=DataScope.USER.value, choices=DataScope.choices, verbose_name=_lazy("数据权限范围")
+        max_length=LEN_SHORT,
+        default=DataScope.USER.value,
+        choices=DataScope.choices,
+        verbose_name=_lazy("数据权限范围"),
     )
     dept = models.ManyToManyField(to="Dept", blank=True, verbose_name=_lazy("数据权限-关联部门"), db_constraint=False)
 
