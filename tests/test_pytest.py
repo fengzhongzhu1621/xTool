@@ -1,13 +1,21 @@
 import pytest
 
 
-# 定义一个 fixture 函数，提供参数 x
 @pytest.fixture
 def x():
     return 2
 
 
-# 定义一个测试函数，接受参数 x 和 y
+@pytest.fixture
+def y():
+    return 3
+
+
+@pytest.fixture
+def expected():
+    return 5
+
+
 @pytest.mark.parametrize(
     "x, y, expected",
     [
@@ -23,7 +31,6 @@ def test_addition_indirect_x(x, y, expected):
     assert 2 + y == expected
 
 
-# 定义一个测试函数，接受参数 x 和 y
 @pytest.mark.parametrize(
     "x, y, expected",
     [
@@ -32,4 +39,21 @@ def test_addition_indirect_x(x, y, expected):
     ],
 )
 def test_addition_without_indirect(x, y, expected):
+    assert x + y == expected
+
+
+@pytest.fixture
+def y():
+    return 3
+
+
+@pytest.mark.parametrize(
+    "x, y, expected",
+    [
+        (1, 2, 6),
+        (2, 3, 6),
+    ],
+    indirect=True,
+)
+def test_addition_indirect_is_true(x, y, expected):
     assert x + y == expected

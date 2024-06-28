@@ -2,7 +2,7 @@ import functools
 import time
 from typing import Optional
 
-from xTool.cachetools import hash_key, typed_key
+from xTool.cache.cachetools import hash_key, typed_key
 from xTool.misc import md5
 
 

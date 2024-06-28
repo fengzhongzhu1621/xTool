@@ -1,6 +1,6 @@
 import unittest
 
-from xTool.cachetools import func
+from xTool.cache.cachetools import func
 
 
 class DecoratorTestMixin:

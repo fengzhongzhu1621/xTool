@@ -1,6 +1,6 @@
 import unittest
 
-from xTool.cachetools.keys import hash_key, typed_key
+from xTool.cache.cachetools.keys import hash_key, typed_key
 
 
 class CacheKeysTest(unittest.TestCase):

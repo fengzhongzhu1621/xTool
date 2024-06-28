@@ -76,17 +76,3 @@ class BackendInstanceManager:
         old = self.backends.get(key, None)
         self.backends[key] = layer
         return old
-
-
-def get_backend_instance(key: str):
-    """
-    Returns a channel layer by alias, or None if it is not configured.
-    """
-    try:
-        return backend_instances[key]
-    except KeyError:
-        return None
-
-
-# Default global instance of the channel layer manager
-backend_instances = BackendInstanceManager()

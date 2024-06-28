@@ -1,7 +1,8 @@
-import math
 import unittest
 
-from xTool.cachetools import TLRUCache
+import math
+
+from xTool.cache.cachetools import TLRUCache
 from .mixin import CacheTestMixin
 
 

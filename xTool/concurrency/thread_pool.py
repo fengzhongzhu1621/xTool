@@ -11,7 +11,7 @@ from types import MappingProxyType
 from typing import NamedTuple, Any, Optional, TypeVar, Callable  # noqa
 
 from xTool.asynchronous.aiomisc import awaiter, context_partial
-from xTool.iterator_wrapper import IteratorWrapper
+from xTool.asynchronous.iterator_wrapper import IteratorWrapper
 
 T = typing.TypeVar("T")
 F = TypeVar("F", bound=Callable[..., Any])

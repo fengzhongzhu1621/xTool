@@ -3,7 +3,7 @@ from contextlib import suppress
 
 import pytest
 
-from xTool import thread_pool
+from xTool.concurrency import thread_pool
 
 
 @pytest.fixture(params=(thread_pool.threaded, thread_pool.threaded_separate))

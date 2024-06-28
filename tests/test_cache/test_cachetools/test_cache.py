@@ -1,6 +1,6 @@
 import unittest
 
-from xTool import cachetools
+from xTool.cache import cachetools
 from .mixin import CacheTestMixin
 
 

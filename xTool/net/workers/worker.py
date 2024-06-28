@@ -23,8 +23,8 @@ except ModuleNotFoundError:
             pass
 
 
-from xTool.servers.server import HttpProtocol, Signal, serve, trigger_events
-from xTool.servers.websocket import WebSocketProtocol
+from xTool.net.servers.server import HttpProtocol, Signal, serve, trigger_events
+from xTool.net.servers.websocket import WebSocketProtocol
 
 
 try:
