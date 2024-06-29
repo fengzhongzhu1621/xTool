@@ -41,6 +41,7 @@ wheels/
 .installed.cfg
 *.egg
 poetry.lock
+.pdm-python
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
