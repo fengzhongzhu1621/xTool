@@ -1,12 +1,7 @@
-"""
-python -W ignore -m pytest -v -s -x tests
-"""
-
 import codecs
 import logging
 import os
 import sys
-from io import open
 
 from setuptools import find_packages
 
@@ -14,12 +9,16 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-from setuptools.command.test import test as TestCommand
-from setuptools import Command
-from setuptools import Extension
+
 from importlib import import_module
 
-from Cython.Build import cythonize
+from setuptools import Command, Extension
+from setuptools.command.test import test as TestCommand
+
+try:
+    from Cython.Build import cythonize
+except ImportError:
+    cythonize = None
 
 logger = logging.getLogger(__name__)
 
@@ -108,11 +107,14 @@ class PyTest(TestCommand):
     user_options = [("pytest-args=", "a", "Arguments to pass to pytest")]
 
     def initialize_options(self):
+        """初始化可选项 ."""
         TestCommand.initialize_options(self)
         self.pytest_args = ""
 
     def run_tests(self):
+        """执行测试 ."""
         import shlex
+
         import pytest
 
         errno = pytest.main(shlex.split(self.pytest_args))
@@ -123,9 +125,10 @@ class PyTest(TestCommand):
 # because in a site-wide install, dropin.cache cannot be rewritten by
 # normal users.
 def refresh_plugin_cache():
+    """刷新缓冲 ."""
     try:
-        from twisted.plugin import getPlugins  # noqa
         from twisted.plugin import IPlugin  # noqa
+        from twisted.plugin import getPlugins  # noqa
 
         list(getPlugins(IPlugin))
     except Exception as e:
@@ -144,7 +147,7 @@ if os.path.exists("requirements.txt"):
         for item in ["pexpect"]:
             try:
                 install_requires.remove(item)
-            except ValueError as e:
+            except ValueError:
                 pass
 
 install_requires.extend([])
@@ -209,8 +212,11 @@ def do_setup():
             "flake8",
             "docutils>=0.14",
         ],
-        extras_require={"dev": ["pytest", "pyyaml", "pytest-sanic"], "fast": ["uvloop"]},
-        ext_modules=cythonize(ext_modules),
+        extras_require={
+            "dev": ["pytest", "pyyaml", "pytest-sanic"],
+            "fast": ["uvloop"],
+        },
+        # ext_modules=cythonize(ext_modules),
         test_suite="tests",
         tests_require=test_requirements,
         cmdclass={"test": PyTest},

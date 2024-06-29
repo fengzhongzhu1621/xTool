@@ -4,6 +4,12 @@ ignore =
     W503,
     ;E203 whitespace before ':'
     E203,
+    D100,
+    D101,
+    D102,
+    D103,
+    D205,
+    D400,
 
 ; exclude file
 exclude =

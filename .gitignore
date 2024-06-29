@@ -40,7 +40,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-poetry.lock
+*.lock
 .pdm-python
 pdm.toml
 
