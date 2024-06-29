@@ -42,6 +42,7 @@ wheels/
 *.egg
 poetry.lock
 .pdm-python
+pdm.toml
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

@@ -1,27 +1,28 @@
-default_stages: [ commit ]
+default_stages: [commit]
 repos:
-    -   repo: https://github.com/asottile/pyupgrade
-        rev: v1.21.0
-        hooks:
-            -   id: pyupgrade
-    -   repo: https://github.com/pre-commit/pre-commit-hooks
-        rev: v2.1.0
-        hooks:
-            -   id: check-merge-conflict
-    -   repo: https://github.com/psf/black
-        rev: 22.8.0
-        hooks:
-            -   id: black
-                language_version: python3.10
-    -   repo: https://github.com/pycqa/isort
-        rev: 5.12.0
-        hooks:
-            -   id: isort
-                args: [ "--profile", "black" ]
-    -   repo: https://github.com/pre-commit/pre-commit-hooks
-        rev: v2.1.0
-        hooks:
-            -   id: flake8
-                args:
-                    - "--config"
-                    - ".flake8"
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.16.0
+    hooks:
+      - id: pyupgrade
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+    - id: check-merge-conflict
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        language_version: python3.10
+        args: [ --config=pyproject.toml ]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort
+        additional_dependencies: [ "toml" ]
+        args: [ --settings-path=pyproject.toml ]
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.0
+    hooks:
+    - id: flake8
+      additional_dependencies: [flake8-docstrings]
