@@ -10,9 +10,8 @@ vim ~/.pip/pip.conf
 
 ```
 [global]
-index-url=https://mirrors.tencent.com/repository/pypi/tencent_pypi/simple
-extra-index-url=http://mirrors.cloud.tencent.com/pypi/simple/
-trusted-host = mirrors.tencent.com, mirrors.cloud.tencent.com
+index-url = http://mirrors.cloud.tencent.com/pypi/simple/
+trusted-host = mirrors.cloud.tencent.com
 ```
 
 使用命令设置
