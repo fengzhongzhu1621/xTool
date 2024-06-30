@@ -3,25 +3,13 @@ import logging
 import socket
 import sys
 import warnings
-from asyncio import events
-from asyncio import open_connection
+from asyncio import events, open_connection
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
-from functools import partial
-from functools import wraps
-from multiprocessing import cpu_count
-from typing import (  # noqa
-    Awaitable,
-    List,
-    Any,
-    Optional,
-    Iterable,
-    Tuple,
-    TypeVar,
-    Callable,
-)
-
+from functools import partial, wraps
 from math import ceil
+from multiprocessing import cpu_count
+from typing import Any, Awaitable, Callable, Iterable, List, Optional, Tuple, TypeVar  # noqa
 
 from xTool.net.utils import is_ipv6
 
@@ -56,7 +44,8 @@ except ImportError:
     context_partial = partial
 
 try:
-    from trio import open_file as open_async, Path  # type: ignore
+    from trio import Path
+    from trio import open_file as open_async  # type: ignore
 
     def stat_async(path):
         return Path(path).stat()
@@ -74,8 +63,7 @@ except ImportError:
         pass
 
 if sys.version_info >= (3, 7):
-    from asyncio import get_running_loop
-    from asyncio import create_task
+    from asyncio import create_task, get_running_loop
 else:
     from asyncio import _get_running_loop
 
@@ -115,7 +103,7 @@ def uvloop_installed():
         return False
 
 
-def load_uvlopo():
+def load_uvloop():
     try:
         import uvloop  # type: ignore
 
@@ -423,9 +411,15 @@ async def await_many_dispatch(consumer_callables: List[Awaitable], dispatch: Cal
         while True:
             # Wait for any of them to complete
             # 等待任意一个任务完成，即其中有一个消费者任务已处理完毕
-            # asyncio.ALL_COMPLETED（默认值）：当所有输入任务都完成时返回。这意味着 done 集合将包含所有已完成的任务，而 pending 集合将为空。
-            # asyncio.FIRST_COMPLETED：当第一个输入任务完成时返回。此时，done 集合将包含一个或多个已完成的任务（取决于哪个任务首先完成），而 pending 集合将包含剩余未完成的任务。
-            # asyncio.FIRST_EXCEPTION：当第一个输入任务引发异常时返回。如果没有任何任务引发异常，则行为与 asyncio.FIRST_COMPLETED 相同。
+            #
+            # asyncio.ALL_COMPLETED（默认值）：当所有输入任务都完成时返回。
+            # 这意味着 done 集合将包含所有已完成的任务，而 pending 集合将为空。
+            #
+            # asyncio.FIRST_COMPLETED：当第一个输入任务完成时返回。此时，done 集合将包含一个或多个已完成的任务（取决于哪个任务首先完成），
+            # 而 pending 集合将包含剩余未完成的任务。
+            #
+            # asyncio.FIRST_EXCEPTION：当第一个输入任务引发异常时返回。如果没有任何任务引发异常，
+            # 则行为与 asyncio.FIRST_COMPLETED 相同。
             _done, _pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             # Find the completed one(s), yield results, and replace them
             # 定位已完成的任务
@@ -446,21 +440,3 @@ async def await_many_dispatch(consumer_callables: List[Awaitable], dispatch: Cal
                 await task
             except asyncio.CancelledError:
                 pass
-
-
-if __name__ == "__main__":
-
-    async def noop2(*args, **kwargs):
-        return asyncio.sleep(1)
-
-    async def task():
-        return await DeprecationWaiter(noop2())
-
-    async def task2():
-        return DeprecationWaiter(noop2())
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(task())
-    loop.run_until_complete(task2())
-
-    loop.close()

@@ -4,9 +4,8 @@ target_version = ['py36', 'py37', 'py38', 'py39', 'py310']
 include = '\.pyi?$'
 skip-string-normalization = 'true'
 exclude = '''
-/
-(
-    \.eggs
+/(
+  \.eggs
   | \.git
   | \.hg
   | \.mypy_cache
@@ -20,8 +19,7 @@ exclude = '''
   | build
   | dist
   | migrations
-)
- /
+)/
 '''
 
 [tool.isort]
