@@ -1,4 +1,4 @@
-from xTool.compress.zlib_compress import ZlibCompress
+from xTool.crypto.compress.zlib_compress import ZlibCompress
 
 
 class TestZlibCompress:

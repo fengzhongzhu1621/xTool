@@ -3,7 +3,8 @@ from typing import Union
 import orjson as json
 
 from xTool.misc import tob
-from xTool.plugin import register_plugin, PluginType
+from xTool.plugin import PluginType, register_plugin
+
 from .base import CodecType
 
 

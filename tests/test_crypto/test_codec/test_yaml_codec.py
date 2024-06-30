@@ -1,4 +1,4 @@
-from xTool.codec.yaml_codec import YamlCodec
+from xTool.crypto.codec.yaml_codec import YamlCodec
 
 
 class TestYamlCodec:

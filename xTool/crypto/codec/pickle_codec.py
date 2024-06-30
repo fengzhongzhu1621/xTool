@@ -3,7 +3,8 @@ from typing import Union
 
 # from .pickle_codec_c import PickleCodec
 from xTool.misc import tob
-from xTool.plugin import register_plugin, PluginType
+from xTool.plugin import PluginType, register_plugin
+
 from .base import CodecType
 
 

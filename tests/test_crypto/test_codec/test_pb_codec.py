@@ -4,7 +4,8 @@ import pytest
 @pytest.mark.skip
 class TestProtocCodec:
     def test_encode(self):
-        from xTool.codec.pb_codec import ProtocCodec
+        from xTool.crypto.codec.pb_codec import ProtocCodec
+
         from .codec_pb2 import Request
 
         request = Request()

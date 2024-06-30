@@ -4,7 +4,8 @@
 
 from google.protobuf.json_format import MessageToJson, Parse
 
-from xTool.plugin import register_plugin, PluginType
+from xTool.plugin import PluginType, register_plugin
+
 from .base import CodecType
 
 

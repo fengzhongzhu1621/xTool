@@ -26,7 +26,7 @@ def test_benchmark_py_picke_codec():
 @pytest.mark.skip
 # @Timer
 def test_benchmark_cython_picke_codec():
-    from xTool.codec.pickle_codec_c import PickleCodec
+    from xTool.crypto.codec.pickle_codec_c import PickleCodec
 
     cython_codec = PickleCodec()
     value = {"a": 1, "b": 2}

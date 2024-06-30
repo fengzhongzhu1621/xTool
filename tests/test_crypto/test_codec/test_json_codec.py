@@ -1,4 +1,4 @@
-from xTool.codec.json_codec import JsonCodec
+from xTool.crypto.codec.json_codec import JsonCodec
 
 
 class TestJsonCodec:

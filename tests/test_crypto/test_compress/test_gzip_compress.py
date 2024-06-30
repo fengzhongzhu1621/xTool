@@ -1,4 +1,4 @@
-from xTool.compress.gzip_compress import GzipCompress
+from xTool.crypto.compress.gzip_compress import GzipCompress
 
 
 class TestGzipCompress:

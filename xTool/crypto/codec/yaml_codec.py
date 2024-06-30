@@ -1,8 +1,9 @@
-from typing import Union, Dict, Hashable, Any, List
+from typing import Any, Dict, Hashable, List, Union
 
 import yaml
 
-from xTool.plugin import register_plugin, PluginType
+from xTool.plugin import PluginType, register_plugin
+
 from .base import CodecType
 
 

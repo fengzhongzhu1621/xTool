@@ -1,4 +1,4 @@
-from xTool.compress.bz2_compress import Bz2Compress
+from xTool.crypto.compress.bz2_compress import Bz2Compress
 
 
 class TestBz2Compress:

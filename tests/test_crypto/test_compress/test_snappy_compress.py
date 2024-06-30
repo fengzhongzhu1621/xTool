@@ -1,4 +1,4 @@
-from xTool.compress.snappy_compress import SnappyCompress
+from xTool.crypto.compress.snappy_compress import SnappyCompress
 
 
 class TestSnappyCompress:

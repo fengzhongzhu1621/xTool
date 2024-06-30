@@ -2,7 +2,8 @@ from typing import Optional
 
 import snappy
 
-from xTool.plugin import register_plugin, PluginType
+from xTool.plugin import PluginType, register_plugin
+
 from .base import CompressType
 
 

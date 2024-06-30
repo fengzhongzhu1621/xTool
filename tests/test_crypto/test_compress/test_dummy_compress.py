@@ -1,4 +1,4 @@
-from xTool.compress.dummy_compress import DummyCompress
+from xTool.crypto.compress.dummy_compress import DummyCompress
 
 
 class TestDummyCompress:

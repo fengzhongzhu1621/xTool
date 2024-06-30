@@ -1,9 +1,9 @@
 import textwrap
-from typing import List, Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 from unittest import TestCase
 
-from xTool.codec.yaml_codec import YamlCodec
 from xTool.config.converter import DictConfigConverter
+from xTool.crypto.codec.yaml_codec import YamlCodec
 
 
 class TestDictConfigConverter(TestCase):

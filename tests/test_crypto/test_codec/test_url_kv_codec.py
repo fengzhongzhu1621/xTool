@@ -1,4 +1,4 @@
-from xTool.codec.url_kv_codec import UrlKvCodec
+from xTool.crypto.codec.url_kv_codec import UrlKvCodec
 
 
 class TestUrlKvCodec:
