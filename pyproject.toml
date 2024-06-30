@@ -31,50 +31,6 @@ use_parentheses = 'true'
 line_length = 120
 skip_glob = ["*/node_modules/**", "*/migrations/**"]
 
-[tool.flake8]
-max-line-length = 120
-max-complexity = 25
-format = "pylint"
-show_source ="false"
-statistics = "true"
-count = "true"
-ignore = [
-    "C901",
-    "D100",
-    "D101",
-    "D102",
-    "D103",
-    "D104",
-    "D107",
-    "D200",
-    "D205",
-    "D400",
-    "E203",
-    "E402",
-    "F405",
-    "W503",
-]
-exclude = [
-    '*migrations*',
-    '.tox',
-    '*.pyc',
-    '.git',
-    '__pycache__',
-    'docs',
-    'old',
-    'build',
-    'dist',
-    '*.egg-info',
-    '.cache',
-    '.eggs',
-    'env',
-    'ebpack',
-    'cripts/*',
-    'vam/*',
-    'onf/*',
-    'larm_backends/tests/*',
-    '/parsetab.py'
-]
 
 [tool]
 rye = { dev-dependencies = [
