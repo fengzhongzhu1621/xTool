@@ -1,5 +1,6 @@
 import asyncio
 import socket
+
 import pytest
 from xTool.servers.tcp import TCPServer
 
@@ -11,7 +12,9 @@ def test_tcp_server(aiomisc_unused_port):
     class TestTcpService(TCPServer):
         DATA = []
 
-        async def handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+        async def handle_client(
+            self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+        ):
             while True:
                 data = await reader.readline()
                 writer.write(data)

@@ -1,10 +1,11 @@
 import asyncio
 
-from xTool.servers.periodic import PeriodicService
+from xTool.asynchronous.servers.periodic import PeriodicService
 
 
 def test_str_representation():
-    class FooPeriodicService(PeriodicService): ...
+    class FooPeriodicService(PeriodicService):
+        pass
 
     svc = FooPeriodicService(interval=42, delay=4815162342)
     assert str(svc) == "FooPeriodicService(interval=42,delay=4815162342)"

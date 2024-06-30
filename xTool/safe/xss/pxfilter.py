@@ -1,7 +1,5 @@
 import re
-
 from html.parser import HTMLParser
-
 
 """
 Python 富文本XSS过滤类
@@ -229,7 +227,12 @@ class XssHtml(HTMLParser):
         return attrs
 
     def __htmlspecialchars(self, html):
-        return html.replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace("'", "&#039;")
+        return (
+            html.replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace('"', "&quot;")
+            .replace("'", "&#039;")
+        )
 
 
 if "__main__" == __name__:

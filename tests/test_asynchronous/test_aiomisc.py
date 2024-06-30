@@ -134,7 +134,7 @@ async def test_cancel_tasks_futures(loop):
     assert len(pending) == 10
 
     for task in pending:
-        assert type(task) == asyncio.Future
+        assert isinstance(task, asyncio.Future) is True
         assert task.done()
 
         with pytest.raises(asyncio.CancelledError):

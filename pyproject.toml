@@ -153,7 +153,11 @@ dependencies = [
     "daphne<5.0.0,>=4.1.2",
     "cycler<1.0.0,>=0.12.1",
     "idna>=3.7",
+    "itsdangerous>=2.2.0",
 ]
 
 [project.urls]
 repository = "https://github.com/fengzhongzhu1621/xTool"
+
+[tool.isort]
+profile = "black"

@@ -1,8 +1,8 @@
 import fakeredis
 
 from xTool.cache import Cache
-from xTool.cache.constants import CacheInstanceType, CacheBackendType
-from xTool.unique.uuid import SequenceManager, uniqid
+from xTool.cache.constants import CacheBackendType, CacheInstanceType
+from xTool.crypto.unique import SequenceManager, uniqid
 
 
 def test_uniqid():

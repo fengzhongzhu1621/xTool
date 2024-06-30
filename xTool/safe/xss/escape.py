@@ -1,6 +1,5 @@
 from .pxfilter import XssHtml
 
-
 """
 蓝鲸平台提供的公用方法
 

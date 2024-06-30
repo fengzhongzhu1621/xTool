@@ -1,7 +1,6 @@
 import multiprocessing
 
 import pytest
-
 from xTool.servers.pipeline import SocketPairPipeline
 
 

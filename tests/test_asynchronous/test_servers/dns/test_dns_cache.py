@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 import pytest
 from xTool.servers.dns.dns_cache import DNSCacheTable
 

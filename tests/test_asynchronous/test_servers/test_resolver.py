@@ -4,7 +4,6 @@ import socket
 from unittest.mock import Mock, patch
 
 import pytest
-
 from aiohttp.resolver import AsyncResolver, DefaultResolver, ThreadedResolver
 
 try:

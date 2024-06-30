@@ -1,10 +1,11 @@
 import asyncio
 
-from xTool.servers.cron import CronService
+from xTool.asynchronous.servers.cron import CronService
 
 
 def test_str_representation():
-    class FooCronService(CronService): ...
+    class FooCronService(CronService):
+        pass
 
     svc = FooCronService()
 
