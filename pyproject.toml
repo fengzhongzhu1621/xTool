@@ -1,12 +1,8 @@
-[tool.isort]
-profile = "black"
-line_length = 120
-skip_glob = ["*/migrations/*", "*/node_modules/*"]
-
 [tool.black]
 line-length = 120
 target_version = ['py36', 'py37', 'py38', 'py39', 'py310']
 include = '\.pyi?$'
+skip-string-normalization = 'true'
 exclude = '''
 /
 (
@@ -28,32 +24,24 @@ exclude = '''
  /
 '''
 
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = 'true'
+force_grid_wrap = 0
+use_parentheses = 'true'
+line_length = 120
+skip_glob = ["*/node_modules/**", "*/migrations/**"]
+
 [tool.flake8]
 max-line-length = 120
 max-complexity = 25
-exclude = [
-    ".eggs",
-    ".git",
-    ".mypy_cache",
-    "_build",
-    ".ypy-cov",
-    ".tox",
-    "._black",
-    ".cache",
-    ".venv",
-    "__pycache__",
-    "build",
-    "dist",
-    "*.pyc",
-    "*.egg-info",
-    "migrations",
-    "node_modules",
-    "templates",
-    "bin",
-]
+format = "pylint"
+show_source ="false"
+statistics = "true"
+count = "true"
 ignore = [
-    "W503",
-    "E203",
+    "C901",
     "D100",
     "D101",
     "D102",
@@ -63,11 +51,32 @@ ignore = [
     "D200",
     "D205",
     "D400",
+    "E203",
+    "E402",
+    "F405",
+    "W503",
 ]
-format = "pylint"
-show_source ="false"
-statistics = "true"
-count = "true"
+exclude = [
+    '*migrations*',
+    '.tox',
+    '*.pyc',
+    '.git',
+    '__pycache__',
+    'docs',
+    'old',
+    'build',
+    'dist',
+    '*.egg-info',
+    '.cache',
+    '.eggs',
+    'env',
+    'ebpack',
+    'cripts/*',
+    'vam/*',
+    'onf/*',
+    'larm_backends/tests/*',
+    '/parsetab.py'
+]
 
 [tool]
 rye = { dev-dependencies = [
