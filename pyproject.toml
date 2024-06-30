@@ -157,7 +157,7 @@ dependencies = [
     "pypinyin<1.0.0,>=0.51.0",
     "ftfy<7.0.0,>=6.2.0",
     "cachetools<6.0.0,>=5.3.3",
-    "ujson==4.3.0",
+    "ujson==5.4.0",
     "jsondiff<3.0.0,>=2.0.0",
     "mysqlclient<3.0.0,>=2.2.4",
     "openpyxl<4.0.0,>=3.1.2",
