@@ -1,3 +1,74 @@
+[tool.isort]
+profile = "black"
+line_length = 120
+skip_glob = ["*/migrations/*", "*/node_modules/*"]
+
+[tool.black]
+line-length = 120
+target_version = ['py36', 'py37', 'py38', 'py39', 'py310']
+include = '\.pyi?$'
+exclude = '''
+/
+(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | _build
+  | \.ypy-cov
+  | \.tox
+  | \._black
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations
+)
+ /
+'''
+
+[tool.flake8]
+max-line-length = 120
+max-complexity = 25
+exclude = [
+    ".eggs",
+    ".git",
+    ".mypy_cache",
+    "_build",
+    ".ypy-cov",
+    ".tox",
+    "._black",
+    ".cache",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.pyc",
+    "*.egg-info",
+    "migrations",
+    "node_modules",
+    "templates",
+    "bin",
+]
+ignore = [
+    "W503",
+    "E203",
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D107",
+    "D200",
+    "D205",
+    "D400",
+]
+format = "pylint"
+show_source ="false"
+statistics = "true"
+count = "true"
+
 [tool]
 rye = { dev-dependencies = [
     "pre-commit>=3.7.1",
@@ -158,6 +229,3 @@ dependencies = [
 
 [project.urls]
 repository = "https://github.com/fengzhongzhu1621/xTool"
-
-[tool.isort]
-profile = "black"
