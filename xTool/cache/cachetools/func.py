@@ -13,9 +13,7 @@ from .mru import MRUCache
 from .rr import RRCache
 from .ttl import TTLCache
 
-_CacheInfo = collections.namedtuple(
-    "CacheInfo", ["hits", "misses", "maxsize", "curr_size"]
-)
+_CacheInfo = collections.namedtuple("CacheInfo", ["hits", "misses", "maxsize", "curr_size"])
 
 
 class _UnboundCache(dict):

@@ -94,6 +94,7 @@ class TTLCache(_TimedCache):
 
     class _Link:
         """一个简单双向环形链表 ."""
+
         __slots__ = ("key", "expires", "next", "prev")
 
         def __init__(self, key=None, expires=None):

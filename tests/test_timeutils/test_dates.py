@@ -1,8 +1,8 @@
 # coding: utf-8
 
 
-from xTool.utils.dates import *
-from xTool.utils.timezone import *
+from xTool.timeutils.dates import *
+from xTool.timeutils.timezone import *
 
 
 def test_date_range():

@@ -11,7 +11,7 @@ import arrow
 import six
 from croniter import croniter
 
-from xTool.utils import timezone
+from . import timezone
 
 # Use timer that's not susceptible to time of day adjustments.
 try:

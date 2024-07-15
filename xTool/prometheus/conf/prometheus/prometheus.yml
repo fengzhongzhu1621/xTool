@@ -20,7 +20,7 @@ scrape_configs:
     static_configs:
 # mac获取宿主机 ip 地址：ipconfig getifaddr en0
 # 替换下面的 ip 地址
-      - targets: ['ip:5001']
+        #- targets: ['ip:5001']
 #  - job_name: 'cadvisor'
 #    static_configs:
 #    - targets: ['ip:8899']
@@ -29,6 +29,6 @@ scrape_configs:
 #    - targets: ['ip:9100']
   - job_name: pushgateway
     static_configs:
-      - targets: ['ip:9091']
+      - targets: ['10.45.29.53:9091']
         labels:
           instance: pushgateway

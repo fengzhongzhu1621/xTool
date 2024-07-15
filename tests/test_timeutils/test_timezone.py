@@ -1,10 +1,9 @@
 # coding: utf-8
 
-import datetime as dt
 import pytest
 
 
-from xTool.utils.timezone import *
+from xTool.timeutils.timezone import *
 
 
 def test_is_localized():
