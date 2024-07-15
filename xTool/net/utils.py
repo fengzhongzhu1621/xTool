@@ -1,9 +1,13 @@
-import ipaddress
 import socket
 import struct
 from typing import List, Tuple
 
-import netifaces
+import ipaddress
+
+try:
+    import netifaces
+except ImportError:
+    netifaces = None
 
 from xTool.exceptions import PortInvalidError
 from xTool.misc import tob, OS_IS_WINDOWS
