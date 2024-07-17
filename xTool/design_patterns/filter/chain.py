@@ -15,7 +15,7 @@ class Method:
         """业务逻辑执行入口 ."""
         return self.process_direct(*args, **kwargs)
 
-    async def process_direct(self, *args, **kwargs):
+    async def async_process_direct(self, *args, **kwargs):
         raise NotImplementedError
 
     async def async_process(self, *args, **kwargs):
