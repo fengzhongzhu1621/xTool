@@ -1,7 +1,8 @@
 import logging
 
 from xTool.plugin import PluginType, register_plugin
-from .chain import BeforeFilter, AfterFilter
+
+from .chain import AfterFilter, BeforeFilter
 
 
 @register_plugin(PluginType.BEFORE_FILTER, "demo")

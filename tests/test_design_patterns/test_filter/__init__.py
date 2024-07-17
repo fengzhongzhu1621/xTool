@@ -1,5 +1,5 @@
-from xTool.patterns.filter.chain import Method, BeforeFilter, AfterFilter
-from xTool.plugin import register_plugin, PluginType
+from xTool.patterns.filter.chain import AfterFilter, BeforeFilter, Method
+from xTool.plugin import PluginType, register_plugin
 
 
 class BusinessMethod(Method):
