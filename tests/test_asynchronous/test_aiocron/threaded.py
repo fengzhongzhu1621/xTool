@@ -9,7 +9,7 @@ import pytest
 class CronThread(threading.Thread):
 
     def __init__(self):
-        super(CronThread, self).__init__()
+        super().__init__()
         self.start()
         time.sleep(0.1)
 

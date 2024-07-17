@@ -3,8 +3,7 @@ import time
 
 import pytest
 
-from xTool.aiocron import asyncio
-from xTool.aiocron import crontab
+from xTool.asynchronous.aiocron import asyncio, crontab
 
 
 class CustomError(Exception):
@@ -24,7 +23,7 @@ def test_str():
 def test_sleep():
     loop = asyncio.new_event_loop()
 
-    future = asyncio.Future(loop=loop)
+    # future = asyncio.Future(loop=loop)
 
     @crontab("* * * * * *", loop=loop)
     async def t():
