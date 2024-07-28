@@ -5,12 +5,12 @@ from typing import List
 
 from django.conf import settings
 from django.utils.module_loading import import_string
-from xTool.file_utils.path import path_to_dotted
 
 from bk_resource.base import Resource
 from bk_resource.management.exceptions import ResourceModuleConflict, ResourceModuleNotRegistered, ResourceNotRegistered
 from bk_resource.management.finder import API_DIR, ResourceFinder, ResourcePath
 from bk_resource.utils.logger import logger
+from xTool.file_io.path import path_to_dotted
 from xTool.misc import camel_to_underscore
 
 __setup__ = False

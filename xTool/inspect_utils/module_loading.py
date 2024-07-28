@@ -1,8 +1,8 @@
 import imp
+import importlib
 import os
 import sys
 import warnings
-from importlib import import_module
 from inspect import ismodule
 from types import ModuleType
 from typing import Callable
@@ -97,7 +97,7 @@ def load_backend_module_from_conf(section, key, default_backend, conf=None):
 
     # 加载模块，加载失败抛出异常
     try:
-        module = import_module(backend)
+        module = importlib.import_module(backend)
     except ImportError as err:
         log.critical("Cannot import %s for %s %s due to: %s", backend, section, key, err)
         raise XToolException(err)
@@ -120,7 +120,7 @@ def import_string(dotted_path: str) -> Callable:
     except ValueError:
         raise ImportError("{} doesn't look like a module path".format(dotted_path))
 
-    module: ModuleType = import_module(module_path)
+    module: ModuleType = importlib.import_module(module_path)
 
     try:
         # 返回模块中的类
@@ -140,7 +140,7 @@ def import_string_from_package(module_name, package=None):
 
     """
     module, klass = module_name.rsplit(".", 1)
-    module = import_module(module, package=package)
+    module = importlib.import_module(module, package=package)
     obj = getattr(module, klass)
     if ismodule(obj):
         return obj
@@ -274,3 +274,89 @@ class XToolImporter:
             return loaded_attribute
 
         raise AttributeError
+
+
+def import_from_file_path(path):
+    """Performs a module import given the filename.
+
+    Args:
+      path (str): the path to the file to be imported.
+
+    Raises:
+      IOError: if the given file does not exist or importlib fails to load it.
+
+    Returns:
+      Tuple[ModuleType, str]: returns the imported module and the module name,
+        usually extracted from the path itself.
+    """
+
+    if not os.path.exists(path):
+        raise OSError('Given file path does not exist.')
+
+    module_name = os.path.basename(path)
+
+    if sys.version_info.major == 3 and sys.version_info.minor < 5:
+        loader = importlib.machinery.SourceFileLoader(  # pylint: disable=no-member
+            fullname=module_name,
+            path=path,
+        )
+
+        module = loader.load_module(module_name)  # pylint: disable=deprecated-method
+
+    elif sys.version_info.major == 3:
+        from importlib import util  # pylint: disable=g-import-not-at-top,import-outside-toplevel,no-name-in-module
+
+        spec = util.spec_from_file_location(module_name, path)
+
+        if spec is None:
+            raise OSError('Unable to load module from specified path.')
+
+        module = util.module_from_spec(spec)  # pylint: disable=no-member
+        spec.loader.exec_module(module)  # pytype: disable=attribute-error
+
+    else:
+        import imp  # pylint: disable=g-import-not-at-top,import-outside-toplevel,deprecated-module,import-error
+
+        module = imp.load_source(module_name, path)
+
+    return module, module_name
+
+
+def import_from_module_name(module_name):
+    """Imports a module and returns it and its name."""
+    module = importlib.import_module(module_name)
+    return module, module_name
+
+
+def import_module(module_or_filename):
+    """Imports a given module or filename.
+
+    If the module_or_filename exists in the file system and ends with .py, we
+    attempt to import it. If that import fails, try to import it as a module.
+
+    Args:
+      module_or_filename (str): string name of path or module.
+
+    Raises:
+      ValueError: if the given file is invalid.
+      IOError: if the file or module can not be found or imported.
+
+    Returns:
+      Tuple[ModuleType, str]: returns the imported module and the module name,
+        usually extracted from the path itself.
+    """
+
+    if os.path.exists(module_or_filename):
+        # importlib.util.spec_from_file_location requires .py
+        if not module_or_filename.endswith('.py'):
+            try:  # try as module instead
+                return import_from_module_name(module_or_filename)
+            except ImportError:
+                raise ValueError('Fire can only be called on .py files.')
+
+        return import_from_file_path(module_or_filename)
+
+    if os.path.sep in module_or_filename:  # Use / to detect if it was a filename.
+        raise OSError('Fire was passed a filename which could not be found.')
+
+    return import_from_module_name(module_or_filename)  # Assume it's a module.
