@@ -1,4 +1,12 @@
-from xTool.plugin import PluginType, register_plugin, get_plugin_instance, PluginRegister
+"""
+注册插件有两种方式
+
+1. 添加装饰器 @register_plugin
+2. 从 PluginRegister 类继承
+
+"""
+
+from xTool.plugin import PluginRegister, PluginType, get_plugin_instance, register_plugin
 
 
 @register_plugin(PluginType.UNITTEST, "unittest")

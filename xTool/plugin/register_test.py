@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from xTool.plugin.register import FunctionsManager, register_func, register_class, BaseInvocation
+from xTool.plugin.register import BaseInvocation, FunctionsManager, register_class, register_func
 
 
 @register_func("add")
