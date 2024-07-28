@@ -1,4 +1,9 @@
-class Proxy(object):
+"""
+代理模式
+"""
+
+
+class Proxy:
     """
     Create a proxy or placeholder for another object.
     """
@@ -19,7 +24,9 @@ class Proxy(object):
         self._callbacks.append(callback)
         return callback
 
-    def pass_through(method):
+    def pass_through(method: str):
+        """装饰器，用于被代理的对象方法 ."""
+
         def inner(self, *args, **kwargs):
             if self.obj is None:
                 raise AttributeError("Cannot use uninitialized Proxy.")
@@ -32,11 +39,13 @@ class Proxy(object):
     __exit__ = pass_through("__exit__")
 
     def __getattr__(self, attr):
+        """获得被代理对象的属性 ."""
         if self.obj is None:
             raise AttributeError("Cannot use uninitialized Proxy.")
         return getattr(self.obj, attr)
 
     def __setattr__(self, attr, value):
+        """修改被代理对象的值 ."""
         if attr not in self.__slots__:
             raise AttributeError("Cannot set attribute on proxy.")
-        return super(Proxy, self).__setattr__(attr, value)
+        return super().__setattr__(attr, value)
