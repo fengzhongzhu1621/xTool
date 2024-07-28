@@ -11,8 +11,8 @@ from typing import Callable, Optional, Sequence, TypeVar, Union, cast
 from xTool.decorators.utils import safe_wraps
 from xTool.exceptions import InvalidStatsNameException
 from xTool.plugin import PluginType, get_plugin_instance, register_plugin
-from xTool.timeutils.now import time_now
-from xTool.timeutils.timer import Timer
+from xTool.time_utils.now import time_now
+from xTool.time_utils.timer import Timer
 from xTool.type_hint import Protocol
 
 log = logging.getLogger(__name__)

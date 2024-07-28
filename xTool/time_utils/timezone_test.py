@@ -1,9 +1,21 @@
-# coding: utf-8
+import datetime as dt
+from datetime import datetime
 
 import pytest
 
-
-from xTool.timeutils.timezone import *
+from xTool.time_utils.timezone import (
+    TIMEZONE_SYSTEM,
+    TIMEZONE_UTC,
+    convert_to_utc,
+    is_localized,
+    is_naive,
+    make_aware,
+    make_naive,
+    parse,
+    parse_execution_date,
+    utc_epoch,
+    utcnow,
+)
 
 
 def test_is_localized():
@@ -71,3 +83,10 @@ def test_parse():
     d3 = parse("1970-01-01 00:00:00", TIMEZONE_UTC)
     d4 = utc_epoch()
     assert d3 == d4
+
+
+def test_parse_execution_date():
+    actual_1 = parse_execution_date("2018-01-01")
+    actual_2 = parse_execution_date("2018-01-01 00:00:00")
+    actual_3 = parse_execution_date("2018-01-01T00:00:00")
+    assert actual_1 == actual_2 == actual_3

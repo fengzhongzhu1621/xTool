@@ -9,7 +9,7 @@ from django.utils.functional import Promise
 from django.utils.timezone import is_aware
 
 from core.utils.time_tools import strftime_local
-from xTool.timeutils.convert import date_to_string
+from xTool.time_utils.convert import date_to_string
 
 
 class DjangoJSONEncoderExtend(json.JSONEncoder):

@@ -10,9 +10,9 @@ def test_get_class_object_init_type():
     assert object_type is None
 
     object_type = get_class_object_init_type(A(1, 2, 3), "b")
-    assert object_type is type(1)
+    assert object_type is int
     assert object_type("1") == 1
 
     object_type = get_class_object_init_type(A(1, 2, 3), "c")
-    assert object_type is type(1)
+    assert object_type is int
     assert object_type("1") == 1

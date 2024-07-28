@@ -11,7 +11,7 @@ class Duck(Protocol):
 
 
 class Proto(Protocol):
-    def meth(self) -> int: ...
+    def meth(self) -> int: ...  # noqa
 
 
 class C:

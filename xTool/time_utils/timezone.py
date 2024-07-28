@@ -213,6 +213,7 @@ def parse_execution_date(execution_date_str):
     """
     Parse execution date string to datetime object.
     """
+    # 将日期字符串转化为datetime对象（带有时区信息）
     o = parse(execution_date_str)
     # 去掉时区信息
     # cross library compatibility

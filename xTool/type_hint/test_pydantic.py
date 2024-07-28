@@ -1,7 +1,7 @@
-from typing import TypeVar, Optional, List, Literal, Any
+from typing import Any, List, Literal, Optional, TypeVar
 
 import pytest
-from pydantic import BaseModel, ValidationError, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from pydantic.alias_generators import to_camel
 
 DataT = TypeVar("DataT")
