@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.handlers.asgi import ASGIHandler
 from django.core.handlers.wsgi import WSGIHandler
 
-from xTool.opentelemetry.metrics.server import start_metrics_http_server
+from xTool.opentelemetry_utils.metrics.server import start_metrics_http_server
 
 
 def get_wsgi_application():
