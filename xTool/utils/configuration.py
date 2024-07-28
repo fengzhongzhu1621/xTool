@@ -1,51 +1,31 @@
-from __future__ import absolute_import
-
 # 开启除法浮点运算
-from __future__ import division
-from __future__ import print_function
 
 # 把你当前模块所有的字符串（string literals）转为unicode
-from __future__ import unicode_literals
 
+import configparser
 import copy
 import json
 import os
 import types
 import warnings
-from builtins import str
 from collections import OrderedDict
 from tempfile import mkstemp
 
-import six
-from six import iteritems
-from six.moves import configparser
-
-if six.PY3:
-    ConfigParser = configparser.ConfigParser
-else:
-    ConfigParser = configparser.SafeConfigParser
-
-from xTool.utils.helpers import expand_env_var
-from xTool.utils.helpers import run_command
-from xTool.utils.helpers import strtobool
-from xTool.utils.log.logging_mixin import LoggingMixin
-from xTool.utils.module_loading import import_string_from_package
-from xTool.exceptions import XToolConfigException, PyFileError
+from xTool.exceptions import PyFileError, XToolConfigException
+from xTool.inspect_utils.module_loading import import_string_from_package
 from xTool.misc import USE_WINDOWS
-
+from xTool.utils.helpers import expand_env_var, run_command, strtobool
+from xTool.utils.log.logging_mixin import LoggingMixin
 
 log = LoggingMixin().log
+
+ConfigParser = configparser.ConfigParser
 
 
 def read_config_file(file_path):
     """根据文件路径，读取文件内容 ."""
-    if six.PY2:
-        with open(file_path) as f:
-            config = f.read()
-            return config.decode("utf-8")
-    else:
-        with open(file_path, encoding="utf-8") as f:
-            return f.read()
+    with open(file_path, encoding="utf-8") as f:
+        return f.read()
 
 
 def parameterized_config(template):
@@ -54,7 +34,7 @@ def parameterized_config(template):
     current scope
     :param template: a config content templated with {{variables}}
     """
-    all_vars = {k: v for d in [globals(), locals()] for k, v in iteritems(d)}
+    all_vars = {k: v for d in [globals(), locals()] for k, v in d.items()}
     return template.format(**all_vars)
 
 
@@ -102,7 +82,7 @@ class XToolConfigParser(ConfigParser):
     )
 
     def __init__(self, default_config=None, *args, **kwargs):
-        super(XToolConfigParser, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # 创建默认配置文件解析器
         self.defaults = ConfigParser(*args, **kwargs)
         # 从字符串读取默认配置
@@ -134,8 +114,8 @@ class XToolConfigParser(ConfigParser):
         if (section, key) in self.as_command_stdout:
             # 如果用户自定义配置中存在以"_cmd"结尾的配置值
             # 则执行此配置值的shell命令，获取其返回值作为真正的配置项的值
-            if super(XToolConfigParser, self).has_option(section, fallback_key):
-                command = super(XToolConfigParser, self).get(section, fallback_key)
+            if super().has_option(section, fallback_key):
+                command = super().get(section, fallback_key)
                 # 执行shell命令，返回标准输出（Unicode编码）
                 return run_command(command)
 
@@ -156,12 +136,12 @@ class XToolConfigParser(ConfigParser):
                 self._warn_deprecate(section, key, deprecated_name)
                 return option
         # 2. 从用户自定义配置文件中获取
-        if super(XToolConfigParser, self).has_option(section, key):
-            return expand_env_var(super(XToolConfigParser, self).get(section, key, **kwargs))
+        if super().has_option(section, key):
+            return expand_env_var(super().get(section, key, **kwargs))
         if deprecated_name:
-            if super(XToolConfigParser, self).has_option(section, deprecated_name):
+            if super().has_option(section, deprecated_name):
                 self._warn_deprecate(section, key, deprecated_name)
-                return expand_env_var(super(XToolConfigParser, self).get(section, deprecated_name, **kwargs))
+                return expand_env_var(super().get(section, deprecated_name, **kwargs))
         # 3. 获得带有_cmd后缀的配置，执行表达式，获取结果
         option = self._get_cmd_option(section, key)
         if option:
@@ -202,12 +182,12 @@ class XToolConfigParser(ConfigParser):
 
     def read(self, filenames):
         """读取多个最新的配置文件，进行校验，并覆盖默认配置."""
-        super(XToolConfigParser, self).read(filenames)
+        super().read(filenames)
         self._validate()
 
     def read_dict(self, *args, **kwargs):
         """从字典中获取配置 ."""
-        super(XToolConfigParser, self).read_dict(*args, **kwargs)
+        super().read_dict(*args, **kwargs)
         self._validate()
 
     def has_option(self, section, option):
@@ -223,8 +203,8 @@ class XToolConfigParser(ConfigParser):
     def remove_option(self, section, option, remove_default=True):
         """删除配置 ."""
         # 删除用户自定义配置
-        if super(XToolConfigParser, self).has_option(section, option):
-            super(XToolConfigParser, self).remove_option(section, option)
+        if super().has_option(section, option):
+            super().remove_option(section, option)
         # 删除默认配置
         if self.defaults.has_option(section, option) and remove_default:
             self.defaults.remove_option(section, option)
@@ -243,7 +223,7 @@ class XToolConfigParser(ConfigParser):
             _section.update(copy.deepcopy(self._sections[section]))
 
         # 遍历section下所有的key，对value进行格式化处理
-        for key, val in iteritems(_section):
+        for key, val in _section.items():
             try:
                 val = int(val)
             except ValueError:
@@ -400,7 +380,7 @@ class Config(dict):
                     compile(config_file.read(), filename, "exec"),
                     module.__dict__,
                 )
-        except IOError as e:
+        except OSError as e:
             e.strerror = "Unable to load configuration file (%s)" % e.strerror
             raise
         except Exception as e:

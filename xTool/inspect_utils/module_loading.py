@@ -1,8 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import imp
 import os
 import sys
@@ -11,8 +6,6 @@ from importlib import import_module
 from inspect import ismodule
 from types import ModuleType
 from typing import Callable
-
-from six import iteritems
 
 from xTool.exceptions import XToolException
 from xTool.utils.log.logging_mixin import LoggingMixin
@@ -66,7 +59,7 @@ def create_object_from_plugin_module(name, *args, **kwargs):
     items = name.split(".")
     if len(items) != 2:
         raise XToolException(
-            "Executor {0} not supported: " "please specify in format plugin_module.executor".format(name)
+            "Executor {} not supported: " "please specify in format plugin_module.executor".format(name)
         )
     # items[0]：表示插件名
     # items[1]：表示插件中的类名
@@ -76,7 +69,7 @@ def create_object_from_plugin_module(name, *args, **kwargs):
         # 根据插件中的类名创建对象
         return globals()[plugin_module_name].__dict__[class_name](*args, **kwargs)
     else:
-        raise XToolException("Executor {0} not supported.".format(name))
+        raise XToolException("Executor {} not supported.".format(name))
 
 
 def load_backend_module_from_conf(section, key, default_backend, conf=None):
@@ -138,7 +131,7 @@ def import_string(dotted_path: str) -> Callable:
 
 def import_string_from_package(module_name, package=None):
     """
-    import a module or class by string path.
+    Import a module or class by string path.
 
     :module_name: str with path of module or path to import and
     instanciate a class
@@ -154,7 +147,7 @@ def import_string_from_package(module_name, package=None):
     return obj()
 
 
-class XToolImporter(object):
+class XToolImporter:
     """
     Importer that dynamically loads a class and module from its parent. This
     allows Airflow to support ``from airflow.operators import BashOperator``
@@ -206,7 +199,7 @@ class XToolImporter(object):
         """
         attribute_modules = {}
 
-        for module, attributes in iteritems(module_attributes):
+        for module, attributes in module_attributes.items():
             for attribute in attributes:
                 attribute_modules[attribute] = module
 

@@ -13,7 +13,9 @@ ignore =
     D107,
     D200,
     D205,
+    D209,
     D400,
+    D401
 
 exclude =
     *migrations*,

@@ -2,14 +2,12 @@ import abc
 from functools import wraps
 from typing import Callable, Dict
 
-from pydantic import (
-    BaseModel,
-    validate_arguments,
-    ValidationError as PydanticValidationError,
-)
+from pydantic import BaseModel
+from pydantic import ValidationError as PydanticValidationError
+from pydantic import validate_arguments
 
 from xTool.exceptions import XToolException
-from xTool.utils.module_loading import import_string
+from xTool.inspect_utils.module_loading import import_string
 
 
 class InvocationMeta(type):
@@ -46,6 +44,7 @@ class InvocationMeta(type):
 
 class FunctionsManager:
     """函数管理器 ."""
+
     # 存放注册的可执行对象
     __hub = {}  # type: ignore
 
@@ -84,11 +83,7 @@ class FunctionsManager:
             elif isinstance(func_obj, Callable):
                 func = func_obj
             else:
-                raise ValueError(
-                    "func register error, {} is not be callable".format(
-                        func_obj, func_name
-                    )
-                )
+                raise ValueError("func register error, {} is not be callable".format(func_name))
 
             cls.__hub[func_name] = func
 
@@ -99,7 +94,7 @@ class FunctionsManager:
 
     @classmethod
     def all_funcs(cls) -> Dict:
-        """获得所有的注册信息. """
+        """获得所有的注册信息."""
         return cls.__hub
 
     @classmethod

@@ -1,8 +1,8 @@
 import asyncio
+import contextlib
+import os
 from functools import wraps
-from typing import (
-    Callable,
-)
+from typing import Callable
 
 import orjson as json
 
@@ -27,3 +27,15 @@ def pytest_async(func):
         loop.run_until_complete(func(*args, **kwargs))
 
     return wrapper
+
+
+@contextlib.contextmanager
+def change_directory(directory: str):
+    """Context manager to mock a directory change and revert on exit."""
+    cwdir = os.getcwd()
+    os.chdir(directory)
+
+    try:
+        yield directory
+    finally:
+        os.chdir(cwdir)

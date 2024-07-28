@@ -1,13 +1,11 @@
-# coding: utf-8
-
 import os
 import sys
 from inspect import isfunction
 
-from xTool.utils import module_loading
-from xTool.exceptions import XToolException
-
 import pytest
+
+from xTool.exceptions import XToolException
+from xTool.inspect_utils import module_loading
 
 
 def test_prepare_classpath():
@@ -39,22 +37,22 @@ def test_make_module():
 def test_load_backend_module_from_conf():
     section = "section"
     key = "key"
-    default_backend = "xTool.utils.module_loading.make_module"
+    default_backend = "xTool.inspect_utils.module_loading.make_module"
     conf = None
-    with pytest.raises(XToolException) as exeinfo:
-        module = module_loading.load_backend_module_from_conf(section, key, default_backend, conf)
+    with pytest.raises(XToolException):
+        module_loading.load_backend_module_from_conf(section, key, default_backend, conf)
 
-    default_backend = "xTool.utils.module_loading"
+    default_backend = "xTool.inspect_utils.module_loading"
     module = module_loading.load_backend_module_from_conf(section, key, default_backend, conf)
     assert module.load_backend_module_from_conf
 
 
 def test_import_string():
-    backend = "xTool.utils.module_loading"
+    backend = "xTool.inspect_utils.module_loading"
     module = module_loading.import_string(backend)
-    assert module.__name__ == "xTool.utils.module_loading"
+    assert module.__name__ == "xTool.inspect_utils.module_loading"
 
-    backend = "xTool.utils.module_loading.make_module"
+    backend = "xTool.inspect_utils.module_loading.make_module"
     function = module_loading.import_string(backend)
     assert isfunction(function)
     assert function.__name__ == "make_module"
