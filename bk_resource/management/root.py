@@ -5,17 +5,13 @@ from typing import List
 
 from django.conf import settings
 from django.utils.module_loading import import_string
+from xTool.file_utils.path import path_to_dotted
 
 from bk_resource.base import Resource
-from bk_resource.management.exceptions import (
-    ResourceModuleConflict,
-    ResourceModuleNotRegistered,
-    ResourceNotRegistered,
-)
+from bk_resource.management.exceptions import ResourceModuleConflict, ResourceModuleNotRegistered, ResourceNotRegistered
 from bk_resource.management.finder import API_DIR, ResourceFinder, ResourcePath
 from bk_resource.utils.logger import logger
 from xTool.misc import camel_to_underscore
-from xTool.utils.path import path_to_dotted
 
 __setup__ = False
 __doc__ = """
@@ -182,7 +178,7 @@ class ResourceManager(tuple):
         return target
 
     def transform(self):
-        """make the little tuple instance get stronger(callable) ^_^"""
+        """Make the little tuple instance get stronger(callable) ^_^"""
         func_finder = self.__root__
         for attr in self:
             func_finder = getattr(func_finder, attr)
@@ -266,7 +262,7 @@ def install_adapter(rs_path: ResourcePath):
         rs = "{}.{}".format(api_root, rs)
         adapter_cls = APIResourceShortcut
     else:
-        rs, ada = [path.strip(".") for path in dotted_path.split("adapter")]
+        rs, ada = (path.strip(".") for path in dotted_path.split("adapter"))
 
     try:
         default_adapter = adapter_cls(rs)

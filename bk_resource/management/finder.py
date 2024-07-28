@@ -3,10 +3,10 @@ import os
 from django.apps import apps
 from django.conf import settings
 from django.contrib.staticfiles.finders import BaseFinder
+from xTool.file_utils.path import path_to_dotted
 
 from bk_resource.management.exceptions import ErrorSettingsWithResourceDirs
 from bk_resource.settings import bk_resource_settings
-from xTool.utils.path import path_to_dotted
 
 API_DIR = bk_resource_settings.DEFAULT_API_DIR
 RESOURCE_DIRS = bk_resource_settings.DEFAULT_RESOURCE_DIRS

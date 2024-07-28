@@ -1,24 +1,17 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import logging
 import multiprocessing
 import os
+import signal
 import time
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
 
-from six import itervalues, iteritems
-
 from xTool.exceptions import XToolException
-from xTool.utils.log.logging_mixin import LoggingMixin
-from xTool.utils.log.logging_mixin import set_context
+from xTool.utils.log.logging_mixin import LoggingMixin, set_context
 
 
-class AbstractFileProcessor(object):
+class AbstractFileProcessor:
     """文件处理器抽象类 ."""
 
     __metaclass__ = ABCMeta
@@ -126,7 +119,7 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
             result_queue.put(result)
             end_time = time.time()
             log.info("Processing %s took %.3f seconds", file_path, end_time - start_time)
-        except:
+        except:  # noqa
             log.exception("Got an exception! Propagating...")
             raise
 
@@ -351,7 +344,7 @@ class FileProcessorManager(LoggingMixin):
 
     def wait_until_finished(self):
         """阻塞等待所有的文件处理器执行完成 ."""
-        for file_path, processor in iteritems(self._processors):
+        for file_path, processor in self._processors.items():
             while not processor.done:
                 time.sleep(0.1)
 
@@ -496,5 +489,5 @@ class FileProcessorManager(LoggingMixin):
 
     def terminate(self):
         """停止所有处理器 ."""
-        for processor in itervalues(self._processors):
+        for processor in self._processors.values():
             processor.terminate()

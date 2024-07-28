@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import errno
 import os
 import re
@@ -8,7 +5,8 @@ import shutil
 import zipfile
 from contextlib import contextmanager
 from io import StringIO
-from tempfile import mkdtemp, NamedTemporaryFile
+from tempfile import NamedTemporaryFile, mkdtemp
+from typing import Union
 
 from xTool.exceptions import XToolConfigException
 from xTool.utils.log.logging_mixin import LoggingMixin
@@ -70,6 +68,15 @@ def mkdirs(path, mode):
         os.umask(o_umask)
 
 
+def mkdirs2(filename: Union[os.PathLike, str], /, *, mode: int = 0o777) -> None:
+    """Recursively create directories up to the path of ``filename``
+    as needed."""
+    dirname = os.path.dirname(filename)
+    if not dirname:
+        return
+    os.makedirs(dirname, mode=mode, exist_ok=True)
+
+
 def mkdir_p(path):
     try:
         os.makedirs(path)
@@ -111,7 +118,7 @@ def list_py_file_paths(
             # 获得需要忽略的文件
             ignore_file = os.path.join(root, ignore_filename)
             if os.path.isfile(ignore_file):
-                with open(ignore_file, "r") as f:
+                with open(ignore_file) as f:
                     # If we have new patterns create a copy so we don't change
                     # the previous list (which would affect other subdirs)
                     patterns = patterns + [p for p in f.read().split("\n") if p]
