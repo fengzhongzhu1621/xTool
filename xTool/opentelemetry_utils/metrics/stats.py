@@ -1,19 +1,19 @@
-import textwrap
-import string
 import logging
-from functools import wraps
-from collections import deque
-import socket
 import random
+import socket
+import string
+import textwrap
+from collections import deque
 from datetime import timedelta
+from functools import wraps
+from typing import Callable, Optional, Sequence, TypeVar, Union, cast
 
-from typing import Callable, Optional, TypeVar, cast, Sequence, Union
-from xTool.type_hint import Protocol
-from xTool.exceptions import InvalidStatsNameException
-from xTool.plugin import PluginType, register_plugin, get_plugin_instance
-from xTool.utils.timer import Timer
 from xTool.decorators.utils import safe_wraps
+from xTool.exceptions import InvalidStatsNameException
+from xTool.plugin import PluginType, get_plugin_instance, register_plugin
+from xTool.type_hint import Protocol
 from xTool.utils.dates import time_now
+from xTool.utils.timer import Timer
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ ALLOWED_CHARACTERS = set(string.ascii_letters + string.digits + "_.-")
 STATS_NAME_DEFAULT_MAX_LENGTH = 250
 
 
-class StatsClientBase(object):
+class StatsClientBase:
     """A Base class for various statsd clients."""
 
     def __init__(self):
@@ -80,7 +80,7 @@ class StatsClientBase(object):
         else:
             # 需要对前面的值进行加法操作
             prefix = "+" if delta and value >= 0 else ""
-            self._send_stat(stat, "%s%s|g" % (prefix, value), rate)
+            self._send_stat(stat, "{}{}|g".format(prefix, value), rate)
 
     def set(self, stat, value, rate=1):
         """Set a set value. 记录flush期间，不重复的值 ."""
@@ -95,12 +95,12 @@ class StatsClientBase(object):
         if rate < 1:
             if random.random() > rate:
                 return
-            value = "%s|@%s" % (value, rate)
+            value = "{}|@{}".format(value, rate)
         # metrics名称添加前缀
         if self._prefix:
-            stat = "%s.%s" % (self._prefix, stat)
+            stat = "{}.{}".format(self._prefix, stat)
 
-        return "%s:%s" % (stat, value)
+        return "{}:{}".format(stat, value)
 
     def _after(self, data):
         if data:
@@ -161,7 +161,7 @@ class StatsClient(StatsClientBase):
         """Send data to statsd."""
         try:
             self._sock.sendto(data.encode("ascii"), self._addr)
-        except (socket.error, RuntimeError):
+        except (OSError, RuntimeError):
             # No time for love, Dr. Jones!
             pass
 
@@ -275,7 +275,7 @@ class UnixSocketStatsClient(StreamClientBase):
         self._sock.connect(self._socket_path)
 
 
-class StatsdTimer(object):
+class StatsdTimer:
     """A context manager/decorator for statsd.timing()."""
 
     def __init__(self, client, stat, rate=1):

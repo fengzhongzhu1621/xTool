@@ -14,9 +14,7 @@
 
 """Fuzz tests for the docstring parser module."""
 
-from hypothesis import example
-from hypothesis import given
-from hypothesis import settings
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from . import docstrings

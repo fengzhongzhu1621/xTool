@@ -1,7 +1,7 @@
 from typing import List
 
 import hypothesis.strategies as st
-from hypothesis import given, assume, example, settings
+from hypothesis import assume, example, given, settings
 from jsondiff import diff
 
 from xTool.testing.random import generate_random_json, perturbate_json
