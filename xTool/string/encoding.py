@@ -33,12 +33,6 @@ def encode(string, encoding=None):
     # In Python 3, the environment sets and gets accept and return text strings
     # only, and it handles the encoding itself so this is not necessary.
     return string
-    if isinstance(string, bytes):
-        # Already an encoded byte string, we are done
-        return string
-
-    encoding = encoding or _get_encoding()
-    return string.encode(encoding)
 
 
 def decode(data, encoding=None):
