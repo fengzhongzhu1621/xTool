@@ -10,12 +10,19 @@ insert_final_newline = true
 charset = utf-8
 end_of_line = lf
 
-[*.py]
+[*.{py,pyx,pxd,pyi}]
+indent_size = 4
 max_line_length = 120
 
 [*.bat]
 indent_style = tab
 end_of_line = crlf
+
+[*.ini]
+indent_size = 4
+
+[*.rst]
+max_line_length = 150
 
 [LICENSE]
 insert_final_newline = false

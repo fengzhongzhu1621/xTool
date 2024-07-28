@@ -223,6 +223,7 @@ at licenses/LICENSE-[project].txt.
     (ALv2 License) airflow (https://github.com/apache/airflow.git)
     (ALv2 License) django-vue3-admin (https://gitee.com/huge-dream/django-vue3-admin)
     (ALv2 License) python-fire v0.6.0 (https://github.com/google/python-fire)
+    (ALv2 License) tenacity v1.3.3 (https://github.com/jd/tenacity)
 
 ========================================================================
 MIT licenses
