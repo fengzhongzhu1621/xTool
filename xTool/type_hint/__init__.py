@@ -4,18 +4,20 @@
 
 """
 
+import os  # noqa
 import sys
+from datetime import timedelta
 from typing import (  # type: ignore # noqa # pylint: disable=unused-import
-    Awaitable,
     Any,
-    Optional,
+    Awaitable,
+    Callable,
     Iterable,
+    Optional,
     Tuple,
     TypeVar,
-    Callable,
     Union,
+    get_type_hints,
 )
-from typing import get_type_hints
 
 from xTool.compat import PY3, unicode_type
 
@@ -31,8 +33,7 @@ except ImportError:
         return x
 
 else:
-    from typing import Any, AnyStr, Union, Optional, Dict, Mapping  # noqa
-    from typing import Tuple, Match, Callable  # noqa
+    from typing import Any, AnyStr, Callable, Dict, Mapping, Match, Optional, Tuple, Union  # noqa
 
     if PY3:
         BaseString = str
@@ -52,15 +53,13 @@ S = TypeVar("S")
 OptionsType = Iterable[Tuple[int, int, int]]
 F = TypeVar("F", bound=Callable[..., Any])
 IP_ADDRESS = Tuple[str, int]
+# 时间单位类型
+time_unit_type = typing.Union[int, float, timedelta]
 
 try:
     # Protocol and TypedDict are only added to typing module starting from
     # python 3.8
-    from typing import (  # type: ignore # noqa # pylint: disable=unused-import
-        Protocol,
-        TypedDict,
-        runtime_checkable,
-    )
+    from typing import Protocol, TypedDict, runtime_checkable  # type: ignore # noqa # pylint: disable=unused-import
 except ImportError:
     from typing_extensions import Protocol, TypedDict, runtime_checkable  # type: ignore # noqa
 
@@ -72,14 +71,3 @@ if sys.version_info >= (3, 10):
     from typing import TypeAlias  # noqa
 else:
     from typing_extensions import TypeAlias  # noqa
-
-
-def get_class_object_init_type(class_obj: object, name: str) -> type:
-    """获得类对象构造函数中指定参数的类型 ."""
-    # 获得运行时类型提示字典，构造必须标注才可以获取到
-    object_type = get_type_hints(type(class_obj).__init__).get(name)
-    # 如果参数类型为int且默认值为None，会返回typing.Union[int, NoneType]，需要处理这种特殊情况
-    if getattr(object_type, "__origin__", None) == Union:
-        union_args = object_type.__args__
-        object_type = next(arg for arg in union_args if arg != type(None))
-    return object_type

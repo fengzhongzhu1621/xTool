@@ -196,19 +196,6 @@ def now(timezone=None):
     return dt.datetime.now(timezone)
 
 
-def is_naive(value):
-    """
-    Determine if a given datetime.datetime is naive.
-
-    The concept is defined in Python's docs:
-    https://docs.python.org/library/datetime.html#datetime.tzinfo
-
-    Assuming value.tzinfo is either None or a proper datetime.tzinfo,
-    value.utcoffset() implements the appropriate logic.
-    """
-    return value.utcoffset() is None
-
-
 def is_aware(value):
     """
     Determine if a given datetime.datetime is aware.
@@ -220,3 +207,14 @@ def is_aware(value):
     value.utcoffset() implements the appropriate logic.
     """
     return value.utcoffset() is not None
+
+
+def parse_execution_date(execution_date_str):
+    """
+    Parse execution date string to datetime object.
+    """
+    o = parse(execution_date_str)
+    # 去掉时区信息
+    # cross library compatibility
+    naive = dt.datetime(o.year, o.month, o.day, o.hour, o.minute, o.second, o.microsecond)
+    return naive

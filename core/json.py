@@ -8,7 +8,8 @@ from django.utils.duration import duration_iso_string
 from django.utils.functional import Promise
 from django.utils.timezone import is_aware
 
-from xTool.utils.dates import date_to_string, strftime_local
+from core.utils.time_tools import strftime_local
+from xTool.timeutils.convert import date_to_string
 
 
 class DjangoJSONEncoderExtend(json.JSONEncoder):

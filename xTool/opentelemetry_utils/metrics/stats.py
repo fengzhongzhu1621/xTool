@@ -11,9 +11,9 @@ from typing import Callable, Optional, Sequence, TypeVar, Union, cast
 from xTool.decorators.utils import safe_wraps
 from xTool.exceptions import InvalidStatsNameException
 from xTool.plugin import PluginType, get_plugin_instance, register_plugin
+from xTool.timeutils.now import time_now
+from xTool.timeutils.timer import Timer
 from xTool.type_hint import Protocol
-from xTool.utils.dates import time_now
-from xTool.utils.timer import Timer
 
 log = logging.getLogger(__name__)
 
@@ -339,9 +339,9 @@ class StatsdTimer:
 class TimerProtocol(Protocol):
     """Type protocol for StatsLogger.timer"""
 
-    def __enter__(self): ...
+    def __enter__(self): ...  # noqa
 
-    def __exit__(self, exc_type, exc_value, traceback): ...
+    def __exit__(self, exc_type, exc_value, traceback): ...  # noqa
 
     def start(self):
         """Start the timer"""
@@ -452,9 +452,9 @@ def validate_stat(fn: T) -> T:
 
 
 class AllowListValidatorProtocol(Protocol):
-    def set_allow_list(self, allow_list: Optional[Union[Sequence[str], str]]) -> None: ...
+    def set_allow_list(self, allow_list: Optional[Union[Sequence[str], str]]) -> None: ...  # noqa
 
-    def test(self, stat: str) -> bool: ...
+    def test(self, stat: str) -> bool: ...  # noqa
 
 
 @register_plugin(plugin_type=PluginType.STATS_NAME_ALLOW_VALIDATOR, plugin_name="default")
