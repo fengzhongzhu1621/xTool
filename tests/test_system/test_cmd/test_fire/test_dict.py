@@ -41,6 +41,15 @@ For detailed information on this command, run:
 
 import fire
 
+
+def add(x, y):
+    return x + y
+
+
+def multiply(x, y):
+    return x * y
+
+
 operations = {
     'add': lambda a, b: a + b,
     'multiply': lambda a, b: a * b,
@@ -48,3 +57,10 @@ operations = {
 
 if __name__ == '__main__':
     fire.Fire(operations)
+
+    # fire.Fire(
+    #     {
+    #         'add': add,
+    #         'multiply': multiply,
+    #     }
+    # )
