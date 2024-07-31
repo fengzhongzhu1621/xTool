@@ -23,6 +23,10 @@ IS_LINUX = sys.platform.startswith("linux")
 # Specifies whether the current runtime is HP-UX.
 IS_UNIX = hasattr(socket, "AF_UNIX")
 
+dataclass_kwargs = {}
+if sys.version_info >= (3, 10):
+    dataclass_kwargs.update({"slots": True})
+
 
 # Specifies whether the current runtime is *NIX.
 
@@ -41,15 +45,15 @@ except ImportError:
 
 
 try:
-    import pwd
     import grp
+    import pwd
 except ImportError:
     pwd = grp = None
 
 try:
     from collections.abc import Mapping
 except ImportError:
-    from collections import Mapping
+    from collections.abc import Mapping  # noqa
 
 try:
     callable
@@ -69,9 +73,9 @@ except NameError:
 
 if PY3:
     try:
-        from queue import SimpleQueue
+        from queue import SimpleQueue  # noqa
     except ImportError:
-        from queue import Queue as SimpleQueue  # type: ignore
+        from queue import Queue as SimpleQueue  # type: ignore # noqa
 
 # Python 3.x (and backports) use a modified iterator syntax
 # This will allow 2.x to behave with 3.x iterators
@@ -123,7 +127,7 @@ if PY3:
     try:
         from collections.abc import Callable
     except ImportError:
-        from collections import Callable
+        from collections.abc import Callable  # noqa
 
     reduce = functools.reduce
     zip = builtins.zip
@@ -180,8 +184,9 @@ if PY3:
             exc_info = None
 
 else:
-    import __builtin__
     import itertools
+
+    import __builtin__
 
     builtins = __builtin__
     reduce = __builtin__.reduce
@@ -190,12 +195,12 @@ else:
     map = itertools.imap
     get_self = operator.attrgetter("im_self")
     get_func = operator.attrgetter("im_func")
-    text = (str, unicode)
-    text_type = unicode
+    text = (str, unicode)  # noqa
+    text_type = unicode  # noqa
     bytes_type = str
-    buffer_type = buffer
-    string_types = (str, unicode)
-    integer_types = (int, long)
+    buffer_type = buffer  # noqa
+    string_types = (str, unicode)  # noqa
+    integer_types = (int, long)  # noqa
     unicode_type = unicode  # noqa
     basestring_type = basestring  # noqa
     izip_longest = itertools.izip_longest

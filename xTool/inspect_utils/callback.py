@@ -6,6 +6,9 @@ def get_callback_name(cb: Callable[..., Any]) -> str:
 
     If no name can be produced ``repr(cb)`` is called and returned.
     """
+    if cb is None:
+        return "<unknown>"
+
     segments = []
     try:
         segments.append(cb.__qualname__)

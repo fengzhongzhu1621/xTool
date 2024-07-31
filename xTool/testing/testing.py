@@ -2,7 +2,7 @@ import asyncio
 import contextlib
 import os
 from functools import wraps
-from typing import Callable
+from typing import Any, Callable
 
 import orjson as json
 
@@ -39,3 +39,14 @@ def change_directory(directory: str):
         yield directory
     finally:
         os.chdir(cwdir)
+
+
+def asynctest(
+    callable_: Callable[..., Any],
+) -> Callable[..., Any]:
+    @wraps(callable_)
+    def wrapper(*a: Any, **kw: Any) -> Any:
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(callable_(*a, **kw))
+
+    return wrapper

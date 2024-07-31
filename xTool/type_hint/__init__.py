@@ -6,6 +6,7 @@
 
 import os  # noqa
 import sys
+from concurrent import futures
 from datetime import timedelta
 from typing import (  # type: ignore # noqa # pylint: disable=unused-import
     Any,
@@ -50,8 +51,11 @@ if PY3:
 
 T = TypeVar("T")
 S = TypeVar("S")
-OptionsType = Iterable[Tuple[int, int, int]]
 F = TypeVar("F", bound=Callable[..., Any])
+WrappedFn = TypeVar("WrappedFn", bound=Callable[..., Any])
+WrappedFnReturnT = typing.TypeVar("WrappedFnReturnT")
+OptionsType = Iterable[Tuple[int, int, int]]
+
 IP_ADDRESS = Tuple[str, int]
 # 时间单位类型
 time_unit_type = typing.Union[int, float, timedelta]
@@ -71,3 +75,31 @@ if sys.version_info >= (3, 10):
     from typing import TypeAlias  # noqa
 else:
     from typing_extensions import TypeAlias  # noqa
+
+if sys.version_info >= (3, 9):
+    FutureGenericT = futures.Future[typing.Any]
+else:
+    FutureGenericT = futures.Future
+
+
+class Future(FutureGenericT):
+    """Encapsulates a (future or past) attempted call to a target function."""
+
+    def __init__(self, attempt_number: int) -> None:
+        super().__init__()
+        self.attempt_number = attempt_number
+
+    @property
+    def failed(self) -> bool:
+        """Return whether a exception is being held in this future."""
+        return self.exception() is not None
+
+    @classmethod
+    def construct(cls, attempt_number: int, value: Any, has_exception: bool) -> "Future":
+        """Construct a new Future object."""
+        fut = cls(attempt_number)
+        if has_exception:
+            fut.set_exception(value)
+        else:
+            fut.set_result(value)
+        return fut

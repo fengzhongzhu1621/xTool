@@ -15,4 +15,5 @@ def find_ordinal(pos_num: int) -> str:
 
 
 def to_ordinal(pos_num: int) -> str:
+    """将阿拉伯数字后面添加英文形容词后缀 ."""
     return f"{pos_num}{find_ordinal(pos_num)}"
