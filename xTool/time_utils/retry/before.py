@@ -18,6 +18,7 @@ def before_log(logger: "logging.Logger", log_level: int) -> typing.Callable[["Re
 
     def log_it(retry_state: "RetryCallState") -> None:
         fn_name = get_callback_name(retry_state.fn)
+        # 记录当前是第几次重试
         logger.log(
             log_level,
             f"Starting call to '{fn_name}', " f"this is the {to_ordinal(retry_state.attempt_number)} time calling it.",
