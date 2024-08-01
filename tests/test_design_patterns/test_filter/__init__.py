@@ -1,4 +1,4 @@
-from xTool.patterns.filter.chain import AfterFilter, BeforeFilter, Method
+from xTool.design_patterns.filter.chain import AfterFilter, BeforeFilter, Method
 from xTool.plugin import PluginType, register_plugin
 
 

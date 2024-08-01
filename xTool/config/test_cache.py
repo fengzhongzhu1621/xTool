@@ -1,7 +1,7 @@
 import fakeredis
 
 from xTool.cache import Cache
-from xTool.cache.constants import CacheInstanceType, CacheBackendType
+from xTool.cache.constants import CacheBackendType, CacheInstanceType
 
 
 class TestCache:

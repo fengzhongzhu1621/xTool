@@ -1,8 +1,9 @@
-from xTool.plugin import register_plugin, PluginType
+from xTool.plugin import PluginType, register_plugin
+
 from .base import ConfigLoaderType
 
 
-@register_plugin(PluginType.COMPRESS, ConfigLoaderType.FILE)
+@register_plugin(PluginType.ConfigLoader, ConfigLoaderType.FILE)
 class FileConfigLoader:
     def __init__(self):
         self.file_path = None

@@ -1,8 +1,6 @@
-# coding: utf-8
-
 import sys
-from xTool.crypto import fernet
 
+from xTool.crypto import fernet
 
 PY3 = sys.version_info[0] == 3
 

@@ -5,10 +5,9 @@ from enum import IntEnum, unique
 class CodecType(IntEnum):
     DUMMY = 0
 
-    PICKLE = 1
-    JSON = 2
-    YAML = 3
-    URL_KV = 4
+    JSON = 1
+    YAML = 2
+    URL_KV = 3
 
     PB = 10
     PB_JSON = 11
