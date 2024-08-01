@@ -14,8 +14,9 @@ def before_nothing(retry_state: "RetryCallState") -> None:
 
 
 def before_log(logger: "logging.Logger", log_level: int) -> typing.Callable[["RetryCallState"], None]:
-    """Before call strategy that logs to some logger the attempt，执行前打印日志 ."""
+    """Before call strategy that logs to some logger the attempt，重试任务前打印开始日志 ."""
 
+    # RetryCallState 表示重试前的状态
     def log_it(retry_state: "RetryCallState") -> None:
         fn_name = get_callback_name(retry_state.fn)
         # 记录当前是第几次重试

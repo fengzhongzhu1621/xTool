@@ -18,8 +18,9 @@ def after_log(
     log_level: int,
     sec_format: str = "%0.3f",
 ) -> typing.Callable[["RetryCallState"], None]:
-    """After call strategy that logs to some logger the finished attempt."""
+    """After call strategy that logs to some logger the finished attempt，重试任务后打印耗时日志 ."""
 
+    # 表示重试后的状态
     def log_it(retry_state: "RetryCallState") -> None:
         fn_name = get_callback_name(retry_state.fn)
         logger.log(
