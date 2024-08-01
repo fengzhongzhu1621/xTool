@@ -31,20 +31,25 @@ class RetryCallState:
         self.kwargs = kwargs
 
         #: The number of the current attempt
+        # 第几次执行任务
         self.attempt_number: int = 1
         #: Last outcome (result or exception) produced by the function
+        # 上一次调用的执行结果
         self.outcome: Optional[Future] = None
         #: Timestamp of the last outcome
         self.outcome_timestamp: Optional[float] = None
         #: Time spent sleeping in retries
         self.idle_for: float = 0.0
         #: Next action as decided by the retry manager
+        # 下一次调用
         self.next_action: Optional[RetryAction] = None
         #: Next sleep time as decided by the retry manager.
+        # 当前调用完成后和下一次开始调用的间隔秒数
         self.upcoming_sleep: float = 0.0
 
     @property
     def seconds_since_start(self) -> Optional[float]:
+        """任务执行耗时 ."""
         if self.outcome_timestamp is None:
             return None
         return self.outcome_timestamp - self.start_time

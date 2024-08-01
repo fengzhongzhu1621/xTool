@@ -3,10 +3,12 @@ import platform
 import sys
 
 from xTool.algorithms.collections import ConstantDict
+
+from .field import *  # noqa
+from .number import *  # noqa
 from .queue import *  # noqa
 from .regex import *  # noqa
 from .time import *  # noqa
-from .regex import *  # noqa
 
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] >= 3
@@ -32,8 +34,8 @@ NO_VALUE = object()  # type: Any
 
 sentinel = object()  # type: Any
 
-CHAR = set(chr(i) for i in range(0, 128))
-CTL = set(chr(i) for i in range(0, 32)) | {
+CHAR = {chr(i) for i in range(0, 128)}
+CTL = {chr(i) for i in range(0, 32)} | {
     chr(127),
 }
 SEPARATORS = {
@@ -59,14 +61,6 @@ SEPARATORS = {
 }
 # 按位异或
 TOKEN = CHAR ^ CTL ^ SEPARATORS
-
-LEN_SHORT = 32
-LEN_NORMAL = 64
-LEN_MIDDLE = 128
-LEN_LONG = 255
-LEN_X_LONG = 1000
-LEN_XX_LONG = 10000
-LEN_XXX_LONG = 20000
 
 EMPTY_INT = 0
 EMPTY_STRING = ""

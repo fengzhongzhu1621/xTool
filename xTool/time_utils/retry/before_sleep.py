@@ -23,6 +23,7 @@ def before_sleep_log(
     def log_it(retry_state: "RetryCallState") -> None:
         local_exc_info: BaseException | bool | None
 
+        # 上次任务没有执行完成或未执行，即状态机的节点没有入度
         if retry_state.outcome is None:
             raise RuntimeError("log_it() called before outcome was set")
 

@@ -1,4 +1,6 @@
-from enum import unique, Enum
+from enum import Enum, unique
+
+__all__ = ["TimeEnum"]
 
 
 @unique
