@@ -32,6 +32,8 @@ line_length = 120
 skip_glob = ["*/node_modules/**", "*/migrations/**"]
 
 
+[tool.pdm]
+distribution = true
 [tool]
 rye = { dev-dependencies = [
     "pre-commit>=3.7.1",
@@ -75,14 +77,24 @@ dev = {file=["requirements-dev.txt"]}
 [project]
 name = "xTool"
 version = "0.2.0"
-description = "Python Study Notes"
+description = "A python script tools"
 authors = [
     {name = "fengzhongzhu1621", email = "jinyinqiao@gmail.com"},
 ]
-requires-python = "<3.11,>=3.10"
+requires-python = ">=3.10"
 readme = "README.md"
-license = {text = "MIT"}
-classifiers = ["Intended Audience :: Developers", "License :: OSI Approved :: Apache Software License", "Natural Language :: English", "Environment :: Console", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.6", "Programming Language :: Python :: 3.10",]
+license = {text = "Apache License 2.0"}
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 2",
+    "Programming Language :: Python :: 2.7",
+]
 dependencies = [
     "django<5.0, >=4.2",
     "djangorestframework<4.0.0,>=3.15.1",
@@ -138,7 +150,7 @@ dependencies = [
     "python-snappy<1.0.0,>=0.7.1",
     "statsd<5.0.0,>=4.0.1",
     "typing-extensions<5.0.0,>=4.12.0",
-    "netifaces<1.0.0,>=0.11.0",
+    "netifaces>=0.11.0",
     "aiohttp>=3.9.5",
     "beautifulsoup4<5.0.0,>=4.12.3",
     "ipaddress<2.0.0,>=1.0.23",
@@ -147,7 +159,7 @@ dependencies = [
     "httptools<1.0.0,>=0.6.1",
     "multidict<7.0.0,>=6.0.5",
     "cryptography<43.0.0,>=42.0.7",
-    "cython<4.0.0,>=3.0.10",
+    "cython>=3.0.10",
     "tabulate<1.0.0,>=0.9.0",
     "croniter<3.0.0,>=2.0.5",
     "pendulum<4.0.0,>=3.0.0",
@@ -192,7 +204,22 @@ dependencies = [
     "fire>=0.6.0",
     "tornado>=6.4.1",
     "airports-py>=1.0.1",
+    "pdm>=2.17.3",
 ]
+keywords = ["xTool"]
 
 [project.urls]
 repository = "https://github.com/fengzhongzhu1621/xTool"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-sanic",
+    "pyyaml",
+]
+fast = [
+    "uvloop",
+]
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"

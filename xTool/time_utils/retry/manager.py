@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 class AttemptManager:
-    """Manage attempt context."""
+    """Manage attempt context，状态上下文管理器，用于当任务执行完毕后设置执行结果 ."""
 
     def __init__(self, retry_state: "RetryCallState"):
         self.retry_state = retry_state

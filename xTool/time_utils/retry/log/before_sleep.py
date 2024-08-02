@@ -7,6 +7,11 @@ if typing.TYPE_CHECKING:
 
     from xTool.time_utils.retry.state import RetryCallState
 
+__all__ = [
+    "before_sleep_nothing",
+    "before_sleep_log",
+]
+
 
 def before_sleep_nothing(retry_state: "RetryCallState") -> None:
     """Before call strategy that does nothing."""
@@ -17,7 +22,7 @@ def before_sleep_log(
     log_level: int,
     exc_info: bool = False,
 ) -> typing.Callable[["RetryCallState"], None]:
-    """Before call strategy that logs to some logger the attempt，重试任务前打印上一次执行的结果（包括失败异常或正常执行结果） ."""
+    """Before call strategy that logs to some logger the attempt，重试任务前打印上一次执行的结果和与下一次执行的间隔（包括失败异常或正常执行结果） ."""
 
     # RetryCallState 表示重试前的状态
     def log_it(retry_state: "RetryCallState") -> None:
