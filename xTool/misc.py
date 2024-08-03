@@ -61,6 +61,13 @@ else:
     import sre_parse  # noqa
     import sre_constants  # noqa
 
+UN_SET = object()
+
+
+def first_set(first: Union[Any, object], second: Any) -> Any:
+    """如果 first 参数是一个 UN_SET 对象，则取第二个参数的值 ."""
+    return second if first is UN_SET else first
+
 
 def get_encodings():
     yield "utf8"

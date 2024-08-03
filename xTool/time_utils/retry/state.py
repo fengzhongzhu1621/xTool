@@ -1,16 +1,44 @@
+import dataclasses
 import time
-from typing import TYPE_CHECKING, Any, Optional, Tuple, Type
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Type, List, Callable
 
+from xTool.compat import dataclass_kwargs
 from xTool.type_hint import Future, WrappedFn
-
 from .action import RetryAction
 
 if TYPE_CHECKING:
     import types  # noqa
 
+__all__ = [
+    "IterState",
+    "RetryCallState",
+]
+
+
+@dataclasses.dataclass(**dataclass_kwargs)
+class IterState:
+    """状态机中状态节点的上下文 ."""
+
+    actions: List[Callable[["RetryCallState"], Any]] = dataclasses.field(default_factory=list)
+    retry_run_result: bool = False
+    delay_since_first_attempt: int = 0
+    stop_run_result: bool = False
+    is_explicit_retry: bool = False
+
+    def reset(self) -> None:
+        # 状态包含的所有策略
+        self.actions = []
+        # 通过重试策略判断是否可以重试的结果
+        self.retry_run_result = False
+        self.delay_since_first_attempt = 0
+        # 是否可以停止的结果
+        self.stop_run_result = False
+        # 如果执行抛出了 TryAgain 异常，说明必须要进行重试
+        self.is_explicit_retry = False
+
 
 class RetryCallState:
-    """State related to a single call wrapped with Retrying."""
+    """State related to a single call wrapped with Retrying，任务执行后的状态，即状态机中的状态节点"""
 
     def __init__(
         self,
@@ -39,6 +67,7 @@ class RetryCallState:
         #: Timestamp of the last outcome
         self.outcome_timestamp: Optional[float] = None
         #: Time spent sleeping in retries
+        # 总的 sleep 耗时
         self.idle_for: float = 0.0
         #: Next action as decided by the retry manager
         # 下一次调用

@@ -2,8 +2,9 @@ import random
 import typing
 from typing import TYPE_CHECKING
 
+from xTool.constants import MAX_WAIT
 from xTool.time_utils.time import to_seconds
-
+from xTool.type_hint import time_unit_type
 from .base import wait_base
 
 if TYPE_CHECKING:
@@ -32,9 +33,9 @@ class wait_exponential(wait_base):
     def __init__(
         self,
         multiplier: typing.Union[int, float] = 1,
-        max: _utils.time_unit_type = _utils.MAX_WAIT,  # noqa
+        max: time_unit_type = MAX_WAIT,  # noqa
         exp_base: typing.Union[int, float] = 2,
-        min: _utils.time_unit_type = 0,  # noqa
+        min: time_unit_type = 0,  # noqa
     ) -> None:
         self.multiplier = multiplier
         self.min = to_seconds(min)
@@ -97,7 +98,7 @@ class wait_exponential_jitter(wait_base):
     def __init__(
         self,
         initial: float = 1,
-        max: float = _utils.MAX_WAIT,  # noqa
+        max: float = MAX_WAIT,  # noqa
         exp_base: float = 2,
         jitter: float = 1,
     ) -> None:

@@ -5,6 +5,8 @@ if TYPE_CHECKING:
 
     from xTool.time_utils.retry.state import RetryCallState
 
+__all__ = ["AttemptManager"]
+
 
 class AttemptManager:
     """Manage attempt context，状态上下文管理器，用于当任务执行完毕后设置执行结果 ."""

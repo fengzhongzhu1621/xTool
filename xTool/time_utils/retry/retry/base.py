@@ -6,7 +6,7 @@ if typing.TYPE_CHECKING:
 
 __all__ = [
     "retry_base",
-    "retry_base",
+    "retry_any",
     "retry_all",
     "RetryBaseT",
 ]

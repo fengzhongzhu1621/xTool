@@ -31,7 +31,3 @@ class sleep_using_event:
         # NOTE(harlowja): this may *not* actually wait for timeout
         # seconds if the event is set (ie this may eject out early).
         self.event.wait(timeout=timeout)
-
-
-class DoSleep(float):
-    pass

@@ -1,5 +1,10 @@
 from typing import Optional, Sequence, SupportsFloat
 
+__all__ = [
+    "BaseAction",
+    "RetryAction",
+]
+
 
 class BaseAction:
     """Base class for representing actions to take by retry object.
