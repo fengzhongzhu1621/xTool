@@ -10,7 +10,8 @@ from xTool.time_utils.retry.retry import *  # noqa
 from xTool.time_utils.retry.state import *  # noqa
 from xTool.time_utils.retry.stop import *  # noqa
 from xTool.time_utils.retry.wait import *  # noqa
-from xTool.type_hint import WrappedFnReturnT, WrappedFn
+from xTool.type_hint import WrappedFn, WrappedFnReturnT
+
 from .base import BaseRetrying, DoAttempt, DoSleep
 
 __all__ = ["retry"]

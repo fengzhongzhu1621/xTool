@@ -21,8 +21,8 @@ def _portable_async_sleep(seconds: float) -> t.Awaitable[None]:
     # can skip further checks.
     if "trio" in sys.modules:
         # If trio is available, then sniffio is too
-        import trio
         import sniffio
+        import trio
 
         if sniffio.current_async_library() == "trio":
             return trio.sleep(seconds)

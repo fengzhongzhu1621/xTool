@@ -11,9 +11,8 @@ from xTool.time_utils.retry.manager import *  # noqa
 from xTool.time_utils.retry.retry import *  # noqa
 from xTool.time_utils.retry.state import *  # noqa
 from xTool.time_utils.retry.stop import *  # noqa
-from xTool.time_utils.retry.stop import *  # noqa
 from xTool.time_utils.retry.wait import *  # noq
-from xTool.type_hint import WrappedFn, Future, WrappedFnReturnT
+from xTool.type_hint import Future, WrappedFn, WrappedFnReturnT
 
 if t.TYPE_CHECKING:
     from xTool.time_utils.retry.retry import RetryBaseT

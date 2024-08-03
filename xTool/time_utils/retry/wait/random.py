@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 from xTool.time_utils.time import to_seconds
 from xTool.type_hint import time_unit_type
+
 from .base import wait_base
 
 if TYPE_CHECKING:

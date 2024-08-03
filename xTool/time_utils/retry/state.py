@@ -1,9 +1,10 @@
 import dataclasses
 import time
-from typing import TYPE_CHECKING, Any, Optional, Tuple, Type, List, Callable
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, Tuple, Type
 
 from xTool.compat import dataclass_kwargs
 from xTool.type_hint import Future, WrappedFn
+
 from .action import RetryAction
 
 if TYPE_CHECKING:

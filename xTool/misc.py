@@ -1,8 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import base64
 import collections
 import decimal
@@ -17,25 +12,15 @@ import subprocess
 import traceback
 import warnings
 from contextlib import contextmanager
-from datetime import datetime, date
+from datetime import date, datetime
 
 try:
     from StringIO import StringIO
 except ImportError:
     from io import BytesIO as StringIO
-from typing import (
-    Tuple,
-    List,
-    Iterable,
-    Union,
-    Dict,
-    Optional,
-    Callable,
-    Any,
-    Sequence,
-    AbstractSet,
-    Iterator,
-)
+
+from typing import AbstractSet, Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
+
 from .type_hint import T
 
 try:
@@ -43,8 +28,10 @@ try:
 except ImportError:
     np = None
 
-import psutil
 from asyncio.constants import DEBUG_STACK_DEPTH
+
+import psutil
+
 from .constants import *  # noqa
 
 if PY3:
@@ -55,11 +42,11 @@ else:
 zip_longest = izip_longest
 
 if sys.version_info >= (3, 11):
-    import re._parser as sre_parse  # noqa
     import re._constants as sre_constants  # noqa
+    import re._parser as sre_parse  # noqa
 else:
-    import sre_parse  # noqa
     import sre_constants  # noqa
+    import sre_parse  # noqa
 
 UN_SET = object()
 
@@ -294,7 +281,7 @@ def properties(obj):
     Note how the entry for prop is not a bound method (i.e. the getter) but a the return value of
     that getter.
     """
-    return dict((attr, getattr(obj, attr)) for attr in dir(obj) if not attr.startswith("__"))
+    return {attr: getattr(obj, attr) for attr in dir(obj) if not attr.startswith("__")}
 
 
 def get_first_duplicate(items):
@@ -317,7 +304,7 @@ def many_to_one(input_dict):
         {'ab': 1, ('c', 'd'): 2} -> {'a': 1, 'b': 1, 'c': 2, 'd': 2}
 
     """
-    return dict((key, val) for keys, val in input_dict.items() for key in keys)
+    return {key: val for keys, val in input_dict.items() for key in keys}
 
 
 def open_url(url):
@@ -496,13 +483,13 @@ def get_md5(content):
 def humanize(num, suffix="B"):
     for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
         if abs(num) < 1024.0:
-            return "%3.1f%s%s" % (num, unit, suffix)
+            return "{:3.1f}{}{}".format(num, unit, suffix)
         num /= 1024.0
-    return "%.1f%s%s" % (num, "Yi", suffix)
+    return "{:.1f}{}{}".format(num, "Yi", suffix)
 
 
 def is_iterable(obj):
-    return isinstance(obj, collections.Iterable)
+    return isinstance(obj, collections.abc.Iterable)
 
 
 if hasattr(sys, "_getframe"):
@@ -573,7 +560,7 @@ def flatten(items):
          [1, 2, [3, 4, [5, 6], 7], 8] -> 1 2 3 4 5 6 7 8
     """
     for x in items:
-        if isinstance(x, collections.Iterable):
+        if isinstance(x, collections.abc.Iterable):
             yield from flatten(x)
         else:
             yield x
