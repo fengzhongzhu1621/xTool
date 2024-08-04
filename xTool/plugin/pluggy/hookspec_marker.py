@@ -113,7 +113,7 @@ class HookSpec:
         self.function: Callable[..., object] = getattr(namespace, name)
         # 表示钩子规范的名称，即函数或方法的名称。
         self.name = name
-        # 表示钩子规范的位置参数名称。表示钩子规范的关键字参数名称。
+        # 表示钩子规范的位置参数名称 和 关键字参数名称。
         self.argnames, self.kwargnames = varnames(self.function)
         # 表示钩子规范的选项，存储在 HookspecOpts 类型的字典中。
         self.opts = opts
