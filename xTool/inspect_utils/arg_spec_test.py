@@ -2,7 +2,7 @@ import unittest
 from functools import wraps
 from typing import cast
 
-from xTool.inspect_utils.arg_spec import get_full_arg_spec, varnames
+from xTool.inspect_utils.arg_spec import format_def, get_full_arg_spec, varnames
 from xTool.testing import test_components as tc
 from xTool.type_hint import F
 
@@ -175,3 +175,25 @@ def test_varnames_decorator() -> None:
     assert varnames(example) == (("a",), ("b",))
     assert varnames(Example.example_method) == (("x",), ("y",))
     assert varnames(ex_inst.example_method) == (("x",), ("y",))
+
+
+def test_format_def() -> None:
+    def function1():
+        pass
+
+    assert format_def(function1) == "function1()"
+
+    def function2(arg1):
+        pass
+
+    assert format_def(function2) == "function2(arg1)"
+
+    def function3(arg1, arg2="qwe"):
+        pass
+
+    assert format_def(function3) == "function3(arg1, arg2='qwe')"
+
+    def function4(arg1, *args, **kwargs):
+        pass
+
+    assert format_def(function4) == "function4(arg1, *args, **kwargs)"

@@ -3,6 +3,7 @@
 import inspect
 import sys
 import types
+from typing import Callable
 
 import six
 
@@ -260,3 +261,8 @@ def varnames(func: object) -> tuple[tuple[str, ...], tuple[str, ...]]:
             args = args[1:]
 
     return args, kwargs
+
+
+def format_def(func: Callable[..., object]) -> str:
+    """打印函数的签名 ."""
+    return f"{func.__name__}{inspect.signature(func)}"
