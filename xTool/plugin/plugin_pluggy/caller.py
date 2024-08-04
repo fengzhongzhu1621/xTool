@@ -85,12 +85,12 @@ class HookCaller:
         向回调链中添加一个实现。"""
         # 获得回调链的插入点，从包含 wrapper 参数的钩子实现后面开始处理，获得可插入的回调链插槽范围
         for i, method in enumerate(self._hookimpls):
-            if method.hookwrapper or method.wrapper:
+            if method.wrapper:
                 splitpoint = i
                 break
         else:
             splitpoint = len(self._hookimpls)
-        if hookimpl.hookwrapper or hookimpl.wrapper:
+        if hookimpl.wrapper:
             start, end = splitpoint, len(self._hookimpls)
         else:
             start, end = 0, splitpoint
@@ -218,7 +218,6 @@ class HookCaller:
         self._verify_all_args_are_provided(kwargs)
         opts: HookimplOpts = {
             "wrapper": False,
-            "hookwrapper": False,
             "optionalhook": False,
             "trylast": False,
             "tryfirst": False,
@@ -233,7 +232,7 @@ class HookCaller:
             i = len(hookimpls) - 1
             while i >= 0 and (
                 # Skip wrappers.
-                (hookimpls[i].hookwrapper or hookimpls[i].wrapper)
+                hookimpls[i].wrapper
                 # Skip tryfirst nonwrappers.
                 or hookimpls[i].tryfirst
             ):

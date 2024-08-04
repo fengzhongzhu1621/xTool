@@ -12,7 +12,6 @@ def my_hook_implementation(*args, **kwargs):
 def test_my_hook_attribute():
     my_hook_implementation()
     assert my_hook_implementation.my_project_impl == {
-        'hookwrapper': False,
         'optionalhook': False,
         'specname': None,
         'tryfirst': True,

@@ -1,4 +1,9 @@
+from typing import TYPE_CHECKING
+
 from .type_hint import _Plugin
+
+if TYPE_CHECKING:
+    pass
 
 
 class PluginValidationError(Exception):
