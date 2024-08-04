@@ -3,7 +3,7 @@ from typing import Callable, Final, TypedDict, final, overload
 from xTool.inspect_utils.arg_spec import varnames
 from xTool.type_hint import F
 
-_Plugin = object
+from .type_hint import _Plugin
 
 
 class HookimplOpts(TypedDict):
