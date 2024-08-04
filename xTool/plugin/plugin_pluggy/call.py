@@ -21,6 +21,7 @@ def _raise_wrapfail(
 
 
 def multicall(
+    hook_name: str,
     hook_impls: Sequence[HookImpl],  # 一个包含 HookImpl 对象的序列，这些对象代表了要调用的函数或方法
     caller_kwargs: Mapping[str, object],  # 从 HookCaller.__call__() 方法传递过来的关键字参数。
     firstresult: bool,  # 一个布尔值，如果为 True，则只返回第一个结果；如果为 False，则返回所有结果。

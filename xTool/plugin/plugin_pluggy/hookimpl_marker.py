@@ -8,7 +8,7 @@ from .type_hint import _Plugin
 
 
 class HookimplOpts(TypedDict):
-    """Options for a hook implementation. 用于存储钩子实现（hook implementation）的选项 ."""
+    """Options for a hook implementation. 用于存储钩子实现（hook implementation）的选项，可以理解为是接口的实现 ."""
 
     #: Whether the hook implementation is a :ref:`wrapper <hookwrapper>`.
     # 一个布尔值，表示钩子实现是否是一个包装器（wrapper）。包装器是一种特殊类型的钩子实现，可以在不修改原始实现的情况下添加额外的行为。
@@ -128,9 +128,9 @@ class HookImpl:
     def __init__(
         self,
         plugin: _Plugin,
-        plugin_name: str,
-        function: _HookImplFunction,
-        hook_impl_opts: HookimplOpts,
+        plugin_name: str,  # 默认是 plugin 插件实例的 id(plugin) 值
+        function: _HookImplFunction,  # 通常是 plugin 类中的使用了 @hookimpl 的方法
+        hook_impl_opts: HookimplOpts,  # @hookimpl 装饰的方法的 _impl 属性值
     ) -> None:
         """接受一个插件对象（_Plugin 类型）、插件名称（str 类型）、
         一个钩子实现函数（_HookImplFunction 类型）和一个钩子实现选项对象（HookimplOpts 类型）。

@@ -11,7 +11,7 @@ class HookspecOpts(TypedDict):
     # 是否仅返回第一个结果
     firstresult: bool
     #: Whether the hook is :ref:`historic <historic>`.
-    # 是否具有历史记录
+    # 表示这个 hook 是需要保存call history 的，当有新的 plugin 注册的时候，需要回放历史
     historic: bool
     #: Whether the hook :ref:`warns when implemented <warn_on_impl>`.
     # 用于存储一个警告类型（Warning）。当钩子实现注册时，如果设置了此字段，将触发指定的警告。
@@ -33,7 +33,7 @@ class HookspecOpts(TypedDict):
 
 @final
 class HookspecMarker:
-    """一个用于标记函数作为钩子规范的装饰器 .
+    """一个用于标记函数作为钩子规范的装饰器，可以理解为定义了一个接口。
 
     用于定义一个钩子规范（hook specification），它指定了插件可以提供哪些钩子实现。
     HookspecMarker 通常与 pluggy.Hookspec 一起使用，后者定义了一个包含多个钩子规范的类。"""

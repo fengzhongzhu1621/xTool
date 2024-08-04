@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Callable, Generic, cast, final
+from typing import Callable, Generator, Generic, Union, cast, final
 
-from xTool.type_hint import ExcInfo
+from xTool.type_hint import ExcInfo, T
 
 from .type_hint import ResultType
 
@@ -93,3 +93,6 @@ class Result(Generic[ResultType]):
             return cast(ResultType, self._result)
         else:
             raise exc.with_traceback(tb)
+
+
+_HookImplFunction = Callable[..., Union[T, Generator[None, Result[T], None]]]
