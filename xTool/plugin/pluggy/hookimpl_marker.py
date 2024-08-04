@@ -2,7 +2,7 @@ from typing import Callable, Final, TypedDict, final, overload
 
 from xTool.inspect_utils.arg_spec import varnames
 from xTool.type_hint import F
-
+from .result import _HookImplFunction
 from .type_hint import _Plugin
 
 
@@ -139,7 +139,7 @@ class HookImpl:
         self,
         plugin: _Plugin,
         plugin_name: str,
-        function: F,
+        function: _HookImplFunction,
         hook_impl_opts: HookimplOpts,
     ) -> None:
         """接受一个插件对象（_Plugin 类型）、插件名称（str 类型）、
