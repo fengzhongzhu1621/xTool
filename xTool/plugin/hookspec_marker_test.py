@@ -1,5 +1,4 @@
-from .hookspec import HookspecMarker
-
+from .hookspec_marker import HookspecMarker
 
 hookspec = HookspecMarker("my_project")
 

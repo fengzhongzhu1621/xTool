@@ -1,9 +1,4 @@
-from typing import Callable
-from typing import Final
-from typing import final
-from typing import Mapping
-from typing import overload
-from typing import TypedDict
+from typing import Callable, Final, Mapping, TypedDict, final, overload
 
 from xTool.type_hint import F
 

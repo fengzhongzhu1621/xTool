@@ -215,16 +215,3 @@ fast = [
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
-[tool.ruff.lint]
-select = [
-    "I",  # isort
-]
-
-[tool.ruff.lint.isort]
-force-single-line = true
-combine-as-imports = true
-force-sort-within-sections = true
-order-by-type = false
-known-local-folder = ["pluggy"]
-lines-after-imports = 2
