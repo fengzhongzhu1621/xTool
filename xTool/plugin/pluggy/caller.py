@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Callable, Final, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import AbstractSet, Any, Callable, Final, List, Mapping, Optional, Sequence, Tuple, Union
 
 from xTool.type_hint import F, Namespace
 
@@ -241,3 +241,38 @@ class HookCaller:
 
     def __repr__(self) -> str:
         return f"<HookCaller {self.name!r}>"
+
+
+class SubsetHookCaller(HookCaller):
+    """A proxy to another HookCaller which manages calls to all registered
+    plugins except the ones from remove_plugins.
+    充当另一个 HookCaller 的代理，管理对所有已注册插件的调用，但排除 remove_plugins 中的插件。"""
+
+    __slots__ = (
+        "_orig",
+        "_remove_plugins",
+    )
+
+    def __init__(self, orig: HookCaller, remove_plugins: AbstractSet[_Plugin]) -> None:
+        self._orig = orig
+        self._remove_plugins = remove_plugins
+        self.name = orig.name  # type: ignore[misc]
+        self._hookexec = orig._hookexec  # type: ignore[misc]
+
+    @property  # type: ignore[misc]
+    def _hookimpls(self) -> list[HookImpl]:
+        """返回一个列表，其中包含原始 HookCaller 实例中的所有实现，但不包括 remove_plugins 中的插件。"""
+        return [impl for impl in self._orig._hookimpls if impl.plugin not in self._remove_plugins]
+
+    @property
+    def spec(self) -> HookSpec | None:  # type: ignore[override]
+        """返回原始 HookCaller 实例的钩子规范。"""
+        return self._orig.spec
+
+    @property
+    def _call_history(self) -> _CallHistory | None:  # type: ignore[override]
+        """返回原始 HookCaller 实例的调用历史。"""
+        return self._orig._call_history
+
+    def __repr__(self) -> str:
+        return f"<_SubsetHookCaller {self.name!r}>"
