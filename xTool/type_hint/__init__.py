@@ -8,18 +8,8 @@ import os  # noqa
 import sys
 from concurrent import futures
 from datetime import timedelta
-from types import ModuleType
-from typing import (  # type: ignore # noqa # pylint: disable=unused-import
-    Any,
-    Awaitable,
-    Callable,
-    Iterable,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-    get_type_hints,
-)
+from types import ModuleType, TracebackType
+from typing import Any, Callable, Iterable, Optional, Tuple, Type, TypeVar, Union
 
 from xTool.compat import PY3, unicode_type
 
@@ -82,6 +72,10 @@ if sys.version_info >= (3, 9):
     FutureGenericT = futures.Future[typing.Any]
 else:
     FutureGenericT = futures.Future
+
+
+# 是一个包含异常信息的元组，包括异常类型、异常实例和追踪信息。
+ExcInfo = Tuple[Type[BaseException], BaseException, Optional[TracebackType]]
 
 
 class Future(FutureGenericT):

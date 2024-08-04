@@ -35,6 +35,7 @@ class TagTracer:
         content = " ".join(map(str, args))
         indent = "  " * self.indent
 
+        # 多个标签用 : 分割
         lines = ["{}{} [{}]\n".format(indent, content, ":".join(tags))]
 
         for name, value in extra.items():

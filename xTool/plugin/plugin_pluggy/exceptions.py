@@ -12,3 +12,7 @@ class PluginValidationError(Exception):
         super().__init__(message)
         #: The plugin which failed validation.
         self.plugin = plugin
+
+
+class HookCallError(Exception):
+    """Hook was called incorrectly."""
