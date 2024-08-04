@@ -1,5 +1,18 @@
 import warnings
-from typing import AbstractSet, Any, Callable, Final, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    AbstractSet,
+    Any,
+    Callable,
+    Final,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    final,
+)
 
 from xTool.type_hint import F, Namespace
 
@@ -276,3 +289,21 @@ class SubsetHookCaller(HookCaller):
 
     def __repr__(self) -> str:
         return f"<_SubsetHookCaller {self.name!r}>"
+
+
+@final
+class HookRelay:
+    """Hook holder object for performing 1:N hook calls where N is the number
+    of registered plugins.
+    用于执行 1:N 的钩子调用，其中 N 是已注册插件的数量。HookRelay 类充当钩子的持有者对象，用于管理钩子的调用。
+    """
+
+    __slots__ = ("__dict__",)
+
+    def __init__(self) -> None:
+        """:meta private:"""
+
+    if TYPE_CHECKING:
+        # 当访问一个不存在的属性时，这个方法会被调用。在这个例子中，__getattr__ 方法返回一个 HookCaller 类型的对象。
+        # 这个方法仅在类型检查时存在，用于提供更好的类型提示。
+        def __getattr__(self, name: str) -> HookCaller: ...
