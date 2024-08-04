@@ -1,7 +1,8 @@
 import typing
 
 from xTool.inspect_utils.callback import get_callback_name
-from xTool.string.ordinal import to_ordinal
+from xTool.strings.ordinal import to_ordinal
+
 
 if typing.TYPE_CHECKING:
     import logging

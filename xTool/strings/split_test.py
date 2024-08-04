@@ -1,6 +1,6 @@
 import pytest
 
-from xTool.string.split import split_member_list
+from xTool.strings.split import split_member_list
 
 
 @pytest.mark.parametrize(

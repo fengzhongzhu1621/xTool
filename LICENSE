@@ -254,6 +254,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     (MIT License) lark 1.1.9 (https://github.com/lark-parser/lark)
     (MIT License) bk-resource v0.4.10 (https://github.com/TencentBlueKing/bk-resource)
     (MIT License) blueapps 4.11.0 (https://github.com/TencentBlueKing/blueapps)
+    (MIT License) pluggy 1.5.0 (https://github.com/pytest-dev/pluggy)
 
 ========================================================================
 BSD 2-Clause licenses

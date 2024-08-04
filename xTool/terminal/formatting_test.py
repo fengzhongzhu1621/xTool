@@ -16,23 +16,22 @@
 
 import unittest
 
-from xTool.string import formatting
+from xTool.strings import formatting
 
 
 class FormattingTest(unittest.TestCase):
-
     def test_bold(self):
-        text = formatting.bold('hello')
-        self.assertIn(text, ['hello', '\x1b[1mhello\x1b[0m'])
+        text = formatting.bold("hello")
+        self.assertIn(text, ["hello", "\x1b[1mhello\x1b[0m"])
 
     def test_underline(self):
-        text = formatting.underline('hello')
-        self.assertIn(text, ['hello', '\x1b[4mhello\x1b[0m'])
+        text = formatting.underline("hello")
+        self.assertIn(text, ["hello", "\x1b[4mhello\x1b[0m"])
 
     def test_indent(self):
-        text = formatting.indent('hello', spaces=2)
-        self.assertEqual('  hello', text)
+        text = formatting.indent("hello", spaces=2)
+        self.assertEqual("  hello", text)
 
     def test_indent_multiple_lines(self):
-        text = formatting.indent('hello\nworld', spaces=2)
-        self.assertEqual('  hello\n  world', text)
+        text = formatting.indent("hello\nworld", spaces=2)
+        self.assertEqual("  hello\n  world", text)

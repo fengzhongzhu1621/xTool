@@ -14,7 +14,6 @@
 
 """A module for dealing with unknown string and environment encodings."""
 
-
 import sys
 
 
@@ -72,7 +71,7 @@ def decode(data, encoding=None):
 
     try:
         # Just return the string if its pure ASCII.
-        return string.decode('ascii')  # pytype: disable=attribute-error
+        return string.decode("ascii")  # pytype: disable=attribute-error
     except UnicodeError:
         # The string is not ASCII encoded.
         pass
@@ -89,7 +88,7 @@ def decode(data, encoding=None):
     # be exceptional if a valid extended ascii encoding with extended chars
     # were also a valid UITF-8 encoding.
     try:
-        return string.decode('utf8')  # pytype: disable=attribute-error
+        return string.decode("utf8")  # pytype: disable=attribute-error
     except UnicodeError:
         # Not a UTF-8 encoding.
         pass
@@ -123,7 +122,7 @@ def decode(data, encoding=None):
     #   string = '\xdc'
     #   string = string.decode('iso-8859-1')
     #   string = string.encode('ascii', 'backslashreplace')
-    return string.decode('iso-8859-1')  # pytype: disable=attribute-error
+    return string.decode("iso-8859-1")  # pytype: disable=attribute-error
 
 
 def get_encoded_value(env, name, default=None):

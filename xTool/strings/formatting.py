@@ -14,14 +14,13 @@
 
 """Formatting utilities for use in creating help text."""
 
+ELLIPSIS = "..."
 
-ELLIPSIS = '...'
 
-
-def wrapped_join(items, separator=' | ', width=80):
+def wrapped_join(items, separator=" | ", width=80):
     """Joins the items by the separator, wrapping lines at the given width."""
     lines = []
-    current_line = ''
+    current_line = ""
     for index, item in enumerate(items):
         is_final_item = index == len(items) - 1
         if is_final_item:

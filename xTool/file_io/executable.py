@@ -1,12 +1,12 @@
 import os
 
-from xTool.string import encoding as encoding_util
+from xTool.strings import encoding as encoding_util
 from xTool.system import platforms
 
 
 def get_system_path():
     """Returns properly encoded system PATH variable string."""
-    return encoding_util.GetEncodedValue(os.environ, 'PATH')
+    return encoding_util.GetEncodedValue(os.environ, "PATH")
 
 
 def _find_executable_on_path(executable, path, pathext):
@@ -27,9 +27,9 @@ def _find_executable_on_path(executable, path, pathext):
 
     if isinstance(pathext, str):
         raise ValueError(
-            '_find_executable_on_path(..., pathext=\'{}\') failed '
-            'because pathext must be an iterable of strings, but got '
-            'a string.'.format(pathext)
+            "_find_executable_on_path(..., pathext='{}') failed "
+            "because pathext must be an iterable of strings, but got "
+            "a string.".format(pathext)
         )
 
     # Prioritize preferred extension over earlier in path.
@@ -46,9 +46,9 @@ def _find_executable_on_path(executable, path, pathext):
 
 def _platform_executable_extensions(platform):
     if platform == platforms.OperatingSystem.WINDOWS:
-        return ('.exe', '.cmd', '.bat', '.com', '.ps1')
+        return (".exe", ".cmd", ".bat", ".com", ".ps1")
     else:
-        return ('', '.sh')
+        return ("", ".sh")
 
 
 def find_executable_on_path(executable, path=None, pathext=None, allow_extensions=False):
@@ -76,13 +76,13 @@ def find_executable_on_path(executable, path=None, pathext=None, allow_extension
 
     if not allow_extensions and os.path.splitext(executable)[1]:
         raise ValueError(
-            'find_executable_on_path({},...) failed because first '
-            'argument must not have an extension.'.format(executable)
+            "find_executable_on_path({},...) failed because first "
+            "argument must not have an extension.".format(executable)
         )
 
     if os.path.dirname(executable):
         raise ValueError(
-            'find_executable_on_path({},...) failed because first ' 'argument must not have a path.'.format(executable)
+            "find_executable_on_path({},...) failed because first " "argument must not have a path.".format(executable)
         )
 
     if path is None:
