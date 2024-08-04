@@ -8,6 +8,7 @@ import os  # noqa
 import sys
 from concurrent import futures
 from datetime import timedelta
+from types import ModuleType
 from typing import (  # type: ignore # noqa # pylint: disable=unused-import
     Any,
     Awaitable,
@@ -55,6 +56,7 @@ F = TypeVar("F", bound=Callable[..., Any])
 WrappedFn = TypeVar("WrappedFn", bound=Callable[..., Any])
 WrappedFnReturnT = typing.TypeVar("WrappedFnReturnT")
 OptionsType = Iterable[Tuple[int, int, int]]
+Namespace = Union[ModuleType, type]
 
 IP_ADDRESS = Tuple[str, int]
 # 时间单位类型

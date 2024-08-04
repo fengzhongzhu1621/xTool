@@ -1,6 +1,7 @@
 from typing import Callable, Final, Mapping, TypedDict, final, overload
 
-from xTool.type_hint import F
+from xTool.inspect_utils.arg_spec import varnames
+from xTool.type_hint import F, Namespace
 
 
 class HookspecOpts(TypedDict):
@@ -89,3 +90,34 @@ class HookspecMarker:
             return setattr_hookspec_opts(function)
         else:
             return setattr_hookspec_opts
+
+
+@final
+class HookSpec:
+    __slots__ = (
+        "namespace",
+        "function",
+        "name",
+        "argnames",
+        "kwargnames",
+        "opts",
+        "warn_on_impl",
+        "warn_on_impl_args",
+    )
+
+    def __init__(self, namespace: Namespace, name: str, opts: HookspecOpts) -> None:
+        """是一个使用 @final 装饰器标记的类，表示一个钩子规范（hook specification）."""
+        # 表示钩子规范所属的命名空间，可以是一个模块（ModuleType）或一个类（type）。
+        self.namespace = namespace
+        # 表示钩子规范对应的函数或方法。这是通过从命名空间中获取具有相同名称的对象来确定的。
+        self.function: Callable[..., object] = getattr(namespace, name)
+        # 表示钩子规范的名称，即函数或方法的名称。
+        self.name = name
+        # 表示钩子规范的位置参数名称。表示钩子规范的关键字参数名称。
+        self.argnames, self.kwargnames = varnames(self.function)
+        # 表示钩子规范的选项，存储在 HookspecOpts 类型的字典中。
+        self.opts = opts
+        # 表示当钩子实现注册时应触发的警告。这是从 opts 字典中获取的。
+        self.warn_on_impl = opts.get("warn_on_impl")
+        # 表示当钩子实现请求特定参数时应触发的警告。这也是从 opts 字典中获取的。
+        self.warn_on_impl_args = opts.get("warn_on_impl_args")

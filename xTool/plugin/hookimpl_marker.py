@@ -1,6 +1,9 @@
 from typing import Callable, Final, TypedDict, final, overload
 
+from xTool.inspect_utils.arg_spec import varnames
 from xTool.type_hint import F
+
+_Plugin = object
 
 
 class HookimplOpts(TypedDict):
@@ -112,3 +115,73 @@ def normalize_hookimpl_opts(opts: HookimplOpts) -> None:
     opts.setdefault("hookwrapper", False)
     opts.setdefault("optionalhook", False)
     opts.setdefault("specname", None)
+
+
+@final
+class HookImpl:
+    """A hook implementation in a :class:`HookCaller`. 使用 @final 装饰器标记的类，表示一个钩子实现（hook implementation）."""
+
+    __slots__ = (
+        "function",
+        "argnames",
+        "kwargnames",
+        "plugin",
+        "opts",
+        "plugin_name",
+        "wrapper",
+        "hookwrapper",
+        "optionalhook",
+        "tryfirst",
+        "trylast",
+    )
+
+    def __init__(
+        self,
+        plugin: _Plugin,
+        plugin_name: str,
+        function: F,
+        hook_impl_opts: HookimplOpts,
+    ) -> None:
+        """接受一个插件对象（_Plugin 类型）、插件名称（str 类型）、
+        一个钩子实现函数（_HookImplFunction 类型）和一个钩子实现选项对象（HookimplOpts 类型）。
+        它初始化类的属性，并提取钩子实现的参数名称和选项。"""
+        #: The hook implementation function.
+        # 表示钩子实现的函数或方法。
+        self.function: Final = function
+        # 表示钩子实现的位置参数名称 和 关键字参数名称。
+        argnames, kwargnames = varnames(self.function)
+        #: The positional parameter names of ``function```.
+        self.argnames: Final = argnames
+        #: The keyword parameter names of ``function```.
+        self.kwargnames: Final = kwargnames
+        #: The plugin which defined this hook implementation.
+        # 表示定义此钩子实现的插件对象。
+        self.plugin: Final = plugin
+        # 表示配置此钩子实现的选项，存储在 HookimplOpts 类型的字典中。
+        #: The :class:`HookimplOpts` used to configure this hook implementation.
+        self.opts: Final = hook_impl_opts
+        #: The name of the plugin which defined this hook implementation.
+        # 表示定义此钩子实现的插件的名称。
+        self.plugin_name: Final = plugin_name
+        #: Whether the hook implementation is a :ref:`wrapper <hookwrapper>`.
+        # 一个布尔值，表示钩子实现是否是一个包装器（wrapper）。
+        self.wrapper: Final = hook_impl_opts["wrapper"]
+        #: Whether the hook implementation is an :ref:`old-style wrapper
+        #: <old_style_hookwrappers>`.
+        # 一个布尔值，表示钩子实现是否是一个旧式包装器（old-style wrapper）。
+        self.hookwrapper: Final = hook_impl_opts["hookwrapper"]
+        #: Whether validation against a hook specification is :ref:`optional
+        #: <optionalhook>`.
+        # 一个布尔值，表示是否应跳过针对钩子规范的验证。
+        self.optionalhook: Final = hook_impl_opts["optionalhook"]
+        #: Whether to try to order this hook implementation :ref:`first
+        #: <callorder>`.
+        # 一个布尔值，表示是否尝试将此钩子实现排在调用顺序的第一位。
+        self.tryfirst: Final = hook_impl_opts["tryfirst"]
+        #: Whether to try to order this hook implementation :ref:`last
+        #: <callorder>`.
+        # 一个布尔值，表示是否尝试将此钩子实现排在调用顺序的最后一位。
+        self.trylast: Final = hook_impl_opts["trylast"]
+
+    def __repr__(self) -> str:
+        return f"<HookImpl plugin_name={self.plugin_name!r}, plugin={self.plugin!r}>"
