@@ -1,4 +1,4 @@
-from typing import Callable, Union, Generator
+from typing import Callable, Generator, Union
 
 from xTool.type_hint import T
 

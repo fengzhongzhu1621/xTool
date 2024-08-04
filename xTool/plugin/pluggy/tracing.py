@@ -4,10 +4,7 @@ Tracing utils
 
 from __future__ import annotations
 
-from typing import Any
-from typing import Callable
-from typing import Sequence
-from typing import Tuple
+from typing import Any, Callable, Sequence, Tuple
 
 # 一个接受字符串并返回任意对象的函数类型。
 _Writer = Callable[[str], object]

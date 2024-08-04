@@ -2,6 +2,7 @@ from typing import Callable, Final, TypedDict, final, overload
 
 from xTool.inspect_utils.arg_spec import varnames
 from xTool.type_hint import F
+
 from .result import _HookImplFunction
 from .type_hint import _Plugin
 
