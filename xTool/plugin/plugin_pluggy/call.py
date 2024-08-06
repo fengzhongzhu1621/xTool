@@ -27,7 +27,7 @@ def multicall(
     firstresult: bool,  # 一个布尔值，如果为 True，则只返回第一个结果；如果为 False，则返回所有结果。
 ) -> object | list[object]:
     """Execute a call into multiple python functions/methods and return the
-    result(s).
+    result(s). 执行钩子实现.
 
     ``caller_kwargs`` comes from HookCaller.__call__().
     """
@@ -54,18 +54,21 @@ def multicall(
                         # which is the desired response.
                         res = hook_impl.function(*args)
                         function_gen = cast(Generator[None, object, object], res)
+                        # 启动生成器
                         next(function_gen)  # first yield
                         teardowns.append(function_gen)
                     except StopIteration:
                         _raise_wrapfail(function_gen, "did not yield")
                 else:
                     res = hook_impl.function(*args)
+                    # 钩子实现返回 None，不收集结果
                     if res is not None:
                         results.append(res)
                         if firstresult:  # halt further impl calls
                             # 只返回第一个钩子实现的结果
                             break
         except BaseException as exc:
+            # 异常则终止后续的钩子实现的执行
             exception = exc
     finally:
         if firstresult:  # first result hooks return a single value
@@ -79,13 +82,14 @@ def multicall(
                 if exception is not None:
                     teardown.throw(exception)  # type: ignore[union-attr]
                 else:
-                    # 向迭代器传递数据
+                    # 将已执行的 hooks 的所有结果传递给当前 hook 执行
                     teardown.send(result)  # type: ignore[union-attr]
                 # Following is unreachable for a well behaved hook wrapper.
                 # Try to force finalizers otherwise postponed till GC action.
                 # Note: close() may raise if generator handles GeneratorExit.
                 teardown.close()  # type: ignore[union-attr]
             except StopIteration as si:
+                # 获得当前 hook 的执行结果
                 result = si.value
                 exception = None
                 continue

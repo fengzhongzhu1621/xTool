@@ -2,6 +2,11 @@ from xTool.design_patterns.filter.chain import AfterFilter, BeforeFilter, Method
 from xTool.plugin import PluginType, register_plugin
 
 
+class Context:
+    def __init__(self):
+        self.value = []
+
+
 class BusinessMethod(Method):
     def process_direct(self, context):
         context.value.append(2)
