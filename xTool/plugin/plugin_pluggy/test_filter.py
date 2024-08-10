@@ -34,7 +34,7 @@ class FilterPlugin1:
     @hookimpl(wrapper=True)
     def process_response(self, request, response):
         response.data["data"].append("FilterPlugin1 before yield")
-        # 接受其他插件的执行结果
+        # 接受插件 FilterPlugin2 的返回结果
         results = yield
         results.append("FilterPlugin1")
         response.data["data"].append("FilterPlugin1 after yield")
@@ -49,7 +49,7 @@ class FilterPlugin2:
     @hookimpl(wrapper=True)
     def process_response(self, request, response):
         response.data["data"].append("FilterPlugin2 before yield")
-        # 接受其他插件的执行结果
+        # 接受插件 FilterPlugin3 的返回结果
         results = yield
         results.append("FilterPlugin2")
         response.data["data"].append("FilterPlugin2 after yield")
