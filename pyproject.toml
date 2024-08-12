@@ -173,6 +173,7 @@ dependencies = [
     "tornado>=6.4.1",
     "airports-py>=1.0.1",
     "pdm>=2.17.3",
+    "aiocarbon>=0.15.3",
 ]
 keywords = ["xTool"]
 
