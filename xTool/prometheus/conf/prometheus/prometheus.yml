@@ -29,6 +29,6 @@ scrape_configs:
 #    - targets: ['ip:9100']
   - job_name: pushgateway
     static_configs:
-      - targets: ['10.45.29.53:9091']
+      - targets: ['x.x.x.x:9091']
         labels:
           instance: pushgateway
