@@ -2,12 +2,14 @@ from typing import List
 
 from visitor import Visitor
 
+
 ########################################################################################################################
 # 定义 Elements
 
 
 class Shape:
     def accept(self, visitor: Visitor):
+        # 执行访问者对当前对象的扩展操作
         visitor.visit(self)
 
 
