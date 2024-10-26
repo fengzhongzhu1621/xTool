@@ -19,7 +19,7 @@ import time
 
 from celery import states as celery_states
 
-from xTool.executors.base_executor import BaseExecutor
+from .base_executor import BaseExecutor
 
 
 class CeleryExecutor(BaseExecutor):

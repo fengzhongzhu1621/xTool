@@ -31,10 +31,10 @@ import subprocess
 import time
 from builtins import range
 
-from xTool.executors.base_executor import BaseExecutor
 from xTool.misc import USE_WINDOWS
 from xTool.utils.log.logging_mixin import LoggingMixin
 from xTool.utils.state import State
+from .base_executor import BaseExecutor
 
 
 class LocalWorker(multiprocessing.Process, LoggingMixin):

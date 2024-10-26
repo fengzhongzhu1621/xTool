@@ -3,8 +3,8 @@ import warnings
 
 import distributed
 
-from xTool.executors.base_executor import BaseExecutor
 from xTool.misc import USE_WINDOWS
+from .base_executor import BaseExecutor
 
 
 class DaskExecutor(BaseExecutor):

@@ -2,9 +2,9 @@ import os
 import subprocess
 from builtins import str
 
-from xTool.executors.base_executor import BaseExecutor
 from xTool.misc import USE_WINDOWS
 from xTool.utils.state import State
+from .base_executor import BaseExecutor
 
 
 class SequentialExecutor(BaseExecutor):

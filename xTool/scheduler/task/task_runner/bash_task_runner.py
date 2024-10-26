@@ -1,7 +1,7 @@
 import psutil
 
-from xTool.task.task_runner.base_task_runner import BaseTaskRunner
-from xTool.utils.helpers import reap_process_group
+from xTool.utils.processes import reap_process_group
+from .base_task_runner import BaseTaskRunner
 
 
 class BashTaskRunner(BaseTaskRunner):

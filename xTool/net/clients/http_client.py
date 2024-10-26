@@ -2,7 +2,7 @@ from json import JSONDecodeError
 
 import httpx
 
-from xTool.clients import websocket_client
+from . import websocket_client
 
 
 async def async_httpx_request(method, url, *args, **kwargs):
