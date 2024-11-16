@@ -4,18 +4,17 @@
 基于fernet的加解密算法
 """
 
-import os
 import base64
+import os
 
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
+from xTool.exceptions import XToolException
 from xTool.misc import tob
 from xTool.utils.log.logging_mixin import LoggingMixin
-from xTool.exceptions import XToolException
-
 
 InvalidFernetToken = InvalidToken
 _fernet = None
@@ -30,11 +29,7 @@ def generate_fernet_key():
 def generate_fernet_pbkdf2hmac_key():
     salt = os.urandom(16)
     password = os.urandom(64)
-    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(),
-                     length=32,
-                     salt=salt,
-                     iterations=100000,
-                     backend=default_backend())
+    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
     key = base64.urlsafe_b64encode(kdf.derive(password))
     return key
 
@@ -60,24 +55,24 @@ def double_decrypt(root_key, instance_key_cipher, cipher_text):
     return decrypt(instance_key, cipher_text)
 
 
-def parseDbConfig(dbConfig, root_key=None, instance_key_cipher=None, max_idle_time=7 * 3600, connect_timeout=5, time_zone="+0:00"):
+def parse_db_config(
+    db_config, root_key=None, instance_key_cipher=None, max_idle_time=7 * 3600, connect_timeout=5, time_zone="+0:00"
+):
     """用于将db配置转换成torndb可识别的参数格式 ."""
-    host = dbConfig.get('host')
-    user = dbConfig.get('user')
-    password = dbConfig.get('password')
+    host = db_config.get('host')
+    user = db_config.get('user')
+    password = db_config.get('password')
     if not password:
-        password = dbConfig.get('passwd')
-    root_key = root_key if root_key else dbConfig.get('root_key')
-    instance_key_cipher = instance_key_cipher if instance_key_cipher else dbConfig.get('instance_key_cipher')
+        password = db_config.get('passwd')
+    root_key = root_key if root_key else db_config.get('root_key')
+    instance_key_cipher = instance_key_cipher if instance_key_cipher else db_config.get('instance_key_cipher')
     if password and root_key and instance_key_cipher:
-        password = double_decrypt(root_key,
-                                  instance_key_cipher,
-                                  password)
-    charset = dbConfig.get('charset', 'utf8')
-    database = dbConfig.get('database')
+        password = double_decrypt(root_key, instance_key_cipher, password)
+    charset = db_config.get('charset', 'utf8')
+    database = db_config.get('database')
     if not database:
-        database = dbConfig.get('db')
-    return (host, database, user, password, max_idle_time, connect_timeout, time_zone, charset)
+        database = db_config.get('db')
+    return host, database, user, password, max_idle_time, connect_timeout, time_zone, charset
 
 
 def get_fernet(fernet_key):
@@ -96,9 +91,7 @@ def get_fernet(fernet_key):
 
     if not fernet_key:
         log = LoggingMixin().log1
-        log.warning(
-            "empty cryptography key - values will not be stored encrypted."
-        )
+        log.warning("empty cryptography key - values will not be stored encrypted.")
         raise XToolException("Could not create Fernet object")
     else:
         _fernet = Fernet(fernet_key.encode('utf-8'))

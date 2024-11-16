@@ -46,7 +46,11 @@ def get_single_client():
     return redis.StrictRedis(connection_pool=pool)
 
 
-CLIENT_GETTER = {"replication": get_client_through_sentinel, "cluster": get_cluster_client, "single": get_single_client}
+CLIENT_GETTER = {
+    "replication": get_client_through_sentinel,
+    "cluster": get_cluster_client,
+    "single": get_single_client,
+}
 
 
 class BackendAppConfig(AppConfig):

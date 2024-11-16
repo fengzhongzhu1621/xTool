@@ -70,5 +70,5 @@ def test_parseDbConfig():
             "instance_key_cipher": instance_key_cipher,
         }
     }
-    conf = fernet.parseDbConfig(db_config.get("db_my_db"))
+    conf = fernet.parse_db_config(db_config.get("db_my_db"))
     assert password == conf[3]
