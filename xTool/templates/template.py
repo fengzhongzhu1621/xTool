@@ -72,7 +72,7 @@ class Template:
         return data
 
     @staticmethod
-    def _get_string_templates(string: str) -> List[str]:
+    def get_string_templates(string: str) -> List[str]:
         """获得所有的模版字符串表达式${xxx} ."""
         return list(set(TEMPLATE_PATTERN.findall(string)))
 
@@ -119,7 +119,7 @@ class Template:
             return string
         # 获得所有的模版字符串表达式${xxx}
         # a ${b + c} d => ["${b + c }"]
-        templates = self.__class__._get_string_templates(string)
+        templates = self.get_string_templates(string)
 
         # TODO keep render return object, here only process simple situation
         # 如果模版字符串只有一个单参数，即格式为 string为 ${a}，这种情况可能返回一个非字符串对象
@@ -136,13 +136,13 @@ class Template:
                 except Exception:  # pylint: disable=broad-except
                     logger.exception("{} safety check error.".format(tpl))
                     raise
-            resolved = self.__class__._render_template(tpl, context, raise_error=raise_error)
+            resolved = self.render_template(tpl, context, raise_error=raise_error)
             # 将模版字符串中的${xxx}，替换为真实的值
             string = string.replace(tpl, resolved)
         return string
 
     @classmethod
-    def _render_template(cls, template: str, context: dict, raise_error: bool = False) -> str:
+    def render_template(cls, template: str, context: dict, raise_error: bool = False) -> str:
         """
         使用特定上下文渲染指定模板
 

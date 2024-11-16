@@ -12,3 +12,7 @@ class ForbiddenMakoTemplateException(MakoSandboxEscapeException):
 
 class ForbiddenExtractNodeException(ForbiddenMakoTemplateException):
     pass
+
+
+class MakoResultIsNotBoolTypeException(Exception):
+    pass
