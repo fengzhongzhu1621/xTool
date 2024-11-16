@@ -18,7 +18,7 @@ ELLIPSIS = "..."
 
 
 def wrapped_join(items, separator=" | ", width=80):
-    """Joins the items by the separator, wrapping lines at the given width."""
+    """Joins the items by the separator, wrapping lines at the given width. 使用指定分隔符合并数组，并设置字符串总宽度"""
     lines = []
     current_line = ""
     for index, item in enumerate(items):
@@ -41,7 +41,7 @@ def wrapped_join(items, separator=" | ", width=80):
 
 
 def ellipsis_truncate(text, available_space, line_length):
-    """Truncate text from the end with ellipsis."""
+    """Truncate text from the end with ellipsis. 省略结尾的字符，用 ... 替代"""
     if available_space < len(ELLIPSIS):
         available_space = line_length
     # No need to truncate
@@ -50,8 +50,8 @@ def ellipsis_truncate(text, available_space, line_length):
     return text[: available_space - len(ELLIPSIS)] + ELLIPSIS
 
 
-def ellipsis_middle_truncate(text, available_space, line_length):
-    """Truncates text from the middle with ellipsis."""
+def ellipsis_middle_truncate(text: str, available_space: int, line_length: int):
+    """Truncates text from the middle with ellipsis. 省略中间的字符，用 ... 替代"""
     if available_space < len(ELLIPSIS):
         available_space = line_length
     if len(text) < available_space:
@@ -63,4 +63,5 @@ def ellipsis_middle_truncate(text, available_space, line_length):
 
 
 def double_quote(text):
+    """字符串添加双引号 ."""
     return '"%s"' % text
