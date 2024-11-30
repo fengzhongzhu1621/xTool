@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
-from apps.component.constants import FieldType, FormItemType
+from apps.core.constants import FieldType, FormItemType
 from core.cache import CacheKey
 from core.constants import (
     LEN_LONG,

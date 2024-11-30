@@ -418,6 +418,25 @@ def snake_to_camel(name: str, title_case=False) -> str:
     return camel_name
 
 
+def camel_case_to_underscore_naming(source: str) -> str:
+    """将驼峰形式字符串转为下划线形式 ."""
+    if not isinstance(source, str):
+        return source
+    result = ''
+    for i, name in enumerate(source):
+        if i == 0:
+            result += name.lower()
+        else:
+            if name.isupper():
+                if source[i - 1].islower():
+                    result += '_' + name.lower()
+                else:
+                    result += name.lower()
+            else:
+                result += name
+    return result
+
+
 def md5(src):
     if not src:
         return None

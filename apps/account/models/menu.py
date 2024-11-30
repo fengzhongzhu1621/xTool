@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
-from apps.component.constants import RequestMethod
+from apps.core.constants import RequestMethod
 from core.constants import LEN_SHORT, LEN_NORMAL, LEN_LONG, LEN_MIDDLE
 from core.models import SoftDeleteModel, SoftDeleteModelManager
 
