@@ -15,7 +15,7 @@ except ImportError:  # pragma: no cover
 
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .client_reqrep import RequestInfo, ClientResponse, ConnectionKey, Fingerprint  # noqa
+    from .client_reqrep import ClientResponse, ConnectionKey, Fingerprint, RequestInfo  # noqa
 else:
     RequestInfo = ClientResponse = ConnectionKey = None
 
@@ -60,7 +60,7 @@ class ClientResponseError(ClientError):
         code: Optional[int] = None,
         status: Optional[int] = None,
         message: str = "",
-        headers: Optional[_CIMultiDict] = None
+        headers: Optional[_CIMultiDict] = None,
     ) -> None:
         self.request_info = request_info
         if code is not None:
@@ -81,17 +81,17 @@ class ClientResponseError(ClientError):
         self.args = (request_info, history)
 
     def __str__(self) -> str:
-        return "%s, message=%r, url=%r" % (self.status, self.message, self.request_info.real_url)
+        return "{}, message={!r}, url={!r}".format(self.status, self.message, self.request_info.real_url)
 
     def __repr__(self) -> str:
-        args = "%r, %r" % (self.request_info, self.history)
+        args = "{!r}, {!r}".format(self.request_info, self.history)
         if self.status != 0:
-            args += ", status=%r" % (self.status,)
+            args += ", status={!r}".format(self.status)
         if self.message != "":
-            args += ", message=%r" % (self.message,)
+            args += ", message={!r}".format(self.message)
         if self.headers is not None:
-            args += ", headers=%r" % (self.headers,)
-        return "%s(%s)" % (type(self).__name__, args)
+            args += ", headers={!r}".format(self.headers)
+        return "{}({})".format(type(self).__name__, args)
 
     @property
     def code(self) -> int:
