@@ -1,12 +1,13 @@
-# -*- coding: utf-8 -*-
-
 import json
+import os
 import sys
 import traceback
 from json.decoder import JSONDecodeError
 from typing import Dict
 
+from blueapps.utils.logger import logger
 from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
@@ -14,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
 from core.exceptions import BlueException
+from core.iam.exceptions import PermissionDeniedError
 
 try:
     from raven.contrib.django.raven_compat.models import sentry_exception_handler
@@ -30,6 +32,18 @@ def notify_sentry(request: Request, response: Response, data: Dict, exc: Excepti
     if isinstance(exc, (BlueException, CoreException, ValidationError)):
         return
     # notify sentry
+    logger.error(
+        """uncaught exception: [%s], request url: [%s], """
+        """request method: [%s], request params: [%s], """
+        """response data->[%s]"""
+        % (
+            traceback.format_exc(),
+            request.path,
+            request.method,
+            json.dumps(getattr(request, request.method, None)),
+            json.dumps(data, cls=DjangoJSONEncoder),
+        )
+    )
     if settings.RUN_MODE in ["PRODUCT", "STAGING"] and sentry_exception_handler is not None:
         sentry_exception_handler(request=request)
 
@@ -67,7 +81,9 @@ def custom_exception_handler(exc, context: Dict):
 
     # 如果是权限异常，返回403
     error_code = exc.code if isinstance(exc, BlueException) else status.HTTP_500_INTERNAL_SERVER_ERROR
-    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    status_code = (
+        status.HTTP_403_FORBIDDEN if isinstance(exc, PermissionDeniedError) else status.HTTP_500_INTERNAL_SERVER_ERROR
+    )
 
     # 由前端处理无权限调整
     if exc_data and isinstance(exc_data, dict):
@@ -85,8 +101,13 @@ def custom_exception_handler(exc, context: Dict):
         "message": exc_message,
         "data": exc_data,
     }
-    if settings.DEBUG:
-        data["traceback"] = traceback.format_exception(*sys.exc_info())
+
+    # 追加 traceback
+    if settings.DEBUG_RETURN_EXCEPTION:
+        err_message = os.linesep.join(
+            info.replace(settings.SECRET_KEY, "**********") for info in traceback.format_exception(*sys.exc_info())
+        )
+        data["error"] = err_message
 
     # 构造响应
     response = Response(data, status=status_code)

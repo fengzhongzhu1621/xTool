@@ -7,6 +7,7 @@ RUN_MODE = "STAGING"
 # 只对正式环境日志级别进行配置，可以在这里修改
 LOG_LEVEL = "ERROR"
 
+DEBUG_RETURN_EXCEPTION = False
 
 # 正式环境数据库可以在这里配置
 # DATABASES.update(

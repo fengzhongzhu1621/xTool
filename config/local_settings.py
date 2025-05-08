@@ -2,6 +2,7 @@ import pymysql
 
 pymysql.install_as_MySQLdb()
 
+DEBUG_RETURN_EXCEPTION = True
 
 DATABASES = {
     "default": {

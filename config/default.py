@@ -404,3 +404,5 @@ API_MODEL_MAP = {
 
 # channels
 CHANNEL_LAYERS = {}
+
+DEBUG_RETURN_EXCEPTION = False
