@@ -60,7 +60,7 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "apps.opentelemetry_instrument",
     "rest_framework",
-    "bk_resource",
+    # "bk_resource",
     "captcha",
     "channels",
     "apps.account",
