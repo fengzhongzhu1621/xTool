@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _lazy
 
 
 class FieldType(TextChoices):
-    """性别 ."""
+    """字段类型 ."""
 
     TEXT = "TEXT", _lazy("文本")
     NUMBER = "NUMBER", _lazy("数字")

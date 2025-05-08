@@ -1,8 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
-from apps.core.constants import PostStatus
-from core.constants import LEN_NORMAL, LEN_SHORT
+from core.constants import LEN_NORMAL, LEN_SHORT, PostStatus
 from core.models import SoftDeleteModel
 
 

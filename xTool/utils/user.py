@@ -14,3 +14,9 @@ def parse_user_to_list(value: str | List[str], sep=",") -> List:
         ]
 
     return usernames
+
+
+def sort_username_list(usernames: List, sep=",") -> List:
+    result = sorted({username.strip().strip(sep) for username in usernames if username and username.strip().strip(sep)})
+
+    return result

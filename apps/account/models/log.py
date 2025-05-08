@@ -2,12 +2,10 @@ import user_agents
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
-from apps.core.constants import LoginType
-from core.constants import LEN_NORMAL, LEN_SHORT, LEN_LONG, LEN_X_LONG
+from core.constants import LEN_LONG, LEN_NORMAL, LEN_SHORT, LEN_X_LONG, LoginType
 from core.ip import get_ip_analysis
 from core.models import SoftDeleteModel, SoftDeleteModelManager
-from core.request import get_browser, get_os
-from core.request import get_request_ip
+from core.request import get_browser, get_os, get_request_ip
 
 
 class LoginLogManager(SoftDeleteModelManager):

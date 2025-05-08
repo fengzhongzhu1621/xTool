@@ -4,8 +4,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
 from apps.account.models import Role
-from apps.core.constants import Gender, UserType
-from core.constants import LEN_NORMAL, LEN_LONG, LEN_SHORT
+from core.constants import LEN_LONG, LEN_NORMAL, LEN_SHORT, Gender, UserType
 from core.models import SoftDeleteModel, SoftDeleteModelManager
 from xTool.misc import md5
 
