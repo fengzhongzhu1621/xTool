@@ -5,6 +5,7 @@ from celery.utils.serialization import strtobool
 from config import APP_CODE, BASE_DIR
 from config.database import get_default_database_config_dict
 from config.log import get_logging_config_dict
+from core.load_settings import load_settings
 
 # 判断是否为本地开发环境
 IS_LOCAL = not os.getenv("ENVIRONMENT", False)
@@ -16,22 +17,6 @@ STATIC_URL = "/static/"
 
 # About whitenoise
 WHITENOISE_STATIC_PREFIX = "/static/"
-
-# Rabbitmq & Celery
-if "RABBITMQ_VHOST" in os.environ:
-    RABBITMQ_VHOST = os.getenv("RABBITMQ_VHOST")
-    RABBITMQ_PORT = os.getenv("RABBITMQ_PORT")
-    RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
-    RABBITMQ_USER = os.getenv("RABBITMQ_USER")
-    RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
-    BROKER_URL = "amqp://{user}:{password}@{host}:{port}/{vhost}".format(
-        user=RABBITMQ_USER,
-        password=RABBITMQ_PASSWORD,
-        host=RABBITMQ_HOST,
-        port=RABBITMQ_PORT,
-        vhost=RABBITMQ_VHOST,
-    )
-DATABASES = {"default": get_default_database_config_dict(locals())}
 
 ROOT_URLCONF = "urls"
 
@@ -46,8 +31,8 @@ LOGIN_CACHE_EXPIRED = int(os.getenv("LOGIN_CACHE_EXPIRED", 60))
 
 AUTH_USER_MODEL = "account.Users"
 
+########################################################################################################################
 # Application definition
-
 INSTALLED_APPS = (
     # "bkoauth",
     # 框架自定义命令
@@ -89,6 +74,7 @@ INSTALLED_APPS = (
     "apps.websocket",
 )
 
+########################################################################################################################
 MIDDLEWARE = (
     "core.middleware.healthz.HealthCheckMiddleware",
     # 将请求对象注入到线程变量，方便根据 get_request() 方法获取
@@ -106,10 +92,13 @@ MIDDLEWARE = (
     "core.middleware.app_exception.AppExceptionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "core.middleware.csrf.CSRFExemptMiddleware",
+    "core.csrf.middleware.CSRFExemptMiddleware",
     "apps.account.middleware.ApiLoggingMiddleware",
 )
 
+########################################################################################################################
+# vue
+VUE_INDEX = "index.html"
 # AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 AUTHENTICATION_BACKENDS = ("core.auth.backends.Md5ModelBackend",)
 TEMPLATE_CONTEXT_PROCESSORS = [
@@ -117,6 +106,7 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     "django.template.context_processors.request",
     "django.contrib.auth.context_processors.auth",
     "django.contrib.messages.context_processors.messages",
+    "blueapps.template.context_processors.blue_settings",
 ]
 TEMPLATES = [
     {
@@ -149,11 +139,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+########################################################################################################################
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 # 国际化配置
 LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)  # noqa
-
 # 时区
 USE_I18N = True
 USE_TZ = True
@@ -203,11 +193,13 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # noqa
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+########################################################################################################################
+# restful framework
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "core.drf.exception.custom_exception_handler",
+    "EXCEPTION_HANDLER": "core.opentelemetry.trace.trace_exception_handler",
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_PAGINATION_CLASS": "core.drf.pagination.CustomPageNumberWithColumnPagination",
-    "PAGE_SIZE": 10,
+    "DEFAULT_PAGINATION_CLASS": "core.drf.pagination.CustomPageNumberPagination",
+    "PAGE_SIZE": 100,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.SessionAuthentication",),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
@@ -218,7 +210,6 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.MultiPartParser",
     ),
     "DEFAULT_RENDERER_CLASSES": ("core.drf.renderers.APIRenderer",),
-    # 版本管理
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
     "DEFAULT_VERSION": "v1",
     "ALLOWED_VERSIONS": ["v1"],
@@ -228,8 +219,22 @@ REST_FRAMEWORK = {
 # 前后端分离开发配置开关，设置为True时dev和stag环境会自动加载允许跨域的相关选项
 FRONTEND_BACKEND_SEPARATION = False
 
+########################################################################################################################
+# 日志配置
 # load logging settings
+# 所有环境的日志级别可以在这里配置
+LOG_LEVEL = 'INFO'
+LOG_TIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 LOGGING = get_logging_config_dict(locals())
+LOGGING["formatters"]["verbose"] = {"()": "core.log.JSONLogFormatter"}
+LOGGING["loggers"]["bk_audit"] = LOGGING["loggers"]["app"]
+for _l in LOGGING["loggers"].values():
+    _l["propagate"] = False
+BK_BK_RESOURCE_LOG_ENABLED = strtobool(os.getenv("BKAPP_BK_RESOURCE_LOG_ENABLED", "true"))  # bk_resource日志
+if BK_BK_RESOURCE_LOG_ENABLED:
+    LOGGING["loggers"]["bk_resource"] = LOGGING["loggers"]["app"]
+    LOGGING["loggers"]["iam"] = LOGGING["loggers"]["app"]
+
 
 # BKUI是否使用了history模式
 IS_BKUI_HISTORY_MODE = False
@@ -252,15 +257,18 @@ BK_RESOURCE = {
     "PLATFORM_AUTH_ACCESS_TOKEN": os.getenv("BKAPP_PLATFORM_AUTH_ACCESS_TOKEN"),
     "PLATFORM_AUTH_ACCESS_USERNAME": os.getenv("BKAPP_PLATFORM_AUTH_ACCESS_USERNAME"),
 }
-BK_BK_RESOURCE_LOG_ENABLED = strtobool(os.getenv("BKAPP_BK_RESOURCE_LOG_ENABLED", "true"))
-if BK_BK_RESOURCE_LOG_ENABLED:
-    LOGGING["loggers"]["bk_resource"] = LOGGING["loggers"]["app"]
-    LOGGING["loggers"]["iam"] = LOGGING["loggers"]["app"]
 
-# CORS
+########################################################################################################################
+# Cookie
 SESSION_COOKIE_DOMAIN = os.getenv("BKAPP_SESSION_COOKIE_DOMAIN")
 CSRF_COOKIE_DOMAIN = os.getenv("BKAPP_CSRF_COOKIE_DOMAIN", SESSION_COOKIE_DOMAIN)
+AUTH_BACKEND_DOMAIN = os.getenv("BKAPP_AUTH_BACKEND_DOMAIN", SESSION_COOKIE_DOMAIN)
 LANGUAGE_COOKIE_DOMAIN = SESSION_COOKIE_DOMAIN
+AUTH_BACKEND_TYPE = os.getenv("BKAPP_AUTH_BACKEND_TYPE", "bk_token")
+OAUTH_COOKIES_PARAMS = {AUTH_BACKEND_TYPE: AUTH_BACKEND_TYPE}
+
+
+# CORS
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [origin for origin in str(os.getenv("BKAPP_CORS_ALLOWED_ORIGINS", "")).split(",") if origin]
 
@@ -269,12 +277,9 @@ CSRF_TRUSTED_ORIGINS = [origin for origin in str(os.getenv("BKAPP_CSRF_TRUSTED_O
 CSRF_EXEMPT_PATHS = []
 CSRF_COOKIE_NAME = APP_CODE + "_csrftoken"
 
-# UserCookie
-AUTH_BACKEND_DOMAIN = os.getenv("BKAPP_AUTH_BACKEND_DOMAIN", SESSION_COOKIE_DOMAIN)
-AUTH_BACKEND_TYPE = os.getenv("BKAPP_AUTH_BACKEND_TYPE", "bk_token")
-OAUTH_COOKIES_PARAMS = {AUTH_BACKEND_TYPE: AUTH_BACKEND_TYPE}
 
-# redis
+########################################################################################################################
+# cache
 USE_REDIS = True
 REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
@@ -304,48 +309,6 @@ single_redis_cache = {
 }
 REDIS_MODE = os.environ.get("BKAPP_REDIS_MODE", "single")
 CACHES_GETTER = {"replication": replication_redis_cache, "single": single_redis_cache}
-
-# 数据库
-DATABASES["default"].setdefault("OPTIONS", {})["charset"] = "utf8mb4"
-
-# CELERY 开关，使用时请改为 True，修改项目目录下的 Procfile 文件，添加以下两行命令：
-# worker: python manage.py celery worker -l info
-# beat: python manage.py celery beat -l info
-# 不使用时，请修改为 False，并删除项目目录下的 Procfile 文件中 celery 配置
-# 下面的命令用于测试
-# python manage.py celery worker -O fair -l info -c 1 -Q celery,default,er_schedule,er_execute
-IS_USE_CELERY = True
-CELERYD_HIJACK_ROOT_LOGGER = False
-# CELERY与RabbitMQ增加60秒心跳设置项
-BROKER_HEARTBEAT = 60
-# celery settings
-if IS_USE_CELERY:
-    INSTALLED_APPS += (
-        "django_celery_beat",
-        "django_celery_results",
-    )
-
-    # 用于替换默认的队列
-    if os.getenv("BK_BROKER_URL"):
-        BROKER_URL = os.getenv("BK_BROKER_URL")
-
-    # CELERY 并发数，默认为 2，是命令行-c参数指定的数目，可以通过环境变量或者 Procfile 设置
-    CELERYD_CONCURRENCY = os.getenv("BK_CELERYD_CONCURRENCY", 2)  # noqa
-    # celery beat 间隔时间，默认为 1，是命令行-B参数指定的数目，可以通过环境变量或者 Procfile 设置
-    CELERY_ENABLE_UTC = True
-    CELERY_TIMEZONE = TIME_ZONE
-    CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-    # 允许传递对象给任务
-    CELERY_TASK_SERIALIZER = "json"
-    CELERY_ACCEPT_CONTENT = ["json"]
-    # CELERY 任务的文件路径，即包含有 @task 装饰器的函数文件
-    CELERY_IMPORTS = []
-
-# 分页最大限制
-MAX_PAGE_SIZE = int(os.getenv("BKAPP_MAX_PAGE_SIZE", 1000))
-# 数据库分配最大限制
-DB_BATCH_SIZE = int(os.getenv("BKAPP_DB_BATCH_SIZE", 1000))
-
 # 缓存设置
 # CACHES = {
 #     "db": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "django_cache"},
@@ -354,7 +317,11 @@ DB_BATCH_SIZE = int(os.getenv("BKAPP_DB_BATCH_SIZE", 1000))
 #     "locmem": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
 # }
 CACHES = {
-    "db": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "django_cache"},
+    "db": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+        "OPTIONS": {"MAX_ENTRIES": 100000, "CULL_FREQUENCY": 10},
+    },
     "login_db": CACHES_GETTER[REDIS_MODE],
     "dummy": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
     "locmem": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
@@ -362,6 +329,16 @@ CACHES = {
 }
 DATA_BACKEND_REDIS_MODE = os.environ.get("BKAPP_DATA_BACKEND_REDIS_MODE", "single")
 DATA_BACKEND = "apps.backend.data.redis_backend.RedisDataBackend"
+if USE_REDIS:
+    CACHES["redis"] = CACHES_GETTER[REDIS_MODE]
+    CACHES["default"] = CACHES["redis"]
+    CACHES["login_db"] = CACHES["redis"]
+else:
+    CACHES["default"] = CACHES["db"]
+
+########################################################################################################################
+# 分页
+MAX_PAGE_SIZE = int(os.getenv("BKAPP_MAX_PAGE_SIZE", 1000))
 
 # OpenTelemetry
 OPEN_TELEMETRY_ENABLE_OTEL_METRICS = bool(strtobool(os.getenv("OPEN_TELEMETRY_ENABLE_OTEL_METRICS", "False")))
@@ -406,3 +383,129 @@ API_MODEL_MAP = {
 CHANNEL_LAYERS = {}
 
 DEBUG_RETURN_EXCEPTION = False
+
+########################################################################################################################
+# bamboengine
+# 流程component自动注册目录
+COMPONENT_PATH = []
+
+########################################################################################################################
+# apigw
+APIGW_ENABLED = bool(strtobool(os.getenv("BKAPP_APIGW_ENABLED", "False")))
+BK_APIGW_NAME = "bksecapp"
+APIGW_DEFINITION_SETTINGS = {
+    # 网关名称
+    "BK_APIGW_NAME": BK_APIGW_NAME,
+    # 网关所有者
+    "MAINTAINERS": ["admin"],
+    # apigw_definition 模板默认输出位置
+    "GENERATE_APIGW_DEFINITION_TARGET_DIR": os.path.join("support-files", "apigw"),
+    # api_resources 模板默认输出位置
+    "GENERATE_API_RESOURCES_TARGET_DIR": os.path.join("support-files", "apigw"),
+}
+# 文件目录
+BK_APIGW_RESOURCE_DOCS_BASE_DIR = os.path.join("support-files", "apigw", "docs")
+
+########################################################################################################################
+# 数据库
+DATABASES = {"default": get_default_database_config_dict(locals())}
+DB_BATCH_SIZE = int(os.getenv("BKAPP_DB_BATCH_SIZE", 1000))
+DATABASES["default"].setdefault("OPTIONS", {})["charset"] = "utf8mb4"
+# DATABASE_ROUTERS = ["config.router.DatabaseRouter"]
+
+########################################################################################################################
+# 调试
+DEBUG_RETURN_EXCEPTION = False
+
+########################################################################################################################
+# celery 配置
+# CELERY 开关，使用时请改为 True，修改项目目录下的 Procfile 文件，添加以下两行命令：
+# worker: python manage.py celery worker -l info
+# beat: python manage.py celery beat -l info
+# 不使用时，请修改为 False，并删除项目目录下的 Procfile 文件中 celery 配置
+# 下面的命令用于测试
+# python manage.py celery worker -O fair -l info -c 1 -Q celery,default,er_schedule,er_execute
+IS_USE_CELERY = True
+# Rabbitmq & Celery
+if "RABBITMQ_VHOST" in os.environ:
+    RABBITMQ_VHOST = os.getenv("RABBITMQ_VHOST")
+    RABBITMQ_PORT = os.getenv("RABBITMQ_PORT")
+    RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
+    RABBITMQ_USER = os.getenv("RABBITMQ_USER")
+    RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
+    BROKER_URL = "amqp://{user}:{password}@{host}:{port}/{vhost}".format(
+        user=RABBITMQ_USER,
+        password=RABBITMQ_PASSWORD,
+        host=RABBITMQ_HOST,
+        port=RABBITMQ_PORT,
+        vhost=RABBITMQ_VHOST,
+    )
+CELERYD_HIJACK_ROOT_LOGGER = False
+# CELERY与RabbitMQ增加60秒心跳设置项
+BROKER_HEARTBEAT = 60
+# celery settings
+if IS_USE_CELERY:
+    INSTALLED_APPS += (
+        "django_celery_beat",
+        "django_celery_results",
+    )
+
+    # 用于替换默认的队列
+    if os.getenv("BK_BROKER_URL"):
+        BROKER_URL = os.getenv("BK_BROKER_URL")
+
+    # CELERY 并发数，默认为 2，是命令行-c参数指定的数目，可以通过环境变量或者 Procfile 设置
+    CELERYD_CONCURRENCY = os.getenv("BK_CELERYD_CONCURRENCY", 2)  # noqa
+    # celery beat 间隔时间，默认为 1，是命令行-B参数指定的数目，可以通过环境变量或者 Procfile 设置
+    CELERY_ENABLE_UTC = True
+    CELERY_TIMEZONE = TIME_ZONE
+    CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+    # 允许传递对象给任务
+    CELERY_TASK_SERIALIZER = "json"
+    CELERY_ACCEPT_CONTENT = ["json"]
+    # CELERY 任务的文件路径，即包含有 @task 装饰器的函数文件
+    CELERY_IMPORTS = []
+
+########################################################################################################################
+# 加载第三方应用配置
+SETTINGS_FOR_MERGE = ["INSTALLED_APPS", "MIDDLEWARE"]
+for module_name in [
+    "bk_resource",
+    "csrf",
+    "cors",
+]:
+    locals().update(
+        load_settings(
+            f"config.{module_name}",
+            settings_for_merge={_setting: globals()[_setting] for _setting in SETTINGS_FOR_MERGE},
+            raise_exception=True,
+        )
+    )
+
+"""
+以下为框架代码 请勿修改
+"""
+# remove disabled apps
+if locals().get("DISABLED_APPS"):
+    INSTALLED_APPS = locals().get("INSTALLED_APPS", [])
+    DISABLED_APPS = locals().get("DISABLED_APPS", [])
+
+    INSTALLED_APPS = [_app for _app in INSTALLED_APPS if _app not in DISABLED_APPS]
+
+    _keys = (
+        "AUTHENTICATION_BACKENDS",
+        "DATABASE_ROUTERS",
+        "FILE_UPLOAD_HANDLERS",
+        "MIDDLEWARE",
+        "PASSWORD_HASHERS",
+        "TEMPLATE_LOADERS",
+        "STATICFILES_FINDERS",
+        "TEMPLATE_CONTEXT_PROCESSORS",
+    )
+
+    import itertools
+
+    for _app, _key in itertools.product(DISABLED_APPS, _keys):
+        if locals().get(_key) is None:
+            continue
+        locals()[_key] = tuple([_item for _item in locals()[_key] if not _item.startswith(_app + ".")])

@@ -1,3 +1,4 @@
+import os
 import uuid
 from datetime import datetime
 from importlib import import_module
@@ -17,6 +18,10 @@ from rest_framework.settings import api_settings
 from core.constants import LEN_NORMAL
 from core.utils.process import is_backend
 from core.utils.request_provider import get_local_request
+
+
+def get_backend_username():
+    return os.getenv("BKAPP_PLATFORM_AUTH_ACCESS_USERNAME", "admin")
 
 
 def get_non_request_username():

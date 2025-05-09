@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import sys
 
 import environ
+
+from core.load_settings import load_settings
 
 # 读取环境变量文件
 # 配置优先级 环境变量 -> .env文件 -> settings.py
@@ -48,7 +51,61 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # 平台错误码前缀
 PLATFORM_CODE = 00
 
+SETTINGS_FOR_MERGE = ["INSTALLED_APPS", "MIDDLEWARE"]
+MIDDLEWARE = []
+INSTALLED_APPS = []
+
 try:
     from config.celery_config import app  # noqa
 except ImportError:
     pass
+
+########################################################################################################################
+# 多模块配置
+base_dir = os.path.dirname(__file__)
+DEPLOY_ALL_MODULE = "__all__"
+DEPLOY_MODULE_ENV_KEY = "BKAPP_DEPLOY_MODULE"
+MODULE_PATH = "modules"
+DEFAULT_DEPLOY_MODULE = "default"
+# 获取所有的模块
+ALL_MODULES = [
+    _path
+    for _path in os.listdir(os.path.join(base_dir, MODULE_PATH))
+    if not _path.startswith("_") and os.path.isdir(os.path.join(base_dir, MODULE_PATH, _path))
+]
+# 默认运行所有模块，根据环境变量运行
+if os.getenv(DEPLOY_MODULE_ENV_KEY) == DEPLOY_ALL_MODULE:
+    DEPLOY_MODULE = ALL_MODULES
+else:
+    DEPLOY_MODULE = [
+        _module
+        for _module in os.getenv(DEPLOY_MODULE_ENV_KEY, DEFAULT_DEPLOY_MODULE).split(",")
+        if _module in ALL_MODULES
+    ]
+
+########################################################################################################################
+# 添加运行 Path
+sys.path.append(os.path.join(base_dir, "apps"))
+sys.path.append(os.path.join(base_dir, MODULE_PATH))
+for _module in DEPLOY_MODULE:
+    sys.path.append(os.path.join(base_dir, f"{MODULE_PATH}/{_module}"))
+
+
+########################################################################################################################
+# 根据环境变量加载对应的配置文件
+DJANGO_CONF_MODULE = "config.{env}".format(env=ENVIRONMENT)
+locals().update(
+    load_settings(
+        DJANGO_CONF_MODULE, settings_for_merge={_setting: globals()[_setting] for _setting in SETTINGS_FOR_MERGE}
+    )
+)
+
+########################################################################################################################
+# 加载多模块的配置文件
+for _module in DEPLOY_MODULE:
+    module_path = f"{MODULE_PATH}.{_module}.settings"
+    locals().update(
+        load_settings(
+            module_path, settings_for_merge={_setting: globals()[_setting] for _setting in SETTINGS_FOR_MERGE}
+        )
+    )

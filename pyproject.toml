@@ -1,24 +1,18 @@
 [tool.black]
 line-length = 120
-target_version = ['py36', 'py37', 'py38', 'py39', 'py310']
 include = '\.pyi?$'
 skip-string-normalization = 'true'
 exclude = '''
 /(
-  \.eggs
-  | \.git
+    \.git
   | \.hg
   | \.mypy_cache
-  | _build
-  | \.ypy-cov
   | \.tox
-  | \._black
   | \.venv
   | _build
   | buck-out
   | build
   | dist
-  | migrations
 )/
 '''
 
@@ -31,6 +25,33 @@ use_parentheses = 'true'
 line_length = 120
 skip_glob = ["*/node_modules/**", "*/migrations/**"]
 
+[tool.flake8]
+ignore = "C901,E203,W503,F405,E402"
+max-line-length = 120
+max-complexity = 25
+format = "pylint"
+exclude = [
+    '*migrations*',
+    '.tox',
+    '*.pyc',
+    '.git',
+    '__pycache__',
+    'docs',
+    'old',
+    'build',
+    'dist',
+    '*.egg-info',
+    '.cache',
+    '.eggs',
+    'env',
+    'ebpack',
+    'cripts/*',
+    'vam/*',
+    'onf/*',
+    'larm_backends/tests/*',
+    '/parsetab.py'
+]
+
 [tool.setuptools.packages.find]
 exclude = ["tests*", "apps/tests*"]
 
@@ -40,8 +61,12 @@ dependencies = {file=["requirements.txt"]}
 [tool.setuptools.dynamic.optional-dependencies]
 dev = {file=["requirements-dev.txt"]}
 
-
 [tool.pdm]
+distribution = false
+
+[tool.pdm.build]
+includes = []
+
 [project]
 name = "xTool"
 version = "0.2.0"
@@ -179,6 +204,33 @@ dependencies = [
     "prettytable>=3.12.0",
     "better-exceptions>=0.3.3",
 ]
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pre-commit<4.0.0,>=3.7.1",
+    "isort<6.0.0,>=5.13.2",
+    "black<25.0.0,>=24.4.2",
+    "pyproject-flake8<8.0.0,>=7.0.0",
+    "beautifulsoup4<5.0.0,>=4.12.3",
+    "coverage<8.0.0,>=7.5.4",
+    "mock<6.0.0,>=5.1.0",
+    "pytest<9.0.0,>=8.2.2",
+    "pytest-django<5.0.0,>=4.8.0",
+    "flake8==7.0.0",
+    "pytest-cov<6.0.0,>=5.0.0",
+    "pytest-dotenv<1.0.0,>=0.5.2",
+    "pytest-env<2.0.0,>=1.1.3",
+    "pytest-html<5.0.0,>=4.1.1",
+    "pytest-mock<4.0.0,>=3.14.0",
+    "pytest-xdist<4.0.0,>=3.6.1",
+    "python-dotenv<2.0.0,>=1.0.1",
+    "mockredispy<3.0.0,>=2.9.3",
+    "xmlrunner<2.0.0,>=1.7.7",
+    "openpyxl<4.0.0,>=3.1.4",
+    "et-xmlfile<2.0.0,>=1.1.0",
+    "pytest-helpers-namespace<2022.0.0,>=2021.12.29",
+]
+
 keywords = ["xTool"]
 
 [project.urls]

@@ -14,8 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework_simplejwt.views import (
@@ -63,3 +64,7 @@ urlpatterns = [
     # 仅用于开发，上线需关闭
     path("api/token/", LoginTokenView.as_view()),
 ]
+
+# 加载模块
+for _module in settings.DEPLOY_MODULE:
+    urlpatterns.append(path("", include(f"{settings.MODULE_PATH}.{_module}.urls")))
