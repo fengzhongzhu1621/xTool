@@ -3,7 +3,7 @@ import time
 from typing import Optional
 
 from xTool.cache.cachetools import hash_key, typed_key
-from xTool.misc import md5
+from xTool.codec import md5
 
 
 class ShareLockError(Exception):

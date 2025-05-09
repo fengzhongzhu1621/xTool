@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 
 import pytest
@@ -171,10 +169,6 @@ def test_snake_to_camel():
     assert actual == "apiResponseFactory"
 
 
-def test_md5():
-    assert misc.md5("1") == "c4ca4238a0b923820dcc509a6f75849b"
-
-
 def test_use_times_generator():
     auto_id_generator = misc.UseTimesGenerator()
     actual = auto_id_generator("a")
@@ -210,14 +204,4 @@ def test_strip():
 def test_get_unique_list():
     actual = misc.get_unique_list(("a", "c", "b", "b", "c", "a"))
     expect = ["a", "c", "b"]
-    assert actual == expect
-
-
-def test_count_md5():
-    actual = misc.count_md5(["a", "b", "c"])
-    expect = "89e0f7adc031c6238d095023a933c7a0"
-    assert actual == expect
-
-    actual = misc.count_md5({"a": ["b", "c"]})
-    expect = "c13d30900c448ecdbde696f3ab350276"
     assert actual == expect

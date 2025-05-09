@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _lazy
 from apps.account.models import Role
 from core.constants import LEN_LONG, LEN_NORMAL, LEN_SHORT, Gender, UserType
 from core.models import SoftDeleteModel, SoftDeleteModelManager
-from xTool.misc import md5
+from xTool.codec import md5
 
 
 class CustomUserManager(SoftDeleteModelManager, UserManager):

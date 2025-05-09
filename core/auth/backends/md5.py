@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
-from xTool.misc import md5
+from xTool.codec import md5
 
 logger = logging.getLogger(__name__)
 UserModel = get_user_model()

@@ -1,9 +1,9 @@
 import functools
 import time
-from typing import Callable, Any
+import zlib
+from typing import Any, Callable
 
 import orjson as json
-import zlib
 from django.core.cache import cache, caches
 from django.utils.encoding import force_bytes
 from django.utils.translation import gettext
@@ -13,7 +13,7 @@ from bk_resource.settings import bk_resource_settings
 from bk_resource.utils.local import local
 from bk_resource.utils.logger import logger
 from bk_resource.utils.request import get_request_username
-from xTool.misc import count_md5
+from xTool.codec import count_md5
 
 try:
     mem_cache = caches["locmem"]
@@ -231,7 +231,7 @@ class UsingCache:
 using_cache = UsingCache
 
 
-class CacheTypeItem(object):
+class CacheTypeItem:
     """
     缓存类型定义
     """
@@ -252,7 +252,7 @@ class CacheTypeItem(object):
         return CacheTypeItem(self.key, timeout, self.user_related, self.label)
 
 
-class InstanceCache(object):
+class InstanceCache:
     _instance = Empty()
 
     @classmethod

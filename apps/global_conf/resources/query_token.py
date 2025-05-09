@@ -3,7 +3,8 @@ from django.utils.translation import gettext_lazy as _lazy
 from apps.global_conf.serializers import GenerateQueryTokenSerializer, GetQueryDataSerializer
 from core.cache import CacheKey
 from core.constants import TimeEnum
-from xTool.misc import count_md5
+from xTool.codec import count_md5
+
 from .base import GlobalConfBaseResource
 
 

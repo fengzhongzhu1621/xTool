@@ -5,7 +5,7 @@ import orjson as json
 from django.core.cache import cache
 
 from core.constants import TimeEnum
-from xTool.misc import count_md5
+from xTool.codec import count_md5
 
 
 class CacheKey(abc.ABC):
