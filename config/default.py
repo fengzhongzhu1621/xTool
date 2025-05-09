@@ -390,23 +390,6 @@ DEBUG_RETURN_EXCEPTION = False
 COMPONENT_PATH = []
 
 ########################################################################################################################
-# apigw
-APIGW_ENABLED = bool(strtobool(os.getenv("BKAPP_APIGW_ENABLED", "False")))
-BK_APIGW_NAME = "bksecapp"
-APIGW_DEFINITION_SETTINGS = {
-    # 网关名称
-    "BK_APIGW_NAME": BK_APIGW_NAME,
-    # 网关所有者
-    "MAINTAINERS": ["admin"],
-    # apigw_definition 模板默认输出位置
-    "GENERATE_APIGW_DEFINITION_TARGET_DIR": os.path.join("support-files", "apigw"),
-    # api_resources 模板默认输出位置
-    "GENERATE_API_RESOURCES_TARGET_DIR": os.path.join("support-files", "apigw"),
-}
-# 文件目录
-BK_APIGW_RESOURCE_DOCS_BASE_DIR = os.path.join("support-files", "apigw", "docs")
-
-########################################################################################################################
 # 数据库
 DATABASES = {"default": get_default_database_config_dict(locals())}
 DB_BATCH_SIZE = int(os.getenv("BKAPP_DB_BATCH_SIZE", 1000))
