@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import arrow
+from dateutil import parser
 from dateutil.tz import tzutc
 from django.conf import settings
 from django.utils import timezone
@@ -17,6 +18,7 @@ __all__ = [
     "format_date_string",
     "format_request_in_param",
     "strftime_local",
+    "has_timezone",
 ]
 
 
@@ -93,3 +95,12 @@ def strftime_local(aware_time, fmt="%Y-%m-%d %H:%M:%S"):
         # translate to time in local timezone
         aware_time = timezone.localtime(aware_time)
     return aware_time.strftime(fmt)
+
+
+def has_timezone(time_str: str) -> bool:
+    """判断时间字符串是否包含时区 ."""
+    try:
+        dt = parser.parse(time_str)
+        return dt.tzinfo is not None
+    except (ValueError, OverflowError):
+        return False
