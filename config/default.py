@@ -204,7 +204,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # noqa
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "core.utils.exception.custom_exception_handler",
+    "EXCEPTION_HANDLER": "core.drf.exception.custom_exception_handler",
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "core.drf.pagination.CustomPageNumberWithColumnPagination",
     "PAGE_SIZE": 10,

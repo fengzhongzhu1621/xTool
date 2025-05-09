@@ -1,16 +1,20 @@
 from typing import Dict
 
 import orjson as json
-from bk_resource.exceptions import ValidateException
 from django.db import models
+from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError as DrfValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
 from rest_framework.serializers import ModelSerializer as DrfModelSerializer
-from rest_framework.settings import api_settings
 from rest_framework.utils import model_meta
 
+from bk_resource.exceptions import ValidateException
+from bk_resource.tools import format_serializer_errors as bk_resource_format_serializer_errors
+from bk_resource.utils.logger import logger
+from core.constants import LEN_SHORT
+from core.drf.format import format_serializer_errors
 from core.drf.serializer_fields import CustomDateTimeField
 from core.exceptions import ParamValidationError
 from core.models import MultiStrSplitCharField, MultiStrSplitTextField
@@ -26,11 +30,44 @@ class FilterConditionSerializer(serializers.Serializer):
     rules = ContentSerializer(label=_lazy("规则"), required=True, many=True)
 
 
-class GeneralSerializer(DrfModelSerializer):
+class GeneralSerializer(serializers.Serializer):
     """
     自定义ModelSerializer序列化器
     """
 
+    def is_valid(self, raise_exception=True):
+        try:
+            super().is_valid(raise_exception)
+        # 捕获原生的参数校验异常，抛出SaaS封装的参数校验异常
+        except ValidationError:
+            if self._errors and raise_exception:
+                err_message = ""
+                error = format_serializer_errors(self)
+                if isinstance(error, dict):
+                    for key, value in error.items():
+                        # 只显示一种错误信息
+                        err_message = f"{key}: {value}"
+                        break
+                else:
+                    err_message = str(error)
+                msg = _("request_data=%s, 请求参数格式错误：%s") % (
+                    self.initial_data,
+                    bk_resource_format_serializer_errors(self),
+                )
+                logger.error(msg)
+                raise ValidateException(err_message)
+        except ParamValidationError as exc_info:
+            args = exc_info.args[0]
+            if isinstance(args, tuple) and len(args) == 2:
+                err = json.loads(args[1])
+                if err and isinstance(err, dict):
+                    raise ValidateException(list(err.values())[0])
+            raise
+
+        return not bool(self._errors)
+
+
+class ModelSerializer(DrfModelSerializer):
     def __init__(self, instance=None, data=empty, **kwargs):
         self.serializer_field_mapping[models.DateTimeField] = CustomDateTimeField
         self.serializer_field_mapping[MultiStrSplitCharField] = serializers.ListField
@@ -38,18 +75,21 @@ class GeneralSerializer(DrfModelSerializer):
         super().__init__(instance=instance, data=data, **kwargs)
 
     def is_valid(self, raise_exception=False):
-        """
-        参数校验 返回为处理后的异常信息
-        """
         try:
             super().is_valid(raise_exception)
         # 捕获原生的参数校验异常，抛出SaaS封装的参数校验异常
-        except DrfValidationError:
+        except ValidationError:
             if self._errors and raise_exception:
-                errors = format_serializer_errors(self.errors, self.fields, self.initial_data)
-                raise ParamValidationError(
-                    errors,
+                raise ValidateException(
+                    format_serializer_errors(self),
                 )
+        except ParamValidationError as exc_info:
+            args = exc_info.args[0]
+            if isinstance(args, tuple) and len(args) == 2:
+                err = json.loads(args[1])
+                if err and isinstance(err, dict):
+                    raise ValidateException(list(err.values())[0])
+            raise
 
         return not bool(self._errors)
 
@@ -99,33 +139,6 @@ class GeneralSerializer(DrfModelSerializer):
         model = None
 
 
-class ModelSerializer(GeneralSerializer):
-    def __init__(self, instance=None, data=empty, **kwargs):
-        self.serializer_field_mapping[models.DateTimeField] = CustomDateTimeField
-        self.serializer_field_mapping[MultiStrSplitCharField] = serializers.ListField
-        self.serializer_field_mapping[MultiStrSplitTextField] = serializers.ListField
-        super().__init__(instance=instance, data=data, **kwargs)
-
-    def is_valid(self, raise_exception=False):
-        try:
-            super().is_valid(raise_exception)
-        # 捕获原生的参数校验异常，抛出SaaS封装的参数校验异常
-        except DrfValidationError:
-            if self._errors and raise_exception:
-                raise ValidateException(
-                    format_serializer_errors(self),
-                )
-        except ParamValidationError as exc_info:
-            args = exc_info.args[0]
-            if isinstance(args, tuple) and len(args) == 2:
-                err = json.loads(args[1])
-                if err and isinstance(err, dict):
-                    raise ValidateException(list(err.values())[0])
-            raise
-
-        return not bool(self._errors)
-
-
 class PageSerializer(serializers.Serializer):
     """
     分页序列化器
@@ -133,6 +146,12 @@ class PageSerializer(serializers.Serializer):
 
     page = serializers.IntegerField(help_text=_lazy("页数"))
     page_size = serializers.IntegerField(help_text=_lazy("每页数量"))
+    ordering = serializers.CharField(label=_lazy("排序字段"), max_length=LEN_SHORT, allow_null=True, default=None)
+
+
+class PageConditionSerializer(serializers.Serializer):
+    start = serializers.IntegerField(label=_lazy("记录开始位置"), required=True, min_value=0)
+    limit = serializers.IntegerField(label=_lazy("每页限制条数，最大500"), required=True, min_value=1, max_value=500)
 
 
 class SearchSerializer(serializers.Serializer):
@@ -172,88 +191,3 @@ class PostFilterSerializer(serializers.Serializer):
     conditions = serializers.ListField(
         help_text=_lazy("查询条件"), child=ConditionSerializer(), required=False, default=[]
     )
-
-
-def format_serializer_errors(  # pylint: disable=too-many-locals,too-many-branches
-    errors, fields, params, prefix="", return_all_errors=True
-):
-    """
-    格式化序列化器的错误，对前端显示更为友好
-    :param errors: serializer_errors
-    :param fields: 校验的字段
-    :param params: 参数
-    :param prefix: 错误消息前缀
-    :param return_all_errors: 是否返回所有错误消息
-    :return:
-    """
-    message = {}
-    cn_message = {}
-    for key, field_errors in list(errors.items()):  # pylint: disable=too-many-nested-blocks
-        sub_message = []
-        try:
-            label = fields[key].label
-        except (KeyError, AttributeError):
-            label = key
-
-        if key == api_settings.NON_FIELD_ERRORS_KEY:
-            sub_message.append(";".join(field_errors))
-        elif key not in fields:
-            sub_message.append(json.dumps(field_errors, ensure_ascii=False))
-        else:
-            field = fields[key]
-            if (
-                hasattr(field, "child")
-                and isinstance(field_errors, list)
-                and len(field_errors) > 0
-                and not isinstance(field_errors[0], str)
-            ):
-                for index, sub_errors in enumerate(field_errors):
-                    if sub_errors:
-                        sub_format = format_serializer_errors(sub_errors, field.child.fields, params, prefix=prefix)
-                        if not return_all_errors:
-                            return f"{label}: {sub_format}"
-                        temp_message = f"{prefix}第{index + 1}项:"
-                        sub_message.append(
-                            temp_message + sub_format[0] if isinstance(sub_format, tuple) else sub_format
-                        )
-            else:
-                if isinstance(field_errors, dict):
-                    if hasattr(field, "child"):
-                        sub_format = format_serializer_errors(field_errors, field.child.fields, params, prefix=prefix)
-                    else:
-                        sub_format = format_serializer_errors(field_errors, field.fields, params, prefix=prefix)
-                    if not return_all_errors:
-                        return f"{label}: {sub_format}"
-                    sub_message.append(sub_format)
-                elif isinstance(field_errors, list):
-                    for index, error in enumerate(field_errors):
-                        error = error.format(**{key: params.get(key, "")})
-                        if len(field_errors) > 1:
-                            sub_message.append("{index}.{error}".format(index=index + 1, error=error))
-                        else:
-                            sub_message.append("{error}".format(error=error))
-                        if not return_all_errors:
-                            sub_message = ",".join(sub_message)
-                            return f"{label}: {sub_message}"
-        cn_message[str(label)] = ",".join(
-            [str(message[1]) if isinstance(message, tuple) else str(message) for message in sub_message]
-        )
-        message[key] = sub_message
-
-    message = json.dumps(message, ensure_ascii=False)
-    cn_message = json.dumps(cn_message, ensure_ascii=False)
-    return message, cn_message
-
-
-def custom_params_valid(serializer, params, instance=None, many=False, partial=False):
-    """序列化器自定义数据校验"""
-    _serializer = serializer(data=params, many=many, instance=instance, partial=partial)
-    try:
-        _serializer.is_valid(raise_exception=True)
-    except serializers.ValidationError:
-        msg_tuple = format_serializer_errors(_serializer.errors, _serializer.fields, params)
-        raise ParamValidationError(msg_tuple)
-    if many:
-        return list(_serializer.validated_data)
-
-    return dict(_serializer.validated_data)
