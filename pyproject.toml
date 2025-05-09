@@ -148,7 +148,6 @@ dependencies = [
     "beautifulsoup4<5.0.0,>=4.12.3",
     "ipaddress<2.0.0,>=1.0.23",
     "trio<1.0.0,>=0.25.1",
-    "gunicorn<23.0.0,>=22.0.0",
     "httptools<1.0.0,>=0.6.1",
     "multidict<7.0.0,>=6.0.5",
     "cryptography>=43.0.3",
@@ -205,6 +204,7 @@ dependencies = [
     "better-exceptions>=0.3.3",
     "blueapps>=4.15.7",
     "raven>=6.10.0",
+    "gunicorn>=23.0.0",
 ]
 
 [tool.pdm.dev-dependencies]
