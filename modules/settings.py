@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from core.settings import load_settings
+from core.load_settings import load_settings
 
 INSTALLED_APPS = ()
 
