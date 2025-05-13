@@ -1,28 +1,12 @@
-import functools
 import json
 import os
 from typing import Any, List
 
-import pytest
 from django.conf import settings
-from django.test import override_settings
 
 
 def format_serializer_data(serializer_data):
     return json.loads(json.dumps(serializer_data))
-
-
-def mock_api_test(func):
-    """单元测试装饰器，忽略IAM验证 ."""
-
-    @pytest.mark.django_db
-    @override_settings(MIDDLEWARE=("blueapps.contrib.test.override_middleware.OverrideMiddleware",))
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        return result
-
-    return wrapper
 
 
 def assert_equal(actual, expect):

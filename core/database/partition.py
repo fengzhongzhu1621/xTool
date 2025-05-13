@@ -1,10 +1,11 @@
 import calendar
 from datetime import timedelta
 
-from blueapps.utils.logger import logger
 from django.db import connection
 from django.db.utils import OperationalError
 from django.utils import timezone
+
+from apps.logger import logger
 
 __all__ = ["create_month_partitions", "delete_month_partitions"]
 

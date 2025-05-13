@@ -5,7 +5,6 @@ import traceback
 from json.decoder import JSONDecodeError
 from typing import Dict
 
-from blueapps.utils.logger import logger
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from rest_framework import status
@@ -14,6 +13,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
+from apps.logger import logger
 from core.exceptions import BlueException
 from core.iam.exceptions import PermissionDeniedError
 

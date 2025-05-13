@@ -6,7 +6,7 @@ from django.contrib.staticfiles.finders import BaseFinder
 
 from bk_resource.management.exceptions import ErrorSettingsWithResourceDirs
 from bk_resource.settings import bk_resource_settings
-from xTool.file_io.path import path_to_dotted
+from xTool.file.path import path_to_dotted
 
 API_DIR = bk_resource_settings.DEFAULT_API_DIR
 RESOURCE_DIRS = bk_resource_settings.DEFAULT_RESOURCE_DIRS

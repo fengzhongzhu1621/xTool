@@ -60,7 +60,7 @@ class BkApiResource(APIResource, abc.ABC):
             return params
 
         # 前端应用, _request，用于并发请求的场景
-        from blueapps.utils.request_provider import get_local_request
+        from core.utils.request_provider import get_local_request
 
         # 获取请求
         _request = params.pop("_request", None)
@@ -109,7 +109,7 @@ class BkApiResource(APIResource, abc.ABC):
         构造Header
         """
 
-        from blueapps.utils.request_provider import get_local_request
+        from core.utils.request_provider import get_local_request
 
         # 初始化
         headers = {bk_resource_settings.REQUEST_LANGUGAE_HEADER_KEY: settings.LANGUAGE_CODE}

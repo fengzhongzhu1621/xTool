@@ -69,8 +69,7 @@ def mkdirs(path, mode):
 
 
 def mkdirs2(filename: Union[os.PathLike, str], /, *, mode: int = 0o777) -> None:
-    """Recursively create directories up to the path of ``filename``
-    as needed."""
+    """Recursively create directories up to the path of ``filename`` as needed."""
     dirname = os.path.dirname(filename)
     if not dirname:
         return

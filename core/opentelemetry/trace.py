@@ -1,7 +1,6 @@
 import json
 from contextlib import contextmanager
 
-from blueapps.utils.logger import logger
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from opentelemetry import trace
@@ -10,6 +9,7 @@ from opentelemetry.trace import Status, StatusCode, get_current_span
 from opentelemetry.trace.span import Span
 from rest_framework.response import Response
 
+from apps.logger import logger
 from bk_resource import BkApiResource as BkApiResourceBase
 from bk_resource.exceptions import APIRequestError
 from bk_resource.settings import bk_resource_settings

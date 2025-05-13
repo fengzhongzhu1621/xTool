@@ -1,10 +1,11 @@
 import json
 
-from blueapps.core.exceptions import ParamValidationError
-from blueapps.utils.logger import logger
 from django.utils.translation import gettext
 from rest_framework import serializers
 from rest_framework.settings import api_settings
+
+from apps.logger import logger
+from core.exceptions import ParamValidationError
 
 
 def format_serializer_errors(serializer):
