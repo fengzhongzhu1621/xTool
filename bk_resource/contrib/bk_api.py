@@ -9,7 +9,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from bk_resource.contrib.api import APIResource
 from bk_resource.exceptions import IAMNoPermission, PlatformAuthParamsNotExist
 from bk_resource.settings import bk_resource_settings
-from core.utils.process import is_backend
+from core.utils import is_backend
 
 
 class BkApiResource(APIResource, abc.ABC):

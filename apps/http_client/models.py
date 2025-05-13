@@ -3,7 +3,6 @@ from typing import Dict
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
-from apps.core.constants import RequestMethod
 from core.constants import (
     EMPTY_STRING,
     LEN_LONG,
@@ -11,6 +10,7 @@ from core.constants import (
     LEN_SHORT,
     LEN_X_LONG,
     LEN_XX_LONG,
+    RequestMethod,
 )
 from core.models import SoftDeleteModel
 

@@ -2,7 +2,7 @@ import logging
 import sys
 
 import pymysql
-from blueapps.conf.log import get_logging_config_dict
+from conf.log import get_logging_config_dict
 
 pymysql.install_as_MySQLdb()
 

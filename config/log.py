@@ -23,7 +23,7 @@ def get_logging_config_dict(settings_module):
             "datefmt": "%Y-%m-%d %H:%M:%S",
         }
     else:
-        log_dir = settings_module.get("LOG_DIR_PREFIX", "/app/v3logs/")
+        log_dir = settings_module.get("LOG_DIR_PREFIX", "")
         rand_str = "".join(random.sample(string.ascii_letters + string.digits, 4))
         log_name_prefix = "{}-{}".format(os.getenv("BKPAAS_PROCESS_TYPE"), rand_str)
 

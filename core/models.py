@@ -16,8 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.settings import api_settings
 
 from core.constants import LEN_NORMAL
-from core.utils.process import is_backend
-from core.utils.request_provider import get_local_request
+from core.utils import get_local_request, is_backend
 
 
 def get_backend_username():
