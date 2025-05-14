@@ -124,7 +124,6 @@ dependencies = [
     "pypinyin<1.0.0,>=0.51.0",
     "ftfy<7.0.0,>=6.2.0",
     "cachetools<6.0.0,>=5.3.3",
-    "ujson==5.4.0",
     "jsondiff<3.0.0,>=2.0.0",
     "openpyxl<4.0.0,>=3.1.2",
     "ipy<2.0,>=1.1",
@@ -204,6 +203,8 @@ dependencies = [
     "gunicorn>=23.0.0",
     "hachoir>=3.3.0",
     "python-json-logger>=3.3.0",
+    "sqlalchemy>=2.0.40",
+    "ujson>=5.10.0",
 ]
 
 [dependency-groups]
