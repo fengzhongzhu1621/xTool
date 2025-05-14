@@ -14,8 +14,32 @@ import os
 import sys
 
 import environ
+import pymysql
+import urllib3
+from django.db.backends.mysql.features import DatabaseFeatures
+from django.utils.functional import cached_property
 
 from core.load_settings import load_settings
+
+# Patch the SSL module for compatibility with legacy CA credentials.
+# https://stackoverflow.com/questions/72479812/how-to-change-tweak-python-3-10-default-ssl-settings-for-requests-sslv3-alert
+urllib3.util.ssl_.DEFAULT_CIPHERS = "ALL:@SECLEVEL=1"
+
+
+class PatchFeatures:
+    @cached_property
+    def minimum_database_version(self):
+        if self.connection.mysql_is_mariadb:
+            return 10, 4
+        return 5, 6
+
+
+# Django 4.2+ 不再官方支持 Mysql 5.7，但目前 Django 仅是对 5.7 做了软性的不兼容改动，
+# 在没有使用 8.0 特异的功能时，对 5.7 版本的使用无影响，为兼容存量的 Mysql 5.7 DB 做此 Patch
+DatabaseFeatures.minimum_database_version = PatchFeatures.minimum_database_version  # noqa
+
+pymysql.install_as_MySQLdb()
+
 
 # 读取环境变量文件
 # 配置优先级 环境变量 -> .env文件 -> settings.py

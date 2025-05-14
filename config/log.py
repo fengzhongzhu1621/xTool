@@ -12,7 +12,7 @@ def get_logging_config_dict(settings_module):
     log_level = settings_module.get("LOG_LEVEL", "INFO")
     is_local = settings_module.get("IS_LOCAL", False)
     if is_local:
-        log_dir = os.path.join(BASE_DIR, "logs", APP_CODE)
+        log_dir = os.path.join(BASE_DIR, "logs")
         log_name_prefix = os.getenv("BKPAAS_LOG_NAME_PREFIX", APP_CODE)
         logging_format = {
             "format": (
@@ -33,7 +33,10 @@ def get_logging_config_dict(settings_module):
                 "%(levelname)s %(asctime)s %(pathname)s %(lineno)d " "%(funcName)s %(process)d %(thread)d %(message)s"
             ),
         }
-    os.makedirs(log_dir, exist_ok=True)
+    try:
+        os.makedirs(log_dir)
+    except Exception:  # pylint: disable=broad-except
+        pass
 
     return {
         "version": 1,

@@ -1,10 +1,7 @@
 import logging
 import sys
 
-import pymysql
-from conf.log import get_logging_config_dict
-
-pymysql.install_as_MySQLdb()
+from config.log import get_logging_config_dict
 
 DEBUG_RETURN_EXCEPTION = True
 
