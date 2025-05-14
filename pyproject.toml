@@ -61,11 +61,23 @@ dependencies = {file=["requirements.txt"]}
 [tool.setuptools.dynamic.optional-dependencies]
 dev = {file=["requirements-dev.txt"]}
 
+
 [tool.pdm]
 distribution = false
 
 [tool.pdm.build]
 includes = []
+
+[tool.pdm.resolution]
+respect-source-order = true
+
+[[tool.pdm.source]]
+name = "tencent"
+url = "https://mirrors.tencent.com/pypi/simple/"
+
+# [[tool.pdm.source]]
+# name = "pypi"
+# url = "https://pypi.org/simple"
 
 [project]
 name = "xTool"
@@ -101,26 +113,12 @@ dependencies = [
     "django-celery-beat<3.0.0,>=2.7.0",
     "django-celery-results<3.0.0,>=2.5.1",
     "celery<6.0.0,>=5.4.0",
-    "django-versionlog<2.0.0,>=1.8.1",
     "django-mptt<1.0.0,>=0.16.0",
     "django-mptt-admin<3.0.0,>=2.6.2",
     "whitenoise<7.0.0,>=6.7.0",
     "protobuf>=5.0",
-    "opentelemetry-api<2.0.0,>=1.25.0",
-    "opentelemetry-sdk<2.0.0,>=1.25.0",
-    "opentelemetry-exporter-jaeger>=1.21.0",
-    "opentelemetry-exporter-otlp-proto-http<2.0.0,>=1.25.0",
-    "opentelemetry-semantic-conventions<1.0,>=0.46b0",
-    "opentelemetry-instrumentation-django<1.0,>=0.46b0",
-    "opentelemetry-instrumentation-elasticsearch<1.0,>=0.46b0",
-    "opentelemetry-instrumentation-dbapi<1.0,>=0.46b0",
-    "opentelemetry-instrumentation-redis<1.0,>=0.46b0",
-    "opentelemetry-instrumentation-requests<1.0,>=0.46b0",
-    "opentelemetry-instrumentation-celery<1.0,>=0.46b0",
-    "opentelemetry-instrumentation-logging<1.0,>=0.46b0",
     "django-prometheus<3.0.0,>=2.3.1",
     "bk-iam<2.0.0,>=1.3.6",
-    "bk-audit[opentelemetry]==1.2.3b0",
     "pypinyin<1.0.0,>=0.51.0",
     "ftfy<7.0.0,>=6.2.0",
     "cachetools<6.0.0,>=5.3.3",
@@ -193,7 +191,6 @@ dependencies = [
     "fire>=0.6.0",
     "tornado>=6.4.1",
     "airports-py>=1.0.1",
-    "pdm>=2.17.3",
     "aiocarbon>=0.15.3",
     "mako>=1.3.6",
     "pycryptodome>=3.21.0",
@@ -205,6 +202,7 @@ dependencies = [
     "python-json-logger>=3.3.0",
     "sqlalchemy>=2.0.40",
     "ujson>=5.10.0",
+    "django-versionlog>=1.8.1",
 ]
 
 [dependency-groups]
@@ -228,7 +226,6 @@ dev = [
     "pytest-xdist>=3.6.1",
     "python-dotenv>=1.0.1",
     "mockredispy>=2.9.3",
-    "xmlrunner>=1.7.7",
     "openpyxl>=3.1.5",
     "et-xmlfile>=2.0.0",
     "mypy<2.0.0,>=1.10.0",
@@ -246,16 +243,5 @@ build-backend = "pdm.backend"
 
 # 当设置为 true 时，PDM 在解析依赖时会优先按照 pyproject.toml 中声明的依赖源（sources）顺序来选择包版本。
 # PDM 会先检查第一个源（如自定义的 PyPI 镜像或私有仓库），如果找不到匹配的版本，再依次检查后续的源。
-[tool.pdm.resolution]
-respect-source-order = true
-
-[[tool.pdm.source]]
-name = "tencent"
-url = "https://mirrors.tencent.com/pypi/simple/"
-
-[[tool.pdm.source]]
-name = "pypi"
-url = "https://pypi.org/simple"
-
 [project.urls]
 repository = "https://github.com/fengzhongzhu1621/xTool"
