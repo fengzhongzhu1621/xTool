@@ -1,4 +1,4 @@
-from xTool.decorators.v_args import v_args, Decoratable, apply_visit_wrapper
+from xTool.decorators import Decoratable, apply_visit_wrapper, v_args
 
 
 class Transformer(Decoratable):

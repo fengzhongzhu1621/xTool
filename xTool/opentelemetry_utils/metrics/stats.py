@@ -8,7 +8,7 @@ from datetime import timedelta
 from functools import wraps
 from typing import Callable, Optional, Sequence, TypeVar, Union, cast
 
-from xTool.decorators.utils import safe_wraps
+from xTool.decorators import safe_wraps
 from xTool.exceptions import InvalidStatsNameException
 from xTool.plugin import PluginType, get_plugin_instance, register_plugin
 from xTool.time_utils.now import time_now

@@ -1,12 +1,13 @@
 import pytest
 
-from xTool.decorators.signal import Signal, receiver
+from xTool.decorators import receiver
 
 
 def test_connect_to_frozen_signal(signal):
     signal.freeze()
 
-    async def cb(): ...
+    async def cb():
+        pass
 
     with pytest.raises(RuntimeError):
         signal.connect(cb)

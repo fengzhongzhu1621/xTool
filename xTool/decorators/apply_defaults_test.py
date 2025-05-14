@@ -1,13 +1,8 @@
-# coding: utf-8
-
-from xTool.decorators.decorators import apply_defaults
-
-
-class Model(object):
+class Model:
     pass
 
 
-class BashOperator(object):
+class BashOperator:
     template_fields = ("bash_command", "env")
     template_ext = (
         ".sh",
@@ -53,10 +48,10 @@ def test_apply_defaults():
     bash_operator = BashOperator(bash_command="ls", *args, **kwargs)
     assert bash_operator.args == ()
     """{
-        'model': <test_apply_defaults.Model object at 0x027CA170>, 
-        'default_args': {'e': 5, 'env': 8}, 
-        'bash_command': 'ls', 
-        'params': {'g': 7, 'b': 22, 'c': 4}, 
+        'model': <test_apply_defaults.Model object at 0x027CA170>,
+        'default_args': {'e': 5, 'env': 8},
+        'bash_command': 'ls',
+        'params': {'g': 7, 'b': 22, 'c': 4},
         'env': 8}
     """
     kwargs = bash_operator.kwargs

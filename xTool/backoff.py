@@ -2,7 +2,7 @@ import asyncio
 from functools import wraps
 from typing import Callable, Optional, Type, TypeVar, Union
 
-from xTool.decorators.timeout import timeout
+from xTool.decorators import timeout
 
 Number = Union[int, float]
 T = TypeVar("T")
@@ -16,7 +16,7 @@ def asyncbackoff(
     *exc: Type[Exception],
     exceptions=(),
     max_tries: int = None,
-    giveup: Callable[[Exception], bool] = None
+    giveup: Callable[[Exception], bool] = None,
 ):
 
     exceptions = exc + tuple(exceptions)

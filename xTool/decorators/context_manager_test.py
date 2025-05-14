@@ -1,6 +1,6 @@
 import unittest
 
-from xTool.decorators.utils import CallableContextManager
+from xTool.decorators import CallableContextManager
 
 
 class A(CallableContextManager):
