@@ -63,6 +63,6 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 # 并且把 local_settings.py 加入版本管理忽略文件中
 try:
     # pylint: disable=wildcard-import
-    from config.local_settings import *  # noqa
+    from .local_settings import *  # noqa
 except ImportError:
     pass

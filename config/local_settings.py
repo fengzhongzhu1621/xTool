@@ -57,6 +57,8 @@ class SQLFilter(logging.Filter):
         return True
 
 
+IS_LOCAL = True
+
 # load logging settings
 LOG_TIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 LOGGING = get_logging_config_dict(locals())
@@ -89,8 +91,6 @@ DATABASES = {
         },
     },
 }
-
-IS_LOCAL = True
 
 OPEN_TELEMETRY_ENABLE_OTEL_METRICS = True
 OPEN_TELEMETRY_ENABLE_OTEL_TRACE = True

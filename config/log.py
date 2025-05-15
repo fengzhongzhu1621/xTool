@@ -33,10 +33,9 @@ def get_logging_config_dict(settings_module):
                 "%(levelname)s %(asctime)s %(pathname)s %(lineno)d " "%(funcName)s %(process)d %(thread)d %(message)s"
             ),
         }
-    try:
-        os.makedirs(log_dir)
-    except Exception:  # pylint: disable=broad-except
-        pass
+    if not log_dir:
+        raise ValueError("log_dir is empty! Please set LOG_DIR environment variable or configure it properly.")
+    os.makedirs(log_dir, exist_ok=True)
 
     return {
         "version": 1,
