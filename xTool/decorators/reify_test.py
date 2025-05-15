@@ -1,6 +1,6 @@
 import pytest
 
-from xTool.decorators.reify import reify_py
+from xTool.decorators import reify_py
 
 
 class ReifyMixin:

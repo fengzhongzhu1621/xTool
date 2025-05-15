@@ -16,6 +16,8 @@ from functools import wraps
 
 from xTool.exceptions import XToolException
 
+__all__ = ["apply_defaults"]
+
 
 def apply_defaults(func):
     """增加对参数的验证逻辑，如果在对象初始化时，参数不全会抛出异常
@@ -85,7 +87,7 @@ def apply_defaults(func):
         # 获得没有设置默认值的参数，抛出异常
         missing_args = list(non_optional_args - set(kwargs))
         if missing_args:
-            msg = "Argument {0} is required".format(missing_args)
+            msg = "Argument {} is required".format(missing_args)
             raise XToolException(msg)
 
         kwargs["params"] = dag_params
