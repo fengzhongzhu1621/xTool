@@ -5,15 +5,13 @@ import io
 import itertools
 import json
 import logging
-import os
 import random
-import re
 import subprocess
-import sys
 import traceback
 import warnings
 from contextlib import contextmanager
 from datetime import date, datetime
+
 
 try:
     from StringIO import StringIO
@@ -337,13 +335,6 @@ def format_exception_without_line_break(exc):
     """将异常对象转换为没有换行的字符串 ."""
     s = format_exception(exc)
     return s.replace("\n", "\\n")
-
-
-def make_int(value):
-    """将值转换为int类型 ."""
-    if value is not None and not isinstance(value, (int, float)):
-        return int(value)
-    return value
 
 
 def __deprecated__(s):

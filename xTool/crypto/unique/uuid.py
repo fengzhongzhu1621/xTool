@@ -18,6 +18,10 @@ def unique_id(prefix: str) -> str:
     return "{}{}".format(prefix, uuid.uuid4().hex)
 
 
+def generate_root_id():
+    return uuid.uuid1().hex[:14]
+
+
 class SequenceManager:
     """全局唯一ID生成器 ."""
 
