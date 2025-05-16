@@ -5,6 +5,8 @@ import os
 import json_log_formatter
 from django.conf import settings
 
+from core.utils import local
+
 
 class JSONLogFormatter(json_log_formatter.JSONFormatter):
     """
@@ -36,3 +38,9 @@ class JSONLogFormatter(json_log_formatter.JSONFormatter):
             extra["exc_info"] = self.formatException(record.exc_info)
 
         return extra
+
+
+class RequestIdFilter(logging.Filter):
+    def filter(self, record):
+        record.request_id = local.request_id
+        return True
