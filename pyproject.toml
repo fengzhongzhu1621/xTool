@@ -203,6 +203,7 @@ dependencies = [
     "sqlalchemy>=2.0.40",
     "ujson>=5.10.0",
     "django-versionlog>=1.8.1",
+    "ipython>=9.2.0",
 ]
 
 [dependency-groups]

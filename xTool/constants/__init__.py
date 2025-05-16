@@ -2,8 +2,7 @@ import os
 import platform
 import sys
 
-from xTool.algorithms.collections import ConstantDict
-
+from xTool.collections import ConstantDict
 from .field import *  # noqa
 from .number import *  # noqa
 from .queue import *  # noqa

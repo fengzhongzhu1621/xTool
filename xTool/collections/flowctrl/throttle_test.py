@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from xTool.utils.throttle import (
+from xTool.collections.flowctrl import (
     BoundedEmptySemaphore,
     GlobalThrottle,
     LocalThrottle,
@@ -11,13 +11,14 @@ from xTool.utils.throttle import (
 )
 
 
-def test_BoundedEmptySemaphore():
-    max_unused = 2
-    semaphore = BoundedEmptySemaphore(max_unused)
-    semaphore.release()
-    semaphore.release()
-    with pytest.raises(ValueError):
+class TestBoundedEmptySemaphore:
+    def test_semaphore(self):
+        max_unused = 2
+        semaphore = BoundedEmptySemaphore(max_unused)
         semaphore.release()
+        semaphore.release()
+        with pytest.raises(ValueError):
+            semaphore.release()
 
 
 def test_GlobalThrottle():

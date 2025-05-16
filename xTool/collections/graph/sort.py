@@ -19,7 +19,7 @@ def topological_sort(tasks):
     if not tasks:
         return tuple(graph_sorted)
 
-    # copy the the tasks so we leave it unmodified
+    # copy the tasks so we leave it unmodified
     graph_unsorted = tasks[:]
 
     # Run until the unsorted graph is empty.

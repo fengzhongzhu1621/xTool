@@ -1,8 +1,8 @@
 import os
 import unittest
+from collections import OrderedDict
 
-from xTool.utils.configuration import *
-
+from xTool.config.configuration import *
 
 # 获得配置文件路径
 config_file_path = os.path.join(os.path.dirname(__file__), "data", "default_config.cfg")

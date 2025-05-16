@@ -93,6 +93,7 @@ MIDDLEWARE = (
     "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "core.csrf.middleware.CSRFExemptMiddleware",
+    "core.csrf.middleware.DisableCSRFCheckMiddleware",
     "apps.account.middleware.ApiLoggingMiddleware",
 )
 

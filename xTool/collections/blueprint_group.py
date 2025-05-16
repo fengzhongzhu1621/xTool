@@ -1,5 +1,9 @@
 from collections.abc import MutableSequence
 
+__all__ = [
+    'BlueprintGroup',
+]
+
 
 class BlueprintGroup(MutableSequence):
     """

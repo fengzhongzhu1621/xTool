@@ -1,12 +1,34 @@
-# coding: utf-8
-
-from __future__ import absolute_import
-
-from builtins import object
-import time
 import threading
+import time
+from builtins import object
 
-from pyds.utils.threads import BoundedEmptySemaphore
+from xTool.compat import PY3
+
+if PY3:
+    from threading import BoundedSemaphore
+else:
+    from threading import _BoundedSemaphore as BoundedSemaphore
+
+
+__all__ = [
+    "BoundedEmptySemaphore",
+    "GlobalThrottle",
+    "LocalThrottle",
+    "throttle",
+]
+
+
+class BoundedEmptySemaphore(BoundedSemaphore):
+    """
+    A bounded semaphore that is initially empty.
+    """
+
+    def __init__(self, value=1):
+        super(BoundedEmptySemaphore, self).__init__(value)
+        # 如果从令牌桶算法算法角度出发，即令牌桶算法在初始化时使用完所有的令牌
+        # value：是令牌桶中初始的令牌数量
+        for i in range(value):
+            assert self.acquire(blocking=False)
 
 
 class GlobalThrottle(object):

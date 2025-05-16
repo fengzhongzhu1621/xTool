@@ -38,6 +38,8 @@ REDIS_CELERY_CONF = {
     "password": "",
 }
 
+MIDDLEWARE += ("pyinstrument.middleware.ProfilerMiddleware",)
+
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {

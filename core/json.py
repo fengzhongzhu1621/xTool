@@ -8,7 +8,7 @@ from django.utils.duration import duration_iso_string
 from django.utils.functional import Promise
 from django.utils.timezone import is_aware
 
-from core.utils.time_tools import strftime_local
+from core.utils import strftime_local
 from xTool.time_utils.convert import date_to_string
 
 
