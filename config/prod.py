@@ -9,6 +9,8 @@ LOG_LEVEL = "ERROR"
 
 DEBUG_RETURN_EXCEPTION = False
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # 正式环境数据库可以在这里配置
 # DATABASES.update(
 #     {

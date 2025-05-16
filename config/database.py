@@ -38,3 +38,6 @@ DATABASES["default"].setdefault("OPTIONS", {})["charset"] = "utf8mb4"
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# for django-dbconn-retry
+MAX_DBCONN_RETRY_TIMES = 3

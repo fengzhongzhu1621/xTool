@@ -1,3 +1,5 @@
+import os
+
 from config import BASE_DIR
 
 # TEMPLATES 是 Django 项目中的一个关键配置项，用于定义模板引擎及其相关设置。
@@ -26,7 +28,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # 项目级模板目录
-        "DIRS": [BASE_DIR / "static", BASE_DIR / "staticfiles"],
+        "DIRS": [os.path.join(BASE_DIR, "static"), os.path.join(BASE_DIR, "staticfiles")],
         # Django 首先会在 DIRS 中指定的目录中查找模板，如果未找到，则会在各个应用的 templates 目录中查找。
         # 在每个已安装应用的 templates 目录中查找模板文件。允许每个应用拥有自己的模板，并且 Django 会按照 INSTALLED_APPS 的顺序搜索这些模板。
         "APP_DIRS": True,

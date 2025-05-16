@@ -11,6 +11,9 @@ DEBUG_RETURN_EXCEPTION = False
 
 MIDDLEWARE += ("pyinstrument.middleware.ProfilerMiddleware",)
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
 # 正式环境数据库可以在这里配置
 # DATABASES.update(
 #     {

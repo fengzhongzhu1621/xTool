@@ -5,7 +5,7 @@ import re
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 
-from xTool.xss import check_script, html_escape, html_escape_name, url_escape
+from xTool.safe.xss import check_script, html_escape, html_escape_name, url_escape
 
 SITE_URL = settings.SITE_URL
 logger = logging.getLogger("app")

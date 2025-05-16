@@ -86,6 +86,7 @@ DATABASES = {
         "PASSWORD": "",
         "HOST": "localhost",
         "PORT": "3306",
+        "OPTIONS": {"init_command": "SET default_storage_engine=INNODB", "charset": "utf8mb4"},
         "TEST": {
             "name": "db_test_xtool",
             "CHARSET": "utf8mb4",

@@ -5,6 +5,9 @@ INSTALLED_APPS = [
     "bk_resource",
 ]
 
+# BkResource - Platform
+PLATFORM = os.getenv("BKPAAS_ENGINE_REGION")
+
 BKAPP_RESOURCE_DEBUG = strtobool(os.getenv("BKAPP_RESOURCE_DEBUG", "False"))
 
 BK_RESOURCE = {
