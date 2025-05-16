@@ -22,11 +22,13 @@ INSTALLED_APPS = (
     "apps.opentelemetry_instrument",
     "rest_framework",
     "django_dbconn_retry",
+    "drf_yasg",
+    # 一定要把debug_toolbar放在django.contrib.staticfiles后面
+    "debug_toolbar",
     # "bk_resource",
     "captcha",
     "channels",
     "apps.account",
-    "drf_yasg",
     "version_log",
     "core.drf_resource",
     # "apigw_manager.apigw",
@@ -53,9 +55,16 @@ INSTALLED_APPS = (
 
 ########################################################################################################################
 MIDDLEWARE = (
+    # 跨域中间件
+    "corsheaders.middleware.CorsMiddleware",
+    # 接口耗时调试工具
+    "pyinstrument.middleware.ProfilerMiddleware",
     "core.middleware.healthz.HealthCheckMiddleware",
+    # 分析页面、接口和SQL调用耗时调试工具
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     # 将请求对象注入到线程变量，方便根据 get_request() 方法获取
     "core.middleware.request_provider.RequestProvider",
+    # default
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -68,8 +77,6 @@ MIDDLEWARE = (
     # exception middleware
     "core.middleware.app_exception.AppExceptionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
-    # 跨域中间件
-    "corsheaders.middleware.CorsMiddleware",
     "core.csrf.middleware.CSRFExemptMiddleware",
     "core.csrf.middleware.DisableCSRFCheckMiddleware",
     "apps.account.middleware.ApiLoggingMiddleware",
@@ -135,6 +142,7 @@ for module_name in [
     "debug",
     "safety",
     "rest_framework",
+    "pyinstrument",
     "bk_resource",
     "cache",
     "queue",

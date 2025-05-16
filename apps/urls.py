@@ -68,3 +68,10 @@ urlpatterns = [
 # 加载模块
 for _module in settings.DEPLOY_MODULE:
     urlpatterns.append(path("", include(f"{settings.MODULE_PATH}.{_module}.urls")))
+
+if settings.DEBUG and settings.DEBUG_TOOL_BAR:
+    import debug_toolbar
+
+    urlpatterns = [
+        path("__debug__/", include(debug_toolbar.urls)),
+    ] + urlpatterns

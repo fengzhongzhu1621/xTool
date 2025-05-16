@@ -9,8 +9,6 @@ LOG_LEVEL = "ERROR"
 
 DEBUG_RETURN_EXCEPTION = False
 
-MIDDLEWARE += ("pyinstrument.middleware.ProfilerMiddleware",)
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 

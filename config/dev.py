@@ -20,6 +20,11 @@ BROKER_URL = "redis://localhost:6379/0"
 
 DEBUG = True
 
+try:
+    MIDDLEWARE = tuple(["pyinstrument.middleware.ProfilerMiddleware"] + list(MIDDLEWARE))
+except ImportError:
+    pass  # 如果中间件不存在，忽略
+
 # celery任务本地执行，方便测试和调试
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_ALWAYS_EAGER = True
@@ -37,8 +42,6 @@ REDIS_CELERY_CONF = {
     "db": 0,
     "password": "",
 }
-
-MIDDLEWARE += ("pyinstrument.middleware.ProfilerMiddleware",)
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
