@@ -235,6 +235,7 @@ dev = [
     "hypothesis<7.0.0,>=6.102.6",
     "mockafka-py<1.0.0,>=0.1.55",
     "pytest-asyncio>=0.23.7",
+    "line-profiler>=4.2.0",
 ]
 fast = [
     "uvloop",

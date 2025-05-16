@@ -26,7 +26,11 @@ replication_redis_cache = {
 single_redis_cache = {
     "BACKEND": "django_redis.cache.RedisCache",
     "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
-    "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient", "PASSWORD": REDIS_PASSWORD},
+    "OPTIONS": {
+        "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        "SERIALIZER": "core.json.RedisJSONSerializer",
+        "PASSWORD": REDIS_PASSWORD,
+    },
     "KEY_PREFIX": REDIS_KEY_PREFIX,
     "VERSION": REDIS_VERSION,
 }

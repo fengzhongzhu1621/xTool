@@ -1,4 +1,4 @@
-from xTool.net.utils import int_to_ipv4, ipv4_to_int, is_ipv4, is_ipv6
+from xTool.net.ip import int_to_ipv4, ipv4_to_int, is_ipv4, is_ipv6
 
 
 def test_int2ip():
