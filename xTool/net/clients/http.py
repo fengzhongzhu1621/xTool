@@ -3,7 +3,7 @@ import logging
 import curlify
 import requests
 
-from xTool.log.log import logger
+from xTool.log import logger
 
 
 def _gen_header():

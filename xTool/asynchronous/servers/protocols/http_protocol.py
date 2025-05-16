@@ -17,7 +17,7 @@ from xTool.exceptions import (
     ServerError,
     ServiceUnavailable,
 )
-from xTool.log.log import access_logger, logger
+from xTool.log import access_logger, logger
 from xTool.request import EXPECT_HEADER, Request, StreamBuffer
 from xTool.response import HTTPResponse
 

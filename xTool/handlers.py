@@ -6,7 +6,7 @@ from xTool.exceptions import (
     HeaderNotFound,
     InvalidRangeType,
 )
-from xTool.log.log import logger
+from xTool.log import logger
 from xTool.response import text
 
 

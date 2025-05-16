@@ -8,6 +8,7 @@ from types import ModuleType
 from typing import Callable
 
 from xTool.exceptions import XToolException
+from xTool.log import logger
 from xTool.utils.log.logging_mixin import LoggingMixin
 
 log = LoggingMixin().log
@@ -145,6 +146,24 @@ def import_string_from_package(module_name, package=None):
     if ismodule(obj):
         return obj
     return obj()
+
+
+def re_import_modules(path, module_path):
+    """递归导入文件下的模块，通常用于触发注册器逻辑"""
+    for name in os.listdir(path):
+        # 忽略无效文件
+        if name.endswith(".pyc") or name in ["__init__.py", "__pycache__"]:
+            continue
+
+        if os.path.isdir(os.path.join(path, name)):
+            re_import_modules(os.path.join(path, name), ".".join([module_path, name]))
+        else:
+            try:
+                module_name = name.replace(".py", "")
+                import_path = ".".join([module_path, module_name])
+                importlib.import_module(import_path)
+            except ModuleNotFoundError as e:
+                logger.warning(e)
 
 
 class XToolImporter:

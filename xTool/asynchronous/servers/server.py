@@ -6,12 +6,13 @@ from signal import SIG_IGN, SIGINT, SIGTERM, Signals
 from signal import signal as signal_func
 from socket import SO_REUSEADDR, SOL_SOCKET, socket
 
-from xTool.asynchronous.aiomisc import load_uvlopo
-from xTool.log.log import logger
-from xTool.misc import OS_IS_WINDOWS
-from xTool.asynchronous.servers.protocols.http_protocol import HttpProtocol
 from xTool.servers.signal import Signal
+
+from xTool.asynchronous.aiomisc import load_uvlopo
+from xTool.asynchronous.servers.protocols.http_protocol import HttpProtocol
 from xTool.asynchronous.servers.trigger import trigger_events
+from xTool.log import logger
+from xTool.misc import OS_IS_WINDOWS
 from xTool.utils.processes import ctrlc_workaround_for_windows
 
 load_uvlopo()
