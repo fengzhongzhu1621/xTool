@@ -142,7 +142,7 @@ for module_name in [
 ]:
     locals().update(
         load_settings(
-            f"config.{module_name}",
+            f"config.sub_config.{module_name}",
             settings_for_merge={_setting: globals()[_setting] for _setting in SETTINGS_FOR_MERGE},
             raise_exception=True,
         )
