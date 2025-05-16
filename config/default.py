@@ -3,7 +3,6 @@ import os
 from celery.utils.serialization import strtobool
 
 from config import APP_CODE, BASE_DIR
-from config.database import get_default_database_config_dict
 from config.log import get_logging_config_dict
 from core.load_settings import load_settings
 
@@ -13,12 +12,6 @@ if not IS_LOCAL:
     STATIC_ROOT = "staticfiles"
 else:
     STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATIC_URL = "/static/"
-
-# About whitenoise
-WHITENOISE_STATIC_PREFIX = "/static/"
-
-ROOT_URLCONF = "urls"
 
 SITE_ID = 1
 
@@ -102,23 +95,6 @@ MIDDLEWARE = (
 VUE_INDEX = "index.html"
 # AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 AUTHENTICATION_BACKENDS = ("core.auth.backends.Md5ModelBackend",)
-TEMPLATE_CONTEXT_PROCESSORS = [
-    "django.template.context_processors.debug",
-    "django.template.context_processors.request",
-    "django.contrib.auth.context_processors.auth",
-    "django.contrib.messages.context_processors.messages",
-]
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": TEMPLATE_CONTEXT_PROCESSORS,
-        },
-    },
-]
-MAKO_DIR_NAME = "mako_templates"
 
 
 # Password validation
@@ -176,13 +152,6 @@ SESSION_SAVE_EVERY_REQUEST = False
 # 3. None：浏览器将在所有跨站点请求中发送 cookie。这可能会增加 CSRF 攻击的风险。
 SESSION_COOKIE_SAMESITE = "Lax"
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# 所有环境的日志级别可以在这里配置
-# LOG_LEVEL = 'INFO'
-
 # 静态资源文件(js,css等）在APP上线更新后, 由于浏览器有缓存,
 # 可能会造成没更新的情况. 所以在引用静态资源的地方，都把这个加上
 # Django 模板中：<script src="/a.js?v=${STATIC_VERSION}"></script>
@@ -221,8 +190,6 @@ FRONTEND_BACKEND_SEPARATION = False
 
 ########################################################################################################################
 # 日志配置
-# load logging settings
-# 所有环境的日志级别可以在这里配置
 LOG_LEVEL = 'INFO'
 LOG_TIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 LOGGING = get_logging_config_dict(locals())
@@ -234,6 +201,15 @@ BK_BK_RESOURCE_LOG_ENABLED = strtobool(os.getenv("BKAPP_BK_RESOURCE_LOG_ENABLED"
 if BK_BK_RESOURCE_LOG_ENABLED:
     LOGGING["loggers"]["bk_resource"] = LOGGING["loggers"]["app"]
     LOGGING["loggers"]["iam"] = LOGGING["loggers"]["app"]
+
+# 操作日志
+API_LOG_ENABLE = True
+API_LOG_METHODS = ["POST", "DELETE", "PUT", "PATCH"]
+API_MODEL_MAP = {
+    "/token/": "登录模块",
+    "/api/login/": "登录模块",
+    "/api/plugins_market/plugins/": "插件市场",
+}
 
 
 # BKUI是否使用了history模式
@@ -257,26 +233,6 @@ BK_RESOURCE = {
     "PLATFORM_AUTH_ACCESS_TOKEN": os.getenv("BKAPP_PLATFORM_AUTH_ACCESS_TOKEN"),
     "PLATFORM_AUTH_ACCESS_USERNAME": os.getenv("BKAPP_PLATFORM_AUTH_ACCESS_USERNAME"),
 }
-
-########################################################################################################################
-# Cookie
-SESSION_COOKIE_DOMAIN = os.getenv("BKAPP_SESSION_COOKIE_DOMAIN")
-CSRF_COOKIE_DOMAIN = os.getenv("BKAPP_CSRF_COOKIE_DOMAIN", SESSION_COOKIE_DOMAIN)
-AUTH_BACKEND_DOMAIN = os.getenv("BKAPP_AUTH_BACKEND_DOMAIN", SESSION_COOKIE_DOMAIN)
-LANGUAGE_COOKIE_DOMAIN = SESSION_COOKIE_DOMAIN
-AUTH_BACKEND_TYPE = os.getenv("BKAPP_AUTH_BACKEND_TYPE", "bk_token")
-OAUTH_COOKIES_PARAMS = {AUTH_BACKEND_TYPE: AUTH_BACKEND_TYPE}
-
-
-# CORS
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [origin for origin in str(os.getenv("BKAPP_CORS_ALLOWED_ORIGINS", "")).split(",") if origin]
-
-# CSRF
-CSRF_TRUSTED_ORIGINS = [origin for origin in str(os.getenv("BKAPP_CSRF_TRUSTED_ORIGINS", "")).split(",") if origin]
-CSRF_EXEMPT_PATHS = []
-CSRF_COOKIE_NAME = APP_CODE + "_csrftoken"
-
 
 ########################################################################################################################
 # cache
@@ -352,9 +308,8 @@ OPEN_TELEMETRY_OTEL_LOGGING_TRACE_FORMAT = (
 )
 
 
-# 本机地址
-BK_HOST = os.getenv("BKAPP_HOST", "")
-
+########################################################################################################################
+# 流程
 # 流程component自动注册目录
 COMPONENT_PATH = []
 
@@ -370,35 +325,8 @@ LOGIN_ANALYSIS_LOG_ENABLED = False
 # 列权限需要排除的App应用
 COLUMN_EXCLUDE_APPS = ["channels", "captcha"] + locals().get("COLUMN_EXCLUDE_APPS", [])
 
-# 操作日志
-API_LOG_ENABLE = True
-API_LOG_METHODS = ["POST", "DELETE", "PUT", "PATCH"]
-API_MODEL_MAP = {
-    "/token/": "登录模块",
-    "/api/login/": "登录模块",
-    "/api/plugins_market/plugins/": "插件市场",
-}
-
 # channels
 CHANNEL_LAYERS = {}
-
-DEBUG_RETURN_EXCEPTION = False
-
-########################################################################################################################
-# bamboengine
-# 流程component自动注册目录
-COMPONENT_PATH = []
-
-########################################################################################################################
-# 数据库
-DATABASES = {"default": get_default_database_config_dict(locals())}
-DB_BATCH_SIZE = int(os.getenv("BKAPP_DB_BATCH_SIZE", 1000))
-DATABASES["default"].setdefault("OPTIONS", {})["charset"] = "utf8mb4"
-# DATABASE_ROUTERS = ["config.router.DatabaseRouter"]
-
-########################################################################################################################
-# 调试
-DEBUG_RETURN_EXCEPTION = False
 
 ########################################################################################################################
 # celery 配置
@@ -453,9 +381,15 @@ if IS_USE_CELERY:
 # 加载第三方应用配置
 SETTINGS_FOR_MERGE = ["INSTALLED_APPS", "MIDDLEWARE"]
 for module_name in [
-    "bk_resource",
+    "url",
+    "template",
+    "cookie",
+    "database",
     "csrf",
     "cors",
+    "debug",
+    "safety",
+    "bk_resource",
 ]:
     locals().update(
         load_settings(
@@ -464,6 +398,15 @@ for module_name in [
             raise_exception=True,
         )
     )
+
+########################################################################################################################
+# 并发
+CONCURRENT_NUMBER = 10
+
+########################################################################################################################
+# 其它
+# 本机地址
+BK_HOST = os.getenv("BKAPP_HOST", "")
 
 """
 以下为框架代码 请勿修改

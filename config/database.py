@@ -28,3 +28,13 @@ def get_default_database_config_dict(settings_module):
         "PORT": os.environ["%s_PORT" % db_prefix],
         "OPTIONS": {"isolation_level": "repeatable read"},
     }
+
+
+DATABASES = {"default": get_default_database_config_dict(locals())}
+DB_BATCH_SIZE = int(os.getenv("BKAPP_DB_BATCH_SIZE", 1000))
+DATABASES["default"].setdefault("OPTIONS", {})["charset"] = "utf8mb4"
+# DATABASE_ROUTERS = ["config.router.DatabaseRouter"]
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

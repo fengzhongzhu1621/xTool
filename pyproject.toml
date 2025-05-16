@@ -204,6 +204,7 @@ dependencies = [
     "ujson>=5.10.0",
     "django-versionlog>=1.8.1",
     "ipython>=9.2.0",
+    "django-dbconn-retry>=0.1.8",
 ]
 
 [dependency-groups]

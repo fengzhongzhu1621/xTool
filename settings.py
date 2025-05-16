@@ -18,8 +18,16 @@ import pymysql
 import urllib3
 from django.db.backends.mysql.features import DatabaseFeatures
 from django.utils.functional import cached_property
+########################################################################################################################
+# 兼容性处理
+# django 3.2 默认的 default_auto_field 是 BigAutoField，django_celery_beat 在 2.2.1 版本已处理此问题
+# 受限于 celery 和 bamboo 的版本，这里暂时这样手动设置 default_auto_field 来处理此问题
+from django_celery_beat.apps import AppConfig
 
 from core.load_settings import load_settings
+
+AppConfig.default_auto_field = "django.db.models.AutoField"
+
 
 # Patch the SSL module for compatibility with legacy CA credentials.
 # https://stackoverflow.com/questions/72479812/how-to-change-tweak-python-3-10-default-ssl-settings-for-requests-sslv3-alert
@@ -41,6 +49,7 @@ DatabaseFeatures.minimum_database_version = PatchFeatures.minimum_database_versi
 pymysql.install_as_MySQLdb()
 
 
+########################################################################################################################
 # 读取环境变量文件
 # 配置优先级 环境变量 -> .env文件 -> settings.py
 environ.Env.read_env()
