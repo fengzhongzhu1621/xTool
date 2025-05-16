@@ -147,6 +147,7 @@ for module_name in [
     "cache",
     "queue",
     "opentelemetry",
+    "version_log",
 ]:
     locals().update(
         load_settings(
