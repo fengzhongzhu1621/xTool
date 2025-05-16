@@ -2,11 +2,19 @@ from collections import defaultdict
 from io import BytesIO
 from typing import List, Dict, Union, Any
 
+from openpyxl import Workbook
 from openpyxl import load_workbook
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.exceptions import InvalidFileException
 from openpyxl.worksheet.worksheet import Worksheet
+
+__all__ = [
+    "adapt_sheet_weight_height",
+    "to_list",
+    "to_matrix",
+    "from_dict",
+]
 
 
 def adapt_sheet_weight_height(sheet: Worksheet, first_header_row: int = 1):
@@ -48,7 +56,7 @@ def adapt_sheet_weight_height(sheet: Worksheet, first_header_row: int = 1):
         sheet.column_dimensions[get_column_letter(col)].width = max_col_dimensions[col]
 
 
-def parse_to_dict(excel: BytesIO, header_row: int = 0, sheet_name: str = "") -> List[Dict]:
+def to_list(excel: BytesIO, header_row: int = 0, sheet_name: str = "") -> List[Dict]:
     """解析excel文件为数据字典
 
     :param excel: 表示 Excel 文件的二进制数据流。BytesIO 是 Python 中用于处理二进制数据的类，通常用于内存中的文件操作。
@@ -99,7 +107,7 @@ def parse_to_dict(excel: BytesIO, header_row: int = 0, sheet_name: str = "") -> 
     return excel_data_dict_list
 
 
-def parse_matrix(excel: Union[BytesIO, str]) -> Dict[str, Dict[str, Any]]:
+def to_matrix(excel: Union[BytesIO, str]) -> Dict:
     """
     解析Excel文件为二维矩阵，默认第一行和第一列是索引指标。
 
@@ -116,7 +124,7 @@ def parse_matrix(excel: Union[BytesIO, str]) -> Dict[str, Dict[str, Any]]:
     except Exception as e:
         raise ValueError(f"Failed to load Excel file: {str(e)}")
 
-    matrix_data: Dict[str, Dict[str, Any]] = defaultdict(dict)
+    matrix_data = {}
 
     # 遍历所有工作表，sheet是1-based
     for sheet in wb.worksheets:
@@ -139,6 +147,7 @@ def parse_matrix(excel: Union[BytesIO, str]) -> Dict[str, Dict[str, Any]]:
 
         # 遍历数据行和列
         for sheet_idx, sheet in enumerate(wb.worksheets):
+            matrix_data[sheet_idx] = defaultdict(dict)
             for row in range(2, sheet.max_row + 1):
                 for col in range(2, sheet.max_column + 1):
                     if sheet.cell(row, col).value is None:
@@ -147,4 +156,71 @@ def parse_matrix(excel: Union[BytesIO, str]) -> Dict[str, Dict[str, Any]]:
                     row_key = sheet.cell(row, 1).value
                     matrix_data[sheet_idx][col_key][row_key] = sheet.cell(row, col).value
 
+    matrix_data = {key: dict(value) for key, value in matrix_data.items()}
+
     return matrix_data
+
+
+def from_dict(
+        data_dict__list: List[Dict],
+        template: str = None,
+        headers: List[Union[str, Dict[str, Any]]] = None,
+        header_style: Dict[str, str] = None,
+        match_header: bool = False,
+    ) -> Workbook:
+        """
+        将数据字典序列化为excel对象
+
+        :param data_dict__list: 数据字典列表，每个字典代表一行数据
+        :param template: excel模板路径（优先以模板的头部样式作为excel的头部）
+        :param headers: excel数据头，格式为 [{"id": "header_id", "name": "header_name"}] 或 ["header1", "header2"]
+        :param header_style: excel的头部样式（颜色），格式为 {"header_id": "color_code"}
+        :param match_header: 数据是否匹配表头，如果为True，则根据 header 严格匹配列名，若不存在，则在该 cell 填充空
+        :return: 返回一个Workbook对象
+        """
+        wb: Workbook = Workbook()
+        sheet: Worksheet = wb.active
+        # 数据起始行（第1行为表头）
+        first_data_row: int = 2
+
+        if template:
+            try:
+                wb = load_workbook(template)
+                sheet = wb.active
+                first_data_row = 3  # 模板第1行为注释，第2行为表头
+            except FileNotFoundError:
+                raise ValueError("Template file not found.")
+            except InvalidFileException:
+                raise ValueError("Invalid template file format.")
+        elif headers:
+            # 设置表头
+            for col_idx, header in enumerate(headers, start=1):
+                header_name = header if isinstance(header, str) else header.get("name", "")
+                header_id = header if isinstance(header, str) else header.get("id", "")
+                cell = sheet.cell(row=1, column=col_idx, value=str(header_name))
+                if header_style and header_id in header_style:
+                    # 表头格式设置为粗体，还需要设置颜色
+                    cell.fill = PatternFill("solid", fgColor=header_style[header_id])
+        else:
+            raise ValueError("Either template or headers must be provided.")
+
+        if match_header and not headers:
+            raise ValueError("Headers must be provided when match_header is True.")
+
+        # 数据写入单元格
+        for row_idx, data_dict in enumerate(data_dict__list, start=1):
+            sheet_row_idx = row_idx + first_data_row - 1
+            if match_header:
+                for col_idx, header in enumerate(headers, start=1):
+                    header_key = header if isinstance(header, str) else header.get("id", "")
+                    cell = sheet.cell(row=sheet_row_idx, column=col_idx, value="")
+                    if header_key in data_dict:
+                        cell.value = str(data_dict[header_key])
+            else:
+                for col_idx, value in enumerate(data_dict.values(), start=1):
+                    sheet.cell(row=sheet_row_idx, column=col_idx, value=str(value))
+
+        # 自适应行高和列宽
+        adapt_sheet_weight_height(sheet=sheet, first_header_row=1 if not template else 2)
+
+        return wb
