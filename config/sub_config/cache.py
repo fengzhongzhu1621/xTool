@@ -24,11 +24,15 @@ replication_redis_cache = {
     "VERSION": REDIS_VERSION,
 }
 single_redis_cache = {
-    "BACKEND": "django_redis.cache.RedisCache",
+    "BACKEND": "django_redis.cache.RedisCache",  # 使用 django-redis 作为缓存后端
     "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
     "OPTIONS": {
-        "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        "SERIALIZER": "core.json.RedisJSONSerializer",
+        "CLIENT_CLASS": "django_redis.client.DefaultClient",  # 使用默认的客户端类
+        "REDIS_CLIENT_CLASS": "redis.client.StrictRedis",  # 使用 StrictRedis 客户端类
+        "REDIS_CLIENT_KWARGS": {"decode_responses": True},  # 自动解码响应为字符串
+        "SERIALIZER": "core.json.RedisJSONSerializer",  # 使用自定义的 JSON 序列化器
+        "MAX_ENTRIES": 100000,  # 缓存的最大条目数
+        "CULL_FREQUENCY": 10,  # 当缓存达到最大条目数时，保留 1/10 的数据
         "PASSWORD": REDIS_PASSWORD,
     },
     "KEY_PREFIX": REDIS_KEY_PREFIX,
@@ -59,10 +63,16 @@ DATA_BACKEND = "apps.backend.data.redis_backend.RedisDataBackend"
 if USE_REDIS:
     CACHES["redis"] = CACHES_GETTER[REDIS_MODE]
     CACHES["default"] = CACHES["redis"]
-    CACHES["login_db"] = CACHES["redis"]
+    CACHES["login_db"] = CACHES["redis"]  # 登录数据库缓存
 else:
     CACHES["default"] = CACHES["db"]
 
+# CACHES["login_db"] = {  # 定义名为 'login_db' 的第二个缓存
+#     "BACKEND": "django.core.cache.backends.db.DatabaseCache",  # 使用数据库作为缓存后端
+#     "LOCATION": "account_cache",  # 使用名为 'account_cache' 的数据库表
+# }
 
 # 登录缓存时间配置, 单位秒（与django cache单位一致）
 LOGIN_CACHE_EXPIRED = int(os.getenv("LOGIN_CACHE_EXPIRED", 60))
+
+DJANGO_REDIS_CONNECTION_FACTORY = "core.redis.ConnectionFactory"
