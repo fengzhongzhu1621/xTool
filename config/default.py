@@ -71,7 +71,6 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    # 蓝鲸静态资源服务
     "whitenoise.middleware.WhiteNoiseMiddleware",
     # Auth middleware
     # exception middleware
@@ -157,6 +156,26 @@ for module_name in [
         )
     )
 
+
+########################################################################################################################
+# global_conf
+FUNCTION_CONTROLLER_INIT_MAP = {
+    "root": {
+        "name": "root",
+        "is_enabled": True,
+        "children": {
+            "user": {
+                "name": "user",
+                "is_enabled": True,
+                "children": {
+                    "create": {"name": "create", "is_enabled": True},
+                    "delete": {"name": "delete", "is_enabled": False},
+                },
+            }
+        },
+    }
+}
+
 ########################################################################################################################
 # 其它
 # 本机地址
@@ -167,6 +186,7 @@ REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"
 CONCURRENT_NUMBER = 10
 
 USE_X_FORWARDED_HOST = True
+
 
 ########################################################################################################################
 """

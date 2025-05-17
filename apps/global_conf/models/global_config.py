@@ -8,11 +8,6 @@ from core.cache import CacheKey
 from core.constants import LEN_LONG, TimeEnum
 from core.models import OptionBase, SoftDeleteModelManager
 
-__all__ = [
-    "GlobalConfigCacheKey",
-    "GlobalConfig",
-]
-
 
 # 全局配置缓存时间
 GLOBAL_CONFIG_CACHE_TTL = getattr(settings, "GLOBAL_CONFIG_CACHE_TTL", TimeEnum.TEN_MINUTE_SECOND)

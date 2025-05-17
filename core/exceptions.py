@@ -342,7 +342,7 @@ class CoreException(AppException):
 class BaseIAMError(CoreException):
     """权限中心异常 ."""
 
-    MODULE_CODE = 99  # 蓝鲸体系通用服务错误码
+    MODULE_CODE = 99
     MESSAGE = _lazy("权限中心异常")
 
 
