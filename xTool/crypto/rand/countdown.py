@@ -3,6 +3,8 @@ import random
 
 __all__ = [
     "calculate_countdown_use_mod",
+    "calculate_countdown_use_random",
+    "calculate_countdown",
 ]
 
 
