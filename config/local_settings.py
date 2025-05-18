@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from config.log import get_logging_config_dict
+from config.sub_config.log import get_logging_config_dict
 
 DEBUG_RETURN_EXCEPTION = True
 

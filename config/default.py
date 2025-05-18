@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     "apps.global_conf",
     "apps.http_client",
     "apps.websocket",
+    "apps.periodic_task",
 )
 
 ########################################################################################################################
