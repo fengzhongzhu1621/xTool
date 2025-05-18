@@ -1,6 +1,6 @@
 import pytest
 
-from xTool.algorithms.collections.object import DictObject, ObjectSet
+from xTool.collections.object import DictObject, ObjectSet
 
 
 def test_dict_object_with_dict():
