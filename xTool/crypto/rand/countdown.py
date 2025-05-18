@@ -34,3 +34,29 @@ def calculate_countdown_use_mod(count: int, index: int, duration: int) -> int:
 
     # 在当前时间区间内随机选择一个时间点作为任务的执行时间
     return random.randint(start_time, end_time)
+
+
+def calculate_countdown_use_random(duration: int) -> int:
+    """
+    把周期任务通过随机数的方式平均分布到 duration 秒 内执行，用于削峰
+
+    :param duration: 执行周期总时长（秒）
+    :return: 当前任务的执行倒计时时间（秒）
+    """
+    return random.randint(0, max(duration - 1, 1))
+
+
+def calculate_countdown(count: int, index: int, duration: int) -> int:
+    """
+    把周期任务随机平均分布到 duration 秒内执行，用于削峰
+
+    :param count: 任务总数
+    :param index: 当前任务索引（从0开始）
+    :param duration: 执行周期总时长（秒）
+    :return: 当前任务的执行倒计时时间（秒）
+    """
+    # 任务总数小于等于1时立即执行
+    if count <= 1:
+        return 0
+    funcs = [calculate_countdown_use_mod, calculate_countdown_use_random]
+    return funcs[random.randint(0, 1)](count=count, index=index, duration=duration)
