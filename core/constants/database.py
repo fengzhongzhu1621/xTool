@@ -63,6 +63,29 @@ MYSQL_COMMON_SQL_STATEMENTS = [
             "select count(*) from infodba_schema.checksum where this_crc<>master_crc or this_cnt<>master_cnt limit 1;"
         ),
     },
+    {
+        "name": _lazy("查询唯一索引"),
+        "sql": (
+            "select distinct table_schema, table_name, index_name, "
+            "group_concat(distinct column_name order by seq_in_index) as column_list "
+            "from information_schema.statistics  where {table_sts} and {db_sts} and non_unique = 0 "
+            "group by table_name, index_name;"
+        ),
+    },
+    {
+        "name": _lazy("查询所有表的所有字段类型"),
+        "sql": (
+            "select table_schema, table_name, column_name, column_type "
+            "from information_schema.columns where {table_sts} and {db_sts};"
+        ),
+    },
+    {
+        "name": _lazy("根据库名查询表名"),
+        "sql": (
+            "select table_schema as table_schema, table_name as table_name "
+            "from information_schema.tables where {db_sts};"
+        ),
+    },
 ]
 
 
