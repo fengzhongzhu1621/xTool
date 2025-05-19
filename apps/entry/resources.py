@@ -50,7 +50,9 @@ class PingResource(EntryBaseResource):
 
 class LogoutResource(EntryBaseResource):
     def perform_request(self, validated_request_data):
-        auth.logout(get_local_request())
+        request = get_local_request()
+        auth.logout(request)
+
         response = Response()
         response.delete_cookie(settings.AUTH_BACKEND_TYPE, domain=settings.AUTH_BACKEND_DOMAIN)
         return response
