@@ -150,7 +150,6 @@ dependencies = [
     "pendulum<4.0.0,>=3.0.0",
     "jinja2<4.0.0,>=3.1.4",
     "psutil<6.0.0,>=5.9.8",
-    "numpy<2.0.0,>=1.26.4",
     "pyparsing<4.0.0,>=3.1.2",
     "lark<2.0.0,>=1.1.9",
     "pydot<3.0.0,>=2.0.0",
@@ -206,6 +205,8 @@ dependencies = [
     "django-debug-toolbar>=5.2.0",
     "django-cors-headers>=4.7.0",
     "Password-Validation>=0.1.1",
+    "pythran>=0.17.0",
+    "numpy>=2.2.6",
 ]
 
 [dependency-groups]

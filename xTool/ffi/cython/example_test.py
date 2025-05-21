@@ -7,7 +7,7 @@ import pytest
 @pytest.mark.skip
 class TestCythonDemo(TestCase):
     def setUp(self) -> None:
-        from xTool.cython.example import CythonDemo
+        from xTool.ffi.cython.example import CythonDemo
 
         self.demo = CythonDemo()
 
