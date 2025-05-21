@@ -1,6 +1,12 @@
 # 简介
 Pythran通过预先编译,将python代码转为C++代码的 后缀为 .so 的文件,从而 在运行时获得更快的运行速度;
 
+# 适用场景
+* 大数据量矩阵运算
+* 信号处理、图像处理算法
+* 科学模拟、物理建模
+* 任何需要“Python 写，C++ 跑”的高性能场景
+
 # 安装
 1.pip（Debian/Ubuntu）
 ```shell
@@ -30,8 +36,12 @@ pythran dprod.py
 >>> dprod.dprod([1, 2], [3, 4])
 11
 ```
+# 配置
+~/.pythranrc
 
 # export
+注解接口：使用 ```#pythran export``` 精确声明输入输出类型，帮助 Pythran 做静态分析。
+
 ## 函数入参设置
 ```shell
 argument_type = basic_type
