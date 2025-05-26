@@ -1,5 +1,6 @@
 from xTool.constants import *  # noqa
 from .account import *  # noqa
+from .alarm import *  # noqa
 from .builtin import *  # noqa
 from .database import *  # noqa
 from .exceptions import *  # noqa
