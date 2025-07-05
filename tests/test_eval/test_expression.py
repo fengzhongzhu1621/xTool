@@ -1,4 +1,4 @@
-from xTool.algorithms.collections.object import ObjectSet
+from xTool.collections.object import ObjectSet
 from xTool.eval.expression import make_expression
 
 

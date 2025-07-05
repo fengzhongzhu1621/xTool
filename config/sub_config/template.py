@@ -40,4 +40,3 @@ TEMPLATES = [
         },
     },
 ]
-MAKO_DIR_NAME = "mako_templates"
