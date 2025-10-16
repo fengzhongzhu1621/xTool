@@ -6,7 +6,10 @@ python-magic 是 libmagic 的封装，是一个文件类型识别库。
 
 import os
 
-import magic
+try:
+    import magic
+except ImportError:
+    magic = None
 
 
 def test_ascii_text():

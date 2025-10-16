@@ -1,7 +1,7 @@
 from collections.abc import MutableMapping
 from typing import Callable, Optional
 
-from xTool.algorithms.collections import DefaultSize
+from xTool.collections import DefaultSize
 
 
 class Cache(MutableMapping):

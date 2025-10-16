@@ -3,7 +3,7 @@ import os
 from pstats import Stats
 from tempfile import NamedTemporaryFile
 
-from xTool.servers.profiler import Profiler
+from xTool.asynchronous.servers.profiler import Profiler
 
 
 async def test_profiler_start_stop():

@@ -3,14 +3,14 @@ import re
 version = "0.2.0"
 
 
-def get_version_parsed_list(version):
+def get_version_parsed_list(version: str):
     """返回日志版本解析结果"""
     # 返回一个整数列表，表示版本号的各个部分（如 [1, 2, 3] 对应 v1.2.3）。
     log_version_pattern = re.compile(r"(\d+)")  # noqa
     return [int(value) for value in re.findall(log_version_pattern, version)]
 
 
-def is_later_version(version1, version2):
+def is_later_version(version1: str | None, version2: str | None) -> bool:
     """判断version1版本号是否大于version2, None属于最旧的级别"""
     if version1 is None:
         return False

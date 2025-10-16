@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 
-from xTool.servers.dns.dns_cache import DNSCacheTable
+from xTool.net.servers.dns.dns_cache import DNSCacheTable
 
 
 class TestDNSCacheTable(TestCase):

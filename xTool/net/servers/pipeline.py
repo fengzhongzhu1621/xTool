@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from xTool.net.utils import new_socketpair
+from xTool.net.socket import new_socketpair
 
 
 class IPipelineConnector(metaclass=ABCMeta):

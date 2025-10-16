@@ -5,8 +5,8 @@ from typing import Tuple, Type
 
 from croniter import croniter
 
-from xTool import aiomisc
-from xTool.utils.timezone import now
+from xTool.asynchronous import aiomisc
+from xTool.time_utils import now
 
 log = logging.getLogger(__name__)
 

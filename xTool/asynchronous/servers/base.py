@@ -6,7 +6,7 @@ import os
 from xTool.asynchronous.aiomisc import cancel_tasks
 from xTool.asynchronous.servers.context import Context, get_context
 from xTool.misc import OS_IS_WINDOWS
-from xTool.servers.signal import register_signal_hander
+from xTool.net.servers.signal import register_signal_hander
 from xTool.utils.processes import ctrlc_workaround_for_windows
 
 

@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 
-from xTool.algorithms.collections.attrdict import DefaultSize, StripDict
+from xTool.collections.attrdict import DefaultSize, StripDict
 
 
 class TestStripDict(TestCase):

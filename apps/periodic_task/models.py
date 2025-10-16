@@ -71,6 +71,8 @@ class MultiTypePeriodicTask(OperateRecordModel):
     task_type = models.CharField(_lazy("任务类型"), choices=PeriodicTaskType.choices, max_length=LEN_SHORT)
     is_frozen = models.BooleanField(_lazy("是否冻结"), default=False)
 
+    objects = MultiTypePeriodicTaskManager()
+
     class Meta:
         verbose_name_plural = verbose_name = _lazy("周期任务")
 

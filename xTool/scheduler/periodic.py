@@ -3,7 +3,7 @@ import logging
 from functools import partial
 from typing import Tuple, Type, Union
 
-from xTool import aiomisc
+from xTool.asynchronous import aiomisc
 
 log = logging.getLogger(__name__)
 

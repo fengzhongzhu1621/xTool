@@ -5,7 +5,7 @@ try:
 except ImportError:
     from unittest.mock import patch
 
-from xTool.algorithms.collections.object import ObjectSet
+from xTool.collections.object import ObjectSet
 from xTool.eval.constants import OP
 from xTool.eval.operators import (
     AndOperator,

@@ -1,7 +1,7 @@
 import asyncio
 import socket
 
-from xTool.servers.udp import UDPServer
+from xTool.asynchronous.servers.udp import UDPServer
 
 
 def test_udp_server(aiomisc_unused_port):

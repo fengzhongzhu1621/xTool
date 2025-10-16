@@ -2,7 +2,7 @@ import multiprocessing
 
 import pytest
 
-from xTool.servers.pipeline import SocketPairPipeline
+from xTool.net.servers.pipeline import SocketPairPipeline
 
 
 def _task(server_connector, message):
