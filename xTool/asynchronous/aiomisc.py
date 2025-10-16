@@ -11,7 +11,7 @@ from math import ceil
 from multiprocessing import cpu_count
 from typing import Any, Awaitable, Callable, Iterable, List, Optional, Tuple, TypeVar  # noqa
 
-from xTool.net.utils import is_ipv6
+from xTool.net.ip import is_ipv6
 
 UVLOOP_INSTALLED = False
 
@@ -153,8 +153,7 @@ def call_later(cb, timeout, loop):  # type: ignore
         return loop.call_at(when, cb)
 
 
-@asyncio.coroutine
-def noop(*args, **kwargs):  # type: ignore
+async def noop(*args, **kwargs):  # type: ignore
     return  # type: ignore
 
 

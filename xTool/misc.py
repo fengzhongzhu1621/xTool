@@ -17,7 +17,7 @@ try:
 except ImportError:
     from io import BytesIO as StringIO
 
-from typing import AbstractSet, Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import AbstractSet, Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple, Type, Union
 
 from .type_hint import T
 
@@ -680,11 +680,7 @@ def classify_bool(seq: Iterable, pred: Callable) -> Any:
 
 
 def dedup_list(s: Sequence[T]) -> List[T]:
-    """序列去重且保留原始的顺序
-
-    Given a list (l) will removing duplicates from the list,
-    preserving the original order of the list. Assumes that
-    the list entries are hashable."""ies are hashable."""
+    """序列去重且保留原始的顺序"""
     dedup = set()
     # This returns None, but that's expected
     return [x for x in s if not (x in dedup or dedup.add(x))]  # type: ignore[func-returns-value]
@@ -693,19 +689,7 @@ def dedup_list(s: Sequence[T]) -> List[T]:
 
 
 def combine_alternatives(lists):
-    """
-    Accepts a list of alternatives, and enumerates all their possible concatenations.
-
-    Examples:
-        >>> combine_alternatives([range(2), [4,5]])
-        [[0, 4], [0, 5], [1, 4], [1, 5]]
-
-        >>> combine_alternatives(["abc", "xy", '$'])
-        [['a', 'x', '$'], ['a', 'y', '$'], ['b', 'x', '$'], ['b', 'y', '$'], ['c', 'x', '$'], ['c', 'y', '$']]
-
-        >>> combine_alternatives([])
-        [[]]
-    """
+    """Accepts a list of alternatives, and enumerates all their possible concatenations."""
     if not lists:
         return [[]]
     assert all(s for s in lists), lists
@@ -713,7 +697,6 @@ def combine_alternatives(lists):
 
 
 def isascii(s: str) -> bool:
-    """str.isascii only exists in python3.7+"""
     if sys.version_info >= (3, 7):
         return s.isascii()
     else:
@@ -765,14 +748,8 @@ def sorted_join(items: [Tuple, List], sep: str = ",") -> str:
 
 
 @contextmanager
-def ignored(*exceptions, **kwargs):
-    """
-    在忽略某异常下执行
-    example:
-        with ignored(Exception):
-            # 不会抛出异常
-            print(1/0)
-    """
+def ignored(*exceptions: Type[BaseException], **kwargs: Any) -> Iterator[None]:
+    """在忽略某异常下执行"""
     try:
         yield
     except exceptions:

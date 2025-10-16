@@ -247,6 +247,7 @@ dev = [
     "mockafka-py<1.0.0,>=0.1.55",
     "pytest-asyncio>=0.23.7",
     "line-profiler>=4.2.0",
+    "fakeredis>=2.32.0",
 ]
 fast = [
     "uvloop",

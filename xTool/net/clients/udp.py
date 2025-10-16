@@ -1,7 +1,7 @@
 import socket
 from asyncio import events
 
-from xTool.net.utils import is_ipv6
+from xTool.net.ip import is_ipv6
 
 
 async def create_datagram_endpoint(protocol, host, port, loop=None, *kwargs):
