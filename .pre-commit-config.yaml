@@ -1,0 +1,73 @@
+default_stages: [pre-commit]
+repos:
+    - repo: https://github.com/asottile/pyupgrade
+      rev: v3.21.0
+      hooks:
+          - id: pyupgrade
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v6.0.0
+      hooks:
+          - id: check-merge-conflict
+    - repo: https://github.com/psf/black
+      rev: 25.9.0
+      hooks:
+          - id: black
+            language_version: python
+            args: [--config=pyproject.toml]
+    - repo: https://github.com/pycqa/isort
+      rev: 7.0.0
+      hooks:
+          - id: isort
+            name: isort
+            additional_dependencies: ["black"]
+            args: [--settings-path=pyproject.toml]
+    - repo: https://github.com/pycqa/flake8
+      rev: 7.3.0
+      hooks:
+          - id: flake8
+            additional_dependencies: [flake8-docstrings]
+    - repo: https://github.com/pdm-project/pdm
+      rev: 2.26.0
+      hooks:
+          - id: pdm-export
+            args:
+                [
+                    "--pyproject",
+                    "--no-hashes",
+                    "--no-markers",
+                    "--prod",
+                    "-o",
+                    "requirements.txt",
+                ]
+            files: ^pdm.lock$
+          - id: pdm-export
+            args:
+                [
+                    "--pyproject",
+                    "--no-hashes",
+                    "--no-markers",
+                    "-G",
+                    "dev",
+                    "--no-default",
+                    "-o",
+                    "requirements_dev.txt",
+                ]
+            files: ^pdm.lock$
+    - repo: https://github.com/pdm-project/pdm
+      rev: 2.26.0
+      hooks:
+          - id: pdm-lock-check
+    - repo: https://github.com/pdm-project/pdm
+      rev: 2.26.0
+      hooks:
+          - id: pdm-sync
+            additional_dependencies:
+                - keyring
+    - repo: local
+      hooks:
+          - id: flake8
+            name: flak8
+            language: python
+            types: [python]
+            pass_filenames: true
+            entry: pflake8 --config=./pyproject.toml

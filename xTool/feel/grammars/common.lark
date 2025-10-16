@@ -1,0 +1,75 @@
+// Basic terminals for common use
+
+
+//
+// Numbers
+//
+
+// 数字
+DIGIT: "0".."9"
+// 大小写字母或数字
+HEXDIGIT: "a".."f"|"A".."F"|DIGIT
+
+// 正整数
+INT: DIGIT+
+// 有符号整数
+SIGNED_INT: ["+"|"-"] INT
+// 正小数
+DECIMAL: INT "." INT? | "." INT
+
+// float = /-?\d+(\.\d+)?([eE][+-]?\d+)?/
+_EXP: ("e"|"E") SIGNED_INT
+// 正浮点数
+FLOAT: INT _EXP | DECIMAL _EXP?
+// 有符号浮点数
+SIGNED_FLOAT: ["+"|"-"] FLOAT
+
+// 正数
+NUMBER: FLOAT | INT
+// 有符号数字
+SIGNED_NUMBER: ["+"|"-"] NUMBER
+
+//
+// Strings
+//
+_STRING_INNER: /.*?/
+_STRING_ESC_INNER: _STRING_INNER /(?<!\\)(\\\\)*?/
+
+ESCAPED_STRING : "\"" _STRING_ESC_INNER "\""
+
+
+//
+// Names (Variables)
+//
+// 小写字母
+LCASE_LETTER: "a".."z"
+// 大写字母
+UCASE_LETTER: "A".."Z"
+
+// 大小写字母
+LETTER: UCASE_LETTER | LCASE_LETTER
+// 单词
+WORD: LETTER+
+
+// 第一个字符下划或大小写字母，其余字符是大小写字母
+CNAME: ("_"|LETTER) ("_"|LETTER|DIGIT)*
+
+
+//
+// Whitespace
+//
+// 空白字符
+WS_INLINE: (" "|/\t/)+
+WS: /[ \t\f\r\n]/+
+
+// 换行符
+CR : /\r/
+LF : /\n/
+NEWLINE: (CR? LF)+
+
+
+// Comments
+SH_COMMENT: /#[^\n]*/
+CPP_COMMENT: /\/\/[^\n]*/
+C_COMMENT: "/*" /(.|\n)*?/ "*/"
+SQL_COMMENT: /--[^\n]*/

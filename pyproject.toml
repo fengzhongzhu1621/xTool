@@ -1,0 +1,262 @@
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+skip-string-normalization = 'true'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = 'true'
+force_grid_wrap = 0
+use_parentheses = 'true'
+line_length = 120
+skip_glob = ["*/node_modules/**", "*/migrations/**"]
+
+[tool.flake8]
+ignore = "C901,E203,W503,F405,E402"
+max-line-length = 120
+max-complexity = 25
+format = "pylint"
+exclude = [
+    '*migrations*',
+    '.tox',
+    '*.pyc',
+    '.git',
+    '__pycache__',
+    'docs',
+    'old',
+    'build',
+    'dist',
+    '*.egg-info',
+    '.cache',
+    '.eggs',
+    'env',
+    'ebpack',
+    'cripts/*',
+    'vam/*',
+    'onf/*',
+    'larm_backends/tests/*',
+    '/parsetab.py'
+]
+
+[tool.setuptools.packages.find]
+exclude = ["tests*", "apps/tests*"]
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.build]
+package-dir = "."
+includes = ["xTool/"]
+excludes = ["tests"]
+
+[tool.pdm.resolution]
+respect-source-order = true
+
+[[tool.pdm.source]]
+name = "tencent"
+url = "https://mirrors.tencent.com/pypi/simple/"
+
+# [[tool.pdm.source]]
+# name = "pypi"
+# url = "https://pypi.org/simple"
+
+[project]
+name = "xTool"
+version = "0.2.0"
+description = "A python script tools"
+authors = [
+    {name = "fengzhongzhu1621", email = "jinyinqiao@gmail.com"},
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "Apache License 2.0"}
+classifiers = [
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+keywords = ["xTool"]
+
+dependencies = [
+    "django<5.0, >=4.2",
+    "djangorestframework<4.0.0,>=3.15.1",
+    "drf-yasg<2.0.0,>=1.21.7",
+    "drf-spectacular>=0.12.0",
+    "django-filter<25.0,>=24.2",
+    "django-redis<6.0.0,>=5.4.0",
+    "django-environ<1.0.0,>=0.11.2",
+    "django-celery-beat<3.0.0,>=2.7.0",
+    "django-celery-results<3.0.0,>=2.5.1",
+    "celery<6.0.0,>=5.4.0",
+    "django-mptt<1.0.0,>=0.16.0",
+    "django-mptt-admin<3.0.0,>=2.6.2",
+    "whitenoise<7.0.0,>=6.7.0",
+    "django-prometheus<3.0.0,>=2.3.1",
+    "bk-iam<2.0.0,>=1.3.6",
+    "pypinyin<1.0.0,>=0.51.0",
+    "ftfy<7.0.0,>=6.2.0",
+    "cachetools<6.0.0,>=5.3.3",
+    "jsondiff<3.0.0,>=2.0.0",
+    "openpyxl<4.0.0,>=3.1.2",
+    "ipy<2.0,>=1.1",
+    "excelrd<4.0.0,>=3.0.0",
+    "tenacity<9.0.0,>=8.3.0",
+    "dacite<2.0.0,>=1.8.1",
+    "pydantic<3.0.0,>=2.7.1",
+    "uhashring<3.0,>=2.3",
+    "pygments<3.0.0,>=2.18.0",
+    "markdown<4.0,>=3.6",
+    "pymysql<2.0.0,>=1.1.1",
+    "curlify<3.0.0,>=2.2.1",
+    "tzlocal<6.0,>=5.2",
+    "python-snappy<1.0.0,>=0.7.1",
+    "statsd<5.0.0,>=4.0.1",
+    "typing-extensions<5.0.0,>=4.12.0",
+    "netifaces>=0.11.0",
+    "aiohttp>=3.9.5",
+    "beautifulsoup4<5.0.0,>=4.12.3",
+    "ipaddress<2.0.0,>=1.0.23",
+    "trio<1.0.0,>=0.25.1",
+    "httptools<1.0.0,>=0.6.1",
+    "multidict<7.0.0,>=6.0.5",
+    "cryptography>=43.0.3",
+    "cython>=3.0.10",
+    "tabulate<1.0.0,>=0.9.0",
+    "croniter<3.0.0,>=2.0.5",
+    "pendulum<4.0.0,>=3.0.0",
+    "jinja2<4.0.0,>=3.1.4",
+    "psutil<6.0.0,>=5.9.8",
+    "pyparsing<4.0.0,>=3.1.2",
+    "lark<2.0.0,>=1.1.9",
+    "pydot<3.0.0,>=2.0.0",
+    "graphviz<1.0.0,>=0.20.3",
+    "pydotplus<3.0.0,>=2.0.2",
+    "pyinstrument<5.0.0,>=4.6.2",
+    "json-log-formatter<2.0,>=1.0",
+    "orjson<4.0.0,>=3.10.3",
+    "shortuuid<2.0.0,>=1.0.13",
+    "python-magic<1.0.0,>=0.4.27",
+    "xpinyin<1.0.0,>=0.7.6",
+    "html5lib<2.0,>=1.1",
+    "pyjwt<3.0.0,>=2.8.0",
+    "django-comment-migrate<1.0.0,>=0.1.7",
+    "django-restql<1.0.0,>=0.15.4",
+    "django-simple-captcha<1.0.0,>=0.6.0",
+    "djangorestframework-simplejwt<6.0.0,>=5.3.1",
+    "django-rest-framework-condition<1.0.0,>=0.1.1",
+    "ua-parser<1.0.0,>=0.18.0",
+    "channels-redis<5.0.0,>=4.2.0",
+    "user-agents<3.0.0,>=2.2.0",
+    "dvadmin-celery<2.0.0,>=1.0.5",
+    "arrow<2.0.0,>=1.3.0",
+    "werkzeug<4.0.0,>=3.0.3",
+    "bk-iam<2.0.0,>=1.3.6",
+    "aiocron<2.0,>=1.8",
+    "sanic<24.0.0,>=23.12.1",
+    "speaklater<2.0,>=1.3",
+    "channels<5.0.0,>=4.1.0",
+    "async-timeout<5.0.0,>=4.0.3",
+    "daphne<5.0.0,>=4.1.2",
+    "cycler<1.0.0,>=0.12.1",
+    "idna>=3.7",
+    "itsdangerous>=2.2.0",
+    "visitor>=0.1.3",
+    "fire>=0.6.0",
+    "tornado>=6.4.1",
+    "airports-py>=1.0.1",
+    "aiocarbon>=0.15.3",
+    "pycryptodome>=3.21.0",
+    "prettytable>=3.12.0",
+    "better-exceptions>=0.3.3",
+    "raven>=6.10.0",
+    "gunicorn>=23.0.0",
+    "hachoir>=3.3.0",
+    "python-json-logger>=3.3.0",
+    "sqlalchemy>=2.0.40",
+    "ujson>=5.10.0",
+    "django-versionlog>=1.8.1",
+    "ipython>=8.10.0",
+    "django-dbconn-retry>=0.1.8",
+    "django-debug-toolbar>=5.2.0",
+    "django-cors-headers>=4.7.0",
+    "Password-Validation>=0.1.1",
+    "pythran>=0.17.0",
+    "numpy>=2.2.6",
+    "pygame>=2.6.1",
+    "protobuf==4.25.3",
+    "opentelemetry-api<2.0.0,>=1.25.0",
+    "opentelemetry-sdk<2.0.0,>=1.25.0",
+    "opentelemetry-exporter-otlp>=1.25.0",
+    "opentelemetry-exporter-jaeger>=1.21.0",
+    "opentelemetry-exporter-otlp-proto-http<2.0.0,>=1.25.0",
+    "opentelemetry-semantic-conventions<1.0,>=0.46b0",
+    "opentelemetry-instrumentation-django<1.0,>=0.46b0",
+    "opentelemetry-instrumentation-elasticsearch<1.0,>=0.46b0",
+    "opentelemetry-instrumentation-dbapi<1.0,>=0.46b0",
+    "opentelemetry-instrumentation-redis<1.0,>=0.46b0",
+    "opentelemetry-instrumentation-requests<1.0,>=0.46b0",
+    "opentelemetry-instrumentation-celery<1.0,>=0.46b0",
+    "opentelemetry-instrumentation-logging<1.0,>=0.46b0",
+    "opentelemetry-proto==1.25.0",
+    "django-prometheus<3.0.0,>=2.3.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest-helpers-namespace<2022.0.0,>=2021.12.29",
+    "pytest>=8.3.3",
+    "pytest-django>=4.9.0",
+    "flake8>=7.0.0",
+    "black>=24.10.0",
+    "pre-commit>=4.0.1",
+    "isort>=5.13.2",
+    "pyproject-flake8>=7.0.0",
+    "beautifulsoup4>=4.12.3",
+    "coverage>=7.6.8",
+    "mock>=5.1.0",
+    "pytest-cov>=6.0.0",
+    "pytest-dotenv>=0.5.2",
+    "pytest-env>=1.1.5",
+    "pytest-html>=4.1.1",
+    "pytest-mock>=3.14.0",
+    "pytest-xdist>=3.6.1",
+    "python-dotenv>=1.0.1",
+    "mockredispy>=2.9.3",
+    "openpyxl>=3.1.5",
+    "et-xmlfile>=2.0.0",
+    "mypy<2.0.0,>=1.10.0",
+    "hypothesis<7.0.0,>=6.102.6",
+    "mockafka-py<1.0.0,>=0.1.55",
+    "pytest-asyncio>=0.23.7",
+    "line-profiler>=4.2.0",
+]
+fast = [
+    "uvloop",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+# 当设置为 true 时，PDM 在解析依赖时会优先按照 pyproject.toml 中声明的依赖源（sources）顺序来选择包版本。
+# PDM 会先检查第一个源（如自定义的 PyPI 镜像或私有仓库），如果找不到匹配的版本，再依次检查后续的源。
+[project.urls]
+repository = "https://github.com/fengzhongzhu1621/xTool"

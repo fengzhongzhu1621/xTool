@@ -1,0 +1,2 @@
+msgid "Unauthorized"
+msgstr "Non autorisé"

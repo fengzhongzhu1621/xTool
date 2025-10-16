@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// protoc --python_out=. codec.proto
+// 一般定义消息类型的文件扩展名为".proto"。
+// 第一行必须指定使用 "proto3"语法。
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 字段编号
+/*
+ * 字段编号范围为：1 ～ 536,870,911
+ * 编号在此消息中是唯一的
+ * 编号 19,000 ～ 19,999 保留，用于协议内部实现
+ * 不能使用之前保留或已经分配过的编号，字段使用后不要修改编号，不要重复使用字段编号。
+ * 对于最常设置的字段，应使用字段编号 1 到 15。
+ */
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 字段规则
+/*
+ * optional
+ * repeated 可以在格式正确的消息中重复零次或多次。将保留重复值的顺序。
+ * map 键/值字段类型。格式正确的消息可以包含此字段中的零个或一个。无法确定是否解析了此类型的字段。
+ * reserved 将已删除的字段编号添加到保留列表中。尝试使用这些保留的字段编号或名称，编译器将报错。
+ */
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 字段类型
+/*
+ * string 默认值为空字符串
+ * int32 默认值为0
+ * int64
+ * uint32
+ * uint64
+ * sint32
+ * sint64
+ * fixed32
+ * fixed64
+ * sfixed32
+ * sfixed64
+ * bool 默认值为 false
+ * bytes 默认值为空字节
+ * double
+ * float
+ */
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 枚举
+/*
+枚举器常量必须在 32 位整数范围内。由于枚举值在网络上使用变体编码，因此负值效率低下，因此不建议使用。
+
+enum Corpus {
+  option allow_alias = true; // 可以通过将相同的值分配给不同的枚举常量来定义别名，否则协议编译器会在找到别名时生成警告消息。
+
+  CORPUS_UNSPECIFIED = 0; // 默认值是第一个定义的枚举值，必须为 0
+  CORPUS_UNIVERSAL = 1;
+  CORPUS_WEB = 2;
+  CORPUS_IMAGES = 3;
+  CORPUS_LOCAL = 4;
+  CORPUS_NEWS = 5;
+  CORPUS_PRODUCTS = 6;
+  CORPUS_VIDEO = 7;
+}
+message SearchRequest {
+  string query = 1;
+  int32 page_number = 2;
+  int32 results_per_page = 3;
+  Corpus corpus = 4;
+}
+*/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 嵌套类型
+/*
+message SearchResponse {
+  message Result {
+    string url = 1;
+    string title = 2;
+    repeated string snippets = 3;
+  }
+  repeated Result results = 1;
+}
+message SomeOtherMessage {
+  SearchResponse.Result result = 1;
+}
+message Outer {       // Level 0
+  message MiddleAA {  // Level 1
+    message Inner {   // Level 2
+      int64 ival = 1;
+      bool  booly = 2;
+    }
+  }
+  message MiddleBB {  // Level 1
+    message Inner {   // Level 2
+      int32 ival = 1;
+      bool  booly = 2;
+    }
+  }
+}
+*/
+
+/
+/*
+message SearchRequest {
+  string query = 1;
+  int32 page_number = 2;
+  int32 results_per_page = 3;
+}
+*/
+
+/*
+message Foo {
+  reserved 2, 15, 9 to 11; // 表示数字2、15、9到11都被保留，不能用作字段的编号。
+  reserved "foo", "bar"; // 表示字符串 "foo" 和 "bar" 也被保留，不能用作字段的名称。
+}
+*/
+
+message Request {
+    string message  = 1;
+}
