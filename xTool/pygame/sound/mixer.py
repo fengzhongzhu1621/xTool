@@ -2,9 +2,9 @@ import pygame
 from pygame.mixer import Sound
 
 
-def init_mixer() -> None:
+def init_mixer(buffer=1024) -> None:
     if pygame.get_sdl_version()[0] == 2:
-        pygame.mixer.pre_init(44100, 32, 2, 1024)  # SDL2音频预初始化
+        pygame.mixer.pre_init(44100, 32, 2, buffer)  # SDL2音频预初始化
 
     # 初始化pygame
     _ = pygame.init()

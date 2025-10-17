@@ -13,6 +13,13 @@ if pg.mixer and not pg.mixer.get_init():
 ## Sound()
 ```python
 sound = pygame.mixer.Sound(file_path)  # 加载音效
+
+print("将录制的数据转换为pg.mixer.Sound对象")
+# 将所有音频数据块合并并创建Sound对象
+sound = pg.mixer.Sound(buffer=b"".join(sound_chunks))
+
+print("播放录制的声音")
+sound.play()  # 播放录制的声音
 ```
 
 # music
