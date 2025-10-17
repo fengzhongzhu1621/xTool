@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """pygame.examples.aliens - 外星人入侵游戏示例
 
 展示一个需要防御外星人入侵的迷你游戏。
@@ -24,17 +23,18 @@
 
 import os
 import random
-from typing import List
+from typing import Any, override
 
 # import basic pygame modules
+import pygame
 import pygame as pg
+from pygame import Rect
+from pygame.font import Font
+from pygame.mixer import Sound
+from pygame.sprite import Group, GroupSingle, RenderUpdates
+from pygame.surface import Surface
 
-from xTool.pygame.image import load_image
-
-# see if we can load more than standard BMP
-if not pg.image.get_extended():
-    raise SystemExit("Sorry, extended image module required")
-
+from xTool.pygame import display, image, init, quit, sound, sprite
 
 # 游戏常量
 MAX_SHOTS = 2  # 屏幕上最多允许的玩家子弹数量
@@ -42,118 +42,165 @@ ALIEN_ODDS = 22  # 新外星人出现的概率（1/22）
 BOMB_ODDS = 60  # 新炸弹掉落的概率（1/60）
 ALIEN_RELOAD = 12  # 新外星人出现的帧间隔
 SCREENRECT = pg.Rect(0, 0, 640, 480)  # 屏幕矩形区域
-g_score = 0  # 游戏分数
 
 main_dir = os.path.split(os.path.abspath(__file__))[0]
 resource_dir = os.path.join(main_dir, "data")
 
 
-def load_sound(file):
-    """加载音效（因为pygame可能在没有mixer的情况下编译）"""
-    if not pg.mixer:
-        return None
-    file = os.path.join(main_dir, "data", file)  # 构建完整文件路径
-    try:
-        sound = pg.mixer.Sound(file)  # 加载音效
-        return sound
-    except pg.error:
-        print(f"警告，无法加载 {file}")
-    return None
+# 每种游戏对象都有 init 和 update 函数
+# update 函数每帧调用一次，用于更新对象的位置和状态
+# Player 对象使用 move 函数而不是 update，因为它需要处理键盘输入信息
 
 
-# Each type of game object gets an init and an update function.
-# The update function is called once per frame, and it is when each object should
-# change its current position and state.
-#
-# The Player object actually gets a "move" function instead of update,
-# since it is passed extra information about the keyboard.
+class Shot(sprite.Sprite):
+    """玩家发射的子弹"""
+
+    speed = -11  # 子弹速度（向上）
+    images: list[pg.Surface] = []  # 子弹图像列表
+
+    def __init__(self, pos: tuple[int, int], *groups):
+        super().__init__(*groups)
+
+        # 加载子弹图像
+        self.images = self.load_images([os.path.join(resource_dir, "shot.gif")])
+        self.image = self.images[0]
+        # 设置子弹的初始位置
+        self.rect: Rect = self.get_rect_midbottom(pos)
+
+    @override
+    def update(self, *args, **kwargs):
+        """每帧更新子弹状态
+
+        每个tick我们向上移动子弹
+        """
+        # 向上移动
+        _ = self.move_up(self.speed)
 
 
-class Player(pg.sprite.Sprite):
+class Player(sprite.Sprite):
     """代表玩家的月球车类型汽车"""
 
-    speed = 10  # 移动速度
-    bounce = 24  # 弹跳效果参数
-    gun_offset = -11  # 枪口偏移量
-    images: List[pg.Surface] = []  # 玩家图像列表
+    speed: int = 10  # 移动速度
+    bounce: int = 24  # 弹跳效果参数
+    gun_offset: int = -11  # 枪口水平偏移量
 
-    def __init__(self, *groups):
-        pg.sprite.Sprite.__init__(self, *groups)  # 调用父类构造函数
-        self.image = self.images[0]  # 设置初始图像
+    def __init__(self, *groups) -> None:
+        super().__init__(*groups)
+
+        self.images: list[Surface] = self.load_flipx_images(os.path.join(resource_dir, "player1.gif"))  # 玩家图像列表
+        self.image: Surface = self.images[0]  # 设置初始图像
+
         # 将玩家放置在屏幕底部中央
-        self.rect = self.image.get_rect(midbottom=SCREENRECT.midbottom)
-        self.reloading = 0  # 重装状态
-        self.origtop = self.rect.top  # 原始顶部位置
-        self.facing = -1  # 面向方向（-1左，1右）
+        self.rect: Rect = self.get_rect_midbottom(SCREENRECT)
 
-    def move(self, direction):
-        """移动玩家"""
-        if direction:
-            self.facing = direction  # 更新面向方向
-        # 根据方向移动玩家
-        self.rect.move_ip(direction * self.speed, 0)
-        # 确保玩家不会移出屏幕
-        self.rect = self.rect.clamp(SCREENRECT)
-        # 根据移动方向切换图像（左右镜像）
-        if direction < 0:
-            self.image = self.images[0]  # 向左的图像
-        elif direction > 0:
-            self.image = self.images[1]  # 向右的图像
-        # 添加弹跳效果
-        self.rect.top = self.origtop - (self.rect.left // self.bounce % 2)
+        self.reloading: int = 0  # 重装状态
+        self.origtop: int = self.rect.top  # 原始顶部位置
 
-    def gunpos(self):
+    def move(self, direction: int) -> None:
+        """移动玩
+
+        @direction int 小于 0 向左移动，大于 0 向右移动
+        """
+        _ = self.move_horizontal(direction, self.origtop, SCREENRECT, self.speed, self.bounce)
+
+    def gunpos(self) -> tuple[int, int]:
         """获取枪口位置"""
+        # self.facing: 玩家面向方向（1=向右，-1=向左）
+        # self.gun_offset: 枪口相对于玩家中心的水平偏移量
+        # self.rect.centerx: 玩家矩形的水平中心坐标
+        # self.rect.top: 玩家矩形的顶部坐标
+        #
+        # 玩家向右 (facing=1):
+        # 枪口位置 = 1 * 15 + 400 = 415 (玩家中心400，枪口在右侧15像素)
+        #
+        # 玩家向左 (facing=-1):
+        # 枪口位置 = -1 * 15 + 400 = 385 (玩家中心400，枪口在左侧15像素)
         pos = self.facing * self.gun_offset + self.rect.centerx
+        # 返回的坐标：(水平位置, 垂直位置)
+        # 子弹会从这个坐标点开始飞行
+        # 确保子弹从玩家的枪口而不是身体中心发射
         return pos, self.rect.top
 
+    def fire(self, firing_state: bool, shoot_sound: Sound | None, shots) -> None:
+        """发射子弹"""
+        # 如果不在重装状态、正在射击且子弹数量未达上限
+        if not self.reloading and firing_state and len(shots) < MAX_SHOTS:
+            # 创建子弹
+            _ = Shot(self.gunpos(), shots, all)
+            # 播放射击音效
+            if pg.mixer and shoot_sound is not None:
+                _ = shoot_sound.play()
 
-class Alien(pg.sprite.Sprite):
+        # 更新重装状态
+        self.reloading = firing_state
+
+
+class Alien(sprite.Sprite):
     """外星人飞船，缓慢在屏幕上移动"""
 
-    speed = 13  # 移动速度
-    animcycle = 12  # 动画循环帧数
-    images: List[pg.Surface] = []  # 外星人图像列表
+    speed: int = 13  # 移动速度
+    animcycle: int = 12  # 动画循环帧数
 
-    def __init__(self, *groups):
-        pg.sprite.Sprite.__init__(self, *groups)  # 调用父类构造函数
-        self.image = self.images[0]  # 设置初始图像
-        self.rect = self.image.get_rect()  # 获取矩形区域
-        # 随机选择移动方向
-        self.facing = random.choice((-1, 1)) * Alien.speed
-        self.frame = 0  # 动画帧计数器
+    def __init__(self, *groups) -> None:
+        super().__init__(*groups)
+
+        # 加载多个动画帧
+        self.images = self.load_images(
+            [
+                os.path.join(resource_dir, "alien1.gif"),
+                os.path.join(resource_dir, "alien2.gif"),
+                os.path.join(resource_dir, "alien3.gif"),
+            ]
+        )
+        # 选择第一帧
+        self.image: Surface = self.images[0]  # 设置初始图像
+        self.rect: Rect = self.image.get_rect()  # 获取矩形区域
+
+        # 随机选择移动方向，并计算移动距离
+        self.facing: int = random.choice((-1, 1)) * Alien.speed
+        self.frame: int = 0  # 动画帧计数器
+
         # 如果向左移动，从屏幕右侧开始
         if self.facing < 0:
             self.rect.right = SCREENRECT.right
 
+    @override
     def update(self, *args, **kwargs):
         """更新外星人状态"""
-        # 移动外星人
+        # 水平移动外星人
         self.rect.move_ip(self.facing, 0)
+
         # 如果碰到屏幕边缘，改变方向并下移一行
-        if not SCREENRECT.contains(self.rect):
-            self.facing = -self.facing  # 反向移动
-            self.rect.top = self.rect.bottom + 1  # 下移一行
-            self.rect = self.rect.clamp(SCREENRECT)  # 确保在屏幕内
+        if not self.in_screen(SCREENRECT):
+            self.facing = -self.facing  # 水平反向移动
+            self.rect = self.move_next_line(SCREENRECT)
+
         # 更新动画帧
         self.frame = self.frame + 1
-        # 循环播放3帧动画
+
+        # 循环播放3帧动画，每次更新时切换图片
         self.image = self.images[self.frame // self.animcycle % 3]
 
 
-class Explosion(pg.sprite.Sprite):
+class Explosion(sprite.Sprite):
     """An explosion. Hopefully the Alien and not the player!"""
 
-    defaultlife = 12
-    animcycle = 3
-    images: List[pg.Surface] = []
+    defaultlife = 12  # 爆炸持续的游戏帧数
+    animcycle = 3  # 动画切换速度（每3帧切换一次图像）
+    images: list[pg.Surface] = []  # 存储爆炸动画帧的列表
 
-    def __init__(self, actor, *groups):
-        pg.sprite.Sprite.__init__(self, *groups)
+    def __init__(self, actor: pygame.sprite.Sprite, *groups):
+        super().__init__(*groups)
+
+        # 存储爆炸动画帧的列表
+        self.images = self.load_flipxy_iamges(os.path.join(resource_dir, "explosion1.gif"))
         self.image = self.images[0]
-        self.rect = self.image.get_rect(center=actor.rect.center)
+
+        # 将爆炸效果的矩形边界定位到被炸对象（actor）的中心点
+        self.rect = self.get_rect_center(actor.rect)  # pyright: ignore[reportAttributeAccessIssue]
         self.life = self.defaultlife
 
+    @override
     def update(self, *args, **kwargs):
         """Called every time around the game loop.
 
@@ -162,46 +209,29 @@ class Explosion(pg.sprite.Sprite):
 
         Also we animate the explosion.
         """
-        self.life = self.life - 1
+        self.life: int = self.life - 1
         self.image = self.images[self.life // self.animcycle % 2]
         if self.life <= 0:
+            # 爆炸消失
             self.kill()
 
 
-class Shot(pg.sprite.Sprite):
-    """玩家发射的子弹"""
-
-    speed = -11  # 子弹速度（向上）
-    images: List[pg.Surface] = []  # 子弹图像列表
-
-    def __init__(self, pos, *groups):
-        pg.sprite.Sprite.__init__(self, *groups)  # 调用父类构造函数
-        self.image = self.images[0]  # 设置子弹图像
-        self.rect = self.image.get_rect(midbottom=pos)  # 设置初始位置
-
-    def update(self, *args, **kwargs):
-        """每帧更新子弹状态
-
-        每个tick我们向上移动子弹
-        """
-        self.rect.move_ip(0, self.speed)  # 向上移动
-        if self.rect.top <= 0:  # 如果子弹飞出屏幕顶部
-            self.kill()  # 移除子弹
-
-
-class Bomb(pg.sprite.Sprite):
+class Bomb(sprite.Sprite):
     """外星人投掷的炸弹"""
 
     speed = 9  # 炸弹下落速度
-    images: List[pg.Surface] = []  # 炸弹图像列表
 
     def __init__(self, alien, explosion_group, *groups):
-        pg.sprite.Sprite.__init__(self, *groups)  # 调用父类构造函数
+        super().__init__(*groups)
+
+        self.images = self.load_images([os.path.join(resource_dir, "bomb.gif")])
         self.image = self.images[0]  # 设置炸弹图像
         # 在外星人下方5像素位置创建炸弹
-        self.rect = self.image.get_rect(midbottom=alien.rect.move(0, 5).midbottom)
+        self.rect = self.get_rect_midbottom(alien.rect.move(0, 5))
+
         self.explosion_group = explosion_group  # 爆炸效果组
 
+    @override
     def update(self, *args, **kwargs):
         """每帧更新炸弹状态
 
@@ -211,100 +241,95 @@ class Bomb(pg.sprite.Sprite):
         - 创建爆炸效果
         - 移除炸弹
         """
-        self.rect.move_ip(0, self.speed)  # 向下移动
+        # 向下移动
+        _ = self.move_down(self.speed)
         if self.rect.bottom >= 470:  # 如果炸弹到达屏幕底部
-            Explosion(self, self.explosion_group)  # 创建爆炸效果
-            self.kill()  # 移除炸弹
+            # 创建爆炸效果，添加到爆炸组中，便于统一更新和渲染
+            Explosion(self, self.explosion_group)
+            # 移除炸弹对象，但爆炸继续播放
+            self.kill()
 
 
 class Score(pg.sprite.Sprite):
     """用于跟踪分数"""
 
-    def __init__(self, *groups):
-        pg.sprite.Sprite.__init__(self, *groups)  # 调用父类构造函数
-        self.font = pg.font.Font(None, 20)  # 创建字体
+    def __init__(self, *groups) -> None:
+        super().__init__(*groups)  # 调用父类构造函数
+
+        self.total: int = 0
+
+        self.font: Font = pg.font.Font(None, 20)  # 创建字体
         self.font.set_italic(1)  # 设置斜体
-        self.color = "white"  # 分数颜色
-        self.lastscore = -1  # 上一次分数
+
+        self.color: str = "white"  # 分数颜色
+        self.lastscore: int = -1  # 上一次分数
+
         self.update()  # 初始更新
-        self.rect = self.image.get_rect().move(10, 450)  # 设置显示位置
+        self.rect: Rect = self.image.get_rect().move(10, 450)  # 设置显示位置
 
-    def update(self, *args, **kwargs):
+    def incr(self) -> None:
+        self.total += 1
+
+    def get_total(self) -> int:
+        return self.total
+
+    @override
+    def update(self, *args, **kwargs) -> None:
         """只有当分数发生变化时才更新"""
-        if g_score != self.lastscore:  # 如果分数有变化
-            self.lastscore = g_score  # 更新上一次分数
-            msg = f"分数: {g_score}"  # 创建分数文本
-            self.image = self.font.render(msg, 0, self.color)  # 渲染分数图像
+        if self.total != self.lastscore:  # 如果分数有变化
+            self.lastscore = self.total  # 更新上一次分数
+            # 渲染分数图像
+            msg = f"Score: {self.total}"  # 创建分数文本
+            self.image: Surface = self.font.render(msg, 0, self.color)
 
 
-def main(winstyle=0):
+def main(winstyle=0) -> None:
     """游戏主函数"""
-    # 初始化pygame
-    if pg.get_sdl_version()[0] == 2:
-        pg.mixer.pre_init(44100, 32, 2, 1024)  # SDL2音频预初始化
-    pg.init()  # 初始化pygame
-    if pg.mixer and not pg.mixer.get_init():  # 检查音频是否初始化成功
-        print("警告，没有声音")
-        pg.mixer = None
-
-    fullscreen = False  # 全屏状态
+    ###############################################################################################################
+    # 初始化
+    init.init_game()
     # 设置显示模式
-    winstyle = 0  # 窗口模式
-    bestdepth = pg.display.mode_ok(SCREENRECT.size, winstyle, 32)  # 获取最佳颜色深度
-    screen = pg.display.set_mode(SCREENRECT.size, winstyle, bestdepth)  # 创建显示窗口
+    display_screen = display.DisplayScreen(SCREENRECT, winstyle, 32)
+    screen = display_screen.set_model()
 
-    # 加载图像，分配给精灵类
-    # （在类使用之前执行，在屏幕设置之后）
-    img = load_image(os.path.join(resource_dir, "player1.gif"))
-    Player.images = [img, pg.transform.flip(img, 1, 0)]  # 玩家左右图像
-    img = load_image(os.path.join(resource_dir, "explosion1.gif"))
-    Explosion.images = [img, pg.transform.flip(img, 1, 1)]  # 爆炸图像
-    Alien.images = [
-        load_image(os.path.join(resource_dir, im)) for im in ("alien1.gif", "alien2.gif", "alien3.gif")
-    ]  # 外星人动画图像
-    Bomb.images = [load_image(os.path.join(resource_dir, "bomb.gif"))]  # 炸弹图像
-    Shot.images = [load_image(os.path.join(resource_dir, "shot.gif"))]  # 子弹图像
-
+    ###############################################################################################################
     # 装饰游戏窗口
-    icon = pg.transform.scale(Alien.images[0], (32, 32))  # 创建窗口图标
-    pg.display.set_icon(icon)  # 设置窗口图标
-    pg.display.set_caption("Pygame Aliens")  # 设置窗口标题
-    pg.mouse.set_visible(0)  # 隐藏鼠标光标
-
+    # 设置窗口图标
+    icon = image.load_image(os.path.join(resource_dir, "alien1.gif"))
+    display_screen.set_icon(icon, (32, 32))
+    # 设置窗口标题
+    display_screen.set_caption("Pygame Aliens")
+    # 隐藏鼠标光标
+    display_screen.hide_mouse()
     # 创建背景，平铺背景图像
-    bgdtile = load_image("background.gif")  # 加载背景瓦片
-    background = pg.Surface(SCREENRECT.size)  # 创建背景表面
-    # 平铺背景图像
-    for x in range(0, SCREENRECT.width, bgdtile.get_width()):
-        background.blit(bgdtile, (x, 0))
-    screen.blit(background, (0, 0))  # 绘制背景到屏幕
-    pg.display.flip()  # 更新显示
+    background = display_screen.flip_background(os.path.join(resource_dir, "background.gif"))
+    # 播放背景音乐
+    display_screen.play_background_sound(os.path.join(resource_dir, "house_lo.wav"))
 
+    ###############################################################################################################
     # 加载音效
-    boom_sound = load_sound("boom.wav")  # 爆炸音效
-    shoot_sound = load_sound("car_door.wav")  # 射击音效
-    if pg.mixer:
-        music = os.path.join(main_dir, "data", "house_lo.wav")  # 背景音乐路径
-        pg.mixer.music.load(music)  # 加载背景音乐
-        pg.mixer.music.play(-1)  # 循环播放背景音乐
+    boom_sound = sound.load_sound(os.path.join(resource_dir, "boom.wav"))  # 爆炸音效
+    shoot_sound = sound.load_sound(os.path.join(resource_dir, "car_door.wav"))  # 射击音效
 
     # 初始化游戏组
-    aliens = pg.sprite.Group()  # 外星人组
-    shots = pg.sprite.Group()  # 子弹组
-    bombs = pg.sprite.Group()  # 炸弹组
-    all = pg.sprite.RenderUpdates()  # 所有需要更新的精灵组
-    lastalien = pg.sprite.GroupSingle()  # 最后一个外星人（用于投掷炸弹）
+    aliens: Group[Alien] = pg.sprite.Group()  # 外星人组
+    shots: Group[Any] = pg.sprite.Group()  # 子弹组
+    bombs: Group[Bomb] = pg.sprite.Group()  # 炸弹组
+    all: RenderUpdates[Any] = pg.sprite.RenderUpdates()  # 所有需要更新的精灵组
+    lastalien: GroupSingle[Any] = pg.sprite.GroupSingle()  # 最后一个外星人（用于投掷炸弹）
 
     # 创建一些初始值
     alienreload = ALIEN_RELOAD  # 外星人重装计数器
     clock = pg.time.Clock()  # 游戏时钟
 
     # 初始化起始精灵
-    global g_score
+    # all = Player + aliens group + score
+    # lastalien = aliens group 中最新的一个
     player = Player(all)  # 创建玩家
     Alien(aliens, all, lastalien)  # 创建初始外星人
+    score: Score = Score(all)  # 创建分数显示
     if pg.font:
-        all.add(Score(all))  # 添加分数显示
+        all.add(score)  # 添加分数显示
 
     # 当玩家存活时运行主循环
     while player.alive():
@@ -315,19 +340,9 @@ def main(winstyle=0):
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:  # ESC键退出
                 return
             if event.type == pg.KEYDOWN:  # 按键事件
-                if event.key == pg.K_f:  # f键切换全屏
-                    if not fullscreen:
-                        print("切换到全屏模式")
-                        screen_backup = screen.copy()  # 备份屏幕内容
-                        screen = pg.display.set_mode(SCREENRECT.size, winstyle | pg.FULLSCREEN, bestdepth)  # 切换到全屏
-                        screen.blit(screen_backup, (0, 0))  # 恢复屏幕内容
-                    else:
-                        print("切换到窗口模式")
-                        screen_backup = screen.copy()  # 备份屏幕内容
-                        screen = pg.display.set_mode(SCREENRECT.size, winstyle, bestdepth)  # 切换到窗口模式
-                        screen.blit(screen_backup, (0, 0))  # 恢复屏幕内容
-                    pg.display.flip()  # 更新显示
-                    fullscreen = not fullscreen  # 切换全屏状态
+                if event.key == pg.K_f:
+                    # f键切换全屏
+                    screen: Surface = display_screen.switch_screen()
 
         keystate = pg.key.get_pressed()  # 获取按键状态
 
@@ -337,25 +352,28 @@ def main(winstyle=0):
         # 更新所有精灵
         all.update()
 
-        # 处理玩家输入
+        # 移动玩家
         direction = keystate[pg.K_RIGHT] - keystate[pg.K_LEFT]  # 计算移动方向
         player.move(direction)  # 移动玩家
         firing = keystate[pg.K_SPACE]  # 射击状态
-        # 如果不在重装状态、正在射击且子弹数量未达上限
-        if not player.reloading and firing and len(shots) < MAX_SHOTS:
-            Shot(player.gunpos(), shots, all)  # 创建子弹
-            if pg.mixer and shoot_sound is not None:  # 播放射击音效
-                shoot_sound.play()
-        player.reloading = firing  # 更新重装状态
+
+        # 发送子弹
+        player.fire(firing, shoot_sound, shots)
 
         # 创建新外星人
         if alienreload:
+            # 每12 帧可能可能创建一个新外星人，是否能够创建由 ALIEN_ODDS 概率决定
             alienreload = alienreload - 1  # 减少重装计数器
         elif not int(random.random() * ALIEN_ODDS):  # 随机决定是否创建外星人
+            # random.random() 生成一个 [0, 1) 范围内的随机浮点数
+            # 乘以 ALIEN_ODDS (值为22)，得到 [0, 22) 范围内的随机数
+            # int() 取整，得到 0 到 21 的整数
+            # not 运算符将结果转换为布尔值：只有结果为 0 时，not 0 才为 True
+            # 所以这个条件的意思是：每帧有 1/22 的概率创建新外星人。
             Alien(aliens, all, lastalien)  # 创建新外星人
             alienreload = ALIEN_RELOAD  # 重置重装计数器
 
-        # 投掷炸弹
+        # 最新的一个外星人投掷炸弹
         if lastalien and not int(random.random() * BOMB_ODDS):  # 随机决定是否投掷炸弹
             Bomb(lastalien.sprite, all, bombs, all)  # 创建炸弹
 
@@ -365,7 +383,7 @@ def main(winstyle=0):
                 boom_sound.play()
             Explosion(alien, all)  # 创建外星人爆炸
             Explosion(player, all)  # 创建玩家爆炸
-            g_score = g_score + 1  # 增加分数
+            score.incr()
             player.kill()  # 移除玩家
 
         # 检测子弹是否击中外星人
@@ -373,7 +391,7 @@ def main(winstyle=0):
             if pg.mixer and boom_sound is not None:  # 播放爆炸音效
                 boom_sound.play()
             Explosion(alien, all)  # 创建爆炸效果
-            g_score = g_score + 1  # 增加分数
+            score.incr()  # 增加分数
 
         # 检测外星人炸弹是否击中玩家
         for bomb in pg.sprite.spritecollide(player, bombs, 1):  # 炸弹碰撞检测
@@ -390,13 +408,13 @@ def main(winstyle=0):
         # 将帧率限制在40fps，也称为40HZ或每秒40次
         clock.tick(40)
 
-    # 游戏结束处理
-    if pg.mixer:
-        pg.mixer.music.fadeout(1000)  # 背景音乐淡出
-    pg.time.wait(1000)  # 等待1秒
+    # 等待1秒
+    pg.time.wait(1000)
+
+    # 退出游戏
+    quit.quit_game()
 
 
 # 如果运行此脚本，调用"main"函数
 if __name__ == "__main__":
     main()  # 运行主函数
-    pg.quit()  # 退出pygame

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """抗锯齿图形绘制示例 - Proof of concept gfxdraw example"""
 
 import pygame

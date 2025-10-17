@@ -1,5 +1,3 @@
-import os
-
 import arrow
 import pytest
 from django.conf import settings
@@ -8,10 +6,6 @@ from django.utils.functional import empty
 from apps.credential.models import Credential, CredentialResource
 from apps.http_client.models import RequestApiConfig, RequestSystemConfig
 from apps.http_client.resources import RequestApiConfigResource
-from core.testing import add_pytest_fixture_plugins
-
-# 拆分 fixtures
-pytest_plugins = add_pytest_fixture_plugins(os.path.join(settings.BASE_DIR, "tests/fixtures"))
 
 
 def pytest_configure():

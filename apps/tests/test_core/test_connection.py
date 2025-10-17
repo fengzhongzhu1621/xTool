@@ -1,4 +1,4 @@
-from apps.core.connection import print_sql_execute_result
+from core.iam.connection import print_sql_execute_result
 
 
 def test_print_sql_execute_result():

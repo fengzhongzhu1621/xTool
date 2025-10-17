@@ -1,0 +1,25 @@
+# Font()
+
+```python
+self.font = pg.font.Font(None, 20)  # 创建字体
+```
+
+# 设置字体
+## set_italic()
+
+```python
+self.font.set_italic(1)  # 设置斜体
+```
+
+# 将文本消息渲染成图像
+```python
+self.total: int = 0
+self.color: str = "white"  # 分数颜色
+msg = f"分数: {self.total}"  # 创建分数文本
+self.image: Surface = self.font.render(msg, 0, self.color)
+```
+
+参数说明：
+* msg: 要显示的文本内容（如"分数: 10"）
+* 0: 抗锯齿参数（0表示不抗锯齿，1表示抗锯齿）
+* self.color: 文本颜色（如"white"）

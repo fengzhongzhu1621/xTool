@@ -1,12 +1,19 @@
-# display
+# set_mode()
+设置显示模式
 
-## set_mode()
 ```python
 # 创建游戏窗口，设置分辨率为1280x720
 screen: pygame.Surface = pygame.display.set_mode((1280, 720))
 ```
 
-## flip()
+```python
+SCREENRECT = pg.Rect(0, 0, 640, 480)  # 屏幕矩形区域
+winstyle = 0  # 窗口模式
+bestdepth = pg.display.mode_ok(SCREENRECT.size, winstyle, 32)  # 获取最佳颜色深度
+screen = pg.display.set_mode(SCREENRECT.size, winstyle, bestdepth)  # 创建显示窗口
+```
+
+# flip()
 
 Pygame通过双缓冲机制来管理屏幕显示。
 
@@ -17,3 +24,12 @@ Pygame通过双缓冲机制来管理屏幕显示。
 pygame.display.flip()
 ```
 
+# set_icon() 设置窗口图标
+```python
+pg.display.set_icon(icon)
+```
+
+# set_caption() 设置窗口标题
+```python
+pg.display.set_caption("Pygame Aliens")
+```

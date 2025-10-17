@@ -8,6 +8,7 @@ Hola Mundo
 
 import fire
 
-english = 'Hello World'
-spanish = 'Hola Mundo'
-fire.Fire()
+if __name__ == '__main__':
+    english = 'Hello World'
+    spanish = 'Hola Mundo'
+    fire.Fire()

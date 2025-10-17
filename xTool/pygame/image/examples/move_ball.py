@@ -17,6 +17,7 @@ screen = pygame.display.set_mode(size)
 
 # 加载球体图片并获取其矩形区域
 ball = pygame.image.load("xTool/pygame/resources/intro_ball.gif")
+# 此时 ball 在屏幕左上角
 ballrect = ball.get_rect()
 
 # 游戏主循环

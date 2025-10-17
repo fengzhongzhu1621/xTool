@@ -4,6 +4,7 @@ import arrow
 from dateutil.tz import tzutc
 from django.conf import settings
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from rest_framework.settings import api_settings
 
 
@@ -58,3 +59,13 @@ def strftime_local(aware_time, fmt="%Y-%m-%d %H:%M:%S"):
         # translate to time in local timezone
         aware_time = timezone.localtime(aware_time)
     return aware_time.strftime(fmt)
+
+
+def from_iso_format(start_time: str) -> datetime:
+    """将iso8601格式的字符串转换为当前时区的时间对象 ."""
+    start_time_obj = parse_datetime(start_time)
+    # 转换为当前时区的时间
+    current_timezone = timezone.get_current_timezone()
+    start_at_current_timezone = start_time_obj.astimezone(current_timezone)
+    start_at_current_timezone_naive = timezone.make_naive(start_at_current_timezone)
+    return start_at_current_timezone_naive
