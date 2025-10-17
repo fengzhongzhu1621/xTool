@@ -14,16 +14,23 @@ def init_mixer(buffer=1024) -> None:
         pygame.mixer = None
 
 
-def load_sound(file_path: str) -> Sound | None:
+class NoneSound:
+    def play(self) -> None:
+        pass
+
+
+def load_sound(file_path: str) -> Sound | NoneSound:
     """加载音效（因为pygame可能在没有mixer的情况下编译）"""
-    if not pygame.mixer:
-        return None
+    if not pygame.mixer or not pygame.mixer.get_init():
+        return NoneSound()
+
     try:
-        sound = pygame.mixer.Sound(file_path)  # 加载音效
+        sound: Sound = pygame.mixer.Sound(file_path)  # 加载音效
         return sound
     except pygame.error:
         print(f"警告，无法加载 {file_path}")
-    return None
+
+    return NoneSound()
 
 
 def play_background_sound(file_path: str) -> None:

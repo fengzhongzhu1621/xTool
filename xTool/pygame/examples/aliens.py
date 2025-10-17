@@ -55,8 +55,7 @@ resource_dir = os.path.join(main_dir, "data")
 class Shot(sprite.Sprite):
     """玩家发射的子弹"""
 
-    speed = -11  # 子弹速度（向上）
-    images: list[pg.Surface] = []  # 子弹图像列表
+    speed: int = -11  # 子弹速度（向上）
 
     def __init__(self, pos: tuple[int, int], *groups):
         super().__init__(*groups)
@@ -121,15 +120,14 @@ class Player(sprite.Sprite):
         # 确保子弹从玩家的枪口而不是身体中心发射
         return pos, self.rect.top
 
-    def fire(self, firing_state: bool, shoot_sound: Sound | None, shots) -> None:
+    def fire(self, firing_state: bool, shoot_sound: Sound | sound.NoneSound, shots, all) -> None:
         """发射子弹"""
         # 如果不在重装状态、正在射击且子弹数量未达上限
         if not self.reloading and firing_state and len(shots) < MAX_SHOTS:
             # 创建子弹
             _ = Shot(self.gunpos(), shots, all)
             # 播放射击音效
-            if pg.mixer and shoot_sound is not None:
-                _ = shoot_sound.play()
+            _ = shoot_sound.play()
 
         # 更新重装状态
         self.reloading = firing_state
@@ -289,7 +287,7 @@ def main(winstyle=0) -> None:
     # 初始化
     init.init_game()
     # 设置显示模式
-    display_screen = display.DisplayScreen(SCREENRECT, winstyle, 32)
+    display_screen = display.DisplayWindow(SCREENRECT, winstyle, 32)
     screen = display_screen.set_model()
 
     ###############################################################################################################
@@ -302,7 +300,8 @@ def main(winstyle=0) -> None:
     # 隐藏鼠标光标
     display_screen.hide_mouse()
     # 创建背景，平铺背景图像
-    background = display_screen.flip_background(os.path.join(resource_dir, "background.gif"))
+    background = display_screen.blit_background(os.path.join(resource_dir, "background.gif"))
+    display_screen.flip()
     # 播放背景音乐
     display_screen.play_background_sound(os.path.join(resource_dir, "house_lo.wav"))
 
@@ -358,7 +357,7 @@ def main(winstyle=0) -> None:
         firing = keystate[pg.K_SPACE]  # 射击状态
 
         # 发送子弹
-        player.fire(firing, shoot_sound, shots)
+        player.fire(firing, shoot_sound, shots, all)
 
         # 创建新外星人
         if alienreload:

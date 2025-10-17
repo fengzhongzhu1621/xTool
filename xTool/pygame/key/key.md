@@ -99,6 +99,23 @@ while True:
         raise SystemExit()
 ```
 
+```python
+# 处理输入事件
+for event in pg.event.get():
+    if event.type == pg.QUIT:  # 窗口关闭事件
+        going = False
+    elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:  # ESC键退出
+        going = False
+    elif event.type == pg.MOUSEBUTTONDOWN:  # 鼠标按下事件
+        if fist.punch(chimp):  # 如果击中猩猩
+            punch_sound.play()  # 播放击中音效
+            chimp.punched()  # 触发猩猩旋转
+        else:
+            whiff_sound.play()  # 播放挥空音效
+    elif event.type == pg.MOUSEBUTTONUP:  # 鼠标释放事件
+        fist.unpunch()  # 收回拳头
+```
+
 # set_repeat()
 ```python
 pg.key.set_repeat(500, 30)  # 设置按键重复：500ms延迟，30ms间隔

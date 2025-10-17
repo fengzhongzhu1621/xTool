@@ -19,6 +19,11 @@ im3.set_alpha(127)  # 设置透明度为127（半透明）
 # 创建用于捕获图像的表面。为了性能考虑，位深度应与显示表面相同
 self.display = pg.display.set_mode(self.size)
 self.snapshot = pg.surface.Surface(self.size, 0, self.display)
+
+# 创建背景
+background = pg.Surface(screen.get_size())  # 创建与屏幕相同尺寸的表面
+background = background.convert()  # 转换为显示格式
+background.fill((170, 238, 187))  # 填充浅绿色背景
 ```
 
 参数解释：

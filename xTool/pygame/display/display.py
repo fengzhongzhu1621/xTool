@@ -5,7 +5,7 @@ from pygame.surface import Surface
 from xTool.pygame import image, sound
 
 
-class DisplayScreen:
+class DisplayWindow:
     def __init__(self, rect: pygame.Rect, winstyle: int = 0, depth: int = 32):
         self.rect: Rect = rect
         self.winstyle: int = winstyle
@@ -14,6 +14,7 @@ class DisplayScreen:
 
         self.fullscreen: bool = False  # 全屏状态
         self.screen: Surface = self.set_model()
+        self.background: Surface = pygame.Surface(self.screen.get_size())
 
     def set_model(self, size: pygame.Rect | None = None, flags: int | None = None, depth: int | None = None) -> Surface:
         if size is not None:
@@ -88,7 +89,7 @@ class DisplayScreen:
         """隐藏鼠标光标"""
         _ = pygame.mouse.set_visible(0)
 
-    def flip_background(self, file_path: str) -> Surface:
+    def blit_background(self, file_path: str) -> Surface:
         # 加载背景图片
         bgdtile = image.load_image(file_path)
         # 创建背景表面
@@ -100,11 +101,27 @@ class DisplayScreen:
         # 绘制背景到屏幕
         _ = self.screen.blit(background, (0, 0))
 
-        # 更新显示
-        pygame.display.flip()
+        self.background = background
+        return background
 
+    def blit_background_color(self, color) -> Surface:
+        # 创建与屏幕相同尺寸的表面
+        background: Surface = pygame.Surface(self.screen.get_size())
+        # 转换为显示格式
+        background = background.convert()
+        # 填充背景色
+        _ = background.fill(color)
+
+        # 绘制背景到屏幕
+        _ = self.screen.blit(background, (0, 0))
+
+        self.background = background
         return background
 
     def play_background_sound(self, file_path: str) -> None:
         """播放背景音乐"""
         sound.play_background_sound(file_path)
+
+    def flip(self) -> None:
+        """更新显示"""
+        pygame.display.flip()

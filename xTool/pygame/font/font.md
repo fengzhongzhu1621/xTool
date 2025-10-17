@@ -17,6 +17,10 @@ self.total: int = 0
 self.color: str = "white"  # 分数颜色
 msg = f"分数: {self.total}"  # 创建分数文本
 self.image: Surface = self.font.render(msg, 0, self.color)
+
+text = font.render("Pummel The Chimp, And Win $$$", True, (10, 10, 10))  # 渲染文本
+textpos = text.get_rect(centerx=background.get_width() / 2, y=10)  # 计算文本位置
+background.blit(text, textpos)  # 将文本绘制到背景上
 ```
 
 参数说明：
