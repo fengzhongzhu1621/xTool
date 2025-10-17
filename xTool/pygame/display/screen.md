@@ -8,6 +8,8 @@ screen.fill(black)
 
 # 用红色填充屏幕背景
 screen.fill((255, 0, 0))
+
+screen.fill((100, 100, 100))
 ```
 
 # 获得屏幕大小

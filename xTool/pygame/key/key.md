@@ -17,7 +17,23 @@ pygame.K_s # S键：向下移动
 pygame.K_a # A键：向左移动
 pygame.K_d # D键：向右移动
 pygame.K_f
+pygame.K_r
+pygame.K_PLUS
+pygame.K_MINUS
 pygame.K_ESCAPE
+pygame.K_1
+pygame.K_2
+pygame.K_3
+pygame.K_4
+pygame.K_5
+pygame.K_6
+pygame.K_7
+pygame.K_8
+pygame.K_9
+```
+
+```python
+step = int(event.unicode)  # 将按键字符转换为数字
 ```
 
 ```python
@@ -69,6 +85,11 @@ while True:
         raise SystemExit()
 ```
 
+# set_repeat()
+```python
+pg.key.set_repeat(500, 30)  # 设置按键重复：500ms延迟，30ms间隔
+```
+
 # get_pressed()
 ```python
 # 获取键盘按键状态
@@ -86,7 +107,7 @@ if keystate[pygame.K_d]:  # D键：向右移动
 
 keystate - 键盘状态字典，包含所有按键的按下状态（True/False）
 
-# 计算移动方向
+## 计算移动方向
 
 计算逻辑：
 
