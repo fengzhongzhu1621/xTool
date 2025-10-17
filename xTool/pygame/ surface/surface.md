@@ -15,6 +15,10 @@ im2.fill((0, 50, 0))  # 填充绿色(RGB:0,50,0)
 # im3= im2.convert(SRCALPHA)  # 可选：创建带alpha通道的副本
 im3 = im2
 im3.set_alpha(127)  # 设置透明度为127（半透明）
+
+# 创建用于捕获图像的表面。为了性能考虑，位深度应与显示表面相同
+self.display = pg.display.set_mode(self.size)
+self.snapshot = pg.surface.Surface(self.size, 0, self.display)
 ```
 
 参数解释：

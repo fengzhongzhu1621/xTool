@@ -21,13 +21,14 @@ Pygame 混合模式示例
 import os
 import time
 
+import numpy
+import pygame
 import pygame as pg
 
 main_dir = os.path.split(os.path.abspath(__file__))[0]
 data_dir = os.path.join(main_dir, "data")
 
 try:
-    import numpy
     import pygame.surfarray
 except ImportError:
     print("no surfarray for you!  install numpy")

@@ -19,3 +19,10 @@ clock.tick(60)  # pyright: ignore[reportUnusedCallResult]
 # 计算一帧的间隔，将tick()返回的毫秒数转换为秒
 dt = clock.tick(60) / 1000
 ```
+
+## get_fps()
+```python
+self.clock.tick()  # 控制帧率
+# 设置窗口标题：显示相机名称和当前帧率
+pygame.display.set_caption(f"{camera} ({self.clock.get_fps():.2f} FPS)")
+```

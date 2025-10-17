@@ -48,6 +48,20 @@ while True:
 ```
 
 ```python
+        going = True
+        while going:
+            events = pg.event.get()
+            for e in events:
+                # 退出条件：窗口关闭或ESC键
+                if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):
+                    going = False
+                # 处理数字键（0-9）切换相机
+                if e.type == pg.KEYDOWN:
+                    if e.key in range(pg.K_0, pg.K_0 + 10):
+                        camera = self.init_cams(e.key - pg.K_0)  # 初始化指定索引的相机
+```
+
+```python
     # 当玩家存活时运行主循环
     while player.alive():
         # 获取输入
