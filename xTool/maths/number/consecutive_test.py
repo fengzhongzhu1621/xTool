@@ -1,4 +1,4 @@
-from xTool.number.consecutive import is_consecutive_strings
+from xTool.maths.number.consecutive import is_consecutive_strings
 
 
 def test_is_consecutive_strings():

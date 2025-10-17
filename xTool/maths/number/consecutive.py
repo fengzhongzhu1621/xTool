@@ -1,4 +1,4 @@
-def is_consecutive_strings(str_list: list) -> bool:
+def is_consecutive_strings(str_list: list[str]) -> bool:
     """
     判断字符串数字列表是否连续
 
