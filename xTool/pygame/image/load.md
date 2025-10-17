@@ -21,6 +21,9 @@ ballrect = ball.get_rect()
 # └─────────────────┘
 # midbottom 是矩形底边的中点坐标，将玩家矩形的底边中点对齐到屏幕底边中点
 self.rect = self.image.get_rect(midbottom=SCREENRECT.midbottom)
+
+img_to_blit = im2.convert()  # 转换为标准格式
+iaa = img_to_blit.convert_alpha()  # 转换为带alpha通道的格式
 ```
 
 Rect 的其他常用对齐点：

@@ -2,6 +2,19 @@
 
 ```python
 s = pygame.Surface(screen.get_size(), pygame.SRCALPHA, 32)
+
+# 创建基础表面im1（红色背景）
+im1 = pg.Surface(screen.get_size())
+# im1= im1.convert()  # 可选的颜色格式转换
+im1.fill((100, 0, 0))  # 填充红色(RGB:100,0,0)
+
+# 创建第二个表面im2（绿色背景）
+im2 = pg.Surface(screen.get_size())
+im2.fill((0, 50, 0))  # 填充绿色(RGB:0,50,0)
+# 创建带透明度的副本
+# im3= im2.convert(SRCALPHA)  # 可选：创建带alpha通道的副本
+im3 = im2
+im3.set_alpha(127)  # 设置透明度为127（半透明）
 ```
 
 参数解释：
