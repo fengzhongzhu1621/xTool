@@ -1,3 +1,11 @@
+# info()
+```python
+# 创建一个使用屏幕80%大小的窗口
+info = pg.display.Info()  # 获取显示信息
+w = info.current_w  # 屏幕宽度
+h = info.current_h  # 屏幕高度
+```
+
 # get_surface()
 ```python
 screen = pg.display.get_surface()
@@ -29,6 +37,16 @@ SCREENRECT = pg.Rect(0, 0, 640, 480)  # 屏幕矩形区域
 winstyle = 0  # 窗口模式
 bestdepth = pg.display.mode_ok(SCREENRECT.size, winstyle, 32)  # 获取最佳颜色深度
 screen = pg.display.set_mode(SCREENRECT.size, winstyle, bestdepth)  # 创建显示窗口
+```
+
+根据屏幕大小创建窗口
+
+```python
+# 创建一个使用屏幕80%大小的窗口
+info = pg.display.Info()  # 获取显示信息
+w = info.current_w  # 屏幕宽度
+h = info.current_h  # 屏幕高度
+pg.display.set_mode((int(w * 0.8), int(h * 0.8)))  # 设置窗口大小
 ```
 
 # flip()

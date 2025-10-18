@@ -3,6 +3,11 @@
 pygame.font.init()
 ```
 
+# get_fonts()
+```python
+pygame.font.get_fonts()
+```
+
 # Font()
 
 ```python
@@ -16,11 +21,29 @@ font1 = pg.font.Font(None, 24)  # 创建24号字体
 font = pg.font.SysFont("Arial", 24)  # 创建Arial字体，24号大小
 ```
 
+# get_default_font()
+```python
+font = pg.font.SysFont(pg.font.get_default_font(), font_size)  # 使用默认字体
+```
+
 # 设置字体
 ## set_italic()
-
 ```python
 self.font.set_italic(1)  # 设置斜体
+```
+
+## set_underline()
+```python
+font.set_underline(1)
+font.set_underline(0)
+```
+
+## set_bold()
+```python
+a_sys_font.set_bold(1)
+ren = a_sys_font.render(text, 1, fg, bg)
+screen.blit(ren, (30 + size[0], 10))
+a_sys_font.set_bold(0)
 ```
 
 # 将文本消息渲染成图像
