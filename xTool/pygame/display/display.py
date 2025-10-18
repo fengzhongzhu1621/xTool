@@ -82,6 +82,9 @@ class DisplayWindow:
     def get_screen_height(self) -> int:
         return self.screen.get_height()
 
+    def get_rect_center(self) -> tuple[int, int]:
+        return self.rect.center
+
     def fill_color(self, color, rect=None) -> Surface:
         _ = self.screen.fill(color, rect)
         return self.screen

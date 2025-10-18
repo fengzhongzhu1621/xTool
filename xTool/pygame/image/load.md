@@ -30,3 +30,14 @@ Rect 的其他常用对齐点：
 
 topleft, topright, bottomleft, bottomright
 midtop, midleft, midright, center
+
+# 设置图片的位置
+```python
+# 尝试打开文件，如果是图像文件则加载显示
+filetype = ev.file[-3:]  # 获取文件扩展名（后3个字符）
+if filetype in ["png", "bmp", "jpg"]:  # 检查是否为支持的图像格式
+    spr_file_image = pg.image.load(ev.file).convert()  # 加载并转换图像
+    spr_file_image.set_alpha(127)  # 设置半透明效果（alpha值127）
+    spr_file_image_rect = spr_file_image.get_rect()  # 获取图像矩形区域
+    spr_file_image_rect.center = surf.get_rect().center  # 图像居中显示
+```

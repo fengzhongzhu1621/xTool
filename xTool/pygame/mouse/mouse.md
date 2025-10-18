@@ -91,3 +91,39 @@ for event in pg.event.get():
     elif event.type == pg.MOUSEBUTTONUP:  # 鼠标释放事件
         fist.unpunch()  # 收回拳头
 ```
+
+# 拖拽事件
+```python
+# 主事件循环
+while going:
+    # 处理事件队列
+    for ev in pg.event.get():
+        if ev.type == pg.QUIT:  # 窗口关闭事件
+            going = False  # 退出循环
+        elif ev.type == pg.DROPBEGIN:  # 拖放开始事件
+            print(ev)  # 打印事件对象
+            print("文件拖放开始!")
+        elif ev.type == pg.DROPCOMPLETE:  # 拖放完成事件
+            print(ev)  # 打印事件对象
+            print("文件拖放完成!")
+        elif ev.type == pg.DROPTEXT:  # 拖放文本事件
+            print(ev)  # 打印事件对象
+            # 更新显示文本为拖放的文本内容
+            spr_file_text = font.render(ev.text, 1, (255, 255, 255))
+            spr_file_text_rect = spr_file_text.get_rect()
+            spr_file_text_rect.center = surf.get_rect().center  # 文本居中
+        elif ev.type == pg.DROPFILE:  # 拖放文件事件
+            print(ev)  # 打印事件对象
+            # 更新显示文本为文件路径
+            spr_file_text = font.render(ev.file, 1, (255, 255, 255))
+            spr_file_text_rect = spr_file_text.get_rect()
+            spr_file_text_rect.center = surf.get_rect().center  # 文本居中
+
+            # 尝试打开文件，如果是图像文件则加载显示
+            filetype = ev.file[-3:]  # 获取文件扩展名（后3个字符）
+            if filetype in ["png", "bmp", "jpg"]:  # 检查是否为支持的图像格式
+                spr_file_image = pg.image.load(ev.file).convert()  # 加载并转换图像
+                spr_file_image.set_alpha(127)  # 设置半透明效果（alpha值127）
+                spr_file_image_rect = spr_file_image.get_rect()  # 获取图像矩形区域
+                spr_file_image_rect.center = surf.get_rect().center  # 图像居中显示
+```

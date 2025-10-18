@@ -1,9 +1,19 @@
+# init()
+```python
+pygame.font.init()
+```
+
 # Font()
 
 ```python
 self.font = pg.font.Font(None, 20)  # 创建字体
 font = pg.font.Font(None, 30)  # 创建30号字体
 font1 = pg.font.Font(None, 24)  # 创建24号字体
+```
+
+# SysFont()
+```python
+font = pg.font.SysFont("Arial", 24)  # 创建Arial字体，24号大小
 ```
 
 # 设置字体
@@ -29,3 +39,11 @@ background.blit(text, textpos)  # 将文本绘制到背景上
 * msg: 要显示的文本内容（如"分数: 10"）
 * 0: 抗锯齿参数（0表示不抗锯齿，1表示抗锯齿）
 * self.color: 文本颜色（如"white"）
+
+# 设置显示位置
+```python
+# 创建初始提示文本
+spr_file_text = font.render("Drag and drop a file or image!!", 1, (255, 255, 255))  # 白色文本
+spr_file_text_rect = spr_file_text.get_rect()  # 获取文本矩形区域
+spr_file_text_rect.center = surf.get_rect().center  # 文本居中显示
+```
