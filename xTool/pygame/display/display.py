@@ -76,6 +76,23 @@ class DisplayWindow:
     def get_screen(self) -> Surface:
         return self.screen
 
+    def get_screen_width(self) -> int:
+        return self.screen.get_width()
+
+    def get_screen_height(self) -> int:
+        return self.screen.get_height()
+
+    def fill_color(self, color, rect=None) -> Surface:
+        _ = self.screen.fill(color, rect)
+        return self.screen
+
+    def draw_circle(self, color, center, radius: float) -> Rect:
+        """绘制圆形 ."""
+        return pygame.draw.circle(self.screen, color, center, radius)
+
+    def draw_rect(self, color, rect) -> Rect:
+        return pygame.draw.rect(self.screen, color, rect)
+
     def set_icon(self, surface: Surface, size: tuple[int, int]) -> None:
         """设置窗口图标"""
         icon = pygame.transform.scale(surface, size)
@@ -121,6 +138,10 @@ class DisplayWindow:
     def play_background_sound(self, file_path: str) -> None:
         """播放背景音乐"""
         sound.play_background_sound(file_path)
+
+    def blit(self, source: Surface, dest) -> Rect:
+        """绘制到屏幕"""
+        return self.screen.blit(source, dest)
 
     def flip(self) -> None:
         """更新显示"""

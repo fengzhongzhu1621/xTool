@@ -10,3 +10,8 @@ clock = pygame.time.Clock()
 ```python
 pygame.time.wait(1000)  # 等待1秒
 ```
+
+# delay()
+```python
+pygame.time.delay(40)  # 短暂延迟防止连续点击
+```

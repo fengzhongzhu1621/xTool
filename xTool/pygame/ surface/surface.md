@@ -24,6 +24,9 @@ self.snapshot = pg.surface.Surface(self.size, 0, self.display)
 background = pg.Surface(screen.get_size())  # 创建与屏幕相同尺寸的表面
 background = background.convert()  # 转换为显示格式
 background.fill((170, 238, 187))  # 填充浅绿色背景
+
+# # 填充浅蓝色背景
+_ = bg.fill((183, 201, 226))
 ```
 
 参数解释：

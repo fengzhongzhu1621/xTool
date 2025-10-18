@@ -2,6 +2,8 @@
 
 ```python
 self.font = pg.font.Font(None, 20)  # 创建字体
+font = pg.font.Font(None, 30)  # 创建30号字体
+font1 = pg.font.Font(None, 24)  # 创建24号字体
 ```
 
 # 设置字体

@@ -42,6 +42,36 @@ Pygame通过双缓冲机制来管理屏幕显示。
 pygame.display.flip()
 ```
 
+# update()
+display.flip()
+* 更新整个屏幕：强制重绘整个显示表面
+* 性能较低：每次调用都会更新所有像素
+* 适用于：需要完全重绘整个屏幕的场景
+* 使用场景：游戏主循环中，当所有内容都需要更新时
+
+display.update()
+* 智能更新：可以只更新指定区域或发生变化的区域
+* 性能较高：只更新需要变化的部分
+* 参数灵活：
+    * update()：更新整个屏幕（与flip相同）
+    * update(rect)：更新指定矩形区域
+    * update(rect_list)：更新多个矩形区域
+* 适用于：部分内容更新的场景，提高性能
+
+```python
+# 初始化时更新整个屏幕
+pg.display.update()  # 等同于 pg.display.flip()
+
+# 在循环中只更新按钮区域
+pg.display.update()  # 这里应该使用区域更新来优化性能
+
+# 只在按钮点击时更新按钮区域
+if button_clicked:
+    pg.display.update(button_rect)  # 只更新按钮区域
+else:
+    pg.display.update()  # 或者使用无参数更新整个屏幕
+```
+
 # set_icon() 设置窗口图标
 ```python
 pg.display.set_icon(icon)

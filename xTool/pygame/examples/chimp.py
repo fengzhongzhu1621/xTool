@@ -198,7 +198,8 @@ def main():
         window.screen.blit(background, (0, 0))  # 重绘背景
         allsprites.draw(window.screen)  # 绘制所有精灵
 
-        pg.display.flip()  # 更新显示
+        # 更新显示
+        window.flip
 
     pg.quit()
 
