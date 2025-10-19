@@ -1,6 +1,30 @@
 # 缩放图像
 ```python
 icon = pygame.transform.scale(surface, size)
+
+# 加载输入图像
+i = pygame.image.load(fin)
+
+# 检查是否支持平滑缩放（smoothscale），如果支持则使用平滑缩放
+if hasattr(pygame.transform, "smoothscale"):
+    scaled_image = pygame.transform.smoothscale(i, (w, h))
+else:
+    # 如果不支持平滑缩放，使用普通缩放
+    scaled_image = pygame.transform.scale(i, (w, h))
+
+
+# 加载图像并进行四倍放大
+imagename = os.path.join(main_dir, "data", "liquid.bmp")
+bitmap = pg.image.load(imagename)
+bitmap = pg.transform.scale2x(bitmap)  # 第一次2倍放大
+bitmap = pg.transform.scale2x(bitmap)  # 第二次2倍放大（总共4倍）
+# 确保图像和屏幕使用相同的格式
+if screen.get_bitsize() == 8:
+    # 如果是8位色深，设置屏幕调色板与图像一致
+    screen.set_palette(bitmap.get_palette())
+else:
+    # 否则将图像转换为屏幕格式
+    bitmap = bitmap.convert()
 ```
 
 参数说明：

@@ -33,6 +33,9 @@ screen: pygame.Surface = pygame.display.set_mode((1280, 720))
 
 SCREEN_SIZE = pg.Vector2(1000, 600)  # 屏幕尺寸
 screen = pg.display.set_mode(SCREEN_SIZE)  # 创建屏幕
+
+# 创建硬件加速的双缓冲显示表面
+screen = pg.display.set_mode((640, 480), pg.HWSURFACE | pg.DOUBLEBUF)
 ```
 
 ```python
