@@ -30,6 +30,9 @@ pg.SCALED
 ```python
 # 创建游戏窗口，设置分辨率为1280x720
 screen: pygame.Surface = pygame.display.set_mode((1280, 720))
+
+SCREEN_SIZE = pg.Vector2(1000, 600)  # 屏幕尺寸
+screen = pg.display.set_mode(SCREEN_SIZE)  # 创建屏幕
 ```
 
 ```python

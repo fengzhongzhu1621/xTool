@@ -18,6 +18,8 @@ clock.tick(60)  # pyright: ignore[reportUnusedCallResult]
 # dt是自上一帧以来的时间增量（秒），用于实现帧率无关的物理计算
 # 计算一帧的间隔，将tick()返回的毫秒数转换为秒
 dt = clock.tick(60) / 1000
+# 控制帧率为60FPS，并获取时间增量
+delta_time = clock.tick(60)
 ```
 
 ## get_fps()
@@ -25,4 +27,6 @@ dt = clock.tick(60) / 1000
 self.clock.tick()  # 控制帧率
 # 设置窗口标题：显示相机名称和当前帧率
 pygame.display.set_caption(f"{camera} ({self.clock.get_fps():.2f} FPS)")
+# 设置窗口标题显示帧率和球体数量
+pg.display.set_caption(f"fps: {round(clock.get_fps(), 2)}, ball count: {len(balls)}")
 ```
