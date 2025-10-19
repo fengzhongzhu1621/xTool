@@ -1,4 +1,4 @@
-# pg.sprite.Sprite
+# pygame.sprite.Sprite
 是 Pygame 中最重要的游戏开发基类。让我详细解释它的作用：
 用
 核心功能：
@@ -28,6 +28,8 @@ class Enemy(pg.sprite.Sprite):
         self.image = load_enemy_image()
         self.rect = self.image.get_rect()
 ```
+
+# pygame.sprite.DirtySprite
 
 # 与精灵组（Group）配合使用
 ## 创建精灵组
