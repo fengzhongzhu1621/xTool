@@ -201,7 +201,7 @@ dependencies = [
     "pythran>=0.17.0",
     "numpy>=2.2.6",
     "pygame>=2.6.1",
-    "protobuf==4.25.3",
+    "protobuf==4.25.8",
     "opentelemetry-api<2.0.0,>=1.25.0",
     "opentelemetry-sdk<2.0.0,>=1.25.0",
     "opentelemetry-exporter-otlp>=1.25.0",
