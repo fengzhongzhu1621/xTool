@@ -218,6 +218,7 @@ dependencies = [
     "opentelemetry-proto==1.25.0",
     "django-prometheus<3.0.0,>=2.3.1",
     "opencv-python>=4.12.0.88",
+    "pyopengl>=3.1.10",
 ]
 
 [dependency-groups]
