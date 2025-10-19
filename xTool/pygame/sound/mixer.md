@@ -28,6 +28,13 @@ sound.play()  # 播放录制的声音
 music = os.path.join(resource_dir, "house_lo.wav")  # 背景音乐路径
 pg.mixer.music.load(music)  # 加载背景音乐
 pg.mixer.music.play(-1)  # 循环播放背景音乐
+pg.mixer.music.load(file_path)  # 加载音频文件
+```
+
+## get_busy()
+```python
+# 主事件循环：当音乐正在播放或处于暂停状态时继续运行
+while pg.mixer.music.get_busy() or paused:
 ```
 
 ## play()
@@ -54,4 +61,19 @@ pg.mixer.music.unpause()
 ## pause()
 ```python
 pg.mixer.music.pause()
+```
+
+## rewind()
+```python
+pg.mixer.music.rewind()  # 倒带（仅支持特定格式）
+```
+
+## fadeout()
+```python
+pg.mixer.music.fadeout(5000)  # 在5秒内淡出音乐
+```
+
+## stop()
+```python
+pg.mixer.music.stop()  # 停止播放
 ```
