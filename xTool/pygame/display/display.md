@@ -107,6 +107,8 @@ pg.display.set_caption("Pygame Aliens")
 ```
 
 # 调整窗口大小事件
+```python
+# 处理窗口大小调整事件
 if e.type == pg.VIDEORESIZE:  # 窗口大小调整事件
     win = pg.display.set_mode(e.size, pg.RESIZABLE)  # 重新设置窗口大小
-
+```
