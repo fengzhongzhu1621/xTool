@@ -12,6 +12,13 @@ pygame.K_ESCAPE
 # event.unicode
 event.unicode
 
+
+# set_blocked()
+```python
+# 阻止鼠标移动事件，保持事件队列更清洁
+pg.event.set_blocked(pg.MOUSEMOTION)
+```
+
 # get()
 ```python
 while running:

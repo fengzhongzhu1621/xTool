@@ -16,6 +16,9 @@ class DisplayWindow:
         self.screen: Surface = self.set_model()
         self.background: Surface = pygame.Surface(self.screen.get_size())
 
+        # 全局计时器变量
+        self.timer: int = 0
+
     def set_model(self, size: pygame.Rect | None = None, flags: int | None = None, depth: int | None = None) -> Surface:
         if size is not None:
             self.rect = size
@@ -149,3 +152,23 @@ class DisplayWindow:
     def flip(self) -> None:
         """更新显示"""
         pygame.display.flip()
+
+    def stopwatch(self, message: str | None = None) -> None:
+        """简单的计时器函数，用于测量Python代码执行时间
+
+        参数:
+            message: 如果为None，则重置计时器；否则打印计时结果
+        """
+        now = pygame.time.get_ticks()
+
+        if not message:
+            # 重置计时器
+            self.timer = now
+            return
+
+        # 计算运行时间并打印结果，转换为秒，避免除零
+        runtime = (now - self.timer) / 1000.0 + 0.001
+
+        print(f"{message} {runtime} 秒\t{(1.0 / runtime):.2f}帧/秒")
+        # 重置计时器
+        self.timer = now
