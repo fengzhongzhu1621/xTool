@@ -43,3 +43,21 @@ if screen.get_bitsize() == 8:
     # 如果是8位色深，设置屏幕调色板与图像一致
     screen.set_palette(bitmap.get_palette())
 ```
+
+# scroll()
+```python
+# 屏幕向上滚动zoom_factor像素
+screen.scroll(dy=zoom_factor)
+# 屏幕向下滚动zoom_factor像素
+screen.scroll(dy=-zoom_factor)
+# 屏幕向左滚动zoom_factor像素
+screen.scroll(dx=zoom_factor)
+# 屏幕向右滚动zoom_factor像素
+screen.scroll(dx=-zoom_factor)
+```
+
+# set_clip()
+```python
+# 设置屏幕裁剪区域（保护边距）
+screen.set_clip((margin, margin, zoom_view_size[0], zoom_view_size[1]))
+```

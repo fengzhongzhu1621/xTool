@@ -112,3 +112,14 @@ pg.display.set_caption("Pygame Aliens")
 if e.type == pg.VIDEORESIZE:  # 窗口大小调整事件
     win = pg.display.set_mode(e.size, pg.RESIZABLE)  # 重新设置窗口大小
 ```
+
+# toggle_fullscreen()
+```python
+# 按F键切换全屏模式
+if event.type == pg.KEYDOWN and event.key == pg.K_f:
+    pg.display.toggle_fullscreen()
+# 窗口大小改变事件
+if event.type == pg.VIDEORESIZE:
+    # 内部API：处理窗口大小改变事件
+    pg.display._resize_event(event)  # pyright: ignore[reportAttributeAccessIssue]
+```

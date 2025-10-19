@@ -88,6 +88,12 @@ while True:
 # set_repeat()
 ```python
 pg.key.set_repeat(500, 30)  # 设置按键重复：500ms延迟，30ms间隔
+
+# 设置按键重复，以便按住键时可以连续滚动
+old_k_delay, old_k_interval = pg.key.get_repeat()
+pg.key.set_repeat(500, 30)  # 初始延迟500ms，重复间隔30ms
+# 恢复原来的按键重复设置
+pg.key.set_repeat(old_k_delay, old_k_interval)
 ```
 
 # get_pressed()
