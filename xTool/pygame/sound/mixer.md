@@ -33,4 +33,25 @@ pg.mixer.music.play(-1)  # 循环播放背景音乐
 ## play()
 ```python
 pg.mixer.music.play(-1)  # 循环播放背景音乐
+pg.mixer.music.play(fade_ms=4000)
+```
+
+## set_volume()
+```python
+pg.mixer.music.set_volume(volume)
+```
+
+## set_endevent()
+```python
+pg.mixer.music.set_endevent(MUSIC_DONE)
+```
+
+## unpause()
+```python 
+pg.mixer.music.unpause()
+```
+
+## pause()
+```python
+pg.mixer.music.pause()
 ```
