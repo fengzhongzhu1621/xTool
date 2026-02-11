@@ -1,6 +1,27 @@
 import os
 
 
+class DiskWalk:
+    """API for getting directory walking collections"""
+
+    def __init__(self, path: str):
+        self.path = path
+
+    def enumerate_file_paths(self):
+        """Returns the path to all the files in a directory as a list"""
+        for dir_path, _, filenames in os.walk(self.path):
+            for file in filenames:
+                full_path = os.path.join(dir_path, file)
+                yield full_path
+
+    def enumerate_dir_paths(self):
+        """Returns all the directories in a directory as a list"""
+        for dir_path, dir_names, _ in os.walk(self.path):
+            for dirname in dir_names:
+                full_path = os.path.join(dir_path, dirname)
+                yield full_path
+
+
 def walk_path(path: str, depth=float('inf'), follow_links=False):
     """This utility function returns a list directories suitable for use as the
     *searchpath* argument to :class:`PluginSource`. This will recursively add
@@ -33,3 +54,16 @@ def walk_path(path: str, depth=float('inf'), follow_links=False):
             paths.extend(walk_path(sub_path, depth - 1, follow_links))
 
     return paths
+
+
+def filter_directory_files(directory: str, exts: list[str]) -> dict[str, str]:
+    """根据后缀过滤文件"""
+    result: dict[str, str] = {}
+    accept: list[str] = [name.lower() for name in exts]
+
+    for song in os.listdir(directory):
+        name, ext = os.path.splitext(song)
+        if ext.lower() in accept:
+            result[name] = os.path.join(directory, song)
+
+    return result

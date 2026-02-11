@@ -6,10 +6,17 @@ import zipfile
 from contextlib import contextmanager
 from io import StringIO
 from tempfile import NamedTemporaryFile, mkdtemp
-from typing import Union
 
 from xTool.exceptions import XToolConfigException
 from xTool.utils.log.logging_mixin import LoggingMixin
+
+try:
+    # atomicwrites doesn't have type bindings
+    import atomicwrites  # type: ignore[import]  # pyright: ignore[reportMissingImports]
+
+    _has_atomicwrites = True
+except ImportError:
+    _has_atomicwrites = False
 
 
 @contextmanager
@@ -68,7 +75,7 @@ def mkdirs(path, mode):
         os.umask(o_umask)
 
 
-def mkdirs2(filename: Union[os.PathLike, str], /, *, mode: int = 0o777) -> None:
+def mkdirs2(filename: str, /, *, mode: int = 0o777) -> None:
     """Recursively create directories up to the path of ``filename`` as needed."""
     dirname = os.path.dirname(filename)
     if not dirname:
@@ -165,42 +172,14 @@ def list_py_file_paths(
     return file_paths
 
 
-class DiskWalk:
-    """API for getting directory walking collections"""
-
-    def __init__(self, path: str):
-        self.path = path
-
-    def enumerate_file_paths(self):
-        """Returns the path to all the files in a directory as a list"""
-        for dir_path, _, filenames in os.walk(self.path):
-            for file in filenames:
-                full_path = os.path.join(dir_path, file)
-                yield full_path
-
-    def enumerate_dir_paths(self):
-        """Returns all the directories in a directory as a list"""
-        for dir_path, dir_names, _ in os.walk(self.path):
-            for dirname in dir_names:
-                full_path = os.path.join(dir_path, dirname)
-                yield full_path
-
-
 def get_unzipped_files(package):
     """
     解压zip文件，获取文件列表
     """
     input_zip = zipfile.ZipFile(package)
-    return {name: StringIO(input_zip.read(name)) for name in input_zip.namelist()}
-
-
-try:
-    # atomicwrites doesn't have type bindings
-    import atomicwrites  # type: ignore[import]
-
-    _has_atomicwrites = True
-except ImportError:
-    _has_atomicwrites = False
+    return {
+        name: StringIO(input_zip.read(name)) for name in input_zip.namelist()  # pyright: ignore[reportArgumentType]
+    }
 
 
 class FS:
@@ -209,12 +188,14 @@ class FS:
     @staticmethod
     def open(name, mode="r", **kwargs):
         if _has_atomicwrites and "w" in mode:
-            return atomicwrites.atomic_write(name, mode=mode, overwrite=True, **kwargs)
+            return atomicwrites.atomic_write(  # pyright: ignore[reportPossiblyUnboundVariable]
+                name, mode=mode, overwrite=True, **kwargs
+            )
         else:
             return open(name, mode, **kwargs)
 
 
 def get_file_store_path(h: str, filename: str) -> str:
     """获得文件存储目录 ."""
-    basename, ext = os.path.splitext(filename)
+    _, ext = os.path.splitext(filename)
     return os.path.join("files", h[:1], h[1:2], h + ext.lower())

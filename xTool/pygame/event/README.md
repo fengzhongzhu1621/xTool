@@ -13,6 +13,12 @@ pygame.K_ESCAPE
 event.unicode
 
 
+# set_allowed()
+```python
+# 设置允许的事件类型
+pg.event.set_allowed([pg.KEYDOWN, pg.KEYUP, pg.QUIT])
+```
+
 # set_blocked()
 ```python
 # 阻止鼠标移动事件，保持事件队列更清洁

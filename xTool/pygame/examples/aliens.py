@@ -1,23 +1,24 @@
-"""pygame.examples.aliens - 外星人入侵游戏示例
+"""pygame.examples.aliens
 
-展示一个需要防御外星人入侵的迷你游戏。
+Shows a mini game where you have to defend against aliens.
 
-这个示例展示了pygame的哪些功能？
+What does it show you about pygame?
 
-* pg.sprite，Sprite和Group的区别
-* 脏矩形优化以提高处理速度
-* 使用pg.mixer.music播放音乐，包括淡出效果
-* 使用pg.Sound播放音效
-* 事件处理，键盘处理，QUIT处理
-* 使用pg.time.Clock限制主循环帧率
-* 全屏切换功能
+* pg.sprite, the difference between Sprite and Group.
+* dirty rectangle optimization for processing for speed.
+* music with pg.mixer.music, including fadeout
+* sound effects with pg.Sound
+* event processing, keyboard handling, QUIT handling.
+* a main loop frame limited with a game clock from pg.time.Clock
+* fullscreen switching.
 
-控制方式
+
+Controls
 --------
 
-* 左右方向键移动
-* 空格键射击
-* f键切换全屏模式
+* Left and right arrows to move.
+* Space bar to shoot
+* f key to toggle between fullscreen.
 
 """
 
@@ -55,10 +56,10 @@ resource_dir = os.path.join(main_dir, "data")
 class Shot(sprite.Sprite):
     """玩家发射的子弹"""
 
-    speed: int = -11  # 子弹速度（向上）
-
     def __init__(self, pos: tuple[int, int], *groups):
         super().__init__(*groups)
+
+        self.speed: int = -11  # 子弹速度（向上）
 
         # 加载子弹图像
         self.images = self.load_images([os.path.join(resource_dir, "shot.gif")])
@@ -79,12 +80,13 @@ class Shot(sprite.Sprite):
 class Player(sprite.Sprite):
     """代表玩家的月球车类型汽车"""
 
-    speed: int = 10  # 移动速度
     bounce: int = 24  # 弹跳效果参数
     gun_offset: int = -11  # 枪口水平偏移量
 
     def __init__(self, *groups) -> None:
         super().__init__(*groups)
+
+        self.speed: int = 10  # 移动速度
 
         self.images: list[Surface] = self.load_flipx_images(os.path.join(resource_dir, "player1.gif"))  # 玩家图像列表
         self.image: Surface = self.images[0]  # 设置初始图像
@@ -136,11 +138,12 @@ class Player(sprite.Sprite):
 class Alien(sprite.Sprite):
     """外星人飞船，缓慢在屏幕上移动"""
 
-    speed: int = 13  # 移动速度
     animcycle: int = 12  # 动画循环帧数
 
     def __init__(self, *groups) -> None:
         super().__init__(*groups)
+
+        self.speed: int = 13  # 移动速度
 
         # 加载多个动画帧
         self.images = self.load_images(
@@ -155,7 +158,7 @@ class Alien(sprite.Sprite):
         self.rect: Rect = self.image.get_rect()  # 获取矩形区域
 
         # 随机选择移动方向，并计算移动距离
-        self.facing: int = random.choice((-1, 1)) * Alien.speed
+        self.facing: int = random.choice((-1, 1)) * self.speed
         self.frame: int = 0  # 动画帧计数器
 
         # 如果向左移动，从屏幕右侧开始
@@ -217,10 +220,10 @@ class Explosion(sprite.Sprite):
 class Bomb(sprite.Sprite):
     """外星人投掷的炸弹"""
 
-    speed = 9  # 炸弹下落速度
-
     def __init__(self, alien, explosion_group, *groups):
         super().__init__(*groups)
+
+        self.speed = 9  # 炸弹下落速度
 
         self.images = self.load_images([os.path.join(resource_dir, "bomb.gif")])
         self.image = self.images[0]  # 设置炸弹图像

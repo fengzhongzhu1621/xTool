@@ -11,26 +11,35 @@ import traceback
 import warnings
 from contextlib import contextmanager
 from datetime import date, datetime
+from traceback import StackSummary
 
 try:
     from StringIO import StringIO
 except ImportError:
     from io import BytesIO as StringIO
 
-from typing import AbstractSet, Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple, Type, Union
-
-from .type_hint import T
-
-try:
-    import numpy as np
-except ImportError:
-    np = None
-
 from asyncio.constants import DEBUG_STACK_DEPTH
+from typing import (
+    AbstractSet,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 
+import numpy as np
 import psutil
 
-from .constants import *  # noqa
+from xTool.constants import *  # noqa
+from xTool.type_hint import T
 
 if PY3:
     xrange = range
@@ -190,7 +199,7 @@ def is_disk_available(dirname, limit=80):
     return True
 
 
-def grouper(n, iterable, padvalue=None):
+def grouper(n, iterable, padvalue=None) -> itertools.zip_longest[tuple[Any | None, ...]] | Any:
     """grouper(3, 'abcdefg', 'x') --> ('a','b','c'), ('d','e','f'), ('g','x','x')"""
     return zip_longest(*[iter(iterable)] * n, fillvalue=padvalue)
 
@@ -293,7 +302,7 @@ def get_first_duplicate(items):
     return None
 
 
-def many_to_one(input_dict: Dict):
+def many_to_one(input_dict) -> dict[Any, Any]:
     """拆分词典中的key
     Convert a many-to-one mapping to a one-to-one mapping
 
@@ -464,11 +473,9 @@ def get_bool_env(name: str, default=None) -> bool:
     return True
 
 
-def extract_stack(f=None, limit=None):
+def extract_stack(f=None, limit=None) -> StackSummary:
     """Replacement for traceback.extract_stack() that only does the
-    necessary work for asyncio debug mode.
-
-        来自python3.9 asyncio
+    necessary work for asyncio debug mode. 来自python3.9 asyncio
     """
     if f is None:
         f = sys._getframe().f_back
@@ -484,10 +491,10 @@ def extract_stack(f=None, limit=None):
 class UseTimesGenerator:
     """获得每个对象的使用次数 ."""
 
-    def __init__(self):
-        self.cache = {}
+    def __init__(self) -> None:
+        self.cache: dict[Any, Any] = {}
 
-    def __call__(self, obj: object):
+    def __call__(self, obj: object) -> Any | Literal[1]:
         """获得自增ID，范围1 ～ 4294967295，线程不安全 ."""
         if obj not in self.cache:
             # 初始值为1

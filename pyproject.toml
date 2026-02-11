@@ -76,14 +76,14 @@ url = "https://mirrors.tencent.com/pypi/simple/"
 
 [project]
 name = "xTool"
-version = "0.2.0"
-description = "A python script tools"
+version = "0.3.0"
+description = "Default template for PDM package"
 authors = [
     {name = "fengzhongzhu1621", email = "jinyinqiao@gmail.com"},
 ]
-requires-python = ">=3.10"
+requires-python = "==3.12"
 readme = "README.md"
-license = {text = "Apache License 2.0"}
+license = {text = "MIT"}
 classifiers = [
     "Intended Audience :: Developers",
     "Natural Language :: English",
@@ -219,6 +219,12 @@ dependencies = [
     "django-prometheus<3.0.0,>=2.3.1",
     "opencv-python>=4.12.0.88",
     "pyopengl>=3.1.10",
+    "pymunk>=7.1.0",
+    "pytmx>=3.32",
+    "scipy",
+    "aubio>=0.4.9",
+    "autobahn>=25.9.1",
+    "parso>=0.8.4",
 ]
 
 [dependency-groups]
@@ -255,11 +261,9 @@ fast = [
     "uvloop",
 ]
 
+[project.urls]
+repository = "https://github.com/fengzhongzhu1621/xTool"
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
-# 当设置为 true 时，PDM 在解析依赖时会优先按照 pyproject.toml 中声明的依赖源（sources）顺序来选择包版本。
-# PDM 会先检查第一个源（如自定义的 PyPI 镜像或私有仓库），如果找不到匹配的版本，再依次检查后续的源。
-[project.urls]
-repository = "https://github.com/fengzhongzhu1621/xTool"

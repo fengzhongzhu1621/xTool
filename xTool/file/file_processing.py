@@ -69,7 +69,8 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
     # 记录这个类实例的创建数量
     class_creation_counter = 0
 
-    def __init__(self, file_path, *args, **kwargs):
+    def __init__(self, file_path, *args, **kwargs) -> None:
+        super().__init__()
         # 文件的路径
         self._file_path = file_path
         # 创建一个多进程队列
@@ -95,7 +96,7 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
         return self._file_path
 
     @staticmethod
-    def process_file(self, file_path):
+    def process_file(self, file_path):  # pyright: ignore[reportUnusedParameter, reportSelfClsParameterName]
         """子进程文件处理函数 .
 
         Returns:
@@ -103,6 +104,7 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
         """
         raise NotImplementedError()
 
+    @staticmethod
     def _handler(result_queue, file_path, thread_name, args, kwargs):
         log = logging.getLogger("xTool.processor")
         # 设置日志处理器上下文，例如日志handler初始化时创建日志目录
@@ -114,7 +116,7 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
 
             log.info("Started process (PID=%s) to work on %s", os.getpid(), file_path)
             # 执行文件处理
-            result = BaseMultiprocessFileProcessor.process_file(file_path)
+            result = BaseMultiprocessFileProcessor.process_file(file_path)  # pyright: ignore[reportCallIssue]
             # 将执行结果保存到结果队列
             result_queue.put(result)
             end_time = time.time()
@@ -152,7 +154,7 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
         if sigkill and self._process.is_alive():
             # 如果进程被终止后依然存活，发送SIGKILL信号杀死进程
             self.log.warning("Killing PID %s", self._process.pid)
-            os.kill(self._process.pid, signal.SIGKILL)
+            os.kill(self._process.pid, signal.SIGKILL)  # pyright: ignore[reportArgumentType]
 
     @property
     def pid(self):
@@ -162,11 +164,11 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
         return self._process.pid
 
     @property
-    def exit_code(self):
+    def exit_code(self) -> int | None:
         """获得文件处理子进程的错误码 ."""
         if not self._done:
             raise XToolException("Tried to call retcode before process was finished!")
-        return self._process.exitcode
+        return self._process.exitcode  # pyright: ignore[reportOptionalMemberAccess]
 
     @property
     def done(self):
@@ -178,9 +180,9 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
             return True
 
         # 如果子进程有结果返回
-        if not self._result_queue.empty():
+        if not self._result_queue.empty():  # pyright: ignore[reportOptionalMemberAccess]
             # 获得执行结果
-            self._result = self._result_queue.get_nowait()
+            self._result = self._result_queue.get_nowait()  # pyright: ignore[reportOptionalMemberAccess]
             self._done = True
             self.log.debug("Waiting for %s", self._process)
             # 等待子进程释放资源并结束
@@ -192,8 +194,8 @@ class BaseMultiprocessFileProcessor(AbstractFileProcessor, LoggingMixin):
             # 设置完成标记
             self._done = True
             # 获得子进程执行结果
-            if not self._result_queue.empty():
-                self._result = self._result_queue.get_nowait()
+            if not self._result_queue.empty():  # pyright: ignore[reportOptionalMemberAccess]
+                self._result = self._result_queue.get_nowait()  # pyright: ignore[reportOptionalMemberAccess]
             # 等待子进程资源释放
             self.log.debug("Waiting for %s", self._process)
             self._process.join()
@@ -232,7 +234,9 @@ class FileProcessorManager(LoggingMixin):
     :type _last_finish_time: dict[unicode, datetime]
     """
 
-    def __init__(self, file_directory, file_paths, parallelism, process_file_interval, max_runs, processor_factory):
+    def __init__(
+        self, file_directory, file_paths, parallelism, process_file_interval, max_runs, processor_factory
+    ) -> None:
         """
         :param file_directory: All
         files in file_paths should be under this directory
@@ -253,6 +257,8 @@ class FileProcessorManager(LoggingMixin):
         :type processor_factory: (unicode, unicode) -> (AbstractDagFileProcessor)
 
         """
+        super().__init__()
+
         # 文件的目录
         self._file_directory = file_directory
         # 需要处理的文件，每个文件启动一个文件处理器进程

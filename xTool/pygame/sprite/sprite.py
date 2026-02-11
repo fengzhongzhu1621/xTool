@@ -105,6 +105,7 @@ class Sprite(pygame.sprite.Sprite):
             self.facing = direction  # 更新面向方向
 
         # 根据方向移动玩家
+        print("direction * speed = ", direction * speed, direction, speed)
         self.rect.move_ip(direction * speed, 0)
         # 确保玩家不会移出屏幕
         if screen_rect:
@@ -177,3 +178,19 @@ class Sprite(pygame.sprite.Sprite):
         hitbox = self.rect.inflate(-5, -5)
         # 检查是否与目标矩形相交
         return hitbox.colliderect(target.rect)
+
+    def extract_image(self, src: Surface, x: int, y: int, width: int, height: int, colorkey, factor: float) -> Surface:
+        """从精灵表中提取图像并缩放"""
+        # 创建目标Surface对象
+        image = pygame.Surface([width, height])
+        rect = image.get_rect()
+
+        # 从源Surface中提取指定区域的图像
+        image.blit(src, (0, 0), (x, y, width, height))
+        # 设置透明色
+        image.set_colorkey(colorkey)
+        # 按比例缩放图像
+        if factor > 0 and factor != 1:
+            image = pygame.transform.scale(image, (int(rect.width * factor), int(rect.height * factor)))
+
+        return image

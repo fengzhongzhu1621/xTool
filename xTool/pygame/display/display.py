@@ -15,9 +15,16 @@ class DisplayWindow:
         self.fullscreen: bool = False  # 全屏状态
         self.screen: Surface = self.set_model()
         self.background: Surface = pygame.Surface(self.screen.get_size())
-
+        # 游戏时钟
+        self.clock = pygame.time.Clock()
+        # 标题
+        self.caption: str = ""
+        # 帧率
+        self.fps = 60
         # 全局计时器变量
         self.timer: int = 0
+        # 默认不显示 FPS
+        self.show_fps: bool = False
 
     def set_model(self, size: pygame.Rect | None = None, flags: int | None = None, depth: int | None = None) -> Surface:
         if size is not None:
@@ -104,9 +111,38 @@ class DisplayWindow:
         icon = pygame.transform.scale(surface, size)
         pygame.display.set_icon(icon)
 
-    def set_caption(self, title: str) -> None:
+    def set_caption(self, caption: str) -> None:
         """设置窗口标题"""
-        pygame.display.set_caption(title)
+        self.caption = caption
+        pygame.display.set_caption(self.caption)
+
+    def get_fps(self) -> float:
+        return self.clock.get_fps()
+
+    def set_fps(self, fps: int | None = None) -> None:
+        if fps is not None and fps > 0:
+            self.fps = fps
+        self.clock.tick(self.fps)
+
+    def toggle_show_fps(self, key: int):
+        """
+        切换FPS显示
+
+        参数:
+            key: 按下的键
+        """
+        if key == pygame.K_F5:
+            self.show_fps = not self.show_fps  # F5键切换FPS显示
+            if not self.show_fps:
+                # 如果不显示FPS，恢复原始标题
+                caption = self.caption
+            else:
+                fps = self.get_fps()  # 获取当前FPS
+                caption = "{} - {:.2f} FPS".format(self.caption, fps)  # 格式化FPS显示
+            pygame.display.set_caption(caption)
+
+    def set_allowed_events(self, events: list[int]) -> None:
+        pygame.event.set_allowed(events)
 
     def hide_mouse(self) -> None:
         """隐藏鼠标光标"""

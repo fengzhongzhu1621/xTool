@@ -2,17 +2,9 @@ import codecs
 import logging
 import os
 import sys
-
-from setuptools import find_packages
-
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
 from importlib import import_module
 
-from setuptools import Command, Extension
+from setuptools import Command, Extension, find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 try:
@@ -190,7 +182,7 @@ def do_setup():
         long_description_content_type="text/markdown",
         author="jinyinqiao",
         author_email="jinyinqiao@gmail.com",
-        license="Apache License 2.0",
+        license="MIT",
         packages=find_packages(exclude=["tests*"]),
         include_package_data=True,
         install_requires=install_requires,
